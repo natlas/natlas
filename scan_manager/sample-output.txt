@@ -1,0 +1,35 @@
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-12-23 17:47 PST
+Nmap scan report for google.com (216.58.192.14)
+Host is up (0.12s latency).
+rDNS record for 216.58.192.14: nuq04s29-in-f14.1e100.net
+Not shown: 998 filtered ports
+PORT    STATE SERVICE  VERSION
+80/tcp  open  http     Google httpd 2.0 (GFE)
+|_http-methods: No Allow or Public header in OPTIONS response (status code 405)
+| http-robots.txt: 258 disallowed entries (15 shown)
+| /search /sdch /groups /catalogs /catalogues /news /nwshp 
+| /setnewsprefs? /index.html? /? /?hl=*& /?hl=*&*&gws_rd=ssl 
+|_/addurl/image? /mail/ /pagead/
+| http-title: Google
+|_Requested resource was http://www.google.com/
+443/tcp open  ssl/http Google httpd 2.0 (GFE)
+|_http-methods: No Allow or Public header in OPTIONS response (status code 405)
+| http-robots.txt: 258 disallowed entries (15 shown)
+| /search /sdch /groups /catalogs /catalogues /news /nwshp 
+| /setnewsprefs? /index.html? /? /?hl=*& /?hl=*&*&gws_rd=ssl 
+|_/addurl/image? /mail/ /pagead/
+| http-title: Google
+|_Requested resource was https://www.google.com/
+| ssl-cert: Subject: commonName=*.google.com/organizationName=Google Inc/stateOrProvinceName=California/countryName=US
+| Not valid before: 2015-12-10T17:52:51+00:00
+|_Not valid after:  2016-03-09T00:00:00+00:00
+|_ssl-date: 2015-12-24T01:47:57+00:00; 0s from local time.
+| tls-nextprotoneg: 
+|   h2
+|   spdy/3.1
+|_  http/1.1
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 34.85 seconds
+
