@@ -60,11 +60,8 @@
     <div class="container-fluid">
       <div class="row">
 
-          {% if query != '' %}
-          <h2 class="sub-header">{{numresults}} search results for '{{query}}'</h2>
-          {% else %}
-          <h2 class="sub-header">{{numresults}} hosts scanned</h2>
-          {% endif %}
+          <h2 class="sub-header">Host information for '{{host}}'</h2>
+
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -74,18 +71,11 @@
                 </tr>
               </thead>
               <tbody>
-
-{% for host in hosts %}
-    <tr>
-      <td>
-      <h3><a href="host?h={{ host.ip }}">{{ host.ip }}</a></h3><br>
-      hostname: {{ host.hostname }}<br>
-      open ports: {{ host.ports }}
-      </td>
-      <td><pre>{{ host.data }}</pre></td>
-    </tr>
-{% endfor %}
-
+      {% if host_data|length > 0 %}
+      <br><pre>{{ host_data.0.data }}</pre>
+      {% else %}
+      wat?
+      {% endif %}
               </tbody>
             </table>
           </div>

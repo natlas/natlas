@@ -15,8 +15,18 @@ import traceback
 
 # Create your views here.
 
-def home(request):
-  return render(request,"base.html",{"content":"potato"})
+def host(request):
+
+  h = request.GET['h']
+
+  host_data = Host.objects.filter(ip=h)
+
+  context = {
+    'host': h,
+    'host_data' : host_data
+    }
+
+  return render(request,"host.html",context)
 
 def search(request):
   # https://djangosnippets.org/snippets/1961/ <-- search by subnet
