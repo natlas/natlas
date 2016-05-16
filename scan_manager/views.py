@@ -16,10 +16,12 @@ import traceback
 # Create your views here.
 
 def host(request):
-
-  h = request.GET['h']
-
-  host_data = Host.objects.filter(ip=h)
+  try:
+    h = request.GET['h']
+    host_data = Host.objects.filter(ip=h)
+  except:
+    h=""
+    host_data=""
 
   context = {
     'host': h,
