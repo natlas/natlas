@@ -7,14 +7,7 @@ import threading
 import multiprocessing
 import multiprocessing.pool
 
-scans=0
-total_threads=0
-
 def scan():
-  global scans
-  global total_threads
-  scans+=1
-
   # pull target
   server="http://127.0.0.1:8000"
   #server="https://nweb.io"
@@ -31,25 +24,20 @@ def scan():
   response=urllib2.urlopen(server+"/submit",data=out).read()
   print("response is:\n"+response)
 
-  scans-=1
-  total_threads-=1
-
-  #break
-  #time.sleep(5)
-
-#scan()
-
 max_threads=30
-pool = multiprocessing.pool.ThreadPool(max_threads)
-#help(pool)
 
 while True:
-  if total_threads>max_threads+10:
-    time.sleep(5)
-    continue
-  print "new thread created .."
-  total_threads+=1
-  pool.apply_async(scan)
-  print "running scans: "+str(scans)
-  print "total threads: "+str(total_threads)
+  if threading.active_count() < max_threads:
+    notifylock=False
+    print "number of threads : "+str(threading.active_count())
+    t = threading.Thread(target=scan)
+    t.start()
+    time.sleep(1)
+  else:
+    if notifylock is False:
+      print "too many threads .. waiting"
+    notifylock=True
+  
   time.sleep(1)
+
+
