@@ -75,7 +75,7 @@ def search(request):
   context = {
     'query': q,
     'net':net ,
-    'numresults': len(search) ,
+    'numresults': search.count() ,
     #'numresults': 0 ,
     'page':page ,
     'hosts': search[page*count:page*count+count] }
