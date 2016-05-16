@@ -78,7 +78,7 @@ def search(request):
     'numresults': len(search) ,
     #'numresults': 0 ,
     'page':page ,
-    'hosts': search[page*count:page*20+count] }
+    'hosts': search[page*count:page*count+count] }
 
   try:
     print("potato")
