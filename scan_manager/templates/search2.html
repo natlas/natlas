@@ -61,7 +61,9 @@
       <div class="row">
 
           {% if query != '' %}
-          <h2 class="sub-header">{{numresults}} search results for '{{query}}'</h2>
+          <h2 class="sub-header">{{numresults}} search results for '{{query}}'
+          <a href="?q={{query}}&net={{net}}&page={{page|add:"1"}}"> [next page]</a>
+          <a href="?q={{query}}&net={{net}}&page={{page}}&f=hostlist"> [hostlist]</a></h2>
           {% else %}
           <h2 class="sub-header">{{numresults}} hosts scanned</h2>
           {% endif %}
