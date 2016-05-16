@@ -71,7 +71,14 @@ def getwork(request):
   random.seed(os.urandom(200))
 
   scope=[]
-  scope.append(IPNetwork("0.0.0.0/0"))
+  try:
+    for line in open("scope.txt"):
+      scope.append(IPNetwork(line))
+
+  except:
+    print("failed to parse scope.txt")
+    scope=[]
+    scope.append(IPNetwork("0.0.0.0/0"))
 
   # how many hosts are in scope?
   magnitude = sum(len(network) for network in scope)
