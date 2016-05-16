@@ -31,11 +31,27 @@ def host(request):
 def search(request):
   # https://djangosnippets.org/snippets/1961/ <-- search by subnet
 
+  # figure out how many results to return per page
+  try:
+    count = int(request.GET['count'])
+  except:
+    count=100
+
+  # too small
+  if count < 1:
+    count = 100
+
+  # okay, count should never be greater than 10,000
+  if count>10000:
+    count = 10000
+
+  # which page are we looking on?
   try:
     page = int(request.GET['page'])
   except:
     page = 0
 
+  # figure out the search query
   try:
     q = request.GET['q']
   except:
@@ -62,8 +78,20 @@ def search(request):
     'numresults': len(search) ,
     #'numresults': 0 ,
     'page':page ,
-    'hosts': search[page*20:page*20+20] }
+    'hosts': search[page*count:page*20+count] }
+
+  try:
+    print("potato")
+    fmt=request.GET['f']
+    print(fmt)
+    return render(request,"hostlist.html",context)
+  except:
+    print("boo")
+    fmt=""
+
   return render(request,"search2.html",context)
+
+
   #return render(request,"search.html",context)
 
 def getwork(request):
