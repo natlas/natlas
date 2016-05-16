@@ -32,7 +32,6 @@ while True:
     print "number of threads : "+str(threading.active_count())
     t = threading.Thread(target=scan)
     t.start()
-    time.sleep(1)
   else:
     if notifylock is False:
       print "too many threads .. waiting"
