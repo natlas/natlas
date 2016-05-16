@@ -1,6 +1,9 @@
 def get_ip(data):
   # second row, 6th column, cut off parens
-  return data.split('\n')[2].split(' ')[5][1:-1]
+  try:
+    return data.split('\n')[2].split(' ')[5][1:-1]
+  except:
+    return data.split('\n')[2].split(' ')[4]
 
 def get_hostname(data):
   # second row, 5th column
