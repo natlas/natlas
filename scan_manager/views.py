@@ -144,6 +144,10 @@ def submit(request):
   if len(ports) == 0:
     return HttpResponse("no open ports!")
 
+  if len(ports) > 500:
+    return HttpResponse("something's fuckey..")
+
+
   newhost, created=Host.objects.get_or_create(ip=ip)
   newhost.hostname = hostname
   newhost.ports = ports
