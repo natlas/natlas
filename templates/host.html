@@ -60,7 +60,7 @@
     <div class="container-fluid">
       <div class="row">
 
-          <h2 class="sub-header">Host information for '{{host}}'</h2>
+          <h2 class="sub-header">Host information for '{{hostname}}'</h2>
 
           <div class="table-responsive">
             <table class="table table-striped">
@@ -71,8 +71,8 @@
                 </tr>
               </thead>
               <tbody>
-      {% if host_data|length > 0 %}
-      <br><pre>{{ host_data.0.data }}</pre>
+      {% if nmap_data|length > 0 %}
+      <br><pre>{{ nmap_data }}</pre>
       {% else %}
       wat?
       {% endif %}

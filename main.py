@@ -19,25 +19,16 @@ import random
 import sys
 import traceback
 
-import model as nweb
+import models as nweb
 
 # Create your views here.
 
 @app.route('/host')
 def host():
-  try:
-    h = request.GET['h']
-    host_data = Host.objects.filter(ip=h)
-  except:
-    h=""
-    host_data=""
+  h = request.args.get('h')
+  context=nweb.gethost(h)
 
-  context = {
-    'host': h,
-    'host_data' : host_data
-    }
-
-  return render_template("host.html")
+  return render_template("host.html",**context)
 
 @app.route('/')
 def search():
