@@ -2,18 +2,19 @@
 
 def search(query):
   result=[]
-  item={}
-  item["ip"]="6.6.6.6"
-  item["hostname"]="potato.potato"
-  item["ports"]="666"
-  item["nmap_data"]="there may be something here some day"
-  result.append(item)
+  item1={}
+  item1["ip"]="6.6.6.6"
+  item1["hostname"]="potato.potato"
+  item1["ports"]="666"
+  item1["nmap_data"]="there may be something here some day"
+  result.append(item1)
 
-  item["ip"]="7.7.7.7"
-  item["hostname"]="potato2.potato"
-  item["ports"]="777"
-  item["nmap_data"]="there will never be anything here"
-  result.append(item)
+  item2={}
+  item2["ip"]="7.7.7.7"
+  item2["hostname"]="potato2.potato"
+  item2["ports"]="777"
+  item2["nmap_data"]="there will never be anything here"
+  result.append(item2)
 
   return result
 

@@ -5,7 +5,7 @@ hello
 <h1>{{ query }}</h1>
 
 {% for host in hosts %}
-    <li><pre>{{ host.ip}}<br>{{ host.data }}</pre></li>
+    <li><pre>{{ host.ip }}<br>{{ host.nmap_data }}</pre></li>
 {% endfor %}
 
 </html>

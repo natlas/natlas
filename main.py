@@ -26,12 +26,13 @@ import models as nweb
 @app.route('/host')
 def host():
   h = request.args.get('h')
-  context=nweb.gethost(h)
-
+  context = nweb.gethost(h)
   return render_template("host.html",**context)
 
 @app.route('/')
 def search():
+  q = request.args.get('q')
+  f = request.args.get('f')
 
   try:
     print("potato")
@@ -43,7 +44,8 @@ def search():
     print("boo")
     fmt=""
 
-  return render_template("search.html")
+  context = nweb.search(q)
+  return render_template("search.html",hosts=context)
 
 
   #return render(request,"search.html",context)
