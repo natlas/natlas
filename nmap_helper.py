@@ -1,13 +1,14 @@
 def get_ip(data):
+  # print(data)
   # second row, 6th column, cut off parens
   try:
-    return data.split('\n')[2].split(' ')[5][1:-1]
+    return data.split('\n')[1].split(' ')[5][1:-1]
   except:
-    return data.split('\n')[2].split(' ')[4]
+    return data.split('\n')[1].split(' ')[4]
 
 def get_hostname(data):
   # second row, 5th column
-  return data.split('\n')[2].split(' ')[4]
+  return data.split('\n')[1].split(' ')[4]
 
 def get_ports(data):
   ports = []
