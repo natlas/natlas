@@ -9,6 +9,7 @@ import flask
 from flask import render_template
 from flask import request
 from flask import Flask
+from flask import g
 app = Flask(__name__,static_url_path='/static')
 
 from netaddr import *
@@ -18,12 +19,28 @@ import json
 import random
 import sys
 import traceback
+import sqlite3
 
 import models as nweb
 from nmap_helper import * # get_ip etc
 
-# Create your views here.
+@app.teardown_appcontext
+def close_db(error):
+    """Closes the database again at the end of the request."""
+    if hasattr(g, 'nweb.db'):
+        g.nweb_db.close()
 
+@app.cli.command('initdb')
+def initdb_command():
+    """Initializes the database."""
+    nweb.init_db()
+    print('Initialized the database.')
+
+@app.cli.command('corpus')
+def add_corpus():
+  nweb.add_corpus()
+
+# Create your views here.
 @app.route('/host')
 def host():
   h = request.args.get('h')

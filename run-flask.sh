@@ -28,6 +28,11 @@ source venv/bin/activate
 pip3 install flask
 pip3 install netaddr
 
+if [ ! -e nweb.db ]
+then
+    flask initdb
+fi
+
 while [ 1 == 1 ]
 do
   echo `date` >> start.log
