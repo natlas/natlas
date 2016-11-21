@@ -43,14 +43,13 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Dashboard</a></li>
+         <!--   <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
-            <li><a href="#">Help</a></li>
+            <li><a href="#">Help</a></li> -->
           </ul>
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" value="{{query}}" name="q" placeholder="Search..." />
-            <input type="text" class="form-control" value="{{net}}" name="net" placeholder="Subnet..." />
 						<input type="submit" value="" style="display: none"/>
           </form>
         </div>
@@ -62,8 +61,6 @@
 
           {% if query != '' %}
           <h2 class="sub-header">{{numresults}} search results for '{{query}}'
-          <a href="?q={{query}}&net={{net}}&page={{page|add:"1"}}"> [next page]</a>
-          <a href="?q={{query}}&net={{net}}&page={{page}}&f=hostlist"> [hostlist]</a></h2>
           {% else %}
           <h2 class="sub-header">{{numresults}} hosts scanned</h2>
           {% endif %}
@@ -84,7 +81,7 @@
       hostname: {{ host.hostname }}<br>
       open ports: {{ host.ports }}
       </td>
-      <td><pre>{{ host.data }}</pre></td>
+      <td><pre>{{ host.nmap_data }}</pre></td>
     </tr>
 {% endfor %}
 

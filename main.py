@@ -45,7 +45,7 @@ def search():
     fmt=""
 
   context = nweb.search(q)
-  return render_template("search.html",hosts=context)
+  return render_template("search2.html",query=q, numhost=len(context), hosts=context)
 
 
   #return render(request,"search.html",context)
