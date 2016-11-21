@@ -40,12 +40,12 @@ def scan():
 
   result={}
   for ext in 'nmap','gnmap','xml':
-    result[ext+"_data"]=open("nweb."+rand+"."+ext).readlines()
+    result[ext+"_data"]=open("nweb."+rand+"."+ext).read()
     os.remove("nweb."+rand+"."+ext)
     print("sending and deleting nweb."+rand+"."+ext)
 
   # submit result
-  response=requests.post(server+"/submit",data=json.dumps(result)).text
+  response=requests.post(server+"/submit",json=json.dumps(result)).text
   print("response is:\n"+response)
 
 max_threads=10

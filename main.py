@@ -4,7 +4,6 @@
 #from django.views.decorators.csrf import csrf_exempt
 
 #from scan_manager.models import Host
-#from scan_manager.nmap_helper import * # get_ip etc
 
 import flask
 from flask import render_template
@@ -15,11 +14,13 @@ app = Flask(__name__,static_url_path='/static')
 from netaddr import *
 import time
 import os
+import json
 import random
 import sys
 import traceback
 
 import models as nweb
+from nmap_helper import * # get_ip etc
 
 # Create your views here.
 
@@ -85,34 +86,29 @@ def getwork():
 @app.route('/submit',methods=['POST'])
 def submit():
 
-  data = str(request.data)
-  data = data.replace('\\n','\n') # this is stupid
+  data = request.get_json()
+  #data = data.replace('\\n','\n') # this is stupid
 
-  print("what do we have here??\n"+data)
+  newhost={}
+  newhost=json.loads(data)
 
-  return "gee thanks"
+  #print("what do we have here??\n"+str(newhost['nmap_data']))
 
   try:
-    ip = get_ip(data)
-    hostname = get_hostname(data)
-    ports = get_ports(data)
-    country = get_country(ip)
+    newhost['ip'] = get_ip(newhost['nmap_data'])
+    newhost['hostname'] = get_hostname(newhost['nmap_data'])
+    newhost['ports'] = str(get_ports(newhost['nmap_data']))
+    #country = get_country(ip)
   except Exception as e:
-    return HttpResponse("you fucked it up!\n"+str(traceback.format_exc()))
+    return "you fucked it up!\n"+str(traceback.format_exc())
 
-  if len(ports) == 0:
-    return HttpResponse("no open ports!")
+  if len(newhost['ports']) == 0:
+    return "no open ports!"
 
-  if len(ports) > 500:
-    return HttpResponse("something's fuckey..")
+  if len(newhost['ports']) > 500:
+    return "something's fuckey.."
 
+  nweb.newhost(newhost)
 
-  newhost, created=Host.objects.get_or_create(ip=ip)
-  newhost.hostname = hostname
-  newhost.ports = ports
-  newhost.country = country
-  newhost.data = request.body
-  newhost.save()
-
-  return HttpResponse("ip: "+ip+"\nhostname: "+hostname+"\nports: "+str(ports))
+  return "ip: "+newhost['ip']+"\nhostname: "+newhost['hostname']+"\nports: "+newhost['ports']
 
