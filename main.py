@@ -1,13 +1,19 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
+#from django.shortcuts import render
+#from django.http import HttpResponse
+#from django.views.decorators.http import require_http_methods
+#from django.views.decorators.csrf import csrf_exempt
 
-from scan_manager.models import Host
+#from scan_manager.models import Host
+#from scan_manager.nmap_helper import * # get_ip etc
 
-from scan_manager.nmap_helper import * # get_ip etc
+import flask
+from flask import render_template
+from flask import request
+from flask import Flask
+app = Flask(__name__,static_url_path='/static')
 
 from netaddr import *
+import time
 import os
 import random
 import sys
@@ -15,7 +21,8 @@ import traceback
 
 # Create your views here.
 
-def host(request):
+@app.route('/host')
+def host():
   try:
     h = request.GET['h']
     host_data = Host.objects.filter(ip=h)
@@ -28,9 +35,10 @@ def host(request):
     'host_data' : host_data
     }
 
-  return render(request,"host.html",context)
+  return render_template("host.html")
 
-def search(request):
+@app.route('/')
+def search():
   # https://djangosnippets.org/snippets/1961/ <-- search by subnet
 
   # figure out how many results to return per page
@@ -64,40 +72,42 @@ def search(request):
   except:
     net = IPNetwork("0.0.0.0/0")
 
-  search = Host.objects.order_by('-mtime')
+  #search = Host.objects.order_by('-mtime')
 
-  if len(q) > 2:
-    search = search.filter(data__search=q)
+  #if len(q) > 2:
+  #  search = search.filter(data__search=q)
 
   # only apply filter for class b or smaller
-  if len(net)<=65536:
-    iplist = [ str(x) for x in list(net) ]
-    search = search.filter(ip__in=iplist)
+  #if len(net)<=65536:
+  #  iplist = [ str(x) for x in list(net) ]
+  #  search = search.filter(ip__in=iplist)
 
-  context = {
-    'query': q,
-    'net':net ,
-    'numresults': search.count() ,
-    #'numresults': 0 ,
-    'page':page ,
-    'hosts': search[page*count:page*count+count] }
+  #context = {
+  #  'query': q,
+  #  'net':net ,
+  #  'numresults': search.count() ,
+  #  #'numresults': 0 ,
+  #  'page':page ,
+  #  'hosts': search[page*count:page*count+count] }
 
   try:
     print("potato")
     fmt=request.GET['f']
     print(fmt)
-    return render(request,"hostlist.html",context)
+    return render_template("hostlist.html")
+    #return render(request,"hostlist.html",context)
   except:
     print("boo")
     fmt=""
 
-  return render(request,"search2.html",context)
+  return render_template("search.html")
 
 
   #return render(request,"search.html",context)
 
-def getwork(request):
-
+@app.route('/getwork')
+def getwork():
+  print("getting work")
   random.seed(os.urandom(200))
 
   scope=[]
@@ -125,9 +135,9 @@ def getwork(request):
       break
 
   #return HttpResponse("google.com")
-  return HttpResponse(target)
+  return str(target)
 
-@csrf_exempt
+@app.route('/submit')
 def submit(request):
 
   data = str(request.body)

@@ -1,16 +1,29 @@
-from django.db import models
-
 # Create your models here.
 
-class Host(models.Model):
-  #ip = models.IPAddressField(unique=True)
-  ip = models.GenericIPAddressField(unique=True)
-  hostname = models.TextField()
-  country = models.TextField()
+def search(query)
+  result=[]
+  item={}
+  item["ip"]="6.6.6.6"
+  item["hostname"]="potato.potato"
+  item["ports"]="666"
+  item["nmap_data"]="there may be something here some day"
+  result.append(item)
 
-  ports = models.CommaSeparatedIntegerField(max_length=65535)
-  data = models.TextField()
+  item["ip"]="7.7.7.7"
+  item["hostname"]="potato2.potato"
+  item["ports"]="777"
+  item["nmap_data"]="there will never be anything here"
+  result.append(item)
 
-  ctime = models.DateTimeField(auto_now_add=True, auto_now=False)
-  mtime = models.DateTimeField(auto_now_add=False, auto_now=True)
+  return result
 
+def newhost(host)
+  print("thanks for the new host "+host["hostname"]+" from "+host["ip"])
+
+def gethost(ip)
+  item={}
+  item["ip"]="8.8.8.8"
+  item["hostname"]="potato3.potato"
+  item["ports"]="8888"
+  item["nmap_data"]="NOOOPE"
+  return
