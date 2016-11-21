@@ -19,6 +19,8 @@ import random
 import sys
 import traceback
 
+import model as nweb
+
 # Create your views here.
 
 @app.route('/host')
@@ -39,56 +41,6 @@ def host():
 
 @app.route('/')
 def search():
-  # https://djangosnippets.org/snippets/1961/ <-- search by subnet
-
-  # figure out how many results to return per page
-  try:
-    count = int(request.GET['count'])
-  except:
-    count=100
-
-  # too small
-  if count < 1:
-    count = 100
-
-  # okay, count should never be greater than 10,000
-  if count>10000:
-    count = 10000
-
-  # which page are we looking on?
-  try:
-    page = int(request.GET['page'])
-  except:
-    page = 0
-
-  # figure out the search query
-  try:
-    q = request.GET['q']
-  except:
-    q = ""
-
-  try:
-    net = IPNetwork(request.GET['net'])
-  except:
-    net = IPNetwork("0.0.0.0/0")
-
-  #search = Host.objects.order_by('-mtime')
-
-  #if len(q) > 2:
-  #  search = search.filter(data__search=q)
-
-  # only apply filter for class b or smaller
-  #if len(net)<=65536:
-  #  iplist = [ str(x) for x in list(net) ]
-  #  search = search.filter(ip__in=iplist)
-
-  #context = {
-  #  'query': q,
-  #  'net':net ,
-  #  'numresults': search.count() ,
-  #  #'numresults': 0 ,
-  #  'page':page ,
-  #  'hosts': search[page*count:page*count+count] }
 
   try:
     print("potato")
