@@ -82,11 +82,15 @@ def getwork():
   #return HttpResponse("google.com")
   return str(target)
 
-@app.route('/submit')
-def submit(request):
+@app.route('/submit',methods=['POST'])
+def submit():
 
-  data = str(request.body)
+  data = str(request.data)
   data = data.replace('\\n','\n') # this is stupid
+
+  print("what do we have here??\n"+data)
+
+  return "gee thanks"
 
   try:
     ip = get_ip(data)
