@@ -3,6 +3,7 @@ import sqlite3
 import os
 import random
 import re
+import time
 from datetime import datetime
 
 # Create your models here.
@@ -65,10 +66,13 @@ def create_sighting(nmap, gnmap, xml, lie_time=None, lie_ip=None):
        mtime = row[0][1]
        print("found host_id %s" % host_id)
     sql = 'insert into sightings ' \
-          '(host_id, ports, nmap_data, gnmap_data, xml_data, ctime) ' \
-          'values (?, ?, ?, ?, ?, ?)'
+          '(host_id, hostname, ports, nmap_data, gnmap_data, xml_data, ctime) ' \
+          'values (?, ?, ?, ?, ?, ?, ?)'
     cur = db.cursor()
-    cur.execute(sql, (host_id, "FIXME NOT IMPLEMENTED", nmap, gnmap, xml, ctime))
+    cur.execute(sql, (host_id,
+                      "not.working", "FIXME NOT IMPLEMENTED",
+                      nmap, gnmap, xml,
+                      ctime))
     sql = 'insert into sightings_fts(sightings_fts) values ("REBUILD")'
     cur.execute(sql)
     if ctime > mtime:
@@ -111,7 +115,7 @@ def add_corpus():
 def search(query):
     sql = 'select ' \
           'hosts.id, hosts.ip, hosts.ctime, hosts.mtime, '\
-          'sightings.id, sightings.host_id, sightings.ports, '\
+          'sightings.id, sightings.hostname, sightings.host_id, sightings.ports, '\
           'sightings.nmap_data, sightings.gnmap_data, ' \
           'sightings.xml_data, sightings.ctime ' \
           'from hosts ' \
@@ -125,13 +129,49 @@ def search(query):
     for entry in entries:
         item = {}
         item["ip"] = entry["ip"]
-        item["hostname"] = "potato.potato"
+        item["hostname"] = entry["hostname"]
         item["ports"] = entry["ports"]
         item["nmap_data"] = entry["nmap_data"]
         result.append(item)
     return result
 
 def newhost(host):
+    db = get_db()
+    ip = host["ip"]
+    sql = 'select id, mtime from hosts where ip = ?'
+    cur = db.execute(sql, (ip,))
+    row = cur.fetchall()
+    c_time = int(time.time())
+    if len(row) == 0:
+        # need to insert
+        sql = 'insert into hosts ' \
+              '(ip, ctime, mtime) ' \
+              'values (?, ?, ?)'
+        cur = db.cursor()
+        cur.execute(sql, (ip, c_time, c_time))
+        host_id = cur.lastrowid
+        m_time = c_time
+    else:
+       host_id = row[0][0]
+       m_time = row[0][1]
+    sql = 'insert into sightings ' \
+          '(host_id, hostname, ports, nmap_data, gnmap_data, xml_data, ctime) ' \
+          'values (?, ?, ?, ?, ?, ?, ?)'
+    cur = db.cursor()
+    cur.execute(sql, (host_id,
+                      host["ports"],
+                      host["hostname"],
+                      host["nmap_data"],
+                      host["gnmap_data"],
+                      host["xml_data"],
+                      c_time))
+    sql = 'insert into sightings_fts(sightings_fts) values ("REBUILD")'
+    cur.execute(sql)
+    if c_time > m_time:
+        # if we're seeing the host at a time later than we have before, update m_time
+        sql = 'update hosts SET m_time = ? where id = ?'
+        cur.execute(sql, (c_time, host_id))
+    db.commit()
     print("thanks for the new host "+host["hostname"]+" from "+host["ip"])
 
 def gethost(ip):
@@ -149,7 +189,7 @@ def gethost(ip):
     if len(entries) == 1:
         entry = entries[0]
         item["ip"] = entry["ip"]
-        item["hostname"] = "potato.potato"
+        item["hostname"] = entry["hostname"]
         item["ports"] = entry["ports"]
         item["nmap_data"] = entry["nmap_data"]
     return item

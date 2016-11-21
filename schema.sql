@@ -10,6 +10,7 @@ create table sightings (
        id integer primary key autoincrement,
        host_id integer,
        ports text not null,
+       hostname txt,
        nmap_data text not null,
        gnmap_data text,
        xml_data text,
