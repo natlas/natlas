@@ -147,11 +147,11 @@ def gethost(ip):
     assert len(entries) <= 1
     item = {}
     if len(entries) == 1:
-        print(entries[0].keys())
-        item["ip"] = '8.8.8.8.'
-        item["hostname"] = "potato3.potato"
-        item["ports"]="8888"
-        item["nmap_data"]="NOOOPE"
+        entry = entries[0]
+        item["ip"] = entry["ip"]
+        item["hostname"] = "potato.potato"
+        item["ports"] = entry["ports"]
+        item["nmap_data"] = entry["nmap_data"]
     return item
 
 #
