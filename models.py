@@ -112,7 +112,7 @@ def add_corpus():
                 rando_ctime = real_ctime - random.randrange(3600, 3600*24*365)
                 create_sighting(nmap, xml, gnmap, rando_ctime, rando_ip)
 
-def search(query):
+def search(query,limit,offset):
     sql = 'select ' \
           'hosts.id, hosts.ip, hosts.ctime, hosts.mtime, '\
           'sightings.id, sightings.hostname, sightings.host_id, sightings.ports, '\
@@ -128,12 +128,12 @@ def search(query):
                'sightings.id = sightings_fts.rowid ' \
                'where sightings.ctime = hosts.mtime ' \
                'and sightings_fts.nmap_data match ? '
-    sql += 'order by hosts.mtime desc'
+    sql += 'order by hosts.mtime desc limit ? offset ?'
     db = get_db()
     cur = None
     start = time.time()
     if query:
-        cur = db.cursor().execute(sql, (query,))
+        cur = db.cursor().execute(sql, (query,limit,offset))
     else:
         cur = db.cursor().execute(sql)
     entries = cur.fetchall()

@@ -51,6 +51,10 @@ def host():
 def search():
   q = request.args.get('q')
   f = request.args.get('f')
+  try:
+    p = int(request.args.get('p'))
+  except:
+    p = 0
 
   try:
     print("potato")
@@ -62,7 +66,7 @@ def search():
     print("boo")
     fmt=""
 
-  context = nweb.search(q)
+  context = nweb.search(q,100,100*int(str(p)))
   return render_template("search2.html",query=q, numhost=len(context), hosts=context)
 
 
