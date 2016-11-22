@@ -119,7 +119,7 @@ def submit():
   except Exception as e:
     return "you fucked it up!\n"+str(traceback.format_exc())
 
-  if len(newhost['ports']) == 0:
+  if len(newhost['ports']) == 2:
     return "no open ports!"
 
   if len(newhost['ports']) > 500:
