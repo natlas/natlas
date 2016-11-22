@@ -50,6 +50,8 @@ def host():
 @app.route('/')
 def search():
   q = request.args.get('q')
+  if not q:
+    q=''
   f = request.args.get('f')
   try:
     p = int(request.args.get('p'))
