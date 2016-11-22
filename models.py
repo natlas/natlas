@@ -135,7 +135,7 @@ def search(query,limit,offset):
     if query:
         cur = db.cursor().execute(sql, (query,limit,offset))
     else:
-        cur = db.cursor().execute(sql)
+        cur = db.cursor().execute(sql, (limit,offset))
     entries = cur.fetchall()
     end = time.time()
     print("search took %f seconds" % float(end-start))
