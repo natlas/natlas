@@ -117,14 +117,28 @@ def search(query):
           'hosts.id, hosts.ip, hosts.ctime, hosts.mtime, '\
           'sightings.id, sightings.hostname, sightings.host_id, sightings.ports, '\
           'sightings.nmap_data, sightings.gnmap_data, ' \
-          'sightings.xml_data, sightings.ctime ' \
-          'from hosts ' \
-          'inner join sightings on ' \
-          'hosts.id = sightings.host_id ' \
-          'where sightings.ctime = hosts.mtime'
+          'sightings.xml_data, sightings.ctime '
+    if query:
+        sql += ',sightings_fts.rowid, sightings_fts.nmap_data '
+    sql += 'from hosts ' \
+           'inner join sightings on ' \
+           'hosts.id = sightings.host_id '
+    if query:
+        sql += 'inner join sightings_fts on ' \
+               'sightings.id = sightings_fts.rowid ' \
+               'where sightings.ctime = hosts.mtime ' \
+               'and sightings_fts.nmap_data match ? '
+    sql += 'order by hosts.mtime desc'
     db = get_db()
-    cur = db.cursor().execute(sql)
+    cur = None
+    start = time.time()
+    if query:
+        cur = db.cursor().execute(sql, (query,))
+    else:
+        cur = db.cursor().execute(sql)
     entries = cur.fetchall()
+    end = time.time()
+    print("search took %f seconds" % float(end-start))
     result=[]
     for entry in entries:
         item = {}
@@ -159,8 +173,8 @@ def newhost(host):
           'values (?, ?, ?, ?, ?, ?, ?)'
     cur = db.cursor()
     cur.execute(sql, (host_id,
-                      host["ports"],
                       host["hostname"],
+                      host["ports"],
                       host["nmap_data"],
                       host["gnmap_data"],
                       host["xml_data"],
@@ -169,7 +183,7 @@ def newhost(host):
     cur.execute(sql)
     if c_time > m_time:
         # if we're seeing the host at a time later than we have before, update m_time
-        sql = 'update hosts SET m_time = ? where id = ?'
+        sql = 'update hosts SET mtime = ? where id = ?'
         cur.execute(sql, (c_time, host_id))
     db.commit()
     print("thanks for the new host "+host["hostname"]+" from "+host["ip"])
