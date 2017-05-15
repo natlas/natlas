@@ -83,28 +83,43 @@ def getwork():
   try:
     for line in open("scope.txt"):
       scope.append(IPNetwork(line))
-
   except:
     print("failed to parse scope.txt")
     scope=[]
     scope.append(IPNetwork("0.0.0.0/0"))
 
+  blacklist=[]
+  try:
+    for line in open("blacklist.txt"):
+      blacklist.append(IPNetwork(line))
+  except Exception as e:
+    print("failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
+    blacklist=[]
+
   # how many hosts are in scope?
   magnitude = sum(len(network) for network in scope)
-  
-  # pick one
-  index = random.randint(0,magnitude-1);
 
-  target=""
-  for network in scope:
-    if index>=len(network):
-      index-=len(network)
-    else:
-      target=network[index]
-      break
+  attempts=0
+  while attempts<1000:
+    # pick one
+    index = random.randint(0,magnitude-1);
+    attempts = attempts+1
 
-  #return HttpResponse("google.com")
-  return str(target)
+    target=""
+    for network in scope:
+      if index>=len(network):
+        index-=len(network)
+      else:
+        #target=network[index]
+        isgood=True
+        for badnet in blacklist: # run through the blacklist looking for match
+          if network[index] in badnet:
+            #print("the ip is in the blacklist! "+str(network[index]))
+            isgood=False
+        if isgood:
+          #print("the ip is not in the blacklist! "+str(network[index]))
+          return str(network[index])
+  return "none"
 
 @app.route('/submit',methods=['POST'])
 def submit():
