@@ -33,15 +33,15 @@ def scan():
   # scan server 
   rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
   print("random value is "+rand)
-  process = subprocess.Popen(["nmap","-oA","nweb."+rand,"-A","-open",target],stdout=subprocess.PIPE)
+  process = subprocess.Popen(["nmap","-oA","data/nweb."+rand,"-A","-open",target],stdout=subprocess.PIPE)
   out, err = process.communicate()
   print("scan complete, nice")
   #print(out)
 
   result={}
   for ext in 'nmap','gnmap','xml':
-    result[ext+"_data"]=open("nweb."+rand+"."+ext).read()
-    os.remove("nweb."+rand+"."+ext)
+    result[ext+"_data"]=open("data/nweb."+rand+"."+ext).read()
+    os.remove("data/nweb."+rand+"."+ext)
     print("sending and deleting nweb."+rand+"."+ext)
 
   # submit result
