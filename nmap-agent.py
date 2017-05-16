@@ -34,7 +34,15 @@ def scan():
   rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
   print("random value is "+rand)
   process = subprocess.Popen(["nmap","-oA","data/nweb."+rand,"-A","-open",target],stdout=subprocess.PIPE)
-  out, err = process.communicate()
+  try:
+    out, err = process.communicate(timeout=360) # 6 minutes
+  except:
+    try:
+      print("killing slacker process")
+      process.kill()
+    except:
+      print("okay, seems like it was already dead")
+
   print("scan complete, nice")
   #print(out)
 
