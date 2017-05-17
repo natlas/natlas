@@ -132,11 +132,15 @@ def search(query,limit,offset):
     db = get_db()
     cur = None
     start = time.time()
+    count = 0
     if query:
+        count = len(db.cursor().execute(sql, (query,100000,offset)).fetchall())
         cur = db.cursor().execute(sql, (query,limit,offset))
     else:
+        count = len(db.cursor().execute(sql, (100000,offset)).fetchall())
         cur = db.cursor().execute(sql, (limit,offset))
-    entries = cur.fetchall()
+
+    entries = cur.fetchmany(limit)
     end = time.time()
     print("search took %f seconds" % float(end-start))
     result=[]
@@ -147,7 +151,7 @@ def search(query,limit,offset):
         item["ports"] = entry["ports"]
         item["nmap_data"] = entry["nmap_data"]
         result.append(item)
-    return result
+    return count,result
 
 def newhost(host):
     db = get_db()
