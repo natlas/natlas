@@ -21,7 +21,7 @@ import sys
 import traceback
 import sqlite3
 
-import models as nweb
+import models_sqlite as nweb
 from nmap_helper import * # get_ip etc
 
 @app.teardown_appcontext
@@ -100,6 +100,8 @@ def getwork():
   magnitude = sum(len(network) for network in scope)
 
   attempts=0
+  work = {}
+  work['type']='nmap'
   while attempts<1000:
     # pick one
     index = random.randint(0,magnitude-1);
@@ -118,7 +120,8 @@ def getwork():
             isgood=False
         if isgood:
           #print("the ip is not in the blacklist! "+str(network[index]))
-          return str(network[index])
+          work['target']=str(network[index])
+          return json.dumps(work)
   return "none"
 
 @app.route('/submit',methods=['POST'])

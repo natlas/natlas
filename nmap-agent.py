@@ -23,7 +23,7 @@ def scan():
   # pull target
   server="http://127.0.0.1:5000"
   #server="https://nweb.io"
-  target = requests.get(server+"/getwork").text
+  target = json.loads(requests.get(server+"/getwork").text)["target"]
   print("target is "+target)
 
   #if ipaddress.ip_address(target).is_private:
