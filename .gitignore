@@ -1,3 +1,5 @@
+scope.txt
+blacklist.txt
 venv
 *~
 __pycache__
