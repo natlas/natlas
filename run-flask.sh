@@ -27,6 +27,7 @@ fi
 source venv/bin/activate
 pip3 install flask
 pip3 install netaddr
+pip3 install elasticsearch
 
 if [ ! -e nweb.db ]
 then
