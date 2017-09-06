@@ -17,21 +17,7 @@ import sqlite3
 import models_elastic as nweb
 from nmap_helper import * # get_ip etc
 
-@app.teardown_appcontext
-def close_db(error):
-    """Closes the database again at the end of the request."""
-    if hasattr(g, 'nweb.db'):
-        g.nweb_db.close()
-
-@app.cli.command('initdb')
-def initdb_command():
-    """Initializes the database."""
-    nweb.init_db()
-    print('Initialized the database.')
-
-@app.cli.command('corpus')
-def add_corpus():
-  nweb.add_corpus()
+from datetime import datetime
 
 # Create your views here.
 @app.route('/host')
@@ -132,6 +118,7 @@ def submit():
     newhost['ip'] = get_ip(newhost['nmap_data'])
     newhost['hostname'] = get_hostname(newhost['nmap_data'])
     newhost['ports'] = str(get_ports(newhost['nmap_data']))
+    newhost['ctime'] = datetime.now()
     #country = get_country(ip)
   except Exception as e:
     return "you fucked it up!\n"+str(traceback.format_exc())

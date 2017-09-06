@@ -56,10 +56,11 @@ def scan():
   response=requests.post(server+"/submit",json=json.dumps(result)).text
   print("response is:\n"+response)
 
-max_threads=10
+max_threads=5
 
-scan()
-exit()
+# uncomment these to test (run single scan)
+#scan()
+#exit()
 
 while True:
   if threading.active_count() < max_threads:
