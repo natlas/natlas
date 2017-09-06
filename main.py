@@ -14,7 +14,7 @@ import sys
 import traceback
 import sqlite3
 
-import models_sqlite as nweb
+import models_elastic as nweb
 from nmap_helper import * # get_ip etc
 
 @app.teardown_appcontext
