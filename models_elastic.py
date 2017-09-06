@@ -9,7 +9,11 @@ def search(query,limit,offset):
 
     print("query is %s",query)
 
-    result = es.search(index="nweb", doc_type="nmap", body={"size":limit, "from":offset, "query": {"match": {'nmap_data':query}},"sort": { "ctime": { "order": "desc" }}})
+    try:
+      result = es.search(index="nweb", doc_type="nmap", body={"size":limit, "from":offset, "query": {"match": {'nmap_data':query}},"sort": { "ctime": { "order": "desc" }}})
+    except:
+      return 0,[] # search borked, return nothing
+
     #result = es.search(index="nweb", doc_type="nmap", body={"size":limit, "from":offset, "query": {"match": {'nmap_data':query}}})
     count = 1
 
