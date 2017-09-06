@@ -59,20 +59,20 @@ def search():
     p = 0
 
   try:
-    print("potato")
-    fmt=request.GET['f']
+    fmt=request.args.get('f')
     print(fmt)
-    return render_template("hostlist.html")
-    #return render(request,"hostlist.html",context)
   except:
-    print("boo")
     fmt=""
 
   count,context = nweb.search(q,100,100*int(str(p)))
-  return render_template("search2.html",query=q, numresults=count, hosts=context)
 
+  # what kind of output are we looking for?
+  if fmt == 'hostlist':
+    print("printing hostlist because "+fmt)
+    return render_template("hostlist.html",query=q, numresults=count, page=p, hosts=context)
 
-  #return render(request,"search.html",context)
+  # default output (a pretty webpage)
+  return render_template("search2.html",query=q, numresults=count, page=p, hosts=context)
 
 @app.route('/getwork')
 def getwork():
