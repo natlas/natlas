@@ -8,10 +8,14 @@ import os
 import random
 import string
 import json
+import base64
 
 import threading
 import multiprocessing
 import multiprocessing.pool
+
+# my script for headshotting servers
+from getheadshot import getheadshot
 
 try:
   import ipaddress
@@ -52,11 +56,22 @@ def scan():
     os.remove("data/nweb."+rand+"."+ext)
     print("sending and deleting nweb."+rand+"."+ext)
 
+  if len(result['nmap_data']) < 250:
+    print("this data looks crappy")
+    return
+  else:
+    print("size was "+str(len(result['nmap_data'])))
+
+  if getheadshot(target,rand) is True:
+    result['headshot']=str(base64.b64encode(open("data/nweb."+rand+".headshot.jpg",'rb').read()))[2:-1]
+    os.remove("data/nweb."+rand+".headshot.jpg")
+    print("submitting headshot")
+
   # submit result
   response=requests.post(server+"/submit",json=json.dumps(result)).text
   print("response is:\n"+response)
 
-max_threads=5
+max_threads=3
 
 # uncomment these to test (run single scan)
 #scan()

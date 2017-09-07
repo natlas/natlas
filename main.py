@@ -112,8 +112,6 @@ def submit():
   newhost={}
   newhost=json.loads(data)
 
-  #print("what do we have here??\n"+str(newhost['nmap_data']))
-
   try:
     newhost['ip'] = get_ip(newhost['nmap_data'])
     newhost['hostname'] = get_hostname(newhost['nmap_data'])
