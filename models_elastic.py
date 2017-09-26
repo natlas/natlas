@@ -10,7 +10,7 @@ def search(query,limit,offset):
     print("query is %s",query)
 
     try:
-      result = es.search(index="nweb", doc_type="nmap", body={"size":limit, "from":offset, "query": {"match": {'nmap_data':query}},"sort": { "ctime": { "order": "desc" }}})
+      result = es.search(index="nweb", doc_type="nmap", body={"size":limit, "from":offset, "query": {"query_string": { 'query':query, "fields":["nmap_data"], "default_operator":"AND"  } },"sort": { "ctime": { "order": "desc" }}})
     except:
       return 0,[] # search borked, return nothing
 
