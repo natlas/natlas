@@ -3,12 +3,27 @@ nweb
 
 nmap scan collection and search
 
-Getting Started
----------------
+
+
+Installing Elasticsearch
+------------------------
+
+NWeb now default to using elasticsearch for the backend.  Download the latest here:
+
+https://www.elastic.co/downloads/elasticsearch
+
+$ sudo apt-get install default-jre
+$ sudo dpkg -i elasticsearch-XXXXXX.deb
+$ sudo /etc/init.d/elasticsearch start
+
+
+Running the Server
+------------------
 
 Most people will be able to just do:
 
 ```
+$ apt-get install virtualenv python3-pip
 $ git clone https://github.com/pierce403/nweb.git
 $ cd nweb
 $ ./run-flask.sh
