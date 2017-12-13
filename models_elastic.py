@@ -25,7 +25,8 @@ def search(query,limit,offset):
 
 def newhost(host):
     ip = str(host['ip'])
-    es.index(index='nweb', doc_type='nmap_history', body=host)
+    # broken in ES6
+    #es.index(index='nweb', doc_type='nmap_history', body=host)
     es.index(index='nweb', doc_type='nmap', id=ip, body=host)
 
 def gethost(ip):
