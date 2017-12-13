@@ -1,3 +1,7 @@
+#!/bin/bash
+
+export LC_ALL="C.UTF-8"
+export LANG="C.UTF-8"
 export FLASK_APP=./main.py
 
 if ! hash virtualenv 2>/dev/null
