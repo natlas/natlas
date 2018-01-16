@@ -3,8 +3,6 @@ nweb
 
 nmap scan collection and search
 
-
-
 Installing Elasticsearch
 ------------------------
 
@@ -12,10 +10,18 @@ NWeb now default to using elasticsearch for the backend.  Download the latest he
 
 https://www.elastic.co/downloads/elasticsearch
 
+```
 $ sudo apt-get install default-jre
 $ sudo dpkg -i elasticsearch-XXXXXX.deb
 $ sudo /etc/init.d/elasticsearch start
+```
 
+Installing Dependencies
+------------------
+
+```
+$ apt-get install wkhtmltopdf vncsnapshot
+```
 
 Running the Server
 ------------------

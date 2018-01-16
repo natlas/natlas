@@ -3,7 +3,6 @@
 import subprocess
 import os
 
-# apt-get install wkhtmltopdf vncsnapshot
 # wkhtmltoimage --width 50 --quality 80 -f jpg <target> out.jpg
 # vncsnapshot -quality 50 <target> out.jpg
 
