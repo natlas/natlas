@@ -61,11 +61,14 @@ def getwork():
   scope=[]
   try:
     for line in open("scope.txt"):
-      scope.append(IPNetwork(line))
+      try:
+        scope.append(IPNetwork(line))
+      except:
+        print("line "+str(line)+" in scope.txt failed to parse")
   except:
-    print("failed to parse scope.txt")
+    print("failed to find scope.txt")
     scope=[]
-    scope.append(IPNetwork("0.0.0.0/0"))
+    scope.append(IPNetwork("127.0.0.1"))
 
   blacklist=[]
   try:
