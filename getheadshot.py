@@ -24,6 +24,7 @@ def getheadshot(ip,rand):
     except:
       print("okay, seems like it was already dead")
 
+  # Try HTTP
   process = subprocess.Popen(["wkhtmltoimage","--javascript-delay","3000","--width","800","--height","600","--quality","80","-f","jpg","http://"+ip,"data/nweb."+rand+".headshot.jpg"],stdout=subprocess.PIPE)
 
   try:
@@ -37,6 +38,7 @@ def getheadshot(ip,rand):
     except:
       print("okay, seems like it was already dead")
 
+  # Try HTTPS
   process = subprocess.Popen(["wkhtmltoimage","--javascript-delay","3000","--width","800","--height","600","--quality","80","-f","jpg","https://"+ip,"data/nweb."+rand+".headshot.jpg"],stdout=subprocess.PIPE)
   try:
     out, err = process.communicate(timeout=60)
