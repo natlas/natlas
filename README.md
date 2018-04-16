@@ -39,3 +39,9 @@ This starts the nweb server on port 5000.  Then, in a new terminal, edit scope.t
 python3 nmap-agent.py
 ```
 This will start the scans, and you will soon be able to see the results in the web interface by browsing to http://127.0.0.1:5000
+
+
+Headshotting
+------------
+
+NWeb uses the tools wkhtmltoimage and vncsnapshot.  These tools should be available in most package repos, and must be installed seperately for headshotting to work properly.  These tools also require an active X session to work, so you may need to get creative if you are trying to run NWeb on a headless server.  I've found that the easiest solution to this problem is to run a VNC server, and you may need to hard code the DISPLAY variable into the getheadshot.py file.
