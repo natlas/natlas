@@ -10,7 +10,7 @@ def getheadshot(ip,rand):
 
   # display hack, wkhtmltoimage doesn't like to run headless
   # this requires you to run a vncserver or something
-  os.environ["DISPLAY"]=':1'
+  # os.environ["DISPLAY"]=':1'
 
   process = subprocess.Popen(["vncsnapshot","-quality","50",ip,"data/nweb."+rand+".headshot.jpg"],stdout=subprocess.PIPE)
   try:
