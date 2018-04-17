@@ -64,7 +64,7 @@ def getwork():
   random.seed(os.urandom(200))
   scope=[]
   try:
-    for line in open("scope.txt"):
+    for line in open("config/scope.txt"):
       try:
         scope.append(IPNetwork(line))
       except:
@@ -76,7 +76,7 @@ def getwork():
 
   blacklist=[]
   try:
-    for line in open("blacklist.txt"):
+    for line in open("config/blacklist.txt"):
       blacklist.append(IPNetwork(line))
   except Exception as e:
     print("failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
