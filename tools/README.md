@@ -1,7 +1,8 @@
 NWeb Tools
 ==========
 
-nmap scan collection and search
+Tools to assist you in all your NWebbing activities.
+
 
 elastic-bumpmaxresults.sh
 -------------------------
