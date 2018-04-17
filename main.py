@@ -56,8 +56,13 @@ def search():
 @app.route('/getwork')
 def getwork():
   print("getting work")
-  random.seed(os.urandom(200))
 
+  try:
+    return nweb.getwork_mass()
+  except:
+    print("masscan data not loaded, falling back to the old way")
+
+  random.seed(os.urandom(200))
   scope=[]
   try:
     for line in open("scope.txt"):

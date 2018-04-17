@@ -32,3 +32,22 @@ def newhost(host):
 def gethost(ip):
   result = es.get(index='nmap', doc_type='_doc', id=ip)
   return result['_source']
+
+def getwork_mass(): # getwork when masscan data is loaded
+
+  # get random ip
+  result = es.search(index="masscan_hosts", doc_type="_doc", body={"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": random.randint(0,2**30)}}]}}})
+  randip = str(result['hits']['hits'][0]['_source']['ip'])
+
+  # get ports
+  result = es.search(index="masscan_services", doc_type="_doc", body={"size": 1000,"query": {"match": {'ip':randip}}})
+  ports=[] # collate results
+  for thing in result['hits']['hits']:
+    ports.append(thing['_source']['ports'][0]['port'])
+
+  work = {}
+  work['type']='nmap'
+  work['target']=randip
+  work['ports']=ports
+  return json.dumps(work)
+
