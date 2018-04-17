@@ -36,7 +36,7 @@ def gethost(ip):
 def getwork_mass(): # getwork when masscan data is loaded
 
   # get random ip
-  result = es.search(index="masscan_hosts", doc_type="_doc", body={"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": random.randint(0,2**30)}}]}}})
+  result = es.search(index="masscan_hosts", doc_type="_doc", body={"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": random.randint(0,2**60)}}]}}})
   randip = str(result['hits']['hits'][0]['_source']['ip'])
 
   # get ports
