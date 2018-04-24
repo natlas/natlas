@@ -47,4 +47,10 @@ Rather than using nmap to scan randomly, you may be interested in initally using
 
 Once the masscan.json file is created, you should be able to run **python massscan-upload.py** to load the masscan data into the elastic server.  When the masscan data is loaded, you'll notice /getwork is now returning port numbers.  This tells the nmap agent to only scan specific ports, so rather than scanning blind, nmap will only scan the specific ports that are open.
 
-At the moment you will probabally want to delete the **masscan_services** and **masscan_hosts** indexes from elastic if you upload any new scan data, otherwise new insertions will be additive, and services that have gone down since the previous scan will not be removed from the list of available targets.
+At the moment you will probabally want to delete the **masscan_services** and **masscan_hosts** indexes from elastic if you upload any new scan data, otherwise new insertions will be additive, and services that have gone down since the previous scan will not be removed from the list of available targets. To do this you can run the following
+
+```
+curl localhost:9200/_cat/indices?v
+curl -XDELETE localhost:9200/masscan_services
+curl -XDELETE localhost:9200/masscan_hosts
+```
