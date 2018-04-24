@@ -70,8 +70,11 @@
                 </tr>
               </thead>
               <tbody>
-      {% if nmap_data|length > 0 %}
-      <br><pre>{{ nmap_data }}</pre>
+      {% if nmap_data|length > 0 %} 
+        {% if host.headshot %}
+          <img width=200 src="data:image/jpeg;base64,{{ host.headshot }}"></br>
+        {% endif %}
+        <br><pre>{{ nmap_data }}</pre>
       {% else %}
       wat?
       {% endif %}
