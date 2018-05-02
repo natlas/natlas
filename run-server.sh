@@ -2,7 +2,7 @@
 
 export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
-export FLASK_APP=./main.py
+export FLASK_APP=./nweb_server.py
 
 if ! hash virtualenv 2>/dev/null
 then
@@ -31,14 +31,9 @@ fi
 source venv/bin/activate
 pip3 install -r requirements.txt
 
-if [ ! -e nweb.db ]
-then
-    flask initdb
-fi
-
 while [ 1 == 1 ]
 do
   echo `date` >> start.log
-  flask run # --host=0.0.0.0
+  flask run --with-threads # --host=0.0.0.0
   sleep 5
 done

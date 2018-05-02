@@ -27,7 +27,8 @@ def scan():
   # pull target
   server="http://127.0.0.1:5000"
   #server="https://nweb.io"
-  target = json.loads(requests.get(server+"/getwork").text)["target"]
+  target_data = json.loads(requests.get(server+"/getwork").text)
+  target = target_data["target"]
   print("target is "+target)
 
   #if ipaddress.ip_address(target).is_private:
@@ -37,7 +38,14 @@ def scan():
   # scan server 
   rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
   print("random value is "+rand)
-  process = subprocess.Popen(["nmap","-oA","data/nweb."+rand,"-A","-open",target],stdout=subprocess.PIPE)
+
+  command = ["nmap","-oA","data/nweb."+rand,"-A","-open",target]
+
+  if 'ports' in target_data:
+    command.append('-p')
+    command.append(str(target_data['ports'])[1:-1])
+
+  process = subprocess.Popen(command,stdout=subprocess.PIPE)
   try:
     out, err = process.communicate(timeout=360) # 6 minutes
   except:

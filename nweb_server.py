@@ -12,7 +12,6 @@ import json
 import random
 import sys
 import traceback
-import sqlite3
 
 import models_elastic as nweb
 from nmap_helper import * # get_ip etc
@@ -56,11 +55,16 @@ def search():
 @app.route('/getwork')
 def getwork():
   print("getting work")
-  random.seed(os.urandom(200))
 
+  try:
+    return nweb.getwork_mass()
+  except:
+    print("masscan data not loaded, falling back to the old way")
+
+  random.seed(os.urandom(200))
   scope=[]
   try:
-    for line in open("scope.txt"):
+    for line in open("config/scope.txt"):
       try:
         scope.append(IPNetwork(line))
       except:
@@ -72,7 +76,7 @@ def getwork():
 
   blacklist=[]
   try:
-    for line in open("blacklist.txt"):
+    for line in open("config/blacklist.txt"):
       blacklist.append(IPNetwork(line))
   except Exception as e:
     print("failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")

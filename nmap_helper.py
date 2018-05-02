@@ -1,14 +1,27 @@
+REPORT = "Nmap scan report for "
+
+# Example of what we're looking for in get_ip and get_hostname
+# Nmap scan report for 127.0.0.0
+# Nmap scan report for something.something.someting.pwn (127.0.0.1)
+
+
 def get_ip(data):
-  # print(data)
-  # second row, 6th column, cut off parens
-  try:
-    return data.split('\n')[1].split(' ')[5][1:-1]
-  except:
-    return data.split('\n')[1].split(' ')[4]
+  for line in data.splitlines():
+     if REPORT in line:
+       predicate = line.split(REPORT)[1]
+       if "(" in predicate:
+         return predicate.split(' ')[1][1:-1]
+       else:
+         return predicate
 
 def get_hostname(data):
-  # second row, 5th column
-  return data.split('\n')[1].split(' ')[4]
+  for line in data.splitlines():
+    if REPORT in line:
+      predicate = line.split(REPORT)[1]
+      if "(" in predicate:
+        return predicate.split(' ')[0]
+      else:
+        return predicate
 
 def get_ports(data):
   ports = []
