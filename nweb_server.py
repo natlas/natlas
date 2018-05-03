@@ -27,29 +27,18 @@ def host():
 
 @app.route('/')
 def search():
-  q = request.args.get('q')
-  if not q:
-    q=''
-  f = request.args.get('f')
-  try:
-    p = int(request.args.get('p'))
-  except:
-    p = 0
-
-  try:
-    fmt=request.args.get('f')
-    print(fmt)
-  except:
-    fmt=""
+  query = request.args.get('q', '')
+  page = int(request.args.get('p', 0))
+  format = request.args.get('f', "")
 
   count,context = nweb.search(q,100,100*int(str(p)))
 
   # what kind of output are we looking for?
-  if fmt == 'hostlist':
-    return render_template("hostlist.html",query=q, numresults=count, page=p, hosts=context)
+  if format == 'hostlist':
+    return render_template("hostlist.html",query=query, numresults=count, page=page, hosts=context)
 
   # default output (a pretty webpage)
-  return render_template("search.html",query=q, numresults=count, page=p, hosts=context)
+  return render_template("search.html",query=query, numresults=count, page=page, hosts=context)
 
 @app.route('/getwork')
 def getwork():
