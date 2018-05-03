@@ -36,7 +36,8 @@ fi
 
 if [ ! -e config/blacklist.txt ]
 then
-    echo "[-] No config/blacklist.txt found"
+    echo "[+] Creating empty config/blacklist.txt"
+    echo "" > config/blacklist.txt
 fi
 
 echo "[+] Entering virtual environment"
