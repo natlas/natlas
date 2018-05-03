@@ -22,6 +22,8 @@
             <tr>
               <td>
                 <h3><a href="host?h={{ host.ip }}">{{ host.ip }}</a></h3><br>
+                <h5>hostname: {{ host.hostname }}<br>
+                open ports: {{ host.ports }}</h5>
                 {% if host.headshot %}
                   <h5>Unknown Headshot</h5>
                   <img width=200 src="data:image/jpeg;base64,{{ host.headshot }}"></br>
@@ -38,8 +40,6 @@
                   <h5>HTTPS</h5>
                   <img width=200 src="data:image/jpeg;base64,{{ host.httpsheadshot }}"></br>
                 {% endif %}
-                <h5>hostname: {{ host.hostname }}<br>
-                open ports: {{ host.ports }}</h5>
               </td>
               <td><pre>{{ host.nmap_data }}</pre></td>
             </tr>

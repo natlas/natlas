@@ -12,7 +12,7 @@ def getheadshot(ip,rand, service):
   # this requires you to run a vncserver or something
   # os.environ["DISPLAY"]=':1'
 
-  if service in ("vnc")
+  if service in ("vnc"):
     process = subprocess.Popen(["vncsnapshot","-quality","50",ip,"data/nweb."+rand+ "." + service + ".headshot.jpg"],stdout=subprocess.PIPE)
     try:
       out, err = process.communicate(timeout=60)

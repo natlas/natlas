@@ -72,18 +72,18 @@ def scan():
 
   if "80/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'http') is True:
-      result['httpheadshot']=str(base64.b64encode(open("data/nweb."+rand+".headshot.jpg",'rb').read()))[2:-1]
-      os.remove("data/nweb."+rand+".headshot.jpg")
+      result['httpheadshot']=str(base64.b64encode(open("data/nweb."+rand+".http.headshot.jpg",'rb').read()))[2:-1]
+      os.remove("data/nweb."+rand+".http.headshot.jpg")
       print("submitting headshot")
   if "443/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'https') is True:
-      result['httpsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".headshot.jpg",'rb').read()))[2:-1]
-      os.remove("data/nweb."+rand+".headshot.jpg")
+      result['httpsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".https.headshot.jpg",'rb').read()))[2:-1]
+      os.remove("data/nweb."+rand+".https.headshot.jpg")
       print("submitting headshot")
   if "5900/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'vnc') is True:
-      result['vncsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".headshot.jpg",'rb').read()))[2:-1]
-      os.remove("data/nweb."+rand+".headshot.jpg")
+      result['vncsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".vnc.headshot.jpg",'rb').read()))[2:-1]
+      os.remove("data/nweb."+rand+".vnc.headshot.jpg")
       print("submitting headshot")
 
   # submit result

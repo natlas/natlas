@@ -39,6 +39,12 @@ Headshotting
 
 The NWeb agent uses the tools **wkhtmltoimage** and **vncsnapshot** to gather "headshots" of servers it scans.  These tools should be available in most package repos, and must be installed seperately for headshotting to work properly.  These tools also require an active X session to work, so you may need to get creative if you are trying to run NWeb on a headless server.  I've found that the easiest solution to this problem is to run a VNC server, and you may need to hard code the DISPLAY variable into the getheadshot.py file.
 
+```
+$ sudo apt install vncsnapshot
+$ wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+$ tar -xvf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+$ sudo mv wkhtmltox/bin/wkhtmltoimage /usr/bin/wkhtmltoimage
+```
 
 Masscan
 -------
