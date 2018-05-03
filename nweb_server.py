@@ -46,7 +46,6 @@ def search():
 
   # what kind of output are we looking for?
   if fmt == 'hostlist':
-    print("printing hostlist because "+fmt)
     return render_template("hostlist.html",query=q, numresults=count, page=p, hosts=context)
 
   # default output (a pretty webpage)
@@ -54,7 +53,6 @@ def search():
 
 @app.route('/getwork')
 def getwork():
-  print("getting work")
 
   try:
     return nweb.getwork_mass()
@@ -126,13 +124,13 @@ def submit():
     newhost['ctime'] = datetime.now()
     #country = get_country(ip)
   except Exception as e:
-    return "you fucked it up!\n"+str(traceback.format_exc())
+    return "[!] Couldn't find necessary nmap_data\n"
 
   if len(newhost['ports']) == 2:
     return "no open ports!"
 
   if len(newhost['ports']) > 500:
-    return "something's fuckey.."
+    return "[!] More than 500 ports found. This is probably an IDS/IPS. We're going to throw the data out."
 
   nweb.newhost(newhost)
 
