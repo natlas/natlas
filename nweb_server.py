@@ -45,7 +45,7 @@ def getwork():
   try:
     return nweb.getwork_mass()
   except:
-    print("masscan data not loaded, falling back to the old way")
+    print("[+] Masscan data not found, selecting random target from scope.")
 
   random.seed(os.urandom(200))
   scope=[]
@@ -54,9 +54,9 @@ def getwork():
       try:
         scope.append(IPNetwork(line))
       except:
-        print("line "+str(line)+" in scope.txt failed to parse")
+        print("[!] Line %s in scope.txt failed to parse" % line)
   except:
-    print("failed to find scope.txt")
+    print("[!] Failed to find scope.txt")
     scope=[]
     scope.append(IPNetwork("127.0.0.1"))
 
@@ -65,7 +65,7 @@ def getwork():
     for line in open("config/blacklist.txt"):
       blacklist.append(IPNetwork(line))
   except Exception as e:
-    print("failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
+    print("[!] Failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
     blacklist=[]
 
   # how many hosts are in scope?
