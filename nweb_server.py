@@ -36,9 +36,8 @@ def search():
   # what kind of output are we looking for?
   if format == 'hostlist':
     return render_template("hostlist.html",query=query, numresults=count, page=page, hosts=context)
-
-  # default output (a pretty webpage)
-  return render_template("search.html",query=query, numresults=count, page=page, hosts=context)
+  else:
+    return render_template("search.html",query=query, numresults=count, page=page, hosts=context)
 
 @app.route('/getwork')
 def getwork():
