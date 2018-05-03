@@ -21,8 +21,8 @@ from datetime import datetime
 # Create your views here.
 @app.route('/host')
 def host():
-  h = request.args.get('h')
-  context = nweb.gethost(h)
+  host = request.args.get('h')
+  context = nweb.gethost(host)
   return render_template("host.html",**context)
 
 @app.route('/')
@@ -100,7 +100,6 @@ def getwork():
 def submit():
 
   data = request.get_json()
-  #data = data.replace('\\n','\n') # this is stupid
 
   newhost={}
   newhost=json.loads(data)
@@ -110,12 +109,11 @@ def submit():
     newhost['hostname'] = get_hostname(newhost['nmap_data'])
     newhost['ports'] = str(get_ports(newhost['nmap_data']))
     newhost['ctime'] = datetime.now()
-    #country = get_country(ip)
   except Exception as e:
     return "[!] Couldn't find necessary nmap_data\n"
 
-  if len(newhost['ports']) == 2:
-    return "no open ports!"
+  if len(newhost['ports']) == 0:
+    return "[!] No open ports found!"
 
   if len(newhost['ports']) > 500:
     return "[!] More than 500 ports found. This is probably an IDS/IPS. We're going to throw the data out."
