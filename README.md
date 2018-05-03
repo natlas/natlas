@@ -25,6 +25,7 @@ Most people will be able to just do:
 $ apt-get install virtualenv python3-pip
 $ git clone https://github.com/pierce403/nweb.git
 $ cd nweb
+$ ./setup-server.sh
 $ ./run-server.sh
 ```
 This starts the nweb server on port 5000.  Then, in a new terminal, edit scope.txt to point to the desired targets, and run:
