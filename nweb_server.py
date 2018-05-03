@@ -21,45 +21,31 @@ from datetime import datetime
 # Create your views here.
 @app.route('/host')
 def host():
-  h = request.args.get('h')
-  context = nweb.gethost(h)
+  host = request.args.get('h')
+  context = nweb.gethost(host)
   return render_template("host.html",**context)
 
 @app.route('/')
 def search():
-  q = request.args.get('q')
-  if not q:
-    q=''
-  f = request.args.get('f')
-  try:
-    p = int(request.args.get('p'))
-  except:
-    p = 0
-
-  try:
-    fmt=request.args.get('f')
-    print(fmt)
-  except:
-    fmt=""
+  query = request.args.get('q', '')
+  page = int(request.args.get('p', 0))
+  format = request.args.get('f', "")
 
   count,context = nweb.search(q,100,100*int(str(p)))
 
   # what kind of output are we looking for?
-  if fmt == 'hostlist':
-    print("printing hostlist because "+fmt)
-    return render_template("hostlist.html",query=q, numresults=count, page=p, hosts=context)
-
-  # default output (a pretty webpage)
-  return render_template("search2.html",query=q, numresults=count, page=p, hosts=context)
+  if format == 'hostlist':
+    return render_template("hostlist.html",query=query, numresults=count, page=page, hosts=context)
+  else:
+    return render_template("search.html",query=query, numresults=count, page=page, hosts=context)
 
 @app.route('/getwork')
 def getwork():
-  print("getting work")
 
   try:
     return nweb.getwork_mass()
   except:
-    print("masscan data not loaded, falling back to the old way")
+    print("[+] Masscan data not found, selecting random target from scope.")
 
   random.seed(os.urandom(200))
   scope=[]
@@ -68,9 +54,9 @@ def getwork():
       try:
         scope.append(IPNetwork(line))
       except:
-        print("line "+str(line)+" in scope.txt failed to parse")
+        print("[!] Line %s in scope.txt failed to parse" % line)
   except:
-    print("failed to find scope.txt")
+    print("[!] Failed to find scope.txt")
     scope=[]
     scope.append(IPNetwork("127.0.0.1"))
 
@@ -79,7 +65,7 @@ def getwork():
     for line in open("config/blacklist.txt"):
       blacklist.append(IPNetwork(line))
   except Exception as e:
-    print("failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
+    print("[!] Failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
     blacklist=[]
 
   # how many hosts are in scope?
@@ -114,7 +100,6 @@ def getwork():
 def submit():
 
   data = request.get_json()
-  #data = data.replace('\\n','\n') # this is stupid
 
   newhost={}
   newhost=json.loads(data)
@@ -124,15 +109,14 @@ def submit():
     newhost['hostname'] = get_hostname(newhost['nmap_data'])
     newhost['ports'] = str(get_ports(newhost['nmap_data']))
     newhost['ctime'] = datetime.now()
-    #country = get_country(ip)
   except Exception as e:
-    return "you fucked it up!\n"+str(traceback.format_exc())
+    return "[!] Couldn't find necessary nmap_data\n"
 
-  if len(newhost['ports']) == 2:
-    return "no open ports!"
+  if len(newhost['ports']) == 0:
+    return "[!] No open ports found!"
 
   if len(newhost['ports']) > 500:
-    return "something's fuckey.."
+    return "[!] More than 500 ports found. This is probably an IDS/IPS. We're going to throw the data out."
 
   nweb.newhost(newhost)
 

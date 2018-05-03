@@ -1,7 +1,6 @@
-scope.txt
-blacklist.txt
 venv
 *~
 __pycache__
 start.log
 nweb.db
+data/

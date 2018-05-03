@@ -8,8 +8,6 @@ def search(query,limit,offset):
   if query=='':
     query='nmap'
 
-  print("query is %s",query)
-
   try:
     result = es.search(index="nmap", doc_type="_doc", body={"size":limit, "from":offset, "query": {"query_string": { 'query':query, "fields":["nmap_data"], "default_operator":"AND"  } },"sort": { "ctime": { "order": "desc" }}})
   except:
