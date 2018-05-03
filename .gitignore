@@ -1,5 +1,3 @@
-config/scope.txt
-config/blacklist.txt
 venv
 *~
 __pycache__
