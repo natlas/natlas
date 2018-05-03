@@ -20,24 +20,21 @@ from getheadshot import getheadshot
 try:
   import ipaddress
 except:
-  print("you should be using python3!")
+  print("[!] ipaddress module not found")
   sys.exit()
 
 def scan():
   # pull target
   server="http://127.0.0.1:5000"
   #server="https://nweb.io"
+  print("[+] Fetching Target from %s" % server)
   target_data = json.loads(requests.get(server+"/getwork").text)
   target = target_data["target"]
-  print("target is "+target)
-
-  #if ipaddress.ip_address(target).is_private:
-  #  print("no I'm not going to scan a private ip.. "+target)
-  #  return
+  print("[+] Target: "+target)
 
   # scan server 
   rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
-  print("random value is "+rand)
+  print("[+] Scan ID: "+rand)
 
   command = ["nmap","-oA","data/nweb."+rand,"-A","-open",target]
 
@@ -50,61 +47,66 @@ def scan():
     out, err = process.communicate(timeout=360) # 6 minutes
   except:
     try:
-      print("killing slacker process")
+      print("[+] (%s) Killing slacker process" % rand)
       process.kill()
     except:
-      print("okay, seems like it was already dead")
+      pass
 
-  print("scan complete, nice")
+  print("[+] Scan Complete: " + rand)
   #print(out)
 
   result={}
   for ext in 'nmap','gnmap','xml':
     result[ext+"_data"]=open("data/nweb."+rand+"."+ext).read()
     os.remove("data/nweb."+rand+"."+ext)
-    print("sending and deleting nweb."+rand+"."+ext)
+    print("[+] (%s) Cleaning up: nweb.%s.%s" % (rand, rand, ext))
 
   if len(result['nmap_data']) < 250:
-    print("this data looks crappy")
+    print("[!] (%s) Nmap data is too short" % rand)
     return
   else:
-    print("size was "+str(len(result['nmap_data'])))
+    print("[+] (%s) scan size: %s" % (rand, len(result['nmap_data'])))
 
   if "80/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'http') is True:
       result['httpheadshot']=str(base64.b64encode(open("data/nweb."+rand+".http.headshot.jpg",'rb').read()))[2:-1]
       os.remove("data/nweb."+rand+".http.headshot.jpg")
-      print("submitting headshot")
+      print("[+] (%s) HTTP snapshot acquired" % rand)
   if "443/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'https') is True:
       result['httpsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".https.headshot.jpg",'rb').read()))[2:-1]
       os.remove("data/nweb."+rand+".https.headshot.jpg")
-      print("submitting headshot")
+      print("[+] (%s) HTTPS snapshot acquired" % rand)
   if "5900/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'vnc') is True:
       result['vncsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".vnc.headshot.jpg",'rb').read()))[2:-1]
       os.remove("data/nweb."+rand+".vnc.headshot.jpg")
-      print("submitting headshot")
+      print("[+] (%s) VNC snapshot acquired" % rand)
 
   # submit result
+  print("[+] (%s) Submitting work" % rand)
   response=requests.post(server+"/submit",json=json.dumps(result)).text
-  print("response is:\n"+response)
+  print("[+] (%s) Response:\n%s" % (rand, response))
 
-max_threads=3
+def main():
+  max_threads=3
 
-# uncomment these to test (run single scan)
-#scan()
-#exit()
+  # uncomment these to test (run single scan)
+  #scan()
+  #exit()
 
-while True:
-  if threading.active_count() < max_threads:
-    notifylock=False
-    print("number of threads : "+str(threading.active_count()))
-    t = threading.Thread(target=scan)
-    t.start()
-  else:
-    if notifylock is False:
-      print("too many threads .. waiting")
-    notifylock=True
+  while True:
+    if threading.active_count() < max_threads:
+      notifylock=False
+      print("[+] Active Threads: %s" % threading.active_count())
+      t = threading.Thread(target=scan)
+      t.start()
+    else:
+      if notifylock is False:
+        print("[+] Thread pool exhausted")
+      notifylock=True
 
-  time.sleep(1)
+    time.sleep(1)
+
+if __name__ == "__main__":
+  main()
