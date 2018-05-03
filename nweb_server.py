@@ -50,7 +50,7 @@ def search():
     return render_template("hostlist.html",query=q, numresults=count, page=p, hosts=context)
 
   # default output (a pretty webpage)
-  return render_template("search2.html",query=q, numresults=count, page=p, hosts=context)
+  return render_template("search.html",query=q, numresults=count, page=p, hosts=context)
 
 @app.route('/getwork')
 def getwork():
