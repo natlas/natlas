@@ -16,6 +16,7 @@ import multiprocessing.pool
 
 # my script for headshotting servers
 from getheadshot import getheadshot
+from config import Config
 
 try:
   import ipaddress
@@ -89,6 +90,8 @@ def scan():
   print("[+] (%s) Response:\n%s" % (rand, response))
 
 def main():
+  if not os.path.isdir("data"):
+    os.mkdir("data")
   while True:
     if threading.active_count() < config.max_threads:
       notifylock=False
