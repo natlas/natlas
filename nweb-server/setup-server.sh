@@ -2,17 +2,58 @@
 
 export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
-export FLASK_APP=./nweb_server.py
 
-if ! hash virtualenv 2>/dev/null
+WHOAMI=$(whoami)
+FAIL=false
+
+if [ $WHOAMI != "root" ]
 then
-    echo "[!] virtualenv not found"
-    exit 1
+    echo "[+] Setup running without permissions. System-wide changes cannot be made."
+else
+    echo "[+] Setup running with permissions. Automatic installation will be attempted."
+fi
+
+if ! hash python3 >/dev/null
+then
+    echo "[!] python3 not found"
+    if $WHOAMI == "root"
+    then
+        apt-get -y install python3.6
+    else
+        $FAIL=true
+    fi
+else
+    echo "[+] python3 found"
 fi
 
 if ! hash pip3 >/dev/null
 then
     echo "[!] pip3 not found"
+    if $WHOAMI == "root"
+    then
+        apt-get -y install python3-pip
+    else
+        $FAIL=true
+    fi
+else
+    echo "[+] pip3 found"
+fi
+
+if ! hash virtualenv >/dev/null
+then
+    echo "[!] virtualenv not found"
+    if $WHOAMI == "root"
+    then
+        pip3 install virtualenv
+    else
+        $FAIL=true
+    fi
+else
+    echo "[+] virtualenv found"
+fi
+
+if [ $FAIL = true ]
+then
     exit 1
 fi
 
@@ -37,10 +78,13 @@ fi
 if [ ! -e config/blacklist.txt ]
 then
     echo "[+] Creating empty config/blacklist.txt"
-    echo "" > config/blacklist.txt
+    echo "127.0.1.1" > config/blacklist.txt
 fi
 
 echo "[+] Entering virtual environment"
 source venv/bin/activate
 echo "[+] Attempting to install python dependencies"
 pip3 install -r requirements.txt
+echo "[+] Exiting virtual environment"
+deactivate
+echo "[+] Setup Complete"
