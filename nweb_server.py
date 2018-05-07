@@ -31,7 +31,7 @@ def search():
   page = int(request.args.get('p', 0))
   format = request.args.get('f', "")
 
-  count,context = nweb.search(q,100,100*int(str(p)))
+  count,context = nweb.search(query,100,100*int(str(page)))
 
   # what kind of output are we looking for?
   if format == 'hostlist':
