@@ -23,10 +23,10 @@ except:
   print("[!] ipaddress module not found")
   sys.exit()
 
+config = Config()
+
 def scan():
-  # pull target
-  server="http://127.0.0.1:5000"
-  #server="https://nweb.io"
+  server=config.server
   print("[+] Fetching Target from %s" % server)
   target_data = json.loads(requests.get(server+"/getwork").text)
   target = target_data["target"]
@@ -44,7 +44,7 @@ def scan():
 
   process = subprocess.Popen(command,stdout=subprocess.PIPE)
   try:
-    out, err = process.communicate(timeout=360) # 6 minutes
+    out, err = process.communicate(timeout=config.timeout) # 6 minutes
   except:
     try:
       print("[+] (%s) Killing slacker process" % rand)
@@ -89,14 +89,8 @@ def scan():
   print("[+] (%s) Response:\n%s" % (rand, response))
 
 def main():
-  max_threads=3
-
-  # uncomment these to test (run single scan)
-  #scan()
-  #exit()
-
   while True:
-    if threading.active_count() < max_threads:
+    if threading.active_count() < config.max_threads:
       notifylock=False
       print("[+] Active Threads: %s" % threading.active_count())
       t = threading.Thread(target=scan)
