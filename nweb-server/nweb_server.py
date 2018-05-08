@@ -70,6 +70,7 @@ def getwork():
 
   # how many hosts are in scope?
   magnitude = sum(len(network) for network in scope)
+  print("[+] There are %s IPs in config/scope.txt" % magnitude)
 
   attempts=0
   work = {}
