@@ -30,11 +30,12 @@ def search():
   page = int(request.args.get('p', 1))
   format = request.args.get('f', "")
 
-  count,context = nweb.search(query,100,100 * (page-1))
+  searchOffset = app.config['POSTS_PER_PAGE'] * (page-1)
+  count,context = nweb.search(query,app.config['POSTS_PER_PAGE'],searchOffset)
 
-  next_url = url_for('search', q=query, page=page + 1) \
+  next_url = url_for('search', q=query, p=page + 1) \
       if count > page * app.config['POSTS_PER_PAGE'] else None
-  prev_url = url_for('search', q=query, page=page - 1) \
+  prev_url = url_for('search', q=query, p=page - 1) \
       if page > 1 else None
 
   # what kind of output are we looking for?
