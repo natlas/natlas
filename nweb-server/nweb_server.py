@@ -31,7 +31,6 @@ def search():
   format = request.args.get('f', "")
 
   count,context = nweb.search(query,100,100 * (page-1))
-  print("Count: %s\nPage: %s\nPosts Per Page:%s" % (count, page, app.config['POSTS_PER_PAGE']))
 
   next_url = url_for('search', q=query, page=page + 1) \
       if count > page * app.config['POSTS_PER_PAGE'] else None
