@@ -54,27 +54,27 @@ def getwork():
   random.seed(os.urandom(200))
   scope=[]
   try:
-    for line in open("config/scope.txt"):
+    for line in open(app.config['SCOPE_DOC']):
       try:
         scope.append(IPNetwork(line))
       except:
-        print("[!] Line %s in scope.txt failed to parse" % line)
+        print("[!] Line %s in %s failed to parse" % (line, app.config['SCOPE_DOC']))
   except:
-    print("[!] Failed to find scope.txt")
+    print("[!] Failed to find %s" % app.config['SCOPE_DOC'])
     scope=[]
     scope.append(IPNetwork("127.0.0.1"))
 
   blacklist=[]
   try:
-    for line in open("config/blacklist.txt"):
+    for line in open(app.config['BLACKLIST_DOC']):
       blacklist.append(IPNetwork(line))
   except Exception as e:
-    print("[!] Failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
+    print("[!] Failed to parse %s :"+str(e)[:-1]+" '"+line[:-1]+"'" % app.config['BLACKLIST_DOC'])
     blacklist=[]
 
   # how many hosts are in scope?
   magnitude = sum(len(network) for network in scope)
-  print("[+] There are %s IPs in config/scope.txt" % magnitude)
+  print("[+] There are %s IPs in %s" % (magnitude, app.config['SCOPE_DOC']))
 
   attempts=0
   work = {}
