@@ -1,9 +1,5 @@
 import flask
-from flask import render_template
-from flask import request
-from flask import Flask
-from flask import g
-app = Flask(__name__,static_url_path='/static')
+from flask import render_template, request, Flask, g, url_for
 
 from netaddr import *
 import time
@@ -18,6 +14,14 @@ from nmap_helper import * # get_ip etc
 
 from datetime import datetime
 
+app = Flask(__name__,static_url_path='/static')
+app.config.from_object('config')
+app.jinja_env.add_extension('jinja2.ext.do')
+
+@app.before_request
+def before_request():
+  g.preview_length = app.config['PREVIEW_LENGTH']
+
 # Create your views here.
 @app.route('/host')
 def host():
@@ -28,16 +32,22 @@ def host():
 @app.route('/')
 def search():
   query = request.args.get('q', '')
-  page = int(request.args.get('p', 0))
+  page = int(request.args.get('p', 1))
   format = request.args.get('f', "")
 
-  count,context = nweb.search(query,100,100*int(str(page)))
+  searchOffset = app.config['RESULTS_PER_PAGE'] * (page-1)
+  count,context = nweb.search(query,app.config['RESULTS_PER_PAGE'],searchOffset)
+
+  next_url = url_for('search', q=query, p=page + 1) \
+      if count > page * app.config['RESULTS_PER_PAGE'] else None
+  prev_url = url_for('search', q=query, p=page - 1) \
+      if page > 1 else None
 
   # what kind of output are we looking for?
   if format == 'hostlist':
     return render_template("hostlist.html",query=query, numresults=count, page=page, hosts=context)
   else:
-    return render_template("search.html",query=query, numresults=count, page=page, hosts=context)
+    return render_template("search.html",query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
 @app.route('/getwork')
 def getwork():
@@ -50,27 +60,27 @@ def getwork():
   random.seed(os.urandom(200))
   scope=[]
   try:
-    for line in open("config/scope.txt"):
+    for line in open(app.config['SCOPE_DOC']):
       try:
         scope.append(IPNetwork(line))
       except:
-        print("[!] Line %s in scope.txt failed to parse" % line)
+        print("[!] Line %s in %s failed to parse" % (line, app.config['SCOPE_DOC']))
   except:
-    print("[!] Failed to find scope.txt")
+    print("[!] Failed to find %s" % app.config['SCOPE_DOC'])
     scope=[]
     scope.append(IPNetwork("127.0.0.1"))
 
   blacklist=[]
   try:
-    for line in open("config/blacklist.txt"):
+    for line in open(app.config['BLACKLIST_DOC']):
       blacklist.append(IPNetwork(line))
   except Exception as e:
-    print("[!] Failed to parse blacklist.txt "+str(e)[:-1]+" '"+line[:-1]+"'")
+    print("[!] Failed to parse %s :"+str(e)[:-1]+" '"+line[:-1]+"'" % app.config['BLACKLIST_DOC'])
     blacklist=[]
 
   # how many hosts are in scope?
   magnitude = sum(len(network) for network in scope)
-  print("[+] There are %s IPs in config/scope.txt" % magnitude)
+  print("[+] There are %s IPs in %s" % (magnitude, app.config['SCOPE_DOC']))
 
   attempts=0
   work = {}
