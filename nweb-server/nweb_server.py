@@ -1,9 +1,5 @@
 import flask
-from flask import render_template
-from flask import request
-from flask import Flask
-from flask import g
-app = Flask(__name__,static_url_path='/static')
+from flask import render_template, request, Flask, g, url_for
 
 from netaddr import *
 import time
@@ -18,6 +14,9 @@ from nmap_helper import * # get_ip etc
 
 from datetime import datetime
 
+app = Flask(__name__,static_url_path='/static')
+app.config.from_object('config')
+
 # Create your views here.
 @app.route('/host')
 def host():
@@ -28,16 +27,22 @@ def host():
 @app.route('/')
 def search():
   query = request.args.get('q', '')
-  page = int(request.args.get('p', 0))
+  page = int(request.args.get('p', 1))
   format = request.args.get('f', "")
 
-  count,context = nweb.search(query,100,100*int(str(page)))
+  count,context = nweb.search(query,100,100 * (page-1))
+  print("Count: %s\nPage: %s\nPosts Per Page:%s" % (count, page, app.config['POSTS_PER_PAGE']))
+
+  next_url = url_for('search', q=query, page=page + 1) \
+      if count > page * app.config['POSTS_PER_PAGE'] else None
+  prev_url = url_for('search', q=query, page=page - 1) \
+      if page > 1 else None
 
   # what kind of output are we looking for?
   if format == 'hostlist':
     return render_template("hostlist.html",query=query, numresults=count, page=page, hosts=context)
   else:
-    return render_template("search.html",query=query, numresults=count, page=page, hosts=context)
+    return render_template("search.html",query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
 @app.route('/getwork')
 def getwork():
