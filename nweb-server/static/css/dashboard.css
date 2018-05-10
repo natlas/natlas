@@ -106,4 +106,18 @@ body {
 
 .nmap_data {
   white-space: pre-wrap;
+  margin-bottom:0px;
+}
+.preview_nmap {
+  background-color:rgba(0,0,0,0.5);
+  text-align:center;
+  line-height:4em;
+  margin-top:-4em;
+}
+.preview_nmap:hover {
+  background-color:rgba(0,0,0,0.75);
+}
+a.preview_link, a:hover.preview_link {
+  color:#fff;
+  display:block;
 }

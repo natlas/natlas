@@ -42,7 +42,21 @@
                   <img width=200 src="data:image/jpeg;base64,{{ host.httpsheadshot }}"></br>
                 {% endif %}
               </td>
-              <td><pre class="nmap_data">{{ host.nmap_data }}</pre></td>
+              <td>
+                  {% set lines = host.nmap_data.split('\n') %}
+                  {% if lines|length > g.preview_length %}
+                    {% set nmap_preview = [] %}
+                    {% for line in lines %}
+                      {% if loop.index <= g.preview_length %}
+                        {% do nmap_preview.append(line) %}
+                      {% endif %}
+                    {% endfor %}
+                    <pre class="nmap_data">{{ nmap_preview|join('\n') }}</pre>
+                    <a class="preview_link" href="host?h={{ host.ip }}"><div class="preview_nmap">Click here to see the complete results for {{ host.ip }}</div></a>
+                  {% else %}
+                    <pre class="nmap_data">{{ host.nmap_data }}</pre>
+                  {% endif %}
+              </td>
             </tr>
           {% endfor %}
         </tbody>

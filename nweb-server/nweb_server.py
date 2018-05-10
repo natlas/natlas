@@ -16,6 +16,11 @@ from datetime import datetime
 
 app = Flask(__name__,static_url_path='/static')
 app.config.from_object('config')
+app.jinja_env.add_extension('jinja2.ext.do')
+
+@app.before_request
+def before_request():
+  g.preview_length = app.config['PREVIEW_LENGTH']
 
 # Create your views here.
 @app.route('/host')
@@ -30,11 +35,11 @@ def search():
   page = int(request.args.get('p', 1))
   format = request.args.get('f', "")
 
-  searchOffset = app.config['POSTS_PER_PAGE'] * (page-1)
-  count,context = nweb.search(query,app.config['POSTS_PER_PAGE'],searchOffset)
+  searchOffset = app.config['RESULTS_PER_PAGE'] * (page-1)
+  count,context = nweb.search(query,app.config['RESULTS_PER_PAGE'],searchOffset)
 
   next_url = url_for('search', q=query, p=page + 1) \
-      if count > page * app.config['POSTS_PER_PAGE'] else None
+      if count > page * app.config['RESULTS_PER_PAGE'] else None
   prev_url = url_for('search', q=query, p=page - 1) \
       if page > 1 else None
 
