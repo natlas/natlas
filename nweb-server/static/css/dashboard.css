@@ -103,3 +103,7 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+.nmap_data {
+  white-space: pre-wrap;
+}
