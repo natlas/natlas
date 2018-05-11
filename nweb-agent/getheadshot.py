@@ -11,6 +11,8 @@ def getheadshot(ip,rand, service):
   # display hack, wkhtmltoimage doesn't like to run headless
   # this requires you to run a vncserver or something
   # os.environ["DISPLAY"]=':1'
+  if not os.environ["DISPLAY"]:
+    return False
   FNULL=open(os.devnull, 'w') # open devnull to get rid of output
   if service in ("vnc"):
     print("[+] (%s) Attempting to take vnc snapshot" % rand)
@@ -39,5 +41,7 @@ def getheadshot(ip,rand, service):
         process.kill()
       except:
         pass
+
   FNULL.close()
-  
+  # fall through to return false if service is unsupported or if process returncodes aren't 0
+  return False

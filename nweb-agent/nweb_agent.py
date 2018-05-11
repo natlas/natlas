@@ -73,16 +73,22 @@ def scan():
       result['httpheadshot']=str(base64.b64encode(open("data/nweb."+rand+".http.headshot.jpg",'rb').read()))[2:-1]
       os.remove("data/nweb."+rand+".http.headshot.jpg")
       print("[+] (%s) HTTP snapshot acquired" % rand)
+    else:
+      print("[!] (%s) Failed to acquire HTTP snapshot" % rand)
   if "443/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'https') is True:
       result['httpsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".https.headshot.jpg",'rb').read()))[2:-1]
       os.remove("data/nweb."+rand+".https.headshot.jpg")
       print("[+] (%s) HTTPS snapshot acquired" % rand)
+    else:
+      print("[!] (%s) Failed to acquire HTTPS snapshot" % rand)
   if "5900/tcp" in result['nmap_data']:
     if getheadshot(target,rand, 'vnc') is True:
       result['vncsheadshot']=str(base64.b64encode(open("data/nweb."+rand+".vnc.headshot.jpg",'rb').read()))[2:-1]
       os.remove("data/nweb."+rand+".vnc.headshot.jpg")
       print("[+] (%s) VNC snapshot acquired" % rand)
+    else:
+      print("[!] (%s) Failed to acquire VNC snapshot" % rand)
 
   # submit result
   print("[+] (%s) Submitting work" % rand)
