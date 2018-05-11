@@ -1,6 +1,5 @@
 import flask
 from flask import render_template, request, Flask, g, url_for
-
 from netaddr import *
 import time
 import os
@@ -8,17 +7,10 @@ import json
 import random
 import sys
 import traceback
-
-from models import Elastic
-from nmap_helper import * # get_ip etc
-
 from datetime import datetime
 
-app = Flask(__name__,static_url_path='/static')
-app.config.from_object('config')
-app.jinja_env.add_extension('jinja2.ext.do')
-
-elastic = Elastic(app.config['ELASTICSEARCH_URL'])
+from app import app, elastic
+from .nmap_parser import NmapParser
 
 @app.before_request
 def before_request():
@@ -111,19 +103,18 @@ def getwork():
 
 @app.route('/submit',methods=['POST'])
 def submit():
-
+  nmap = NmapParser()
   data = request.get_json()
 
   newhost={}
   newhost=json.loads(data)
-
   try:
-    newhost['ip'] = get_ip(newhost['nmap_data'])
-    newhost['hostname'] = get_hostname(newhost['nmap_data'])
-    newhost['ports'] = str(get_ports(newhost['nmap_data']))
+    newhost['ip'] = nmap.get_ip(newhost['nmap_data'])
+    newhost['hostname'] = nmap.get_hostname(newhost['nmap_data'])
+    newhost['ports'] = str(nmap.get_ports(newhost['nmap_data']))
     newhost['ctime'] = datetime.now()
   except Exception as e:
-    return "[!] Couldn't find necessary nmap_data\n"
+    return "[!] Couldn't find necessary nmap_data\n" + str(e)
 
   if len(newhost['ports']) == 0:
     return "[!] No open ports found!"
@@ -133,4 +124,4 @@ def submit():
 
   elastic.newhost(newhost)
 
-  return "[+] nmap successful and submitted for ip: "+newhost['ip']+"\nhostname: "+newhost['hostname']+"\nports: "+newhost['ports']
+  return "[+] nmap successful and submitted for ip: "+newhost['ip']

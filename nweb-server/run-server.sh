@@ -2,7 +2,7 @@
 
 export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
-export FLASK_APP=./nweb_server.py
+export FLASK_APP=./nweb-server.py
 
 source venv/bin/activate
 while [ 1 == 1 ]
