@@ -9,7 +9,7 @@ import random
 import sys
 import traceback
 
-import models_elastic as nweb
+from models import Elastic
 from nmap_helper import * # get_ip etc
 
 from datetime import datetime
@@ -17,6 +17,8 @@ from datetime import datetime
 app = Flask(__name__,static_url_path='/static')
 app.config.from_object('config')
 app.jinja_env.add_extension('jinja2.ext.do')
+
+elastic = Elastic(app.config['ELASTICSEARCH_URL'])
 
 @app.before_request
 def before_request():
@@ -26,7 +28,7 @@ def before_request():
 @app.route('/host')
 def host():
   host = request.args.get('h')
-  context = nweb.gethost(host)
+  context = elastic.gethost(host)
   return render_template("host.html",**context)
 
 @app.route('/')
@@ -36,7 +38,7 @@ def search():
   format = request.args.get('f', "")
 
   searchOffset = app.config['RESULTS_PER_PAGE'] * (page-1)
-  count,context = nweb.search(query,app.config['RESULTS_PER_PAGE'],searchOffset)
+  count,context = elastic.search(query,app.config['RESULTS_PER_PAGE'],searchOffset)
 
   next_url = url_for('search', q=query, p=page + 1) \
       if count > page * app.config['RESULTS_PER_PAGE'] else None
@@ -53,7 +55,7 @@ def search():
 def getwork():
 
   try:
-    return nweb.getwork_mass()
+    return elastic.getwork_mass()
   except:
     print("[+] Masscan data not found, selecting random target from scope.")
 
@@ -129,6 +131,6 @@ def submit():
   if len(newhost['ports']) > 500:
     return "[!] More than 500 ports found. This is probably an IDS/IPS. We're going to throw the data out."
 
-  nweb.newhost(newhost)
+  elastic.newhost(newhost)
 
   return "[+] nmap successful and submitted for ip: "+newhost['ip']+"\nhostname: "+newhost['hostname']+"\nports: "+newhost['ports']
