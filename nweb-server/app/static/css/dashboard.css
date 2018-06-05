@@ -121,3 +121,7 @@ a.preview_link, a:hover.preview_link {
   color:#fff;
   display:block;
 }
+
+.messages {
+  margin-top:1em;
+}

@@ -6,8 +6,11 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
-
+    {% if title %}
+    <title>{{ title }} | nweb</title>
+    {% else %}
     <title>nweb.io</title>
+    {% endif %}
 
     <!-- Bootstrap core CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">

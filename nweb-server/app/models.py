@@ -1,57 +1,38 @@
-import json
-from elasticsearch import Elasticsearch
+from time import time
+from app import app, db
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+from app import login
+import jwt
 
-import random
+class User(UserMixin, db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  email = db.Column(db.String(128), index=True, unique=True)
+  password_hash = db.Column(db.String(128))
 
-class Elastic:
-  es = ''
+  def __repr__(self):
+    return '<User {}>'.format(self.email)
 
-  def __init__(self, elasticURL):
-    self.es = Elasticsearch(elasticURL)
-  
-  def search(self, query,limit,offset):
-    if query=='':
-      query='nmap'
+  def set_password(self, password):
+    self.password_hash = generate_password_hash(password)
 
+  def check_password(self, password):
+    return check_password_hash(self.password_hash, password)
+
+  @login.user_loader
+  def load_user(id):
+    return User.query.get(int(id))
+
+  def get_reset_password_token(self, expires_in=600):
+    return jwt.encode(
+      {'reset_password': self.id, 'exp': time() + expires_in},
+      app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+  @staticmethod
+  def verify_reset_password_token(token):
     try:
-      result = self.es.search(index="nmap", doc_type="_doc", body={"size":limit, "from":offset, "query": {"query_string": { 'query':query, "fields":["nmap_data"], "default_operator":"AND"  } },"sort": { "ctime": { "order": "desc" }}})
+      id = jwt.decode(token, app.config['SECRET_KEY'],
+                      algorithms=['HS256'])['reset_password']
     except:
-      return 0,[] # search borked, return nothing
-
-    #result = es.search(index="nmap", doc_type="_doc", body={"size":limit, "from":offset, "query": {"match": {'nmap_data':query}}})
-    count = 1
-
-    results=[] # collate results
-    for thing in result['hits']['hits']:
-      results.append(thing['_source'])
-
-    return result['hits']['total'],results
-
-
-  def newhost(self, host):
-    ip = str(host['ip'])
-    # broken in ES6
-    self.es.index(index='nmap_history', doc_type='_doc', body=host)
-    self.es.index(index='nmap', doc_type='_doc', id=ip, body=host)
-
-  def gethost(self, ip):
-    result = self.es.get(index='nmap', doc_type='_doc', id=ip)
-    return result['_source']
-
-  def getwork_mass(self): # getwork when masscan data is loaded
-
-    # get random ip
-    result = self.es.search(index="masscan_hosts", doc_type="_doc", body={"size": 1,"query": {"function_score": {"functions": [{"random_score": {"seed": random.randint(0,2**60)}}]}}})
-    randip = str(result['hits']['hits'][0]['_source']['ip'])
-
-    # get ports
-    result = self.es.search(index="masscan_services", doc_type="_doc", body={"size": 1000,"query": {"match": {'ip':randip}}})
-    ports=[] # collate results
-    for thing in result['hits']['hits']:
-      ports.append(thing['_source']['ports'][0]['port'])
-
-    work = {}
-    work['type']='nmap'
-    work['target']=randip
-    work['ports']=ports
-    return json.dumps(work)
+      return
+    return User.query.get(id)

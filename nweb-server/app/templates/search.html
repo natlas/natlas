@@ -2,7 +2,7 @@
 
 {% block content %}
   <div class="row">
-    {% include 'pagination.html' %}
+    {% include 'includes/pagination.html' %}
 
     {% if query != '' %}
       <h2 class="sub-header">{{numresults}} search results for '{{query}}'
@@ -62,6 +62,6 @@
         </tbody>
       </table>
     </div>
-    {% include 'pagination.html' %}
+    {% include 'includes/pagination.html' %}
   </div>
 {% endblock %}

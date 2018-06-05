@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-  {% include 'head.html' %}
+  {% include 'includes/head.html' %}
   <body>
-    {% include 'nav.html' %}
+    {% include 'includes/nav.html' %}
     <div class="container">
+    	{% include 'includes/messages.html' %}
       {% block content %}
       {% endblock %}
     </div> <!-- /container -->
-    {% include 'scripts.html' %}
+    {% include 'includes/scripts.html' %}
   </body>
 </html>
