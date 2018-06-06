@@ -3,48 +3,21 @@ nweb
 
 nmap scan collection and search
 
-Installing Elasticsearch
-------------------------
+nweb-server
+-------
+The nweb-server is where the data gets stored and the web interface exists so that you can search through the data.
 
-NWeb now default to using elasticsearch for the backend.  Download the latest here:
-
-https://www.elastic.co/downloads/elasticsearch
-
-```
-$ sudo apt-get install default-jre
-$ sudo dpkg -i elasticsearch-XXXXXX.deb
-$ sudo /etc/init.d/elasticsearch start
-```
-
-Running the Server
-------------------
-
-Most people will be able to just do:
-
-```
-$ apt-get install virtualenv python3-pip
-$ git clone https://github.com/pierce403/nweb.git
-$ cd nweb
-$ ./setup-server.sh
-$ ./run-server.sh
-```
-This starts the nweb server on port 5000.  Then, in a new terminal, edit scope.txt to point to the desired targets, and run:
-```
-python3 nweb_agent.py
-```
-This will start the scans, and you will soon be able to see the results in the web interface by browsing to http://127.0.0.1:5000
+You can read more about setting up and running the server on the [nweb-server/README.md](nweb-server/README.md)
 
 
-Headshotting
-------------
+nweb-agent
+-------
+The nweb-agent is what fetches work from the server and actually performs the scans.
 
-The NWeb agent uses the tools **wkhtmltoimage** and **vncsnapshot** to gather "headshots" of servers it scans.  These tools should be available in most package repos, and must be installed seperately for headshotting to work properly.  These tools also require an active X session to work, so you may need to get creative if you are trying to run NWeb on a headless server.  I've found that the easiest solution to this problem is to run a VNC server, and you may need to hard code the DISPLAY variable into the getheadshot.py file.
+You can read more about setting up and running the agent on the [nweb-agent/README.md](nweb-agent/README.md)
 
-```
-$ sudo apt install wkhtmltopdf vncsnapshot
-```
 
-Masscan
+[Optional] Masscan
 -------
 
 Rather than using nmap to scan randomly, you may be interested in initally using masscan to gather your targets.  The tool **masscan.sh** will run an appropriate masscan scan (make sure **masscan** itself is in your path).  This script will use your existing scope.txt and blacklist.txt to figure out what it should scan.  Additonally there is a **ports.txt**, which tells masscan which ports it should be scanning.  It's currently populated with the nmap top 1000 ports, but that can be changed as desired.
