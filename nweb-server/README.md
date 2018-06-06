@@ -127,6 +127,7 @@ WorkingDirectory=/opt/nweb/nweb-server
 EnvironmentFile=/opt/nweb/nweb-server/nweb.env
 ExecStart=/bin/bash /opt/nweb/nweb-server/run-server.sh
 Restart=always
+
 [Install]
 WantedBy=multi-user.target
 ```
