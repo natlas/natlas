@@ -33,3 +33,23 @@ The setup script above will attempt to automatically install these, however you 
 ```
 $ sudo apt install wkhtmltopdf vncsnapshot
 ```
+
+
+Example Systemd Unit
+------------------
+Below is an example systemd unit you can use to get nweb-agent running in systemd.
+
+```
+[Unit]
+Description=Nweb Agent
+After=network.target
+ 
+[Service]
+Type=simple
+WorkingDirectory=/opt/nweb/nweb-agent
+ExecStart=/usr/bin/python3 /opt/nweb/nweb-agent/nweb_agent.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
