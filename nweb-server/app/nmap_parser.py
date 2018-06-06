@@ -5,6 +5,13 @@ class NmapParser():
   # Nmap scan report for 127.0.0.0
   # Nmap scan report for something.something.someting.pwn (127.0.0.1)
 
+  def has_scan_report(self, data):
+    for line in data.splitlines():
+      if self.REPORT in line:
+        return True
+      else:
+        continue
+    return False
 
   def get_ip(self, data):
     for line in data.splitlines():

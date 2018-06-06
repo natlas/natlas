@@ -194,6 +194,10 @@ def submit():
 
   newhost={}
   newhost=json.loads(data)
+  
+  if not nmap.has_scan_report(newhost['nmap_data']):
+    return "[!] No scan report found! Make sure your scan includes \"%s\"" % nmap.REPORT
+
   try:
     newhost['ip'] = nmap.get_ip(newhost['nmap_data'])
     newhost['hostname'] = nmap.get_hostname(newhost['nmap_data'])
