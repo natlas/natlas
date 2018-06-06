@@ -3,7 +3,7 @@
 Installing Elasticsearch
 ------------------------
 
-NWeb now default to using elasticsearch for the backend.  Download the latest here:
+NWeb now defaults to using elasticsearch for the backend. The installation of elasticsearch isn't something I wanted to try to automate, so download the latest here and then follow the instructions below:
 
 https://www.elastic.co/downloads/elasticsearch
 
@@ -12,6 +12,7 @@ $ sudo apt-get install default-jre
 $ sudo dpkg -i elasticsearch-XXXXXX.deb
 $ sudo /etc/init.d/elasticsearch start
 ```
+
 
 The Setup
 ------------------
@@ -30,7 +31,15 @@ If you run the setup script as root, it will automatically attempt to install th
 - apt-get install python3-pip
 - pip3 install virtualenv
 
-Once this process is done, the server should be almost ready to go. But before we begin, we need to setup some instance-specific configuration options. The application does this via environment variables, which you can set however you want. Since this is the server, I encourage the use of a systemd unit and an EnvironmentFile. You can see the various options to configure in `config.py`. I'm not going to list them here because they will probably change and create conflicting information in the documentation.
+
+The Config
+------------------
+Once this process is done, the server should be almost ready to go. But before we begin, we need to setup some instance-specific configuration options. The application does this via environment variables, which you can set however you want. Since this is the server, I encourage the use of a systemd unit and an EnvironmentFile. You can see the various options to configure in `config.py`. I'm not going to list them in detail here because they will probably change and create conflicting information in the documentation.
+
+
+Setting the Scope
+------------------
+By default, we generate a `config/scope.txt` and a `config/blacklist.txt` that include loopback addresses in them. You'll want to modify this to include the scope of your targets. Each line in either file should be either a single IP address or a CIDR range. For example, to scan your local network you might add `10.0.0.0/8` to `config/scope.txt`. But maybe you know there's a specific system that will crash if you scan it, so you want to add `10.1.13.7` to `config/blacklist.txt`. This will ensure that your agents won't be tasked to scan that host.
 
 
 Starting the Server
@@ -38,7 +47,8 @@ Starting the Server
 
 Starting the server is easy and can pretty much be handled entirely by the `run-server.sh` script. Simply navigate to the nweb-server folder (where this readme is) and `./run-server.sh`. This will start the flask application in your terminal, listening on localhost on port 5000. If you really want, you could change this to listen on a specific IP address on another port, but it is encouraged that you add nginx in front of your flask application.
 
-Furthermore, you might think it's mighty inconvenient that the flask application is running in your terminal and now you can't close the terminal without shutting down the server. You can remediate this with a systemd unit (an example one will be provided), or by simply launching the server inside a `screen` session. 
+Furthermore, you might think it's mighty inconvenient that the flask application is running in your terminal and now you can't close the terminal without shutting down the server. You can remediate this with a systemd unit (an example one will be provided), or by simply launching the server inside a `screen` session.
+
 
 NGINX as a Reverse Proxy
 ------------------
