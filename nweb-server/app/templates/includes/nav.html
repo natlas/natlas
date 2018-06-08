@@ -10,11 +10,7 @@
           <a class="navbar-brand" href="/">nweb.io</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            {% if current_user.is_admin %}
-            <li><a href="{{ url_for('admin') }}">Admin</a></li>
-            {% endif %}
-          </ul>
+
 
           <form class="navbar-form navbar-right" action="{{ url_for('search') }}" name="search">
             <div class="input-group">
@@ -28,11 +24,15 @@
 
 
           <ul class="nav navbar-nav navbar-right">
+            {% if current_user.is_admin %}
+            <li><a href="{{ url_for('admin') }}">Admin</a></li>
+            {% endif %}
             {% if current_user.is_anonymous %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
             {% else %}
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
             {% endif %}
+          </ul>
           </ul>
         </div>
       </div>

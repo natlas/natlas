@@ -7,14 +7,16 @@
   <div class="row">
     <h2 class="sub-header">Admin Panel</h2>
     <h3>Invite Users</h3>
-      <form action="" method="post">
+      <form class="form-inline" action="" method="post">
         {{ inviteForm.hidden_tag() }}
-        {{ inviteForm.email.label }}<br>
-        {{ inviteForm.email(size=32) }}<br>
-        {% for error in inviteForm.email.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-        <p>{{ inviteForm.submit() }}</p>
+        <div class="input-group">
+          {{ inviteForm.email(size=32, class="form-control", placeholder="user@example.com") }}
+          {% for error in inviteForm.email.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+          {% endfor %}
+        </div>
+        {{ inviteForm.submit(class="btn btn-primary") }}
+      </form>
   </div>
   {% endif %}
 {% endblock %}
