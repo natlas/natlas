@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if not current_user.is_admin %}
+  <div class="row">
+  	<h2 class="sub-header">You're not an admin!</h2>
+  {% else %}
+  <div class="row">
+    <h2 class="sub-header">Admin Panel</h2>
+    <h3>Invite Users</h3>
+      <form action="" method="post">
+        {{ inviteForm.hidden_tag() }}
+        {{ inviteForm.email.label }}<br>
+        {{ inviteForm.email(size=32) }}<br>
+        {% for error in inviteForm.email.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        <p>{{ inviteForm.submit() }}</p>
+  </div>
+  {% endif %}
+{% endblock %}

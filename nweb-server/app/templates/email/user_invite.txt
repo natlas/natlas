@@ -1,0 +1,5 @@
+You've been invited to nweb! Use the link below to set a password.
+
+{{ url_for('reset_password', token=token, _external=True) }}
+
+If you did not want this invitation, simply disregard it.

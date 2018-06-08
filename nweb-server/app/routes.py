@@ -15,8 +15,8 @@ from datetime import datetime
 from app import app, elastic, db
 from app import login as lm
 from app.models import User
-from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
-from app.email import send_password_reset_email
+from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, InviteUserForm
+from app.email import send_password_reset_email, send_user_invite_email
 from .nmap_parser import NmapParser
 
 @app.before_request
@@ -107,6 +107,18 @@ def host():
   context = elastic.gethost(host)
   return render_template("host.html",**context)
 
+@app.route('/admin', methods=['GET', 'POST'])
+@isAuthenticated
+def admin():
+  inviteForm = InviteUserForm()
+  if inviteForm.validate_on_submit():
+    newUser = User(email=inviteForm.email.data)
+    db.session.add(newUser)
+    db.session.commit()
+    send_user_invite_email(newUser)
+    flash('Invitation Sent!', 'success')
+    return redirect(url_for('admin'))
+  return render_template("admin.html", inviteForm=inviteForm)
 
 @app.route('/')
 @isAuthenticated
@@ -194,7 +206,7 @@ def submit():
 
   newhost={}
   newhost=json.loads(data)
-  
+
   if not nmap.has_scan_report(newhost['nmap_data']):
     return "[!] No scan report found! Make sure your scan includes \"%s\"" % nmap.REPORT
 
