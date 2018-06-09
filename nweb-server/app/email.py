@@ -16,7 +16,7 @@ def send_email(subject, sender, recipients, text_body):
 def send_password_reset_email(user):
     token = user.get_reset_password_token()
     send_email('[nweb] Reset Your Password',
-               sender=app.config['ADMINS'][0],
+               sender=app.config['MAIL_FROM'],
                recipients=[user.email],
                text_body=render_template('email/reset_password.txt',
                                          user=user, token=token))
@@ -24,7 +24,7 @@ def send_password_reset_email(user):
 def send_user_invite_email(user):
     token = user.get_reset_password_token()
     send_email('[nweb] You\'ve been invited to nweb!',
-               sender=app.config['ADMINS'][0],
+               sender=app.config['MAIL_FROM'],
                recipients=[user.email],
                text_body=render_template('email/user_invite.txt',
                                          user=user, token=token))
