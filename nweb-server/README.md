@@ -101,19 +101,20 @@ server {
         ssl_prefer_server_ciphers on;
         ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
         ssl_ecdh_curve secp384r1;
-        ssl_dhparam /etc/nginx/dhparam.pem;
+#        ssl_dhparam /etc/nginx/dhparam.pem; # you should generate strong dhparams and then enable this
 
         add_header X-Frame-Options DENY;
         add_header X-Content-Type-Options nosniff;
         add_header X-XSS-Protection "1; mode=block";
         add_header X-Robots-Tag none;
-        add_header Strict-Transport-Security "max-age=31536000";
+#        add_header Strict-Transport-Security "max-age=31536000"; # enable this after you've confirmed things are working
 
         location / {
                 proxy_set_header Host $host;
                 proxy_set_header REMOTE_ADDR $remote_addr;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
                 proxy_pass http://127.0.0.1:5000;
         }
 }
