@@ -16,6 +16,7 @@ class Config(object):
 	# Display Config
 	RESULTS_PER_PAGE = 100
 	PREVIEW_LENGTH = 100
+	PREFERRED_URL_SCHEME = 'https'
 
 	# Data store config
 	ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL') or \
