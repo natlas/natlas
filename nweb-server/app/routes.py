@@ -42,7 +42,8 @@ def internal_server_error(e):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('search'))
+      flash("You're already logged in!", "info")
+      return redirect(url_for('search'))
     form = LoginForm()
     if form.validate_on_submit():
       user = User.query.filter_by(email=form.email.data).first()
@@ -146,29 +147,51 @@ def search():
   else:
     return render_template("search.html",query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
+def hostinfo(ip):
+  hostinfo={}
+  count,context = elastic.gethost(ip)
+  if count == 0:
+    return abort(404)
+  hostinfo['history'] = count
+  headshots=0
+  headshotTypes = ['headshot', 'vncheadshot', 'httpheadshot', 'httpsheadshot']
+  for hs in headshotTypes:
+    if context.get(hs):
+      headshots+=1
+  hostinfo['headshots'] = headshots
+  if context.get('hostname'):
+    hostinfo['hostname'] = context.get('hostname')
+  return hostinfo, context
+
 # Create your views here.
 @app.route('/host/<ip>')
 @isAuthenticated
 def host(ip):
-  count,context = elastic.gethost(ip)
-  if count == 0:
-    abort(404)
-  return render_template("host.html",**context, history=count)
+  info,context = hostinfo(ip)
+  return render_template("host/summary.html",**context, info=info)
 
 @app.route('/host/<ip>/history')
 @isAuthenticated
 def host_history(ip):
+  info,context = hostinfo(ip)
   page = int(request.args.get('p', 1))
   searchOffset = app.config['RESULTS_PER_PAGE'] * (page-1)
 
   count,context = elastic.gethost_history(ip, app.config['RESULTS_PER_PAGE'], searchOffset)
-
+  if count == 0:
+    abort(404)
   next_url = url_for('host_history', ip=ip, p=page + 1) \
       if count > page * app.config['RESULTS_PER_PAGE'] else None
   prev_url = url_for('host_history', ip=ip, p=page - 1) \
       if page > 1 else None
 
-  return render_template("host_history.html", ip=ip, numresults=count, page=page, hosts=context,next_url=next_url, prev_url=prev_url)
+  return render_template("host/history.html", ip=ip, info=info, page=page, hosts=context,next_url=next_url, prev_url=prev_url)
+
+@app.route('/host/<ip>/headshots')
+@isAuthenticated
+def host_headshots(ip):
+  info,context = hostinfo(ip)
+  return render_template("host/headshots.html", **context, info=info)
 
 ### API / AGENT ROUTES ###
 

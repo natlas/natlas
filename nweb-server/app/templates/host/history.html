@@ -1,18 +1,10 @@
 {% extends "base.html" %}
-
+{% set active_page = "history" %}
 {% block content %}
   <div class="row">
-    {% include 'includes/pagination.html' %}
-
-    <h2 class="sub-header">{{numresults}} historical results for {{ip}}
+    {% include 'includes/host_header.html' %}
     <div class="table-responsive">
       <table class="table table-striped">
-        <thead>
-          <tr>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
         <tbody>
           {% for host in hosts %}
             <tr>

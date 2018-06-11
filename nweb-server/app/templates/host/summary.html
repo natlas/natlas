@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% set active_page = "summary" %}
+{% block content %}
+  <div class="row">
+    {% include 'includes/host_header.html' %}
+    {% if nmap_data|length > 0 %}
+    <pre class="nmap_data">{{ nmap_data }}</pre>
+    {% endif %}
+  </div>
+{% endblock %}

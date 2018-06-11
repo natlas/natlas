@@ -107,6 +107,7 @@ body {
 .nmap_data {
   white-space: pre-wrap;
   margin-bottom:0px;
+  margin-top:1em;
 }
 .preview_nmap {
   background-color:rgba(0,0,0,0.5);
@@ -128,4 +129,19 @@ a.preview_link, a:hover.preview_link {
 
 .register-link {
   margin-top:1em;
+}
+
+.host-nav {
+  margin-bottom:1em;
+}
+
+.table-striped>tbody>tr:first-child>td {
+  border-top:none;
+}
+
+.host-headshot {
+  max-width:100%;
+}
+.headshot-header {
+  border-bottom:1px solid #cfcfcf;
 }

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% set active_page = "headshots" %}
+{% block content %}
+  <div class="row">
+    {% include 'includes/host_header.html' %}
+	{% if headshot %}
+	  <h3 class="headshot-header">Unknown Headshot</h3>
+	  <img src="data:image/jpeg;base64,{{ headshot }}" class="host-headshot"></br>
+	{% endif %}
+	{% if vncheadshot %}
+	  <h3 class="headshot-header">VNC</h3>
+	  <img src="data:image/jpeg;base64,{{ vncheadshot }}" class="host-headshot"></br>
+	{% endif %}
+	{% if httpheadshot %}
+	  <h3 class="headshot-header">HTTP</h3>
+	  <img src="data:image/jpeg;base64,{{ httpheadshot }}" class="host-headshot"></br>
+	{% endif %}
+	{% if httpsheadshot %}
+	  <h3 class="headshot-header">HTTPS</h3>
+	  <img src="data:image/jpeg;base64,{{ httpsheadshot }}" class="host-headshot"></br>
+	{% endif %}
+  </div>
+{% endblock %}
+
+    
