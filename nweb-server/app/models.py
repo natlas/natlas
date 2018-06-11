@@ -37,3 +37,17 @@ class User(UserMixin, db.Model):
     except:
       return
     return User.query.get(id)
+
+  def get_invite_token(self, expires_in=172800):
+    return jwt.encode(
+      {'invite_user': self.id, 'exp': time() + expires_in},
+      app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+  @staticmethod
+  def verify_invite_token(token):
+    try:
+      id = jwt.decode(token, app.config['SECRET_KEY'],
+                      algorithms=['HS256'])['invite_user']
+    except:
+      return
+    return User.query.get(id)

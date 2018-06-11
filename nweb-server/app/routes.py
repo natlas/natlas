@@ -15,7 +15,7 @@ from datetime import datetime
 from app import app, elastic, db
 from app import login as lm
 from app.models import User
-from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, InviteUserForm
+from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, InviteUserForm, InviteConfirmForm
 from app.email import send_password_reset_email, send_user_invite_email
 from .nmap_parser import NmapParser
 
@@ -104,9 +104,26 @@ def reset_password(token):
   if form.validate_on_submit():
     user.set_password(form.password.data)
     db.session.commit()
-    flash('Your password has been reset.', "info")
+    flash('Your password has been reset.', "success")
     return redirect(url_for('login'))
   return render_template('password_reset.html', form=form)
+
+@app.route('/invite/<token>', methods=['GET', 'POST'])
+def invite_user(token):
+  if current_user.is_authenticated:
+    return redirect(url_for('index'))
+  user = User.verify_invite_token(token)
+  if not user:
+    flash("Failed to verify invite token!", "danger")
+    flash(User.verify_invite_token(token))
+    return redirect(url_for('index'))
+  form = InviteConfirmForm()
+  if form.validate_on_submit():
+    user.set_password(form.password.data)
+    db.session.commit()
+    flash('Your password has been set.', "success")
+    return redirect(url_for('login'))
+  return render_template('accept_invite.html', form=form)
 
 @app.route('/admin', methods=['GET', 'POST'])
 @isAuthenticated

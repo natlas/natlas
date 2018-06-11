@@ -22,7 +22,7 @@ def send_password_reset_email(user):
                                          user=user, token=token))
 
 def send_user_invite_email(user):
-    token = user.get_reset_password_token()
+    token = user.get_invite_token()
     send_email('[nweb] You\'ve been invited to nweb!',
                sender=app.config['MAIL_FROM'],
                recipients=[user.email],
