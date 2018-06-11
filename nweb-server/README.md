@@ -41,6 +41,7 @@ Setting the Scope
 ------------------
 By default, we generate a `config/scope.txt` and a `config/blacklist.txt` that include loopback addresses in them. You'll want to modify this to include the scope of your targets. Each line in either file should be either a single IP address or a CIDR range. For example, to scan your local network you might add `10.0.0.0/8` to `config/scope.txt`. But maybe you know there's a specific system that will crash if you scan it, so you want to add `10.1.13.7` to `config/blacklist.txt`. This will ensure that your agents won't be tasked to scan that host.
 
+
 Initializing the Database
 ------------------
 There's one more thing we need to do, and that's initialize the metadata database with the correct schema. This is done using the flask-migrate plugin, and can be done like so:
@@ -51,6 +52,18 @@ $ source venv/bin/activate
 $ export FLASK_APP=nweb-server.py
 $ flask db upgrade
 $ deactivate
+```
+
+Giving a User Admin Privilege
+------------------
+Certain functions are restricted to only users with administrative privilege. Currently the only case for this is when you're inviting a new user, however future use cases will include modifying certain platform configurations (such as whether or not login is required or registration is allowed) and deleting data that is found to be irrelevant, out of scope, plain wrong, or otherwise not valuable.
+
+To give an existing user account admin privileges, you can use the add-admin.py script. This relies on loading the app to interact with the User model, so you need to run it from within your virtual environment.
+
+```
+$ cd nweb/nweb-server
+$ source venv/bin/activate
+$ python3 add-admin.py user@example.com
 ```
 
 Starting the Server
