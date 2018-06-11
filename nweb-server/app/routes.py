@@ -1,5 +1,5 @@
 import flask
-from flask import render_template, request, Flask, g, url_for, flash, redirect, current_app
+from flask import render_template, request, Flask, g, url_for, flash, redirect, abort
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 from netaddr import *
@@ -30,6 +30,14 @@ def isAuthenticated(f):
       return lm.unauthorized()
     return f(*args, **kwargs)
   return decorated_function
+
+@app.errorhandler(404)
+def page_not_found(e):
+  return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+  return render_template('500.html'), 500
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -99,14 +107,6 @@ def reset_password(token):
     return redirect(url_for('login'))
   return render_template('password_reset.html', form=form)
 
-# Create your views here.
-@app.route('/host')
-@isAuthenticated
-def host():
-  host = request.args.get('h')
-  context = elastic.gethost(host)
-  return render_template("host.html",**context)
-
 @app.route('/admin', methods=['GET', 'POST'])
 @isAuthenticated
 def admin():
@@ -121,6 +121,11 @@ def admin():
   return render_template("admin.html", inviteForm=inviteForm)
 
 @app.route('/')
+@isAuthenticated
+def index():
+  return redirect(url_for('search'))
+
+@app.route('/search')
 @isAuthenticated
 def search():
   query = request.args.get('q', '')
@@ -140,6 +145,32 @@ def search():
     return render_template("hostlist.html",query=query, numresults=count, page=page, hosts=context)
   else:
     return render_template("search.html",query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
+
+# Create your views here.
+@app.route('/host/<ip>')
+@isAuthenticated
+def host(ip):
+  count,context = elastic.gethost(ip)
+  if count == 0:
+    abort(404)
+  return render_template("host.html",**context, history=count)
+
+@app.route('/host/<ip>/history')
+@isAuthenticated
+def host_history(ip):
+  page = int(request.args.get('p', 1))
+  searchOffset = app.config['RESULTS_PER_PAGE'] * (page-1)
+
+  count,context = elastic.gethost_history(ip, app.config['RESULTS_PER_PAGE'], searchOffset)
+
+  next_url = url_for('host_history', ip=ip, p=page + 1) \
+      if count > page * app.config['RESULTS_PER_PAGE'] else None
+  prev_url = url_for('host_history', ip=ip, p=page - 1) \
+      if page > 1 else None
+
+  return render_template("host_history.html", ip=ip, numresults=count, page=page, hosts=context,next_url=next_url, prev_url=prev_url)
+
+### API / AGENT ROUTES ###
 
 @app.route('/getwork')
 def getwork():

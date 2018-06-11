@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="row">
-    <h2 class="sub-header">Host information for '{{hostname}}'</h2>
+    <h2 class="sub-header">{{ ip }} - {{ hostname }}</h2>
+    {% if history %}
+    <a href="{{ url_for('host_history', ip=ip) }}">History ({{ history }})</a>
+    {% endif %}
     <div class="table-responsive">
       <table class="table table-striped">
         <thead>
@@ -13,13 +16,9 @@
         <tbody>
           {% if nmap_data|length > 0 %}
           <br><pre class="nmap_data">{{ nmap_data }}</pre>
-        {% else %}
-          wat?
-        {% endif %}
-      </tbody>
-    </table>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
-</div>
-</div>
 {% endblock %}

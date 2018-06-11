@@ -34,8 +34,19 @@ class Elastic:
     self.es.index(index='nmap', doc_type='_doc', id=ip, body=host)
 
   def gethost(self, ip):
-    result = self.es.get(index='nmap', doc_type='_doc', id=ip)
-    return result['_source']
+    result = self.es.search(index='nmap_history', doc_type='_doc', body={"size":1, "query": {"query_string": { 'query':ip, "fields":["nmap_data"], "default_operator":"AND"  } },"sort": { "ctime": { "order": "desc" }}})
+    if result['hits']['total'] == 0:
+      return 0,None
+    return result['hits']['total'],result['hits']['hits'][0]['_source']
+
+  def gethost_history(self, ip, limit, offset):
+    result = self.es.search(index='nmap_history', doc_type='_doc', body={"size":limit, "from":offset, "query": {"query_string": { 'query':ip, "fields":["nmap_data"], "default_operator":"AND"  } },"sort": { "ctime": { "order": "desc" }}})
+    
+    results=[] # collate results
+    for thing in result['hits']['hits']:
+      results.append(thing['_source'])
+
+    return result['hits']['total'],results
 
   def getwork_mass(self): # getwork when masscan data is loaded
 

@@ -4,12 +4,7 @@
   <div class="row">
     {% include 'includes/pagination.html' %}
 
-    {% if query != '' %}
-      <h2 class="sub-header">{{numresults}} search results for '{{query}}'
-      <a href="?q={{query}}&p={{page}}&f=hostlist"> [hostlist]</a></h2>
-    {% else %}
-      <h2 class="sub-header">{{numresults}} hosts scanned</h2>
-    {% endif %}
+    <h2 class="sub-header">{{numresults}} historical results for {{ip}}
     <div class="table-responsive">
       <table class="table table-striped">
         <thead>
