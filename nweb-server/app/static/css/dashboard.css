@@ -145,3 +145,11 @@ a.preview_link, a:hover.preview_link {
 .headshot-header {
   border-bottom:1px solid #cfcfcf;
 }
+
+.green {
+  color:green;
+}
+
+.red {
+  color:red;
+}

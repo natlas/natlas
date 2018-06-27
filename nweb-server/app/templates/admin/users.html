@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if not current_user.is_admin %}
+  <div class="row">
+  	<h2 class="sub-header">You're not an admin!</h2>
+  </div>
+  {% else %}
+  <div class="row">
+    <h2 class="sub-header">Admin Panel</h2>
+    <h3>Invite Users</h3>
+    <form class="form-inline" action="" method="post">
+      {{ inviteForm.hidden_tag() }}
+      <div class="input-group">
+        {{ inviteForm.email(size=32, class="form-control", placeholder="user@example.com") }}
+        {% for error in inviteForm.email.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+      </div>
+      {{ inviteForm.submit(class="btn btn-primary") }}
+    </form>
+    {% if users %}
+    <h3>Manage Users</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Email</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <th scope="row">{{ user.id }}</th>
+          <td>{{ user.email }}{% if user.is_admin %} <span class="badge">admin</span>{% endif %}</td>
+          <td><form method="POST" action="{{ url_for('deleteUser', id=user.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteUser(class="btn btn-danger") }}</form></td>
+          <td><form method="POST" action="{{ url_for('toggleUser', id=user.id) }}">{{ editForm.hidden_tag() }}{{ editForm.editUser(class="btn btn-danger") }}</form></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+  {% endif %}
+{% endblock %}

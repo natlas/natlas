@@ -46,3 +46,9 @@ class InviteConfirmForm(FlaskForm):
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Set Password')
+
+class UserDeleteForm(FlaskForm):
+    deleteUser = SubmitField('Delete User')
+
+class UserEditForm(FlaskForm):
+    editUser = SubmitField('Toggle Admin')

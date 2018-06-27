@@ -15,7 +15,7 @@ from datetime import datetime
 from app import app, elastic, db
 from app import login as lm
 from app.models import User
-from app.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, InviteUserForm, InviteConfirmForm
+from app.forms import *
 from app.email import send_password_reset_email, send_user_invite_email
 from .nmap_parser import NmapParser
 
@@ -128,6 +128,15 @@ def invite_user(token):
 @app.route('/admin', methods=['GET', 'POST'])
 @isAuthenticated
 def admin():
+  
+  return render_template("admin/index.html")
+
+@app.route('/admin/users', methods=['GET', 'POST'])
+@isAuthenticated
+def admin_users():
+  users = User.query.all()
+  delForm = UserDeleteForm()
+  editForm = UserEditForm()
   inviteForm = InviteUserForm()
   if inviteForm.validate_on_submit():
     newUser = User(email=inviteForm.email.data)
@@ -135,8 +144,54 @@ def admin():
     db.session.commit()
     send_user_invite_email(newUser)
     flash('Invitation Sent!', 'success')
-    return redirect(url_for('admin'))
-  return render_template("admin.html", inviteForm=inviteForm)
+    return redirect(url_for('admin_users'))
+  return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
+
+@app.route('/admin/users/<int:id>/delete', methods=['POST'])
+@isAuthenticated
+def deleteUser(id):
+  if current_user.is_admin:
+    delForm = UserDeleteForm()
+    if delForm.validate_on_submit():
+      if current_user.id == id:
+        flash('You can\'t delete yourself!', 'danger')
+        return redirect(url_for('admin_users'))
+      user = User.query.filter_by(id=id).first()
+      User.query.filter_by(id=id).delete()
+      db.session.commit()
+      flash('%s deleted!' % user.email, 'success')
+      return redirect(url_for('admin_users'))
+    else:
+      return "Form couldn't validate!"  
+  else:
+    return "Not an admin!"
+
+@app.route('/admin/users/<int:id>/toggle', methods=['POST'])
+@isAuthenticated
+def toggleUser(id):
+  if current_user.is_admin:
+    editForm = UserEditForm()
+    if editForm.validate_on_submit():
+      user = User.query.filter_by(id=id).first()
+      if user.is_admin:
+        admins = User.query.filter_by(is_admin=True).all()
+        if len(admins) == 1:
+          flash('Can\'t delete the last admin!', 'danger')
+          return redirect(url_for('admin_users'))
+        user.is_admin = False
+        db.session.commit()
+        flash('User demoted!', 'success')
+        return redirect(url_for('admin_users'))
+      else:
+        user.is_admin = True
+        db.session.commit()
+        flash('User promoted!', 'success')
+        return redirect(url_for('admin_users'))
+    else:
+      return "Form couldn't validate!"
+    #User.query.filter_by(id=id).delete()
+  else:
+    return "Not an admin!"
 
 @app.route('/')
 @isAuthenticated
