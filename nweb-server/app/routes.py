@@ -162,9 +162,11 @@ def deleteUser(id):
       flash('%s deleted!' % user.email, 'success')
       return redirect(url_for('admin_users'))
     else:
-      return "Form couldn't validate!"  
+      flash("Form couldn't validate!", 'danger')
+      return redirect(url_for('admin_users'))
   else:
-    return "Not an admin!"
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
 
 @app.route('/admin/users/<int:id>/toggle', methods=['POST'])
 @isAuthenticated
@@ -188,10 +190,11 @@ def toggleUser(id):
         flash('User promoted!', 'success')
         return redirect(url_for('admin_users'))
     else:
-      return "Form couldn't validate!"
-    #User.query.filter_by(id=id).delete()
+      flash("Form couldn't validate!", 'danger')
+      return redirect(url_for('admin_users'))
   else:
-    return "Not an admin!"
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
 
 @app.route('/')
 @isAuthenticated
