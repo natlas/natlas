@@ -125,7 +125,7 @@ def invite_user(token):
     return redirect(url_for('login'))
   return render_template('accept_invite.html', form=form)
 
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/admin', methods=['GET'])
 @isAuthenticated
 def admin():
   
