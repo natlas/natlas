@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% set active_page = "config" %}
 {% block content %}
   {% if not current_user.is_admin %}
   <div class="row">
@@ -6,8 +7,7 @@
   </div>
   {% else %}
   <div class="row">
-    <h2 class="sub-header">Admin Panel</h2>
-    <h3><a href="{{ url_for('admin_users') }}">Manage Users</a></h3>
+    {% include 'includes/admin_header.html' %}
   </div>
   {% endif %}
 {% endblock %}

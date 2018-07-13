@@ -10,11 +10,12 @@ import json
 import random
 import sys
 import traceback
+import ipaddress
 from datetime import datetime
 
 from app import app, elastic, db
 from app import login as lm
-from app.models import User
+from app.models import User, ScopeItem
 from app.forms import *
 from app.email import send_password_reset_email, send_user_invite_email
 from .nmap_parser import NmapParser
@@ -128,24 +129,31 @@ def invite_user(token):
 @app.route('/admin', methods=['GET'])
 @isAuthenticated
 def admin():
-  
-  return render_template("admin/index.html")
+  if current_user.is_admin:
+    return render_template("admin/index.html")
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
 
 @app.route('/admin/users', methods=['GET', 'POST'])
 @isAuthenticated
 def admin_users():
-  users = User.query.all()
-  delForm = UserDeleteForm()
-  editForm = UserEditForm()
-  inviteForm = InviteUserForm()
-  if inviteForm.validate_on_submit():
-    newUser = User(email=inviteForm.email.data)
-    db.session.add(newUser)
-    db.session.commit()
-    send_user_invite_email(newUser)
-    flash('Invitation Sent!', 'success')
-    return redirect(url_for('admin_users'))
-  return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
+  if current_user.is_admin:
+    users = User.query.all()
+    delForm = UserDeleteForm()
+    editForm = UserEditForm()
+    inviteForm = InviteUserForm()
+    if inviteForm.validate_on_submit():
+      newUser = User(email=inviteForm.email.data)
+      db.session.add(newUser)
+      db.session.commit()
+      send_user_invite_email(newUser)
+      flash('Invitation Sent!', 'success')
+      return redirect(url_for('admin_users'))
+    return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
 
 @app.route('/admin/users/<int:id>/delete', methods=['POST'])
 @isAuthenticated
@@ -192,6 +200,90 @@ def toggleUser(id):
     else:
       flash("Form couldn't validate!", 'danger')
       return redirect(url_for('admin_users'))
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
+
+@app.route('/admin/scope', methods=['GET', 'POST'])
+@isAuthenticated
+def admin_scope():
+  if current_user.is_admin:
+    scope = ScopeItem.getScope()
+    newForm = NewScopeForm()
+    delForm = ScopeDeleteForm()
+    editForm = ScopeToggleForm()
+    if newForm.validate_on_submit():
+      newTarget = ScopeItem(target=newForm.target.data, blacklist=False)
+      db.session.add(newTarget)
+      db.session.commit()
+      flash('Target added!', 'success')
+      return redirect(url_for('admin_scope'))
+    return render_template("admin/scope.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm)
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
+
+@app.route('/admin/blacklist', methods=['GET', 'POST'])
+@isAuthenticated
+def admin_blacklist():
+  if current_user.is_admin:
+    scope = ScopeItem.getBlacklist()
+    newForm = NewScopeForm()
+    delForm = ScopeDeleteForm()
+    editForm = ScopeToggleForm()
+    if newForm.validate_on_submit():
+      newTarget = ScopeItem(target=newForm.target.data, blacklist=True)
+      db.session.add(newTarget)
+      db.session.commit()
+      flash('Target blacklisted!', 'success')
+      return redirect(url_for('admin_blacklist'))
+    return render_template("admin/blacklist.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm)
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
+
+@app.route('/admin/scope/<int:id>/delete', methods=['POST'])
+@isAuthenticated
+def deleteScopeItem(id):
+  if current_user.is_admin:
+    delForm = ScopeDeleteForm()
+    if delForm.validate_on_submit():
+      item = ScopeItem.query.filter_by(id=id).first()
+      if item.blacklist:
+        redirectLoc = 'admin_blacklist'
+      else:
+        redirectLoc = 'admin_scope'
+      ScopeItem.query.filter_by(id=id).delete()
+      db.session.commit()
+      flash('%s deleted!' % item.target, 'success')
+      return redirect(url_for(redirectLoc))
+    else:
+      flash("Form couldn't validate!", 'danger')
+      return redirect(url_for(redirectLoc))
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
+
+@app.route('/admin/scope/<int:id>/toggle', methods=['POST'])
+@isAuthenticated
+def toggleScopeItem(id):
+  if current_user.is_admin:
+    toggleForm = ScopeToggleForm()
+    if toggleForm.validate_on_submit():
+      item = ScopeItem.query.filter_by(id=id).first()
+      if item.blacklist:
+        item.blacklist = False
+        db.session.commit()
+        flash('%s removed from blacklist!' % item.target, 'success')
+        return redirect(url_for('admin_blacklist'))
+      else:
+        item.blacklist = True
+        db.session.commit()
+        flash('%s blacklisted!' % item.target, 'success')
+        return redirect(url_for('admin_scope'))
+    else:
+      flash("Form couldn't validate!", 'danger')
+      return redirect(url_for('admin_scope'))
   else:
     flash("You're not an admin!", 'danger')
     return redirect(url_for('index'))
@@ -243,6 +335,7 @@ def hostinfo(ip):
 @isAuthenticated
 def host(ip):
   info,context = hostinfo(ip)
+  print("Is Acceptable Target: %s" % (isAcceptableTarget(ip)))
   return render_template("host/summary.html",**context, info=info)
 
 @app.route('/host/<ip>/history')
@@ -270,6 +363,40 @@ def host_headshots(ip):
 
 ### API / AGENT ROUTES ###
 
+def isAcceptableTarget(target):
+  targetAddr = ipaddress.IPv4Address(target)
+  print("Target: %s" % [targetAddr])
+  inScope = False
+
+  scope=[]
+  for item in ScopeItem.getScope():
+    scope.append(ipaddress.ip_network(item.target))
+  print("Scope: %s" % scope)
+
+  for network in scope:
+    if str(network).endswith('/32'):
+      if targetAddr == ipaddress.IPv4Address(str(network).strip('/32')):
+        inScope = True
+    if targetAddr in list(network.hosts()):
+      inScope = True
+
+  if not inScope:
+    return False
+
+  blacklist=[]
+  for item in ScopeItem.getBlacklist():
+    blacklist.append(ipaddress.ip_network(item.target))
+
+  for network in blacklist:
+    if str(network).endswith('/32'):
+      if targetAddr == ipaddress.IPv4Address(str(network).strip('/32')):
+        return False
+    if targetAddr in list(network.hosts()):
+      return False
+
+  return True
+
+
 @app.route('/getwork')
 def getwork():
 
@@ -280,28 +407,18 @@ def getwork():
 
   random.seed(os.urandom(200))
   scope=[]
-  try:
-    for line in open(app.config['SCOPE_DOC']):
-      try:
-        scope.append(IPNetwork(line))
-      except:
-        print("[!] Line %s in %s failed to parse" % (line, app.config['SCOPE_DOC']))
-  except:
-    print("[!] Failed to find %s" % app.config['SCOPE_DOC'])
-    scope=[]
-    scope.append(IPNetwork("127.0.0.1"))
+  for item in ScopeItem.getScope():
+    scope.append(ipaddress.ip_network(item.target))
 
   blacklist=[]
-  try:
-    for line in open(app.config['BLACKLIST_DOC']):
-      blacklist.append(IPNetwork(line))
-  except Exception as e:
-    print("[!] Failed to parse %s :"+str(e)[:-1]+" '"+line[:-1]+"'" % app.config['BLACKLIST_DOC'])
-    blacklist=[]
+  for item in ScopeItem.getBlacklist():
+    blacklist.append(ipaddress.ip_network(item.target))
 
   # how many hosts are in scope?
-  magnitude = sum(len(network) for network in scope)
-  print("[+] There are %s IPs in %s" % (magnitude, app.config['SCOPE_DOC']))
+  magnitude = sum(network.num_addresses for network in scope)
+  blacklistSize = sum(network.num_addresses for network in blacklist)
+  print("[+] Scope Size: %s IPs" % (magnitude))
+  print("[+] Blacklist Size: %s IPs" % (blacklistSize))
 
   attempts=0
   work = {}
@@ -313,8 +430,8 @@ def getwork():
 
     target=""
     for network in scope:
-      if index>=len(network):
-        index-=len(network)
+      if index>=network.num_addresses:
+        index-=network.num_addresses
       else:
         #target=network[index]
         isgood=True
@@ -341,6 +458,8 @@ def submit():
 
   try:
     newhost['ip'] = nmap.get_ip(newhost['nmap_data'])
+    if not isAcceptableTarget(newhost['ip']):
+      return "[!] This address isn't in our authorized scope!"
     newhost['hostname'] = nmap.get_hostname(newhost['nmap_data'])
     newhost['ports'] = str(nmap.get_ports(newhost['nmap_data']))
     newhost['ctime'] = datetime.now()

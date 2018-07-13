@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set active_page = "blacklist" %}
+{% block content %}
+  {% if not current_user.is_admin %}
+  <div class="row">
+  	<h2 class="sub-header">You're not an admin!</h2>
+  </div>
+  {% else %}
+  <div class="row">
+    {% include 'includes/admin_header.html' %}
+    <h3>Add Blacklist</h3>
+    <form class="form-inline" action="" method="post">
+      {{ newForm.hidden_tag() }}
+      <div class="input-group">
+        {{ newForm.target(size=32, class="form-control", placeholder="E.g. 10.0.0.0/8") }}
+        {% for error in newForm.target.errors %}
+        <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </div>
+      {{ newForm.submit(class="btn btn-primary") }}
+    </form>
+    <h3>Manage Blacklist</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Target</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in scope %}
+        <tr>
+          <th scope="row">{{ item.id }}</th>
+          <td>{{ item.target }}</td>
+          <td><form method="POST" action="{{ url_for('deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger") }}</form></td>
+          <td><form method="POST" action="{{ url_for('toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning") }}</form></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+{% endblock %}
