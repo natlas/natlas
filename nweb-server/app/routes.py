@@ -335,7 +335,6 @@ def hostinfo(ip):
 @isAuthenticated
 def host(ip):
   info,context = hostinfo(ip)
-  print("Is Acceptable Target: %s" % (isAcceptableTarget(ip)))
   return render_template("host/summary.html",**context, info=info)
 
 @app.route('/host/<ip>/history')
@@ -365,13 +364,11 @@ def host_headshots(ip):
 
 def isAcceptableTarget(target):
   targetAddr = ipaddress.IPv4Address(target)
-  print("Target: %s" % [targetAddr])
   inScope = False
 
   scope=[]
   for item in ScopeItem.getScope():
     scope.append(ipaddress.ip_network(item.target))
-  print("Scope: %s" % scope)
 
   for network in scope:
     if str(network).endswith('/32'):
