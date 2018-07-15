@@ -40,6 +40,12 @@
         {% endfor %}
       </tbody>
     </table>
+    <h3>Import Blacklist</h3>
+    <form method="POST" action="{{ url_for('importBlacklist') }}">
+      {{ importForm.hidden_tag() }}
+      {{ importForm.scope }}
+      {{ importForm.submit }}
+    </form>
   </div>
   {% endif %}
 {% endblock %}

@@ -213,13 +213,16 @@ def admin_scope():
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
+    importForm = ImportScopeForm()
     if newForm.validate_on_submit():
+      if '/' not in newForm.target.data:
+        newForm.target.data = newForm.target.data + '/32'
       newTarget = ScopeItem(target=newForm.target.data, blacklist=False)
       db.session.add(newTarget)
       db.session.commit()
-      flash('Target added!', 'success')
+      flash('%s added!' % newTarget.target, 'success')
       return redirect(url_for('admin_scope'))
-    return render_template("admin/scope.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm)
+    return render_template("admin/scope.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
   else:
     flash("You're not an admin!", 'danger')
     return redirect(url_for('index'))
@@ -232,13 +235,76 @@ def admin_blacklist():
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
+    importForm = ImportScopeForm()
     if newForm.validate_on_submit():
+      if '/' not in newForm.target.data:
+        newForm.target.data = newForm.target.data + '/32'
       newTarget = ScopeItem(target=newForm.target.data, blacklist=True)
       db.session.add(newTarget)
       db.session.commit()
-      flash('Target blacklisted!', 'success')
+      flash('%s blacklisted!' % newTarget.target, 'success')
       return redirect(url_for('admin_blacklist'))
-    return render_template("admin/blacklist.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm)
+    return render_template("admin/blacklist.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
+
+@app.route('/admin/scope/import', methods=['POST'])
+@isAuthenticated
+def importScope():
+  if current_user.is_admin:
+    importForm = ImportScopeForm()
+    if importForm.validate_on_submit():
+      successImport = 0
+      newScopeItems = importForm.scope.data.split('\n')
+      for item in newScopeItems:
+        item = item.strip()
+        if '/' not in item:
+          item = item + '/32'
+        exists = ScopeItem.query.filter_by(target=item).first()
+        if exists:
+          continue
+        newTarget = ScopeItem(target=item, blacklist=False)
+        db.session.add(newTarget)
+        db.session.commit()
+        successImport += 1
+      flash('%s targets added to scope!' % successImport, 'success')
+      return redirect(url_for('admin_scope'))
+    else:
+      for field,errors in importForm.errors.items():
+        for error in errors:
+          flash(error, 'danger')
+      return redirect(url_for('admin_scope'))
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
+
+@app.route('/admin/blacklist/import', methods=['POST'])
+@isAuthenticated
+def importBlacklist():
+  if current_user.is_admin:
+    importForm = ImportScopeForm()
+    if importForm.validate_on_submit():
+      successImport = 0
+      newScopeItems = importForm.scope.data.split('\n')
+      for item in newScopeItems:
+        item = item.strip()
+        if '/' not in item:
+          item = item + '/32'
+        exists = ScopeItem.query.filter_by(target=item).first()
+        if exists:
+          continue
+        newTarget = ScopeItem(target=item, blacklist=True)
+        db.session.add(newTarget)
+        db.session.commit()
+        successImport += 1
+      flash('%s targets added to blacklist!' % successImport, 'success')
+      return redirect(url_for('admin_blacklist'))
+    else:
+      for field,errors in importForm.errors.items():
+        for error in errors:
+          flash(error, 'danger')
+      return redirect(url_for('admin_blacklist'))
   else:
     flash("You're not an admin!", 'danger')
     return redirect(url_for('index'))

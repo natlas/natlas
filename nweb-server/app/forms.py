@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
 from app.models import User, ScopeItem
 import ipaddress
@@ -68,6 +68,21 @@ class NewScopeForm(FlaskForm):
         except ipaddress.AddressValueError:
             raise ValidationError('Target %s couldn\'t be validated' % target.data)
 
+class ImportScopeForm(FlaskForm):
+    scope = TextAreaField("Scope Import")
+    submit = SubmitField("Import Scope")
+
+    def validate_scope(self, scope):
+        for target in scope.data.split('\n'):
+            target = target.strip()
+            if '/' not in target:
+                target = target + '/32'
+            try:
+                isValid = ipaddress.IPv4Network(target)
+            except ipaddress.AddressValueError:
+                raise ValidationError('Target %s couldn\'t be validated' % target)
+                
+        
 class ScopeDeleteForm(FlaskForm):
     deleteScopeItem = SubmitField('Delete Target')
 

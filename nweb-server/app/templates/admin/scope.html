@@ -40,6 +40,15 @@
         {% endfor %}
       </tbody>
     </table>
+    <h3>Import Scope</h3>
+    <form method="POST" action="{{ url_for('importScope') }}">
+      {{ importForm.hidden_tag() }}
+      {{ importForm.scope }}
+      {{ importForm.submit }}
+    </form>
+    {% for error in importForm.scope.errors %}
+    <span style="color: red;">{{ error }}</span>
+    {% endfor %}
   </div>
   {% endif %}
 {% endblock %}
