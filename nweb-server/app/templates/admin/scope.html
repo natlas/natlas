@@ -43,12 +43,11 @@
     <h3>Import Scope</h3>
     <form method="POST" action="{{ url_for('importScope') }}">
       {{ importForm.hidden_tag() }}
-      {{ importForm.scope }}
-      {{ importForm.submit }}
+      {{ importForm.scope(rows='10', cols='80') }}
+      <br />
+      {{ importForm.submit(class="btn btn-primary") }}
     </form>
-    {% for error in importForm.scope.errors %}
-    <span style="color: red;">{{ error }}</span>
-    {% endfor %}
+    <a href="{{ url_for('exportScope') }}" class="btn btn-primary export-btn" role="button">Export Scope</a>
   </div>
   {% endif %}
 {% endblock %}

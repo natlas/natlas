@@ -153,3 +153,7 @@ a.preview_link, a:hover.preview_link {
 .red {
   color:red;
 }
+
+.export-btn {
+  margin-top:1em;
+}

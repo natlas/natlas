@@ -43,9 +43,11 @@
     <h3>Import Blacklist</h3>
     <form method="POST" action="{{ url_for('importBlacklist') }}">
       {{ importForm.hidden_tag() }}
-      {{ importForm.scope }}
-      {{ importForm.submit }}
+      {{ importForm.scope(rows='10', cols='80') }}
+      <br />
+      {{ importForm.submit(class="btn btn-primary") }}
     </form>
+    <a href="{{ url_for('exportBlacklist') }}" class="btn btn-primary export-btn" role="button">Export Blacklist</a>
   </div>
   {% endif %}
 {% endblock %}

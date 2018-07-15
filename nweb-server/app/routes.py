@@ -309,6 +309,23 @@ def importBlacklist():
     flash("You're not an admin!", 'danger')
     return redirect(url_for('index'))
 
+@app.route('/admin/blacklist/export', methods=['GET'])
+@isAuthenticated
+def exportBlacklist():
+  if current_user.is_admin:
+    blacklistItems = ScopeItem.query.filter_by(blacklist=True).all()
+    return "<br />".join(str(item.target) for item in blacklistItems)
+  else:
+    flash("You're not an admin!", 'danger')
+    return redirect(url_for('index'))
+
+@app.route('/admin/scope/export', methods=['GET'])
+@isAuthenticated
+def exportScope():
+  if current_user.is_admin:
+    scopeItems = ScopeItem.query.filter_by(blacklist=False).all()
+    return "<br />".join(str(item.target) for item in scopeItems)
+
 @app.route('/admin/scope/<int:id>/delete', methods=['POST'])
 @isAuthenticated
 def deleteScopeItem(id):
