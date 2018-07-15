@@ -19,6 +19,7 @@ from app.models import User, ScopeItem
 from app.forms import *
 from app.email import send_password_reset_email, send_user_invite_email
 from .nmap_parser import NmapParser
+from .util import *
 
 @app.before_request
 def before_request():
@@ -314,21 +315,7 @@ def search():
   else:
     return render_template("search.html",query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
-def hostinfo(ip):
-  hostinfo={}
-  count,context = elastic.gethost(ip)
-  if count == 0:
-    return abort(404)
-  hostinfo['history'] = count
-  headshots=0
-  headshotTypes = ['headshot', 'vncheadshot', 'httpheadshot', 'httpsheadshot']
-  for hs in headshotTypes:
-    if context.get(hs):
-      headshots+=1
-  hostinfo['headshots'] = headshots
-  if context.get('hostname'):
-    hostinfo['hostname'] = context.get('hostname')
-  return hostinfo, context
+
 
 # Create your views here.
 @app.route('/host/<ip>')
@@ -361,38 +348,6 @@ def host_headshots(ip):
   return render_template("host/headshots.html", **context, info=info)
 
 ### API / AGENT ROUTES ###
-
-def isAcceptableTarget(target):
-  targetAddr = ipaddress.IPv4Address(target)
-  inScope = False
-
-  scope=[]
-  for item in ScopeItem.getScope():
-    scope.append(ipaddress.ip_network(item.target))
-
-  for network in scope:
-    if str(network).endswith('/32'):
-      if targetAddr == ipaddress.IPv4Address(str(network).strip('/32')):
-        inScope = True
-    if targetAddr in list(network.hosts()):
-      inScope = True
-
-  if not inScope:
-    return False
-
-  blacklist=[]
-  for item in ScopeItem.getBlacklist():
-    blacklist.append(ipaddress.ip_network(item.target))
-
-  for network in blacklist:
-    if str(network).endswith('/32'):
-      if targetAddr == ipaddress.IPv4Address(str(network).strip('/32')):
-        return False
-    if targetAddr in list(network.hosts()):
-      return False
-
-  return True
-
 
 @app.route('/getwork')
 def getwork():
