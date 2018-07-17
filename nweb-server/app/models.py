@@ -54,8 +54,8 @@ class User(UserMixin, db.Model):
 
 class ScopeItem(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  target = db.Column(db.String, unique=True)
-  blacklist = db.Column(db.Boolean)
+  target = db.Column(db.String, index=True, unique=True)
+  blacklist = db.Column(db.Boolean, index=True)
 
   def getBlacklist():
     return ScopeItem.query.filter_by(blacklist=True).all()
