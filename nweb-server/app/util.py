@@ -28,7 +28,7 @@ def isAcceptableTarget(target):
 
   for network in scope:
     if str(network).endswith('/32'):
-      if targetAddr == ipaddress.IPv4Address(str(network).strip('/32')):
+      if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
         inScope = True
     if targetAddr in list(network.hosts()):
       inScope = True
@@ -42,7 +42,7 @@ def isAcceptableTarget(target):
 
   for network in blacklist:
     if str(network).endswith('/32'):
-      if targetAddr == ipaddress.IPv4Address(str(network).strip('/32')):
+      if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
         return False
     if targetAddr in list(network.hosts()):
       return False
