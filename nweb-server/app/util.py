@@ -1,6 +1,6 @@
 import ipaddress
 from app.models import ScopeItem
-from app import elastic
+from app import elastic, ScopeManager
 
 def hostinfo(ip):
   hostinfo={}
@@ -22,11 +22,8 @@ def isAcceptableTarget(target):
   targetAddr = ipaddress.IPv4Address(target)
   inScope = False
 
-  scope=[]
-  for item in ScopeItem.getScope():
-    scope.append(ipaddress.ip_network(item.target))
 
-  for network in scope:
+  for network in ScopeManager.getScope():
     if str(network).endswith('/32'):
       if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
         inScope = True
@@ -36,11 +33,7 @@ def isAcceptableTarget(target):
   if not inScope:
     return False
 
-  blacklist=[]
-  for item in ScopeItem.getBlacklist():
-    blacklist.append(ipaddress.ip_network(item.target))
-
-  for network in blacklist:
+  for network in ScopeManager.getBlacklist():
     if str(network).endswith('/32'):
       if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
         return False

@@ -13,7 +13,7 @@ import traceback
 import ipaddress
 from datetime import datetime
 
-from app import app, elastic, db
+from app import app, elastic, db, ScopeManager
 from app import login as lm
 from app.models import User, ScopeItem
 from app.forms import *
@@ -209,7 +209,7 @@ def toggleUser(id):
 @isAuthenticated
 def admin_scope():
   if current_user.is_admin:
-    scope = ScopeItem.getScope()
+    scope = ScopeManager.getScope()
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
@@ -220,6 +220,7 @@ def admin_scope():
       newTarget = ScopeItem(target=newForm.target.data, blacklist=False)
       db.session.add(newTarget)
       db.session.commit()
+      ScopeManager.updateScope()
       flash('%s added!' % newTarget.target, 'success')
       return redirect(url_for('admin_scope'))
     return render_template("admin/scope.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
@@ -231,7 +232,7 @@ def admin_scope():
 @isAuthenticated
 def admin_blacklist():
   if current_user.is_admin:
-    scope = ScopeItem.getBlacklist()
+    scope = ScopeManager.getBlacklist()
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
@@ -242,6 +243,7 @@ def admin_blacklist():
       newTarget = ScopeItem(target=newForm.target.data, blacklist=True)
       db.session.add(newTarget)
       db.session.commit()
+      ScopeManager.updateBlacklist()
       flash('%s blacklisted!' % newTarget.target, 'success')
       return redirect(url_for('admin_blacklist'))
     return render_template("admin/blacklist.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
@@ -268,6 +270,7 @@ def importScope():
         db.session.add(newTarget)
         db.session.commit()
         successImport += 1
+      ScopeManager.updateScope()
       flash('%s targets added to scope!' % successImport, 'success')
       return redirect(url_for('admin_scope'))
     else:
@@ -298,6 +301,7 @@ def importBlacklist():
         db.session.add(newTarget)
         db.session.commit()
         successImport += 1
+      ScopeManager.updateBlacklist()
       flash('%s targets added to blacklist!' % successImport, 'success')
       return redirect(url_for('admin_blacklist'))
     else:
@@ -339,6 +343,7 @@ def deleteScopeItem(id):
         redirectLoc = 'admin_scope'
       ScopeItem.query.filter_by(id=id).delete()
       db.session.commit()
+      ScopeManager.update()
       flash('%s deleted!' % item.target, 'success')
       return redirect(url_for(redirectLoc))
     else:
@@ -358,11 +363,13 @@ def toggleScopeItem(id):
       if item.blacklist:
         item.blacklist = False
         db.session.commit()
+        ScopeManager.update()
         flash('%s removed from blacklist!' % item.target, 'success')
         return redirect(url_for('admin_blacklist'))
       else:
         item.blacklist = True
         db.session.commit()
+        ScopeManager.update()
         flash('%s blacklisted!' % item.target, 'success')
         return redirect(url_for('admin_scope'))
     else:
@@ -441,17 +448,17 @@ def getwork():
     print("[+] Masscan data not found, selecting random target from scope.")
 
   random.seed(os.urandom(200))
-  scope=[]
-  for item in ScopeItem.getScope():
-    scope.append(ipaddress.ip_network(item.target))
+  # scope=[]
+  # for item in ScopeManager.getScope():
+  #   scope.append(ipaddress.ip_network(item.target))
 
-  blacklist=[]
-  for item in ScopeItem.getBlacklist():
-    blacklist.append(ipaddress.ip_network(item.target))
+  # blacklist=[]
+  # for item in ScopeManager.getBlacklist():
+  #   blacklist.append(ipaddress.ip_network(item.target))
 
   # how many hosts are in scope?
-  magnitude = sum(network.num_addresses for network in scope)
-  blacklistSize = sum(network.num_addresses for network in blacklist)
+  magnitude = sum(network.num_addresses for network in ScopeManager.getScope())
+  blacklistSize = sum(network.num_addresses for network in ScopeManager.getBlacklist())
   print("[+] Scope Size: %s IPs" % (magnitude))
   print("[+] Blacklist Size: %s IPs" % (blacklistSize))
 
@@ -464,13 +471,13 @@ def getwork():
     attempts = attempts+1
 
     target=""
-    for network in scope:
+    for network in ScopeManager.getScope():
       if index>=network.num_addresses:
         index-=network.num_addresses
       else:
         #target=network[index]
         isgood=True
-        for badnet in blacklist: # run through the blacklist looking for match
+        for badnet in ScopeManager.getBlacklist(): # run through the blacklist looking for match
           if network[index] in badnet:
             #print("the ip is in the blacklist! "+str(network[index]))
             isgood=False

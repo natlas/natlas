@@ -58,7 +58,9 @@ class ScopeItem(db.Model):
   blacklist = db.Column(db.Boolean, index=True)
 
   def getBlacklist():
+    print("Blacklist fetched from database!")
     return ScopeItem.query.filter_by(blacklist=True).all()
 
   def getScope():
+    print("Scope fetched from database!")
     return ScopeItem.query.filter_by(blacklist=False).all()

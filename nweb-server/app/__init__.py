@@ -5,6 +5,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from config import Config
 from app.elastic import Elastic
+from app.scope import ScopeManager
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -20,5 +21,7 @@ mail = Mail(app)
 elastic = Elastic(app.config['ELASTICSEARCH_URL'])
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+ScopeManager = ScopeManager()
 
 from app import routes, models
+ScopeManager.update()
