@@ -210,6 +210,7 @@ def toggleUser(id):
 def admin_scope():
   if current_user.is_admin:
     scope = ScopeItem.getScope()
+    scopeSize = ScopeManager.getScopeSize()
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
@@ -223,7 +224,7 @@ def admin_scope():
       ScopeManager.updateScope()
       flash('%s added!' % newTarget.target, 'success')
       return redirect(url_for('admin_scope'))
-    return render_template("admin/scope.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
+    return render_template("admin/scope.html", scope=scope, scopeSize=scopeSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
   else:
     flash("You're not an admin!", 'danger')
     return redirect(url_for('index'))
@@ -233,6 +234,7 @@ def admin_scope():
 def admin_blacklist():
   if current_user.is_admin:
     scope = ScopeItem.getBlacklist()
+    blacklistSize = ScopeManager.getBlacklistSize()
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
@@ -246,7 +248,7 @@ def admin_blacklist():
       ScopeManager.updateBlacklist()
       flash('%s blacklisted!' % newTarget.target, 'success')
       return redirect(url_for('admin_blacklist'))
-    return render_template("admin/blacklist.html", scope=scope, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
+    return render_template("admin/blacklist.html", scope=scope, blacklistSize=blacklistSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
   else:
     flash("You're not an admin!", 'danger')
     return redirect(url_for('index'))
@@ -457,8 +459,8 @@ def getwork():
   #   blacklist.append(ipaddress.ip_network(item.target))
 
   # how many hosts are in scope?
-  magnitude = sum(network.num_addresses for network in ScopeManager.getScope())
-  blacklistSize = sum(network.num_addresses for network in ScopeManager.getBlacklist())
+  magnitude = ScopeManager.getScopeSize()
+  blacklistSize = ScopeManager.getBlacklistSize()
   print("[+] Scope Size: %s IPs" % (magnitude))
   print("[+] Blacklist Size: %s IPs" % (blacklistSize))
 
