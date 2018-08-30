@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% if query != '' %}
+  {% set title = query ~ " | Page " ~ page %}
+{% else %}
+  {% set title = "Browse | Page " ~ page %}
+{% endif %}
 
 {% block content %}
   <div class="row">
