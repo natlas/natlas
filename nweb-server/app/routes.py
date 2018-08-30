@@ -209,7 +209,7 @@ def toggleUser(id):
 @isAuthenticated
 def admin_scope():
   if current_user.is_admin:
-    scope = ScopeManager.getScope()
+    scope = ScopeItem.getScope()
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
@@ -232,7 +232,7 @@ def admin_scope():
 @isAuthenticated
 def admin_blacklist():
   if current_user.is_admin:
-    scope = ScopeManager.getBlacklist()
+    scope = ScopeItem.getBlacklist()
     newForm = NewScopeForm()
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
