@@ -27,8 +27,9 @@ migrate = Migrate(app, db)
 from app import routes, models
 
 # super gross hack that enables flask db operations when the databse doesn't already exist
-try: 
-	ScopeManager = ScopeManager()
-	ScopeManager.update()
+try:
+    ScopeManager = ScopeManager()
+    ScopeManager.update()
 except sqlalchemy.exc.OperationalError as e:
-	print("[!] Scope Manager could not find metadata.db: %s" % app.config['SQLALCHEMY_DATABASE_URI'])
+    print("[!] Scope Manager could not find metadata.db: %s" %
+          app.config['SQLALCHEMY_DATABASE_URI'])

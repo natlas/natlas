@@ -1,50 +1,51 @@
 import ipaddress
 
+
 class ScopeManager():
-  
-  scope = []
-  blacklist = []
-  scopeSize = 0
-  blacklistSize = 0
 
-  def __init__(self):
-    self.scope = []
-    self.blacklist = []
+    scope = []
+    blacklist = []
+    scopeSize = 0
+    blacklistSize = 0
 
-  def getScopeSize(self):
-    return self.scopeSize
+    def __init__(self):
+        self.scope = []
+        self.blacklist = []
 
-  def getBlacklistSize(self):
-    return self.blacklistSize
+    def getScopeSize(self):
+        return self.scopeSize
 
-  def getScope(self):
-    return self.scope
+    def getBlacklistSize(self):
+        return self.blacklistSize
 
-  def getBlacklist(self):
-    return self.blacklist
+    def getScope(self):
+        return self.scope
 
-  def updateScope(self):
-    from app.models import ScopeItem
-    newScopeSize = 0
-    for item in ScopeItem.getScope():
-      newItem = ipaddress.ip_network(item.target)
-      self.scope.append(newItem)
-      newScopeSize += newItem.num_addresses
-    self.scopeSize = newScopeSize
-    print("Scope Size: %s" % self.scopeSize)
+    def getBlacklist(self):
+        return self.blacklist
 
-  def updateBlacklist(self):
-    from app.models import ScopeItem
-    newBlacklistSize = 0
-    for item in ScopeItem.getBlacklist():
-      newItem = ipaddress.ip_network(item.target)
-      self.blacklist.append(newItem)
-      newBlacklistSize += newItem.num_addresses
-    self.blacklistSize = newBlacklistSize
-    print("Blacklist Size: %s" % self.blacklistSize)
+    def updateScope(self):
+        from app.models import ScopeItem
+        newScopeSize = 0
+        for item in ScopeItem.getScope():
+            newItem = ipaddress.ip_network(item.target)
+            self.scope.append(newItem)
+            newScopeSize += newItem.num_addresses
+        self.scopeSize = newScopeSize
+        print("Scope Size: %s" % self.scopeSize)
 
-  def update(self):
-    from app.models import ScopeItem
-    self.updateScope()
+    def updateBlacklist(self):
+        from app.models import ScopeItem
+        newBlacklistSize = 0
+        for item in ScopeItem.getBlacklist():
+            newItem = ipaddress.ip_network(item.target)
+            self.blacklist.append(newItem)
+            newBlacklistSize += newItem.num_addresses
+        self.blacklistSize = newBlacklistSize
+        print("Blacklist Size: %s" % self.blacklistSize)
 
-    self.updateBlacklist()
+    def update(self):
+        from app.models import ScopeItem
+        self.updateScope()
+
+        self.updateBlacklist()

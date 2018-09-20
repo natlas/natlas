@@ -4,16 +4,18 @@ from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Le
 from app.models import User, ScopeItem
 import ipaddress
 
+
 class LoginForm(FlaskForm):
-	email = StringField('Email', validators=[DataRequired()])
-	password = PasswordField('Password', validators=[DataRequired()])
-	remember_me = BooleanField('Remember Me')
-	submit = SubmitField('Sign In')
+    email = StringField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Sign In')
 
 
 class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
+    password = PasswordField('Password', validators=[
+                             DataRequired(), Length(min=8)])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
@@ -23,15 +25,19 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Email already exists!')
 
+
 class ResetPasswordRequestForm(FlaskForm):
-	email = StringField('Email', validators=[DataRequired(), Email()])
-	submit = SubmitField('Request Password Reset')
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
+    password = PasswordField('Password', validators=[
+                             DataRequired(), Length(min=8)])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
 
 class InviteUserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -42,17 +48,22 @@ class InviteUserForm(FlaskForm):
         if user is not None:
             raise ValidationError('Email %s already exists!' % user.email)
 
+
 class InviteConfirmForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
+    password = PasswordField('Password', validators=[
+                             DataRequired(), Length(min=8)])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Set Password')
 
+
 class UserDeleteForm(FlaskForm):
     deleteUser = SubmitField('Delete User')
 
+
 class UserEditForm(FlaskForm):
     editUser = SubmitField('Toggle Admin')
+
 
 class NewScopeForm(FlaskForm):
     target = StringField('Target', validators=[DataRequired()])
@@ -66,7 +77,9 @@ class NewScopeForm(FlaskForm):
         try:
             isValid = ipaddress.IPv4Interface(target.data)
         except ipaddress.AddressValueError:
-            raise ValidationError('Target %s couldn\'t be validated' % target.data)
+            raise ValidationError(
+                'Target %s couldn\'t be validated' % target.data)
+
 
 class ImportScopeForm(FlaskForm):
     scope = TextAreaField("Scope Import")
@@ -80,11 +93,13 @@ class ImportScopeForm(FlaskForm):
             try:
                 isValid = ipaddress.IPv4Network(target)
             except ipaddress.AddressValueError:
-                raise ValidationError('Target %s couldn\'t be validated' % target)
-                
-        
+                raise ValidationError(
+                    'Target %s couldn\'t be validated' % target)
+
+
 class ScopeDeleteForm(FlaskForm):
     deleteScopeItem = SubmitField('Delete Target')
+
 
 class ScopeToggleForm(FlaskForm):
     toggleScopeItem = SubmitField('Toggle Blacklist')
