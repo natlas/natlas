@@ -6,6 +6,7 @@ from flask_mail import Mail
 from config import Config
 from app.elastic import Elastic
 from app.scope import ScopeManager
+import sqlalchemy
 import os
 
 app = Flask(__name__)
@@ -26,8 +27,8 @@ migrate = Migrate(app, db)
 from app import routes, models
 
 # super gross hack that enables flask db operations when the databse doesn't already exist
-if os.path.exists(os.path.exists(os.path.join(app.config['BASEDIR'], 'metadata.db'))): 
+try: 
 	ScopeManager = ScopeManager()
 	ScopeManager.update()
-else:
+except sqlalchemy.exc.OperationalError as e:
 	print("[!] Scope Manager could not find metadata.db: %s" % app.config['SQLALCHEMY_DATABASE_URI'])
