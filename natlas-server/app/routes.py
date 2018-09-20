@@ -472,19 +472,7 @@ def host_headshots(ip):
 @app.route('/getwork')
 def getwork():
 
-    try:
-        return elastic.getwork_mass()
-    except:
-        print("[+] Masscan data not found, selecting random target from scope.")
-
     random.seed(os.urandom(200))
-    # scope=[]
-    # for item in ScopeManager.getScope():
-    #   scope.append(ipaddress.ip_network(item.target))
-
-    # blacklist=[]
-    # for item in ScopeManager.getBlacklist():
-    #   blacklist.append(ipaddress.ip_network(item.target))
 
     # how many hosts are in scope?
     magnitude = ScopeManager.getScopeSize()
@@ -505,14 +493,11 @@ def getwork():
             if index >= network.num_addresses:
                 index -= network.num_addresses
             else:
-                # target=network[index]
                 isgood = True
                 for badnet in ScopeManager.getBlacklist():  # run through the blacklist looking for match
                     if network[index] in badnet:
-                        #print("the ip is in the blacklist! "+str(network[index]))
                         isgood = False
                 if isgood:
-                    #print("the ip is not in the blacklist! "+str(network[index]))
                     work['target'] = str(network[index])
                     return json.dumps(work)
     return "none"
