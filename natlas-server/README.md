@@ -44,12 +44,12 @@ By default, we generate a `config/scope.txt` and a `config/blacklist.txt` that i
 
 Initializing the Database
 ------------------
-There's one more thing we need to do, and that's initialize the metadata database with the correct schema. This is done using the flask-migrate plugin, and can be done like so:
+The database should be initialized automatically during the `./setup-server` script, but if it is not for whatever reason, this is the manual steps required to intiialize or upgrade the database.
 
 ```
 $ cd natlas/natlas-server
 $ source venv/bin/activate
-$ export FLASK_APP=natlas-server.py
+$ export FLASK_APP=./natlas-server.py
 $ flask db upgrade
 $ deactivate
 ```
