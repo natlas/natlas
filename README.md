@@ -1,7 +1,7 @@
 nweb
 ========
 
-nmap scan collection and search
+nmap scan collection and search. Originally forked from [pierce403/nweb](https://github.com/0xdade/nweb).
 
 nweb-server
 -------
