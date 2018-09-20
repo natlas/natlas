@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-Submits nmap scans to nweb from local targets.txt.
+Submits nmap scans to natlas from local targets.txt.
 '''
 import sys
 import requests
@@ -34,7 +34,7 @@ def scan(target):
   # scan server
   rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
   print("random value is "+rand)
-  process = subprocess.Popen(["nmap","-oA","data/nweb."+rand,"-A","-open",target],stdout=subprocess.PIPE)
+  process = subprocess.Popen(["nmap","-oA","data/natlas."+rand,"-A","-open",target],stdout=subprocess.PIPE)
   try:
     out, err = process.communicate(timeout=360) # 6 minutes
   except:
@@ -48,9 +48,9 @@ def scan(target):
 
   result={}
   for ext in 'nmap','gnmap','xml':
-    result[ext+"_data"]=open("data/nweb."+rand+"."+ext).read()
-    os.remove("data/nweb."+rand+"."+ext)
-    print("sending and deleting nweb."+rand+"."+ext)
+    result[ext+"_data"]=open("data/natlas."+rand+"."+ext).read()
+    os.remove("data/natlas."+rand+"."+ext)
+    print("sending and deleting natlas."+rand+"."+ext)
 
   if len(result['nmap_data']) < 250:
     print("this data looks crappy")

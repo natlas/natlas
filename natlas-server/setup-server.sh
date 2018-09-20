@@ -94,7 +94,7 @@ source venv/bin/activate
 echo "[+] Attempting to install python dependencies"
 pip3 install -r requirements.txt
 echo "[+] Initializing metadata database"
-export FLASK_APP=nweb-server.py
+export FLASK_APP=natlas-server.py
 flask db upgrade
 echo "[+] Exiting virtual environment"
 deactivate

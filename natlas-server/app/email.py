@@ -15,7 +15,7 @@ def send_email(subject, sender, recipients, text_body):
 
 def send_password_reset_email(user):
     token = user.get_reset_password_token()
-    send_email('[nweb] Reset Your Password',
+    send_email('[Natlas] Reset Your Password',
                sender=app.config['MAIL_FROM'],
                recipients=[user.email],
                text_body=render_template('email/reset_password.txt',
@@ -23,7 +23,7 @@ def send_password_reset_email(user):
 
 def send_user_invite_email(user):
     token = user.get_invite_token()
-    send_email('[nweb] You\'ve been invited to nweb!',
+    send_email('[Natlas] You\'ve been invited to Natlas!',
                sender=app.config['MAIL_FROM'],
                recipients=[user.email],
                text_body=render_template('email/user_invite.txt',

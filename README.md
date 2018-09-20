@@ -1,25 +1,25 @@
-nweb
+Natlas
 ========
 
-nmap scan collection and search. Originally forked from [pierce403/nweb](https://github.com/0xdade/nweb).
+You've got a lot of maps and they are getting pretty unruly. What do you do? You put them in a book and call it an atlas. This is like that, except it's a website and it's a collection of nmaps. Originally forked from [pierce403/nweb](https://github.com/pierce403/nweb).
 
-nweb-server
+natlas-server
 -------
-The nweb-server is where the data gets stored and the web interface exists so that you can search through the data.
+The natlas-server is where the data gets stored and the web interface exists so that you can search through the data.
 
-You can read more about setting up and running the server on the [nweb-server/README.md](nweb-server/README.md)
+You can read more about setting up and running the server on the [natlas-server/README.md](natlas-server/README.md)
 
 
-nweb-agent
+natlas-agent
 -------
-The nweb-agent is what fetches work from the server and actually performs the scans.
+The natlas-agent is what fetches work from the server and actually performs the scans.
 
-You can read more about setting up and running the agent on the [nweb-agent/README.md](nweb-agent/README.md)
+You can read more about setting up and running the agent on the [natlas-agent/README.md](natlas-agent/README.md)
 
 
 License
 -------
-Copyright 2018 The Nweb Authors
+Copyright 2018 The Natlas Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

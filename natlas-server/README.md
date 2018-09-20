@@ -1,9 +1,9 @@
-# nweb-server
+# natlas-server
 
 Installing Elasticsearch
 ------------------------
 
-NWeb now defaults to using elasticsearch for the backend. The installation of elasticsearch isn't something I wanted to try to automate, so download the latest here and then follow the instructions below:
+natlas now defaults to using elasticsearch for the backend. The installation of elasticsearch isn't something I wanted to try to automate, so download the latest here and then follow the instructions below:
 
 https://www.elastic.co/downloads/elasticsearch
 
@@ -20,8 +20,8 @@ The Setup
 Most people will be able to just do:
 
 ```
-$ git clone https://github.com/pierce403/nweb.git
-$ cd nweb/nweb-server/
+$ git clone https://github.com/natlas/natlas.git
+$ cd natlas/natlas-server/
 $ ./setup-server.sh
 ```
 
@@ -47,9 +47,9 @@ Initializing the Database
 There's one more thing we need to do, and that's initialize the metadata database with the correct schema. This is done using the flask-migrate plugin, and can be done like so:
 
 ```
-$ cd nweb/nweb-server
+$ cd natlas/natlas-server
 $ source venv/bin/activate
-$ export FLASK_APP=nweb-server.py
+$ export FLASK_APP=natlas-server.py
 $ flask db upgrade
 $ deactivate
 ```
@@ -61,7 +61,7 @@ Certain functions are restricted to only users with administrative privilege. Cu
 To give an existing user account admin privileges, you can use the add-admin.py script. This relies on loading the app to interact with the User model, so you need to run it from within your virtual environment.
 
 ```
-$ cd nweb/nweb-server
+$ cd natlas/natlas-server
 $ source venv/bin/activate
 $ python3 add-admin.py user@example.com
 ```
@@ -69,7 +69,7 @@ $ python3 add-admin.py user@example.com
 Starting the Server
 ------------------
 
-Starting the server is easy and can pretty much be handled entirely by the `run-server.sh` script. Simply navigate to the nweb-server folder (where this readme is) and `./run-server.sh`. This will start the flask application in your terminal, listening on localhost on port 5000. If you really want, you could change this to listen on a specific IP address on another port, but it is encouraged that you add nginx in front of your flask application.
+Starting the server is easy and can pretty much be handled entirely by the `run-server.sh` script. Simply navigate to the natlas-server folder (where this readme is) and `./run-server.sh`. This will start the flask application in your terminal, listening on localhost on port 5000. If you really want, you could change this to listen on a specific IP address on another port, but it is encouraged that you add nginx in front of your flask application.
 
 Furthermore, you might think it's mighty inconvenient that the flask application is running in your terminal and now you can't close the terminal without shutting down the server. You can remediate this with a systemd unit (an example one will be provided), or by simply launching the server inside a `screen` session.
 
@@ -81,10 +81,10 @@ As mentioned above, it is not really advisable to run the flask application dire
 To install nginx, you can simply `apt-get install nginx` as root. Once it's installed, let's make a copy of the default site config:
 
 ```
-cp /etc/nginx/sites-available/default /etc/nginx/sites-available/nweb
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/natlas
 ```
 
-Now open up `/etc/nginx/sites-available/nweb` in your favorite text editor and add this:
+Now open up `/etc/nginx/sites-available/natlas` in your favorite text editor and add this:
 
 ```
 server {
@@ -138,7 +138,7 @@ If you're not planning on using TLS, well, you should reconsider. Go ahead and m
 
 Example Systemd Unit
 ------------------
-Below is an example systemd unit you can use to get nweb-server running in systemd.
+Below is an example systemd unit you can use to get natlas-server running in systemd.
 
 ```
 [Unit]
@@ -147,10 +147,10 @@ After=network.target
  
 [Service]
 Type=simple
-User=nweb
-WorkingDirectory=/opt/nweb/nweb-server
-EnvironmentFile=/opt/nweb/nweb-server/nweb.env
-ExecStart=/bin/bash /opt/nweb/nweb-server/run-server.sh
+User=natlas
+WorkingDirectory=/opt/natlas/natlas-server
+EnvironmentFile=/opt/natlas/natlas-server/natlas.env
+ExecStart=/bin/bash /opt/natlas/natlas-server/run-server.sh
 Restart=always
 
 [Install]
