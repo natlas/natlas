@@ -1,12 +1,12 @@
 import os
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 class Config(object):
-	
+	BASEDIR = os.path.abspath(os.path.dirname(__file__))	
 	SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-should-set-a-secret-key'
-	SCOPE_DOC = os.path.join(basedir, 'config/scope.txt')
-	BLACKLIST_DOC = os.path.join(basedir, 'config/blacklist.txt')
+	SCOPE_DOC = os.path.join(BASEDIR, 'config/scope.txt')
+	BLACKLIST_DOC = os.path.join(BASEDIR, 'config/blacklist.txt')
 	
 
 	# Access Control Config
@@ -22,7 +22,7 @@ class Config(object):
 	ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL') or \
 		'http://localhost:9200'
 	SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or \
-		'sqlite:///' + os.path.join(basedir, 'metadata.db')
+		'sqlite:///' + os.path.join(BASEDIR, 'metadata.db')
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	
 	# Mail Config
