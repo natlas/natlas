@@ -17,17 +17,20 @@ The nweb-agent is what fetches work from the server and actually performs the sc
 You can read more about setting up and running the agent on the [nweb-agent/README.md](nweb-agent/README.md)
 
 
-[Optional] Masscan
+License
 -------
+Copyright 2018 The Nweb Authors
 
-Rather than using nmap to scan randomly, you may be interested in initally using masscan to gather your targets.  The tool **masscan.sh** will run an appropriate masscan scan (make sure **masscan** itself is in your path).  This script will use your existing scope.txt and blacklist.txt to figure out what it should scan.  Additonally there is a **ports.txt**, which tells masscan which ports it should be scanning.  It's currently populated with the nmap top 1000 ports, but that can be changed as desired.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Once the masscan.json file is created, you should be able to run **python massscan-upload.py** to load the masscan data into the elastic server.  When the masscan data is loaded, you'll notice /getwork is now returning port numbers.  This tells the nmap agent to only scan specific ports, so rather than scanning blind, nmap will only scan the specific ports that are open.
+   http://www.apache.org/licenses/LICENSE-2.0
 
-At the moment you will probabally want to delete the **masscan_services** and **masscan_hosts** indexes from elastic if you upload any new scan data, otherwise new insertions will be additive, and services that have gone down since the previous scan will not be removed from the list of available targets. To do this you can run the following
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-```
-curl localhost:9200/_cat/indices?v
-curl -XDELETE localhost:9200/masscan_services
-curl -XDELETE localhost:9200/masscan_hosts
-```
+
