@@ -59,6 +59,7 @@ def scan():
     # print(out)
 
     result = {}
+    result['scan_id'] = rand
     for ext in 'nmap', 'gnmap', 'xml':
         result[ext+"_data"] = open("data/natlas."+rand+"."+ext).read()
         os.remove("data/natlas."+rand+"."+ext)

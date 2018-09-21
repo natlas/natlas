@@ -459,6 +459,15 @@ def host_history(ip):
 
     return render_template("host/history.html", ip=ip, info=info, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
+@app.route('/host/<ip>/history/<scan_id>')
+@isAuthenticated
+def host_historical_result(ip, scan_id):
+    info, context = hostinfo(ip)
+    
+    count, context = elastic.gethost_scan_id(
+        ip, scan_id)
+
+    return render_template("host/summary.html", info=info, **context)
 
 @app.route('/host/<ip>/headshots')
 @isAuthenticated

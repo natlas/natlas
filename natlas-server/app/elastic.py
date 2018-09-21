@@ -51,6 +51,14 @@ class Elastic:
 
         return result['hits']['total'], results
 
+    def gethost_scan_id(self, ip, scan_id):
+        result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {
+                                "query_string": {'query': scan_id, "fields": ["scan_id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+
+        if result['hits']['total'] == 0:
+            return 0, None
+        return result['hits']['total'], result['hits']['hits'][0]['_source']
+
     def getwork_mass(self):  # getwork when masscan data is loaded
 
         # get random ip
