@@ -1,6 +1,7 @@
 venv
 *~
 __pycache__
+*.pyc
 start.log
 data/
 metadata.db
