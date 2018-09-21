@@ -23,12 +23,12 @@ mail = Mail(app)
 elastic = Elastic(app.config['ELASTICSEARCH_URL'])
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+ScopeManager = ScopeManager()
 
 from app import routes, models
 
 # super gross hack that enables flask db operations when the databse doesn't already exist
 try:
-    ScopeManager = ScopeManager()
     ScopeManager.update()
 except sqlalchemy.exc.OperationalError as e:
     print("[!] Scope Manager could not find metadata.db: %s" %
