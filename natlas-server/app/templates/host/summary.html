@@ -19,9 +19,9 @@
                 <h4>Scan ID</h4> 
                 <a href="{{ url_for('host_historical_result', ip=ip, scan_id=scan_id) }}">{{ scan_id }}</a>
                 <h4>Export</h4>
-                <a href="{{ url_for('export_scan_xml', ip=ip, scan_id=scan_id) }}">XML</a> - 
-                <a href="{{ url_for('export_scan_nmap', ip=ip, scan_id=scan_id) }}">nmap</a> -
-                <a href="{{ url_for('export_scan_gnmap', ip=ip, scan_id=scan_id) }}">gnmap</a>
+                <a class="btn btn-primary" href="{{ url_for('export_scan_xml', ip=ip, scan_id=scan_id) }}">XML</a>
+                <a class="btn btn-primary" href="{{ url_for('export_scan_nmap', ip=ip, scan_id=scan_id) }}">nmap</a>
+                <a class="btn btn-primary" href="{{ url_for('export_scan_gnmap', ip=ip, scan_id=scan_id) }}">gnmap</a>
                 {% endif %}
                 {% if headshot %}
                   <h5>Unknown Headshot</h5>
