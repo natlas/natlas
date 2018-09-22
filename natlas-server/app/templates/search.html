@@ -25,7 +25,10 @@
                 <h5>hostname: {{ host.hostname }}<br>
                 open ports: {{ host.ports }}<br>
                 {% if host.scan_id %}
-                Scan ID: <a href="{{ url_for('host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a>
+                Scan ID: <a href="{{ url_for('host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a><br/>
+                {% endif %}
+                {% if host.ctime %}
+                Added: {{ host.ctime | ctime }}
                 {% endif %}</h5>
                 {% if host.headshot %}
                   <h5>Unknown Headshot</h5>

@@ -10,12 +10,16 @@
           {% for host in hosts %}
             <tr>
               <td>
-                <h3>{{ host.ip }}</h3><br>
-                <h5>hostname: {{ host.hostname }}<br>
-                open ports: {{ host.ports }}<br>
+                <h4>Open Ports</h4>
+                {{ host.ports }}<br>
                 {% if host.scan_id %}
-                Scan ID: <a href="{{ url_for('host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a>
-                {% endif %}</h5>
+                <h4>Scan ID</h4> 
+                <a href="{{ url_for('host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a><br>
+                {% endif %}
+                {% if host.ctime %}
+                <h4>Date Added</h4>
+                {{ host.ctime | ctime }}
+                {% endif %}
                 {% if host.headshot %}
                   <h5>Unknown Headshot</h5>
                   <img width=200 src="data:image/jpeg;base64,{{ host.headshot }}"></br>
