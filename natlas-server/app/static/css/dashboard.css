@@ -114,6 +114,7 @@ body {
   text-align:center;
   line-height:4em;
   margin-top:-4em;
+  color:#fff;
 }
 .preview_nmap:hover {
   background-color:rgba(0,0,0,0.75);
