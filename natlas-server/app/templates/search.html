@@ -21,9 +21,19 @@
           {% for host in hosts %}
             <tr>
               <td>
-                <h3><a href="{{ url_for('host', ip=host.ip) }}">{{ host.ip }}</a></h3><br>
+                <h3><a href="{{ url_for('host', ip=host.ip) }}">{{ host.ip }}</a></h3>
                 <h5>hostname: {{ host.hostname }}<br>
-                open ports: {{ host.ports }}</h5>
+                open ports: {{ host.ports }}<br>
+                {% if host.ctime %}
+                Added: {{ host.ctime | ctime }}<br>
+                {% endif %}
+                {% if host.scan_id %}
+                Scan ID: <a href="{{ url_for('host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a><br>
+                Export: <a href="{{ url_for('export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">XML</a> - 
+                <a href="{{ url_for('export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">nmap</a> -
+                <a href="{{ url_for('export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">gnmap</a>
+                {% endif %}
+                </h5>
                 {% if host.headshot %}
                   <h5>Unknown Headshot</h5>
                   <img width=200 src="data:image/jpeg;base64,{{ host.headshot }}"></br>
@@ -51,7 +61,7 @@
                       {% endif %}
                     {% endfor %}
                     <pre class="nmap_data">{{ nmap_preview|join('\n') }}</pre>
-                    <a class="preview_link" href="host?h={{ host.ip }}"><div class="preview_nmap">Click here to see the complete results for {{ host.ip }}</div></a>
+                    <a class="preview_link" href="host/{{ host.ip }}"><div class="preview_nmap">Click here to see the complete results for {{ host.ip }}</div></a>
                   {% else %}
                     <pre class="nmap_data">{{ host.nmap_data }}</pre>
                   {% endif %}

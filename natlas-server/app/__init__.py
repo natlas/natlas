@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ScopeManager = ScopeManager()
 
-from app import routes, models
+from app import routes, models, filters
 
 # super gross hack that enables flask db operations when the databse doesn't already exist
 try:
