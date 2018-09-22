@@ -37,8 +37,8 @@
         <tr>
           <th scope="row">{{ user.id }}</th>
           <td>{{ user.email }}{% if user.is_admin %} <span class="badge">admin</span>{% endif %}</td>
-          <td><form method="POST" action="{{ url_for('deleteUser', id=user.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteUser(class="btn btn-danger") }}</form></td>
-          <td><form method="POST" action="{{ url_for('toggleUser', id=user.id) }}">{{ editForm.hidden_tag() }}{{ editForm.editUser(class="btn btn-warning") }}</form></td>
+          <td><form method="POST" action="{{ url_for('deleteUser', id=user.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteUser(class="btn btn-danger", onclick="return confirm('Are you sure you want to delete this user?')") }}</form></td>
+          <td><form method="POST" action="{{ url_for('toggleUser', id=user.id) }}">{{ editForm.hidden_tag() }}{{ editForm.editUser(class="btn btn-warning", onclick="return confirm('Are you sure you want to make this user an admin?')") }}</form></td>
         </tr>
         {% endfor %}
       </tbody>

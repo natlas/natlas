@@ -35,8 +35,8 @@
         <tr>
           <th scope="row">{{ item.id }}</th>
           <td>{{ item.target }}</td>
-          <td><form method="POST" action="{{ url_for('deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger") }}</form></td>
-          <td><form method="POST" action="{{ url_for('toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning") }}</form></td>
+          <td><form method="POST" action="{{ url_for('deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger", onclick="return confirm('Are you sure you want to delete this scope item?')") }}</form></td>
+          <td><form method="POST" action="{{ url_for('toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning", onclick="return confirm('Are you sure you want to toggle the blacklist status for this scope item?')") }}</form></td>
         </tr>
         {% endfor %}
       </tbody>
