@@ -1,5 +1,5 @@
 import flask
-from flask import render_template, request, Flask, g, url_for, flash, redirect, abort
+from flask import render_template, request, Flask, g, url_for, flash, redirect, abort, Response
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 from netaddr import *
@@ -428,7 +428,10 @@ def search():
 
     # what kind of output are we looking for?
     if format == 'hostlist':
-        return render_template("hostlist.html", query=query, numresults=count, page=page, hosts=context)
+        hostlist = []
+        for host in context:
+            hostlist.append(str(host['ip']))
+        return Response('\n'.join(hostlist), mimetype='text/plain')
     else:
         return render_template("search.html", query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
