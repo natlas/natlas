@@ -11,13 +11,17 @@
               <td>
                 <h4>Open Ports</h4>
                 {{ ports }}<br>
-                {% if scan_id %}
-                <h4>Scan ID</h4> 
-                <a href="{{ url_for('host_historical_result', ip=ip, scan_id=scan_id) }}">{{ scan_id }}</a><br>
-                {% endif %}
                 {% if ctime %}
                 <h4>Date Added</h4>
                 {{ ctime | ctime }}
+                {% endif %}
+                {% if scan_id %}
+                <h4>Scan ID</h4> 
+                <a href="{{ url_for('host_historical_result', ip=ip, scan_id=scan_id) }}">{{ scan_id }}</a>
+                <h4>Export</h4>
+                <a href="{{ url_for('export_scan_xml', ip=ip, scan_id=scan_id) }}">XML</a> - 
+                <a href="{{ url_for('export_scan_nmap', ip=ip, scan_id=scan_id) }}">nmap</a> -
+                <a href="{{ url_for('export_scan_gnmap', ip=ip, scan_id=scan_id) }}">gnmap</a>
                 {% endif %}
                 {% if headshot %}
                   <h5>Unknown Headshot</h5>

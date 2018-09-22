@@ -438,6 +438,7 @@ def search():
 
 # Create your views here.
 @app.route('/host/<ip>')
+@app.route('/host/<ip>/')
 @isAuthenticated
 def host(ip):
     info, context = hostinfo(ip)
@@ -445,6 +446,7 @@ def host(ip):
 
 
 @app.route('/host/<ip>/history')
+@app.route('/host/<ip>/history/')
 @isAuthenticated
 def host_history(ip):
     info, context = hostinfo(ip)
@@ -462,19 +464,44 @@ def host_history(ip):
 
     return render_template("host/history.html", ip=ip, info=info, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
-@app.route('/host/<ip>/history/<scan_id>')
+@app.route('/host/<ip>/<scan_id>')
 @isAuthenticated
 def host_historical_result(ip, scan_id):
+
     info, context = hostinfo(ip)
+    count, context = elastic.gethost_scan_id(
+        ip, scan_id)
+    return render_template("host/summary.html", info=info, **context)
+
+@app.route('/host/<ip>/<scan_id>.xml')
+@isAuthenticated
+def export_scan_xml(ip, scan_id):
     
     count, context = elastic.gethost_scan_id(
         ip, scan_id)
+    return Response(context['xml_data'], mimetype="text/plain")
 
-    return render_template("host/summary.html", info=info, **context)
+@app.route('/host/<ip>/<scan_id>.nmap')
+@isAuthenticated
+def export_scan_nmap(ip, scan_id):
+    
+    count, context = elastic.gethost_scan_id(
+        ip, scan_id)
+    return Response(context['nmap_data'], mimetype="text/plain")
+
+@app.route('/host/<ip>/<scan_id>.gnmap')
+@isAuthenticated
+def export_scan_gnmap(ip, scan_id):
+    
+    count, context = elastic.gethost_scan_id(
+        ip, scan_id)
+    return Response(context['gnmap_data'], mimetype="text/plain")
 
 @app.route('/host/<ip>/headshots')
+@app.route('/host/<ip>/headshots/')
 @isAuthenticated
 def host_headshots(ip):
+
     info, context = hostinfo(ip)
     return render_template("host/headshots.html", **context, info=info)
 
