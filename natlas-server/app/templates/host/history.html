@@ -51,7 +51,11 @@
                       {% endif %}
                     {% endfor %}
                     <pre class="nmap_data">{{ nmap_preview|join('\n') }}</pre>
-                    <a class="preview_link" href="host/{{ host.ip }}"><div class="preview_nmap">Click here to see the complete results for {{ host.ip }}</div></a>
+                    {% if host.scan_id %}
+                    <a class="preview_link" href="{{ url_for('host_historical_result', ip=host.ip, scan_id=host.scan_id) }}"><div class="preview_nmap">Click here to see the complete results for {{ host.ip }}</div></a>
+                    {% else %}
+                    <div class="preview_nmap">Unfortunately we are unable to display the rest of this scan because we can't find a scan identifier!</div>
+                    {% endif %}
                   {% else %}
                     <pre class="nmap_data">{{ host.nmap_data }}</pre>
                   {% endif %}
