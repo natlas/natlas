@@ -106,7 +106,7 @@ def main():
     if not os.path.isdir("data"):
         os.mkdir("data")
     while True:
-        if threading.active_count() < config.max_threads:
+        if threading.active_count() <= config.max_threads:
             notifylock = False
             print("[+] Active Threads: %s" % threading.active_count())
             t = threading.Thread(target=scan)
