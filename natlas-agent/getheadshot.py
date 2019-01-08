@@ -12,7 +12,7 @@ def getheadshot(ip, rand, service):
     # display hack, wkhtmltoimage doesn't like to run headless
     # this requires you to run a vncserver or something
     # os.environ["DISPLAY"]=':1'
-    if not os.environ["DISPLAY"]:
+    if "DISPLAY" not in os.environ:
         return False
     FNULL = open(os.devnull, 'w')  # open devnull to get rid of output
     if service in ("vnc"):
