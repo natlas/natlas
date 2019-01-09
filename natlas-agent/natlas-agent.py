@@ -39,7 +39,7 @@ def scan():
                    for _ in range(10))
     print("[+] Scan ID: "+rand)
 
-    command = ["nmap", "-oA", "data/natlas."+rand, "-A", "-open", target]
+    command = ["nmap", "-oA", "data/natlas."+rand, "-sV", "-O","-sC", "-open", target]
 
     if 'ports' in target_data:
         command.append('-p')
