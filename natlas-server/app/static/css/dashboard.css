@@ -66,7 +66,31 @@ body {
   background-color: #428bca;
 }
 
-
+/*
+ * Footer
+ */
+.global-footer {
+  text-align:left;
+  padding-top:50px;
+  padding-bottom:50px;
+  margin-top:100px;
+  color:#99979c;
+  background-color:#222;
+}
+.footer-links {
+  padding-left:0;
+  margin-bottom:20px;
+}
+.footer-links li {
+  display:inline-block;
+  margin-left:3em;
+}
+.footer-links li:first-child {
+  margin-left:0em;
+}
+.footer-links a {
+  color: #fff;
+}
 /*
  * Main content
  */
