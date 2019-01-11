@@ -10,7 +10,7 @@ https://www.elastic.co/downloads/elasticsearch
 ```
 $ sudo apt-get install default-jre
 $ sudo dpkg -i elasticsearch-XXXXXX.deb
-$ sudo /etc/init.d/elasticsearch start
+$ sudo systemctl start elasticsearch
 ```
 
 
@@ -27,9 +27,9 @@ $ ./setup-server.sh
 
 If you run the setup script as root, it will automatically attempt to install the necessary prerequisites for you. If you run it without permissions, it will tell you what it was able to determine about setup. The following packages are necessary:
 
-- apt-get install python3.6
-- apt-get install python3-pip
-- pip3 install virtualenv
+- apt install python3
+- apt install python3-pip
+- apt install python3-venv
 
 
 The Config
