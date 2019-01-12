@@ -23,15 +23,28 @@ python3 natlas-agent.py
 ```
 
 
-[Optional] Headshotting
+[Optional] Aquatone
 ------------
 
-The Natlas agent uses the tools **wkhtmltoimage** and **vncsnapshot** to gather "headshots" of servers it scans.  These tools should be available in most package repos, and must be installed for headshotting to work properly.  These tools also require an active X session to work, so you may need to get creative if you are trying to run natlas-agent on a headless server.  I've found that the easiest solution to this problem is to run a VNC server, and you may need to hard code the DISPLAY variable into the getheadshot.py file.
+The Natlas agent now supports the use of Aquatone if it's available. Aquatone relies on Chrome or Chromium. [More information about installing aquatone](https://github.com/michenriksen/aquatone#installation).
 
-The setup script above will attempt to automatically install these, however you can manually install them like so:
+The setup script will check for the existence of chromium-browser and try to install it if you're running as root, however you can manually install it like so:
 
 ```
-$ sudo apt install wkhtmltopdf vncsnapshot
+$ sudo apt install chromium-browser
+```
+
+
+
+[Optional] vncsnapshot
+------------
+
+The Natlas agent uses the `vncsnapshot` to gather snapshots of vnc servers it scans.  `vncsnapshot` can be found in most distribution repositories. This tool also requires an active X session to work, so you may need to get creative if you are trying to run natlas-agent on a headless server.  I've found that the easiest solution to this problem is to run a VNC server, and you may need to hard code the DISPLAY variable into the getheadshot.py file.
+
+The setup script above will attempt to automatically install this, however you can manually install them like so:
+
+```
+$ sudo apt install vncsnapshot
 ```
 
 

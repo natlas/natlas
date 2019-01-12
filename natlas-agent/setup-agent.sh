@@ -6,62 +6,69 @@ FAIL=false
 
 if [ $WHOAMI != "root" ]
 then
-    echo "[+] Setup running without permissions. System-wide changes cannot be made."
+    echo '[+] Setup running without permissions. System-wide changes cannot be made.'
 else
-    echo "[+] Setup running with permissions. Automatic installation will be attempted."
+    echo '[+] Setup running with permissions. Automatic installation will be attempted.'
 fi
 
-if ! hash python3 >/dev/null
+if ! which python3 >/dev/null
 then
-    echo "[!] Python3 not found"
+    echo '[!] Python3 not found'
     if $WHOAMI == "root"
     then
-        apt-get -y install python3.6
+        apt-get install -y python3.6
     else
         $FAIL=true
     fi
 else
-	echo "[+] Python3 found"
+	echo '[+] Python3 found'
 fi
 
-if ! hash nmap >/dev/null
+if ! which nmap >/dev/null
 then
-    echo "[!] nmap not found"
+    echo '[!] nmap not found'
     if $WHOAMI == "root"
     then
-        apt-get -y install nmap
+        apt-get install -y nmap
     else
         $FAIL=true
     fi
 else
-	echo "[+] nmap found"
+	echo '[+] nmap found'
 fi
 
-if ! hash wkhtmltoimage >/dev/null
+if ! which chromium-browser >/dev/null
 then
-    echo "[!] wkhtmltoimage not found"
+    echo '[!] chromium-browser not found.'
     if $WHOAMI == "root"
     then
-        apt-get -y install wkhtmltopdf
+        apt-get install -y chromium-browser
     else
         $FAIL=true
     fi
 else
-	echo "[+] wkhtmltoimage found"
+    echo '[+] chromium-browser found'
 fi
 
-if ! hash vncsnapshot >/dev/null
+if ! which aquatone >/dev/null
 then
-    echo "[!] vncsnapshot not found"
+    echo '[!] aquatone not found. Please install it by reviewing the instructions: https://github.com/michenriksen/aquatone#installation'
+else
+	echo '[+] aquatone found'
+fi
+
+if ! which vncsnapshot >/dev/null
+then
+    echo '[!] vncsnapshot not found'
     if $WHOAMI == "root"
     then
-        apt-get -y install vncsnapshot
+        apt-get install -y vncsnapshot
     else
         $FAIL=true
     fi
 else
-	echo "[+] vncsnapshot found"
+	echo '[+] vncsnapshot found'
 fi
 
 
-echo "[+] Setup Complete"
+echo '[+] Setup Complete'

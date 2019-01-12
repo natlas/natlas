@@ -10,6 +10,7 @@ import string
 import json
 import base64
 import argparse
+import shutil
 
 import threading
 import queue
@@ -39,7 +40,7 @@ def scan(target=None):
 
     command = ["nmap", "-oA", "data/natlas."+rand, "-sV", "-O","-sC", "-open", target]
 
-    process = subprocess.Popen(command, stdout=subprocess.PIPE)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
         out, err = process.communicate(timeout=config.timeout)  # 6 minutes
     except:
@@ -50,7 +51,6 @@ def scan(target=None):
             pass
 
     print("[+] Scan Complete: " + rand)
-    # print(out)
 
     result = {}
     result['scan_id'] = rand
@@ -68,30 +68,34 @@ def scan(target=None):
     else:
         print("[+] (%s) scan size: %s" % (rand, len(result['nmap_data'])))
 
-    if "80/tcp" in result['nmap_data']:
-        if getheadshot(target, rand, 'http') is True:
-            result['httpheadshot'] = str(base64.b64encode(
-                open("data/natlas."+rand+".http.headshot.jpg", 'rb').read()))[2:-1]
-            os.remove("data/natlas."+rand+".http.headshot.jpg")
-            print("[+] (%s) HTTP snapshot acquired" % rand)
-        else:
-            print("[!] (%s) Failed to acquire HTTP snapshot" % rand)
-    if "443/tcp" in result['nmap_data']:
-        if getheadshot(target, rand, 'https') is True:
-            result['httpsheadshot'] = str(base64.b64encode(
-                open("data/natlas."+rand+".https.headshot.jpg", 'rb').read()))[2:-1]
-            os.remove("data/natlas."+rand+".https.headshot.jpg")
-            print("[+] (%s) HTTPS snapshot acquired" % rand)
-        else:
-            print("[!] (%s) Failed to acquire HTTPS snapshot" % rand)
-    if "5900/tcp" in result['nmap_data']:
-        if getheadshot(target, rand, 'vnc') is True:
-            result['vncsheadshot'] = str(base64.b64encode(
-                open("data/natlas."+rand+".vnc.headshot.jpg", 'rb').read()))[2:-1]
-            os.remove("data/natlas."+rand+".vnc.headshot.jpg")
-            print("[+] (%s) VNC snapshot acquired" % rand)
-        else:
-            print("[!] (%s) Failed to acquire VNC snapshot" % rand)
+    if shutil.which("aquatone") is not None:
+        if "80/tcp" in result['nmap_data']:
+            if getheadshot(target, rand, 'http') is True:
+                screenshotPath = "data/aquatone." + rand + ".http/screenshots/http__" +target.replace('.','_') + ".png"
+                result['httpheadshot'] = str(base64.b64encode(
+                    open(screenshotPath, 'rb').read()))[2:-1]
+                shutil.rmtree("data/aquatone." + rand + ".http/")
+                print("[+] (%s) HTTP snapshot acquired" % rand)
+            else:
+                print("[!] (%s) Failed to acquire HTTP snapshot" % rand)
+        if "443/tcp" in result['nmap_data']:
+            if getheadshot(target, rand, 'https') is True:
+                screenshotPath = "data/aquatone." + rand + ".https/screenshots/https__" +target.replace('.','_') + ".png"
+                result['httpsheadshot'] = str(base64.b64encode(
+                    open(screenshotPath, 'rb').read()))[2:-1]
+                shutil.rmtree("data/aquatone." + rand + ".https/")
+                print("[+] (%s) HTTPS snapshot acquired" % rand)
+            else:
+                print("[!] (%s) Failed to acquire HTTPS snapshot" % rand)
+    if shutil.which("vncsnapshot") is not None:
+        if "5900/tcp" in result['nmap_data']:
+            if getheadshot(target, rand, 'vnc') is True:
+                result['vncsheadshot'] = str(base64.b64encode(
+                    open("data/natlas."+rand+".vnc.headshot.jpg", 'rb').read()))[2:-1]
+                os.remove("data/natlas."+rand+".vnc.headshot.jpg")
+                print("[+] (%s) VNC snapshot acquired" % rand)
+            else:
+                print("[!] (%s) Failed to acquire VNC snapshot" % rand)
 
     # submit result
     print("[+] (%s) Submitting work" % rand)
