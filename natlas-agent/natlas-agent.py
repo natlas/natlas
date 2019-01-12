@@ -72,19 +72,25 @@ def scan(target=None):
         if "80/tcp" in result['nmap_data']:
             if getheadshot(target, rand, 'http') is True:
                 screenshotPath = "data/aquatone." + rand + ".http/screenshots/http__" +target.replace('.','_') + ".png"
-                result['httpheadshot'] = str(base64.b64encode(
-                    open(screenshotPath, 'rb').read()))[2:-1]
-                shutil.rmtree("data/aquatone." + rand + ".http/")
-                print("[+] (%s) HTTP snapshot acquired" % rand)
+                if not os.path.isfile(screenshotPath):
+                    pass
+                else:
+                    result['httpheadshot'] = str(base64.b64encode(
+                        open(screenshotPath, 'rb').read()))[2:-1]
+                    shutil.rmtree("data/aquatone." + rand + ".http/")
+                    print("[+] (%s) HTTP snapshot acquired" % rand)
             else:
                 print("[!] (%s) Failed to acquire HTTP snapshot" % rand)
         if "443/tcp" in result['nmap_data']:
             if getheadshot(target, rand, 'https') is True:
                 screenshotPath = "data/aquatone." + rand + ".https/screenshots/https__" +target.replace('.','_') + ".png"
-                result['httpsheadshot'] = str(base64.b64encode(
-                    open(screenshotPath, 'rb').read()))[2:-1]
-                shutil.rmtree("data/aquatone." + rand + ".https/")
-                print("[+] (%s) HTTPS snapshot acquired" % rand)
+                if not os.path.isfile(screenshotPath):
+                    pass
+                else:
+                    result['httpsheadshot'] = str(base64.b64encode(
+                        open(screenshotPath, 'rb').read()))[2:-1]
+                    shutil.rmtree("data/aquatone." + rand + ".https/")
+                    print("[+] (%s) HTTPS snapshot acquired" % rand)
             else:
                 print("[!] (%s) Failed to acquire HTTPS snapshot" % rand)
     if shutil.which("vncsnapshot") is not None:
