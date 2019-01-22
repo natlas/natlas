@@ -31,6 +31,9 @@ def fetch_target():
         if target_request.status_code != requests.codes.ok:
             print("[!] Server returned %s" % target_request.status_code)
             return False
+        if target_request.headers['content-type'] != "application/json":
+            print("[!] Expected application/json, received %s" % target_request.headers['content-type'])
+            return False
         target_data = target_request.json()
     except requests.ConnectionError as e:
         print("[!] Connection Error connecting to %s." % config.server)

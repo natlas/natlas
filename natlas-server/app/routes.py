@@ -514,17 +514,17 @@ def getwork():
     random.seed(os.urandom(200))
 
     # how many hosts are in scope?
-    magnitude = ScopeManager.getScopeSize()
+    scopeSize = ScopeManager.getScopeSize()
     blacklistSize = ScopeManager.getBlacklistSize()
-    print("[+] Scope Size: %s IPs" % (magnitude))
-    print("[+] Blacklist Size: %s IPs" % (blacklistSize))
+    if scopeSize == 0:
+        return "Scope Not Found", 404, {'content-type':'text/plain'}
 
     attempts = 0
     work = {}
     work['type'] = 'nmap'
     while attempts < 1000:
         # pick one
-        index = random.randint(0, magnitude-1)
+        index = random.randint(0, scopeSize-1)
         attempts = attempts+1
 
         target = ""
@@ -538,8 +538,8 @@ def getwork():
                         isgood = False
                 if isgood:
                     work['target'] = str(network[index])
-                    return json.dumps(work)
-    return "none"
+                    return json.dumps(work), 200, {'content-type':'application/json'}
+    return "Couldn't find a target that wasn't blacklisted.", 404, {'content-type':'text/plain'}
 
 
 @app.route('/submit', methods=['POST'])
