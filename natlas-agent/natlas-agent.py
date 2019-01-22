@@ -24,16 +24,56 @@ import ipaddress
 config = Config()
 MAX_QUEUE_SIZE = 100 # setting max queue size to 100 so that we can take advantage of the memory benefits of using the .hosts() iterator instead of loading all hosts into a queue
 
+def fetch_target():
+    print("[+] Fetching Target from %s" % config.server)
+    try:
+        target_request = requests.get(config.server+"/getwork", timeout=config.request_timeout)
+        if target_request.status_code != requests.codes.ok:
+            print("[!] Server returned %s" % target_request.status_code)
+            return False
+        target_data = target_request.json()
+    except requests.ConnectionError as e:
+        print("[!] Connection Error connecting to %s." % config.server)
+        return False
+    except requests.Timeout as e:
+        print("[!] Request timed out after %s seconds." % config.request_timeout)
+        return False
+    except ValueError as e:
+        print("[!] Error: %s" % e)
+        return False
+    target = target_data["target"]
+
+    return target
+
+def validate_target(target):
+    try:
+        iptarget = ipaddress.ip_address(target)
+        if iptarget.is_private and not config.scan_local:
+            print("[!] We're not configured to scan local addresses!")
+            return False
+    except ipaddress.AddressValueError:
+        print("[!] %s is not a valid IP Address" % target)
+        return False
+    return True
+
 def scan(target=None):
-    server = config.server
-    if target is None:
-        print("[+] Fetching Target from %s" % server)
-        target_data = json.loads(requests.get(server+"/getwork").text)
-        target = target_data["target"]
+    attempt = 0
+    
+    while not target:
+        target = fetch_target()
+        if not target:
+            attempt += 1
+            jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
+            current_sleep = min(config.backoff_max, config.backoff_base * 2 ** attempt) + jitter
+            print("[!] Failed to acquire target from %s. Waiting %s seconds before retrying." % (config.server, current_sleep))
+            time.sleep(current_sleep)
+    
+    if not validate_target(target):
+        print("[!] Failed to validate target %s" % target)
+        return False
 
     print("[+] Target: "+target)
-
-    # scan server
+    
     rand = ''.join(random.choice(string.ascii_lowercase + string.digits)
                    for _ in range(10))
     print("[+] Scan ID: "+rand)
@@ -42,7 +82,7 @@ def scan(target=None):
 
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
-        out, err = process.communicate(timeout=config.timeout)  # 6 minutes
+        out, err = process.communicate(timeout=config.scan_timeout)  # 6 minutes
     except:
         try:
             print("[+] (%s) Killing slacker process" % rand)
@@ -105,7 +145,7 @@ def scan(target=None):
 
     # submit result
     print("[+] (%s) Submitting work" % rand)
-    response = requests.post(server+"/submit", json=json.dumps(result)).text
+    response = requests.post(config.server+"/submit", json=json.dumps(result)).text
     print("[+] (%s) Response:\n%s" % (rand, response))
 
 class ThreadScan(threading.Thread):
