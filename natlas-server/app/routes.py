@@ -11,6 +11,7 @@ import random
 import sys
 import traceback
 import ipaddress
+import string
 from datetime import datetime
 
 from app import app, elastic, db, ScopeManager
@@ -469,32 +470,28 @@ def host_history(ip):
 def host_historical_result(ip, scan_id):
 
     info, context = hostinfo(ip)
-    count, context = elastic.gethost_scan_id(
-        ip, scan_id)
+    count, context = elastic.gethost_scan_id(scan_id)
     return render_template("host/summary.html", info=info, **context)
 
 @app.route('/host/<ip>/<scan_id>.xml')
 @isAuthenticated
 def export_scan_xml(ip, scan_id):
     
-    count, context = elastic.gethost_scan_id(
-        ip, scan_id)
+    count, context = elastic.gethost_scan_id(scan_id)
     return Response(context['xml_data'], mimetype="text/plain")
 
 @app.route('/host/<ip>/<scan_id>.nmap')
 @isAuthenticated
 def export_scan_nmap(ip, scan_id):
     
-    count, context = elastic.gethost_scan_id(
-        ip, scan_id)
+    count, context = elastic.gethost_scan_id(scan_id)
     return Response(context['nmap_data'], mimetype="text/plain")
 
 @app.route('/host/<ip>/<scan_id>.gnmap')
 @isAuthenticated
 def export_scan_gnmap(ip, scan_id):
     
-    count, context = elastic.gethost_scan_id(
-        ip, scan_id)
+    count, context = elastic.gethost_scan_id(scan_id)
     return Response(context['gnmap_data'], mimetype="text/plain")
 
 @app.route('/host/<ip>/headshots')
@@ -522,6 +519,16 @@ def getwork():
     attempts = 0
     work = {}
     work['type'] = 'nmap'
+
+    scan_id = ''
+    while scan_id == '':
+        rand = ''.join(random.choice(string.ascii_lowercase + string.digits)
+               for _ in range(10))
+        count, context = elastic.gethost_scan_id(rand)
+        if count == 0:
+            scan_id = rand
+    work['scan_id'] = scan_id
+
     while attempts < 1000:
         # pick one
         index = random.randint(0, scopeSize-1)

@@ -51,7 +51,7 @@ class Elastic:
 
         return result['hits']['total'], results
 
-    def gethost_scan_id(self, ip, scan_id):
+    def gethost_scan_id(self, scan_id):
         result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {
                                 "query_string": {'query': scan_id, "fields": ["scan_id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
 

@@ -45,8 +45,9 @@ def fetch_target():
         print("[!] Error: %s" % e)
         return False
     target = target_data["target"]
+    scan_id = target_data["scan_id"]
 
-    return target
+    return target, scan_id
 
 def validate_target(target):
     try:
@@ -63,7 +64,7 @@ def scan(target=None):
     attempt = 0
     
     while not target:
-        target = fetch_target()
+        target, scan_id = fetch_target()
         if not target:
             attempt += 1
             jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
@@ -75,81 +76,79 @@ def scan(target=None):
         print("[!] Failed to validate target %s" % target)
         return False
 
-    print("[+] Target: "+target)
+    print("[+] Target: %s" % target)
     
-    rand = ''.join(random.choice(string.ascii_lowercase + string.digits)
-                   for _ in range(10))
-    print("[+] Scan ID: "+rand)
+    print("[+] Scan ID: %s" % scan_id)
 
-    command = ["nmap", "-oA", "data/natlas."+rand, "-sV", "-O","-sC", "-open", target]
+    command = ["nmap", "-oA", "data/natlas."+scan_id, "-sV", "-O","-sC", "-open", target]
 
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
         out, err = process.communicate(timeout=config.scan_timeout)  # 6 minutes
     except:
         try:
-            print("[+] (%s) Killing slacker process" % rand)
+            print("[+] (%s) Killing slacker process" % scan_id)
             process.kill()
         except:
             pass
 
-    print("[+] Scan Complete: " + rand)
+    print("[+] Scan Complete: " + scan_id)
 
     result = {}
-    result['scan_id'] = rand
+    result['scan_id'] = scan_id
     for ext in 'nmap', 'gnmap', 'xml':
-        result[ext+"_data"] = open("data/natlas."+rand+"."+ext).read()
-        os.remove("data/natlas."+rand+"."+ext)
-        print("[+] (%s) Cleaning up: natlas.%s.%s" % (rand, rand, ext))
+        result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
+        os.remove("data/natlas."+scan_id+"."+ext)
+        print("[+] (%s) Cleaning up: natlas.%s.%s" % (scan_id, scan_id, ext))
 
     if len(result['nmap_data']) < 250:
-        print("[!] (%s) Nmap data is too short" % rand)
+        print("[!] (%s) Nmap data is too short" % scan_id)
         return
     elif 'Nmap scan report for' not in result['nmap_data']: # checking for this on the agent saves bandwidth
-        print("[!] (%s) Nmap scan report not found" % rand)
+        print("[!] (%s) Nmap scan report not found" % scan_id)
         return
     else:
-        print("[+] (%s) scan size: %s" % (rand, len(result['nmap_data'])))
+        print("[+] (%s) scan size: %s" % (scan_id, len(result['nmap_data'])))
 
     if shutil.which("aquatone") is not None:
         if "80/tcp" in result['nmap_data']:
-            if getheadshot(target, rand, 'http') is True:
-                screenshotPath = "data/aquatone." + rand + ".http/screenshots/http__" +target.replace('.','_') + ".png"
+            if getheadshot(target, scan_id, 'http') is True:
+                screenshotPath = "data/aquatone." + scan_id + ".http/screenshots/http__" +target.replace('.','_') + ".png"
                 if not os.path.isfile(screenshotPath):
                     pass
                 else:
                     result['httpheadshot'] = str(base64.b64encode(
                         open(screenshotPath, 'rb').read()))[2:-1]
-                    shutil.rmtree("data/aquatone." + rand + ".http/")
-                    print("[+] (%s) HTTP snapshot acquired" % rand)
+                    shutil.rmtree("data/aquatone." + scan_id + ".http/")
+                    print("[+] (%s) HTTP snapshot acquired" % scan_id)
             else:
-                print("[!] (%s) Failed to acquire HTTP snapshot" % rand)
+                print("[!] (%s) Failed to acquire HTTP snapshot" % scan_id)
         if "443/tcp" in result['nmap_data']:
-            if getheadshot(target, rand, 'https') is True:
-                screenshotPath = "data/aquatone." + rand + ".https/screenshots/https__" +target.replace('.','_') + ".png"
+            if getheadshot(target, scan_id, 'https') is True:
+                screenshotPath = "data/aquatone." + scan_id + ".https/screenshots/https__" +target.replace('.','_') + ".png"
                 if not os.path.isfile(screenshotPath):
                     pass
                 else:
                     result['httpsheadshot'] = str(base64.b64encode(
                         open(screenshotPath, 'rb').read()))[2:-1]
-                    shutil.rmtree("data/aquatone." + rand + ".https/")
-                    print("[+] (%s) HTTPS snapshot acquired" % rand)
+                    shutil.rmtree("data/aquatone." + scan_id + ".https/")
+                    print("[+] (%s) HTTPS snapshot acquired" % scan_id)
             else:
-                print("[!] (%s) Failed to acquire HTTPS snapshot" % rand)
+                print("[!] (%s) Failed to acquire HTTPS snapshot" % scan_id)
     if shutil.which("vncsnapshot") is not None:
         if "5900/tcp" in result['nmap_data']:
-            if getheadshot(target, rand, 'vnc') is True:
+            if getheadshot(target, scan_id, 'vnc') is True:
                 result['vncsheadshot'] = str(base64.b64encode(
-                    open("data/natlas."+rand+".vnc.headshot.jpg", 'rb').read()))[2:-1]
-                os.remove("data/natlas."+rand+".vnc.headshot.jpg")
-                print("[+] (%s) VNC snapshot acquired" % rand)
+                    open("data/natlas."+scan_id+".vnc.headshot.jpg", 'rb').read()))[2:-1]
+                os.remove("data/natlas."+scan_id+".vnc.headshot.jpg")
+                print("[+] (%s) VNC snapshot acquired" % scan_id)
             else:
-                print("[!] (%s) Failed to acquire VNC snapshot" % rand)
+                print("[!] (%s) Failed to acquire VNC snapshot" % scan_id)
 
     # submit result
-    print("[+] (%s) Submitting work" % rand)
+    print("[+] (%s) Submitting work" % scan_id)
     response = requests.post(config.server+"/submit", json=json.dumps(result)).text
-    print("[+] (%s) Response:\n%s" % (rand, response))
+    print("[+] (%s) Response:\n%s" % (scan_id, response))
 
 class ThreadScan(threading.Thread):
     def __init__(self, queue):
