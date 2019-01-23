@@ -62,7 +62,7 @@ def validate_target(target):
 
 def scan(target=None):
     attempt = 0
-    
+    scan_id = False
     while not target:
         target, scan_id = fetch_target()
         if not target:
@@ -75,9 +75,11 @@ def scan(target=None):
     if not validate_target(target):
         print("[!] Failed to validate target %s" % target)
         return False
-
     print("[+] Target: %s" % target)
-    
+
+    if not scan_id: # If running in standalone mode, generate our own scan_id
+        scan_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
+               for _ in range(10))
     print("[+] Scan ID: %s" % scan_id)
 
     command = ["nmap", "-oA", "data/natlas."+scan_id, "-sV", "-O","-sC", "-open", target]
