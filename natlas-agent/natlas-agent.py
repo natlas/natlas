@@ -22,12 +22,12 @@ from config import Config
 import ipaddress
 
 config = Config()
-MAX_QUEUE_SIZE = 100 # setting max queue size to 100 so that we can take advantage of the memory benefits of using the .hosts() iterator instead of loading all hosts into a queue
+MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
 
 RTTVAR_MSG = "RTTVAR has grown to over"
 
 
-def fetch_target():
+def fetch_target_from_server():
     print("[+] Fetching Target from %s" % config.server)
     try:
         target_request = requests.get(config.server+"/api/getwork", timeout=config.request_timeout)
@@ -47,10 +47,22 @@ def fetch_target():
     except ValueError as e:
         print("[!] Error: %s" % e)
         return False
-    target = target_data["target"]
-    scan_id = target_data["scan_id"]
 
-    return target, scan_id
+    return target_data
+
+def fetch_target():
+    attempt = 0
+    target_data = None
+    while not target_data:
+        target_data = fetch_target_from_server()
+        if not target_data:
+            attempt += 1
+            jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
+            current_sleep = min(config.backoff_max, config.backoff_base * 2 ** attempt) + jitter
+            print("[!] Failed to acquire target from %s. Waiting %s seconds before retrying." % (config.server, current_sleep))
+            time.sleep(current_sleep)
+
+    return target_data
 
 def validate_target(target):
     try:
@@ -63,26 +75,15 @@ def validate_target(target):
         return False
     return True
 
-def scan(target=None):
-    attempt = 0
-    scan_id = False
-    while not target:
-        target, scan_id = fetch_target()
-        if not target:
-            attempt += 1
-            jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
-            current_sleep = min(config.backoff_max, config.backoff_base * 2 ** attempt) + jitter
-            print("[!] Failed to acquire target from %s. Waiting %s seconds before retrying." % (config.server, current_sleep))
-            time.sleep(current_sleep)
+def generate_scan_id():
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
+
+def scan(target=None, scan_id=None):
     
     if not validate_target(target):
         print("[!] Failed to validate target %s" % target)
         return False
     print("[+] Target: %s" % target)
-
-    if not scan_id: # If running in standalone mode, generate our own scan_id
-        scan_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
-               for _ in range(10))
     print("[+] Scan ID: %s" % scan_id)
 
     command = ["nmap", "-oA", "data/natlas."+scan_id, "-sV", "-O","-sC", "-open", target]
@@ -172,8 +173,8 @@ class ThreadScan(threading.Thread):
 
     def run(self):
         while True:
-            target = self.queue.get()
-            scan(target)
+            target_data = self.queue.get()
+            scan(target_data["target"], target_data["scan_id"])
             self.queue.task_done()
 
 def main():
@@ -184,85 +185,60 @@ def main():
     PARSER_EPILOG = "Report problems to https://github.com/natlas/natlas"
     parser = argparse.ArgumentParser(description=PARSER_DESC, epilog=PARSER_EPILOG)
     mutually_exclusive = parser.add_mutually_exclusive_group()
-    mutually_exclusive.add_argument('--target', metavar='IPADDR', help="An IPv4 address to scan. e.g. 192.168.0.1", dest='target')
-    mutually_exclusive.add_argument('--range', metavar='CIDR', help="A CIDR block to scan. e.g. 192.168.0.0/24", dest='range')
-    mutually_exclusive.add_argument('--target-file', metavar='FILENAME', help="A file of line separated target IPv4 addresses", dest='tfile')
-    mutually_exclusive.add_argument('--range-file', metavar='FILENAME', help="A file of line separated target CIDR blocks", dest='rfile')
+    mutually_exclusive.add_argument('--target', metavar='IPADDR', help="An IPv4 address or CIDR range to scan. e.g. 192.168.0.1, 192.168.0.1/24", dest='target')
+    mutually_exclusive.add_argument('--target-file', metavar='FILENAME', help="A file of line separated target IPv4 addresses or CIDR ranges", dest='tfile')
     args = parser.parse_args()
     
+    q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
+
+    # Start threads that will wait for items in queue and then scan them
+    for i in range(int(config.max_threads)):
+        t = ThreadScan(q)
+        t.setDaemon(True)
+        t.start()
+
     if args.target:
-        print("[+] Running in single-target mode")
-        scan(args.target)
-        
-        print("[+] Finished scanning the single target: %s" % args.target)
-        return
+        print("[+] Scanning: %s" % args.target)
 
-    elif args.range:
-        print("[+] Running in target-range mode\n[+] Target Range: %s" % args.range)
-        targetNetwork = ipaddress.ip_network(args.range, False)
-        q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
+        targetNetwork = ipaddress.ip_interface(args.target)
+        if targetNetwork.with_prefixlen.endswith('/32'):
+            scan_id = generate_scan_id()
+            target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id}
+            q.put(target_data)
+        else:    
+            # Iterate over usable hosts in target, queue.put will block until a queue slot is available
+            for t in targetNetwork.network.hosts(): 
+                scan_id = generate_scan_id()
+                target_data = {"target": str(t), "scan_id": scan_id}
+                q.put(target_data)
 
-        # Start threads that will wait for items in queue and then scan them
-        for i in range(int(config.max_threads)):
-            t = ThreadScan(q)
-            t.setDaemon(True)
-            t.start()
-
-        # Iterate over items in target, queue.put will block until a queue slot is available
-        for target in targetNetwork.hosts(): 
-            q.put(str(target))
-
-        # queue.join to wait until the queue is processed once we've finished stuffing hosts into the queue
         q.join()
-        print("[+] Finished scanning the target range %s" % args.range)
+        print("[+] Finished scanning: %s" % args.target)
         return
 
     elif args.tfile:
-        print("[+] Running in target-file mode\n[+] Target File: %s" % args.tfile)
-        q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
-
-        for i in range(int(config.max_threads)):
-            t = ThreadScan(q)
-            t.setDaemon(True)
-            t.start()
+        print("[+] Reading scope from file: %s" % args.tfile)
 
         for target in open(args.tfile, "r"):
-            q.put(str(target.strip()))
-        
+            targetNetwork = ipaddress.ip_interface(target.strip())
+            if targetNetwork.with_prefixlen.endswith('/32'):
+                scan_id = generate_scan_id()
+                target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id}
+                q.put(target_data)
+            else:
+                for t in targetNetwork.network.hosts():
+                    scan_id = generate_scan_id()
+                    target_data = {"target": str(t), "scan_id": scan_id}
+                    q.put(target_data)
         q.join()
         print("[+] Finished scanning the target file %s" % args.tfile)
         return
 
-    elif args.rfile:
-        print("[+] Running in range-file mode\n[+] Range File: %s" % args.rfile)
-        q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
-
-        for i in range(int(config.max_threads)):
-            t = ThreadScan(q)
-            t.setDaemon(True)
-            t.start()
-
-        for trange in open(args.rfile, "r"):
-            targetNetwork = ipaddress.ip_network(trange.strip())
-            for target in targetNetwork.hosts():
-                q.put(str(target))
-
-        q.join()
-        print("[+] Finished scanning the range file %s" % args.rfile)
-        return
     # This is the default behavior of fetching work from the server
     else:
         while True:
-            if threading.active_count() <= int(config.max_threads):
-                notifylock = False
-                print("[+] Active Threads: %s" % threading.active_count())
-                t = threading.Thread(target=scan)
-                t.start()
-            else:
-                if notifylock is False:
-                    print("[+] Thread pool exhausted")
-                notifylock = True
-            time.sleep(1) 
+            target_data = fetch_target()
+            q.put(target_data)
 
 
 if __name__ == "__main__":
