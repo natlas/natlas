@@ -16,6 +16,7 @@ netaddr==0.7.19
 pkg-resources==0.0.0
 PyJWT==1.7.1
 python-dateutil==2.7.5
+python-dotenv==0.10.1
 python-editor==1.0.3
 six==1.12.0
 SQLAlchemy==1.2.15
