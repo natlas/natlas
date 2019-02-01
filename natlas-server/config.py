@@ -1,8 +1,11 @@
 import os
+from dotenv import load_dotenv
 
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(BASEDIR, '.env'))
 
 class Config(object):
-    BASEDIR = os.path.abspath(os.path.dirname(__file__))
+    
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-should-set-a-secret-key'
     SCOPE_DOC = os.path.join(BASEDIR, 'config/scope.txt')
     BLACKLIST_DOC = os.path.join(BASEDIR, 'config/blacklist.txt')

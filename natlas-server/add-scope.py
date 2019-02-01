@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import ipaddress
-from app import app, db
+from app import create_app, db
 from app.models import ScopeItem
 
+app = create_app()
+app.app_context().push()
 
 def importScope(file, blacklist):
     successImport = 0

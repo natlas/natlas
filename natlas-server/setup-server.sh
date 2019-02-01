@@ -77,18 +77,6 @@ then
     exit 1
 fi
 
-if [ ! -e config/scope.txt ]
-then
-    echo "[+] Generating default config/scope.txt"
-    echo "127.0.0.1" > config/scope.txt
-fi
-
-if [ ! -e config/blacklist.txt ]
-then
-    echo "[+] Creating empty config/blacklist.txt"
-    echo "127.0.1.1" > config/blacklist.txt
-fi
-
 echo "[+] Entering virtual environment"
 source venv/bin/activate
 echo "[+] Attempting to install python dependencies"

@@ -2,8 +2,11 @@
 import argparse
 import random
 import string
-from app import app, db
+from app import create_app, db
 from app.models import User
+
+app = create_app()
+app.app_context().push()
 
 pass_length = 16
 
