@@ -39,9 +39,9 @@ class NmapParser():
             except:
                 continue
             if int(x) > 0:
-                ports.append(x)  # yup, it's a port alright
+                ports.append(str(x))  # yup, it's a port alright
 
-        return ports
+        return ', '.join(ports)
 
     def get_country(self, ip):
         return "fake"
