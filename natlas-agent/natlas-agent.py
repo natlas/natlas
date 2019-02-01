@@ -24,10 +24,13 @@ import ipaddress
 config = Config()
 MAX_QUEUE_SIZE = 100 # setting max queue size to 100 so that we can take advantage of the memory benefits of using the .hosts() iterator instead of loading all hosts into a queue
 
+RTTVAR_MSG = "RTTVAR has grown to over"
+
+
 def fetch_target():
     print("[+] Fetching Target from %s" % config.server)
     try:
-        target_request = requests.get(config.server+"/getwork", timeout=config.request_timeout)
+        target_request = requests.get(config.server+"/api/getwork", timeout=config.request_timeout)
         if target_request.status_code != requests.codes.ok:
             print("[!] Server returned %s" % target_request.status_code)
             return False
@@ -112,6 +115,16 @@ def scan(target=None):
     else:
         print("[+] (%s) scan size: %s" % (scan_id, len(result['nmap_data'])))
 
+    if RTTVAR_MSG in result['nmap_data']:
+        orig_data = result['nmap_data'].splitlines()
+        new_data = ''
+        for line in orig_data:
+            if line.startswith(RTTVAR_MSG):
+                continue
+            else:
+                new_data += line + '\n'
+        result['nmap_data'] = new_data.rstrip('\n')
+
     if shutil.which("aquatone") is not None:
         if "80/tcp" in result['nmap_data']:
             if getheadshot(target, scan_id, 'http') is True:
@@ -149,7 +162,7 @@ def scan(target=None):
 
     # submit result
     print("[+] (%s) Submitting work" % scan_id)
-    response = requests.post(config.server+"/submit", json=json.dumps(result)).text
+    response = requests.post(config.server+"/api/submit", json=json.dumps(result)).text
     print("[+] (%s) Response:\n%s" % (scan_id, response))
 
 class ThreadScan(threading.Thread):
@@ -190,7 +203,7 @@ def main():
         q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
         # Start threads that will wait for items in queue and then scan them
-        for i in range(config.max_threads):
+        for i in range(int(config.max_threads)):
             t = ThreadScan(q)
             t.setDaemon(True)
             t.start()
@@ -208,7 +221,7 @@ def main():
         print("[+] Running in target-file mode\n[+] Target File: %s" % args.tfile)
         q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
-        for i in range(config.max_threads):
+        for i in range(int(config.max_threads)):
             t = ThreadScan(q)
             t.setDaemon(True)
             t.start()
@@ -224,7 +237,7 @@ def main():
         print("[+] Running in range-file mode\n[+] Range File: %s" % args.rfile)
         q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
-        for i in range(config.max_threads):
+        for i in range(int(config.max_threads)):
             t = ThreadScan(q)
             t.setDaemon(True)
             t.start()
@@ -240,7 +253,7 @@ def main():
     # This is the default behavior of fetching work from the server
     else:
         while True:
-            if threading.active_count() <= config.max_threads:
+            if threading.active_count() <= int(config.max_threads):
                 notifylock = False
                 print("[+] Active Threads: %s" % threading.active_count())
                 t = threading.Thread(target=scan)

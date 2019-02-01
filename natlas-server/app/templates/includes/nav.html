@@ -11,11 +11,11 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="{{ url_for('search') }}">Browse</a></li>
+            <li><a href="{{ url_for('main.search') }}">Browse</a></li>
           </ul>
 
 
-          <form class="navbar-form navbar-right" action="{{ url_for('search') }}" name="search">
+          <form class="navbar-form navbar-right" action="{{ url_for('main.search') }}" name="search">
             <div class="input-group">
               <input type="text" class="form-control" value="{{query}}" name="q" placeholder="Search..." />
               <input type="submit" value="" style="display: none"/>
@@ -32,12 +32,12 @@
 
           <ul class="nav navbar-nav navbar-right">
             {% if current_user.is_admin %}
-            <li><a href="{{ url_for('admin') }}">Admin</a></li>
+            <li><a href="{{ url_for('admin.admin') }}">Admin</a></li>
             {% endif %}
             {% if current_user.is_anonymous %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('auth.login') }}">Login</a></li>
             {% else %}
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
             {% endif %}
           </ul>
           </ul>

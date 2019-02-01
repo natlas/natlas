@@ -1,11 +1,11 @@
 import ipaddress
 from app.models import ScopeItem
-from app import elastic, ScopeManager
+from flask import current_app
 
 
 def hostinfo(ip):
     hostinfo = {}
-    count, context = elastic.gethost(ip)
+    count, context = current_app.elastic.gethost(ip)
     if count == 0:
         return abort(404)
     hostinfo['history'] = count
@@ -25,7 +25,7 @@ def isAcceptableTarget(target):
     targetAddr = ipaddress.IPv4Address(target)
     inScope = False
 
-    for network in ScopeManager.getScope():
+    for network in current_app.ScopeManager.getScope():
         if str(network).endswith('/32'):
             if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
                 inScope = True
@@ -35,7 +35,7 @@ def isAcceptableTarget(target):
     if not inScope:
         return False
 
-    for network in ScopeManager.getBlacklist():
+    for network in current_app.ScopeManager.getBlacklist():
         if str(network).endswith('/32'):
             if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
                 return False

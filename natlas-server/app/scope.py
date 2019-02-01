@@ -32,7 +32,7 @@ class ScopeManager():
             self.scope.append(newItem)
             newScopeSize += newItem.num_addresses
         self.scopeSize = newScopeSize
-        print("Scope Size: %s" % self.scopeSize)
+        #print("Scope Size: %s" % self.scopeSize)
 
     def updateBlacklist(self):
         from app.models import ScopeItem
@@ -42,10 +42,9 @@ class ScopeManager():
             self.blacklist.append(newItem)
             newBlacklistSize += newItem.num_addresses
         self.blacklistSize = newBlacklistSize
-        print("Blacklist Size: %s" % self.blacklistSize)
+        #print("Blacklist Size: %s" % self.blacklistSize)
 
     def update(self):
-        from app.models import ScopeItem
         self.updateScope()
-
         self.updateBlacklist()
+        print("ScopeManager Updated")

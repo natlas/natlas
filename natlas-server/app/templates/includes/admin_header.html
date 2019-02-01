@@ -3,15 +3,15 @@
 </div>
 <ul class="nav nav-tabs host-nav" role="tablist">
   <li role="presentation" class="{{ 'active' if active_page == 'config' else '' }}">
-  	<a id="summary" href="{{ url_for('admin') }}">Config</a>
+  	<a id="summary" href="{{ url_for('admin.admin') }}">Config</a>
   </li>
   <li role="presentation" class="{{ 'active' if active_page == 'users' else '' }}">
-  	<a id="users" href="{{ url_for('admin_users') }}">Users</a>
+  	<a id="users" href="{{ url_for('admin.users') }}">Users</a>
   </li>
   <li role="presentation" class="{{ 'active' if active_page == 'scope' else '' }}">
-  	<a id="scope" href="{{ url_for('admin_scope') }}">Scope</a>
+  	<a id="scope" href="{{ url_for('admin.scope') }}">Scope</a>
   </li>
   <li role="presentation" class="{{ 'active' if active_page == 'blacklist' else '' }}">
-    <a id="scope" href="{{ url_for('admin_blacklist') }}">Blacklist</a>
+    <a id="scope" href="{{ url_for('admin.blacklist') }}">Blacklist</a>
   </li>
 </ul>

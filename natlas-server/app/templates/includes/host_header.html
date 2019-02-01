@@ -3,12 +3,12 @@
 </div>
 <ul class="nav nav-tabs host-nav" role="tablist">
   <li role="presentation" class="{{ 'active' if active_page == 'summary' else '' }}">
-  	<a id="summary" href="{{ url_for('host', ip=ip) }}">Summary</a>
+  	<a id="summary" href="{{ url_for('main.host', ip=ip) }}">Summary</a>
   </li>
   <li role="presentation" class="{{ 'active' if active_page == 'history' else '' }}">
-  	<a id="history" href="{{ url_for('host_history', ip=ip) }}">History <span class="badge">{{ info.history }}</span></a>
+  	<a id="history" href="{{ url_for('main.host_history', ip=ip) }}">History <span class="badge">{{ info.history }}</span></a>
   </li>
   <li role="presentation" class="{{ 'active' if active_page == 'headshots' else '' }}">
-  	<a id="headshots" href="{{ url_for('host_headshots', ip=ip) }}">Headshots <span class="badge">{{ info.headshots }}</span></a>
+  	<a id="headshots" href="{{ url_for('main.host_headshots', ip=ip) }}">Headshots <span class="badge">{{ info.headshots }}</span></a>
   </li>
 </ul>

@@ -35,20 +35,20 @@
         <tr>
           <th scope="row">{{ item.id }}</th>
           <td>{{ item.target }}</td>
-          <td><form method="POST" action="{{ url_for('deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger", onclick="return confirm('Are you sure you want to delete this scope item?')") }}</form></td>
-          <td><form method="POST" action="{{ url_for('toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning", onclick="return confirm('Are you sure you want to toggle the blacklist status for this scope item?')") }}</form></td>
+          <td><form method="POST" action="{{ url_for('admin.deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger", onclick="return confirm('Are you sure you want to delete this scope item?')") }}</form></td>
+          <td><form method="POST" action="{{ url_for('admin.toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning", onclick="return confirm('Are you sure you want to toggle the blacklist status for this scope item?')") }}</form></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
     <h3>Import Scope</h3>
-    <form method="POST" action="{{ url_for('importScope') }}">
+    <form method="POST" action="{{ url_for('admin.importScope') }}">
       {{ importForm.hidden_tag() }}
       {{ importForm.scope(rows='10', cols='80') }}
       <br />
       {{ importForm.submit(class="btn btn-primary") }}
     </form>
-    <a href="{{ url_for('exportScope') }}" class="btn btn-primary export-btn" role="button">Export Scope</a>
+    <a href="{{ url_for('admin.exportScope') }}" class="btn btn-primary export-btn" role="button">Export Scope</a>
   </div>
   {% endif %}
 {% endblock %}

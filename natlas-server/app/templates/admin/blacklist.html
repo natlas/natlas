@@ -35,20 +35,20 @@
         <tr>
           <th scope="row">{{ item.id }}</th>
           <td>{{ item.target }}</td>
-          <td><form method="POST" action="{{ url_for('deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger") }}</form></td>
-          <td><form method="POST" action="{{ url_for('toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning") }}</form></td>
+          <td><form method="POST" action="{{ url_for('admin.deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger") }}</form></td>
+          <td><form method="POST" action="{{ url_for('admin.toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning") }}</form></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
     <h3>Import Blacklist</h3>
-    <form method="POST" action="{{ url_for('importBlacklist') }}">
+    <form method="POST" action="{{ url_for('admin.importBlacklist') }}">
       {{ importForm.hidden_tag() }}
       {{ importForm.scope(rows='10', cols='80') }}
       <br />
       {{ importForm.submit(class="btn btn-primary") }}
     </form>
-    <a href="{{ url_for('exportBlacklist') }}" class="btn btn-primary export-btn" role="button">Export Blacklist</a>
+    <a href="{{ url_for('admin.exportBlacklist') }}" class="btn btn-primary export-btn" role="button">Export Blacklist</a>
   </div>
   {% endif %}
 {% endblock %}
