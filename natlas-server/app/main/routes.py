@@ -17,7 +17,8 @@ def index():
 def search():
     query = request.args.get('q', '')
     page = int(request.args.get('p', 1))
-    format = request.args.get('f', "")
+    format = request.args.get('f', '')
+    scan_ids = request.args.get('s', '')
 
     searchOffset = current_app.config['RESULTS_PER_PAGE'] * (page-1)
     count, context = current_app.elastic.search(
@@ -32,7 +33,10 @@ def search():
     if format == 'hostlist':
         hostlist = []
         for host in context:
-            hostlist.append(str(host['ip']))
+            if scan_ids:
+                hostlist.append(str(host['ip']) + ',' + str(host['scan_id']))
+            else:
+                hostlist.append(str(host['ip']))
         return Response('\n'.join(hostlist), mimetype='text/plain')
     else:
         return render_template("search.html", query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
