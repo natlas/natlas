@@ -58,23 +58,3 @@ class Elastic:
         if result['hits']['total'] == 0:
             return 0, None
         return result['hits']['total'], result['hits']['hits'][0]['_source']
-
-    def getwork_mass(self):  # getwork when masscan data is loaded
-
-        # get random ip
-        result = self.es.search(index="masscan_hosts", doc_type="_doc", body={"size": 1, "query": {
-                                "function_score": {"functions": [{"random_score": {"seed": random.randint(0, 2**60)}}]}}})
-        randip = str(result['hits']['hits'][0]['_source']['ip'])
-
-        # get ports
-        result = self.es.search(index="masscan_services", doc_type="_doc", body={
-                                "size": 1000, "query": {"match": {'ip': randip}}})
-        ports = []  # collate results
-        for thing in result['hits']['hits']:
-            ports.append(thing['_source']['ports'][0]['port'])
-
-        work = {}
-        work['type'] = 'nmap'
-        work['target'] = randip
-        work['ports'] = ports
-        return json.dumps(work)
