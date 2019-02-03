@@ -7,12 +7,10 @@ load_dotenv(os.path.join(BASEDIR, '.env'))
 class Config(object):
     
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-should-set-a-secret-key'
-    SCOPE_DOC = os.path.join(BASEDIR, 'config/scope.txt')
-    BLACKLIST_DOC = os.path.join(BASEDIR, 'config/blacklist.txt')
 
     # Access Control Config
-    LOGIN_REQUIRED = os.environ.get('LOGIN_REQUIRED')
-    REGISTER_ALLOWED = os.environ.get('REGISTER_ALLOWED')
+    LOGIN_REQUIRED = os.environ.get('LOGIN_REQUIRED') or False
+    REGISTER_ALLOWED = os.environ.get('REGISTER_ALLOWED') or False
 
     # Display Config
     RESULTS_PER_PAGE = 100
