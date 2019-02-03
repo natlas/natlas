@@ -24,9 +24,9 @@ def search():
     count, context = current_app.elastic.search(
         query, current_app.config['RESULTS_PER_PAGE'], searchOffset)
 
-    next_url = url_for('search', q=query, p=page + 1) \
+    next_url = url_for('main.search', q=query, p=page + 1) \
         if count > page * current_app.config['RESULTS_PER_PAGE'] else None
-    prev_url = url_for('search', q=query, p=page - 1) \
+    prev_url = url_for('main.search', q=query, p=page - 1) \
         if page > 1 else None
 
     # what kind of output are we looking for?
