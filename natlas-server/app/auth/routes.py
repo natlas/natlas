@@ -6,11 +6,11 @@ from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm
 from app.models import User
 from app.auth.email import send_password_reset_email
 from app.auth import bp
+from werkzeug.urls import url_parse
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        flash("You're already logged in!", "info")
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():

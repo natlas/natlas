@@ -15,7 +15,7 @@ def isAuthenticated(f):
 def isAdmin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_admin:
+        if current_user.is_anonymous or not current_user.is_admin:
             return lm.unauthorized()
         return f(*args, **kwargs)
     return decorated_function

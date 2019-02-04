@@ -10,7 +10,7 @@ import sqlalchemy
 import os
 
 login = LoginManager()
-login.login_view = 'login'
+login.login_view = 'auth.login'
 login.login_message_category = "warning"
 login.session_protection = "strong"
 mail = Mail()
