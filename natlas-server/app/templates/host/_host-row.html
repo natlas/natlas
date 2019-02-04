@@ -1,0 +1,56 @@
+<tr>
+              <td>
+                {% if pagetype == 'search' %}
+                  <h3><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
+                {% endif %}
+                <h4>Open Ports</h4>
+                {{ host.ports }}<br>
+                {% if host.ctime %}
+                <h4>Date Added</h4>
+                {{ host.ctime | ctime }}
+                {% endif %}
+                {% if host.scan_id %}
+                <h4>Scan ID</h4> 
+                <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a>
+                <h4>Export</h4>
+                <a class="btn btn-primary" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">XML</a>
+                <a class="btn btn-primary" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">nmap</a>
+                <a class="btn btn-primary" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">gnmap</a>
+                {% endif %}
+                {% if host.headshot %}
+                  <h5>Unknown Headshot</h5>
+                  <img width=200 src="data:image/jpeg;base64,{{ host.headshot }}"></br>
+                {% endif %}
+                {% if host.vncheadshot %}
+                  <h5>VNC</h5>
+                  <img width=200 src="data:image/jpeg;base64,{{ host.vncheadshot }}"></br>
+                {% endif %}
+                {% if host.httpheadshot %}
+                  <h5>HTTP</h5>
+                  <img width=200 src="data:image/jpeg;base64,{{ host.httpheadshot }}"></br>
+                {% endif %}
+                {% if host.httpsheadshot %}
+                  <h5>HTTPS</h5>
+                  <img width=200 src="data:image/jpeg;base64,{{ host.httpsheadshot }}"></br>
+                {% endif %}
+              </td>
+              <td>
+                  {% set lines = host.nmap_data.split('\n') %}
+                  {% if lines|length > g.preview_length and hosts %}
+                    {% set nmap_preview = [] %}
+                    {% for line in lines %}
+                      {% if loop.index <= g.preview_length %}
+                        {% do nmap_preview.append(line) %}
+                      {% endif %}
+                    {% endfor %}
+                    <pre class="nmap_data">{{ nmap_preview|join('\n') }}</pre>
+                    {% if host.scan_id %}
+                    <a class="preview_link" href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}"><div class="preview_nmap">Click here to see the complete results for {{ host.ip }} ({{ host.scan_id }})</div></a>
+                    {% else %}
+                    <div class="preview_nmap">Unfortunately we are unable to display the rest of this scan because we can't find a scan identifier!</div>
+                    {% endif %}
+                  {% else %}
+                    <pre class="nmap_data">{{ host.nmap_data }}</pre>
+                  {% endif %}
+              </td>
+            </tr>

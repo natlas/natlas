@@ -3,7 +3,7 @@
 {% set active_page = "headshots" %}
 {% block content %}
   <div class="row">
-    {% include 'includes/host_header.html' %}
+    {% include 'host/_header.html' %}
 	{% if headshot %}
 	  <h3 class="headshot-header">Unknown Headshot</h3>
 	  <img src="data:image/jpeg;base64,{{ headshot }}" class="host-headshot"></br>

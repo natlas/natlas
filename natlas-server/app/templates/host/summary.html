@@ -3,49 +3,11 @@
 {% set active_page = "summary" %}
 {% block content %}
   <div class="row">
-    {% include 'includes/host_header.html' %}
+    {% include 'host/_header.html' %}
 	<div class="table-responsive">
       <table class="table table-striped">
         <tbody>
-            <tr>
-              <td>
-                <h4>Open Ports</h4>
-                {{ ports }}<br>
-                {% if ctime %}
-                <h4>Date Added</h4>
-                {{ ctime | ctime }}
-                {% endif %}
-                {% if scan_id %}
-                <h4>Scan ID</h4> 
-                <a href="{{ url_for('main.host_historical_result', ip=ip, scan_id=scan_id) }}">{{ scan_id }}</a>
-                <h4>Export</h4>
-                <a class="btn btn-primary" href="{{ url_for('main.export_scan_xml', ip=ip, scan_id=scan_id) }}">XML</a>
-                <a class="btn btn-primary" href="{{ url_for('main.export_scan_nmap', ip=ip, scan_id=scan_id) }}">nmap</a>
-                <a class="btn btn-primary" href="{{ url_for('main.export_scan_gnmap', ip=ip, scan_id=scan_id) }}">gnmap</a>
-                {% endif %}
-                {% if headshot %}
-                  <h5>Unknown Headshot</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ headshot }}"></br>
-                {% endif %}
-                {% if vncheadshot %}
-                  <h5>VNC</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ vncheadshot }}"></br>
-                {% endif %}
-                {% if httpheadshot %}
-                  <h5>HTTP</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ httpheadshot }}"></br>
-                {% endif %}
-                {% if httpsheadshot %}
-                  <h5>HTTPS</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ httpsheadshot }}"></br>
-                {% endif %}
-              </td>
-              <td>
-              	{% if nmap_data|length > 0 %}
-    			<pre class="nmap_data">{{ nmap_data }}</pre>
-    			{% endif %}
-              </td>
-            </tr>
+            {% include 'host/_host-row.html' %}
         </tbody>
     </table>
 </div>

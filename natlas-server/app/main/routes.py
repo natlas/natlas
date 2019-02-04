@@ -46,7 +46,7 @@ def search():
 @isAuthenticated
 def host(ip):
     info, context = hostinfo(ip)
-    return render_template("host/summary.html", **context, info=info)
+    return render_template("host/summary.html", **context, host=context, info=info)
 
 
 @bp.route('/host/<ip>/history')
@@ -74,7 +74,7 @@ def host_historical_result(ip, scan_id):
 
     info, context = hostinfo(ip)
     count, context = current_app.elastic.gethost_scan_id(scan_id)
-    return render_template("host/summary.html", info=info, **context)
+    return render_template("host/summary.html", host=context, info=info, **context)
 
 @bp.route('/host/<ip>/<scan_id>.xml')
 @isAuthenticated
