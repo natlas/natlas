@@ -28,31 +28,24 @@ class NewScopeForm(FlaskForm):
     submit = SubmitField('Add Target')
 
     def validate_target(self, target):
-        item = ScopeItem.query.filter_by(target=target.data).first()
-        if item is not None:
-            raise ValidationError('Target %s already exists!' % item.target)
+        if '/' not in target.data:
+            target.data = target.data + '/32'
         try:
-            isValid = ipaddress.IPv4Interface(target.data)
+            isValid = ipaddress.ip_network(target.data, False)
+            item = ScopeItem.query.filter_by(target=isValid.with_prefixlen).first()
+            if item is not None:
+                raise ValidationError('Target %s already exists!' % item.target)
         except ipaddress.AddressValueError:
             raise ValidationError(
                 'Target %s couldn\'t be validated' % target.data)
-
 
 class ImportScopeForm(FlaskForm):
     scope = TextAreaField("Scope Import")
     submit = SubmitField("Import Scope")
 
-    def validate_scope(self, scope):
-        for target in scope.data.split('\n'):
-            target = target.strip()
-            if '/' not in target:
-                target = target + '/32'
-            try:
-                isValid = ipaddress.IPv4Network(target)
-            except ipaddress.AddressValueError:
-                raise ValidationError(
-                    'Target %s couldn\'t be validated' % target)
-
+class ImportBlacklistForm(FlaskForm):
+    scope = TextAreaField("Blacklist Import")
+    submit = SubmitField("Import Blacklist")
 
 class ScopeDeleteForm(FlaskForm):
     deleteScopeItem = SubmitField('Delete Target')

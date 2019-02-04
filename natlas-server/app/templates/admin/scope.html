@@ -42,13 +42,13 @@
       </tbody>
     </table>
     <h3>Import Scope</h3>
-    <form method="POST" action="{{ url_for('admin.importScope') }}">
+    <form method="POST" action="{{ url_for('admin.importScope', scopetype='scope') }}">
       {{ importForm.hidden_tag() }}
       {{ importForm.scope(rows='10', cols='80') }}
       <br />
       {{ importForm.submit(class="btn btn-primary") }}
     </form>
-    <a href="{{ url_for('admin.exportScope') }}" class="btn btn-primary export-btn" role="button">Export Scope</a>
+    <a href="{{ url_for('admin.exportScope', scopetype='scope') }}" class="btn btn-primary export-btn" role="button">Export Scope</a>
   </div>
   {% endif %}
 {% endblock %}

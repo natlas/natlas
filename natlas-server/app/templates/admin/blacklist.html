@@ -42,13 +42,13 @@
       </tbody>
     </table>
     <h3>Import Blacklist</h3>
-    <form method="POST" action="{{ url_for('admin.importBlacklist') }}">
+    <form method="POST" action="{{ url_for('admin.importScope', scopetype='blacklist') }}">
       {{ importForm.hidden_tag() }}
       {{ importForm.scope(rows='10', cols='80') }}
       <br />
       {{ importForm.submit(class="btn btn-primary") }}
     </form>
-    <a href="{{ url_for('admin.exportBlacklist') }}" class="btn btn-primary export-btn" role="button">Export Blacklist</a>
+    <a href="{{ url_for('admin.exportScope', scopetype='blacklist') }}" class="btn btn-primary export-btn" role="button">Export Blacklist</a>
   </div>
   {% endif %}
 {% endblock %}

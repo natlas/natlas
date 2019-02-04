@@ -1,12 +1,13 @@
-from flask import render_template, redirect, url_for, current_app, flash
+from flask import render_template, redirect, url_for, current_app, flash, Response, abort
 from flask_login import current_user
 from app import db
 from app.admin import bp
 from app.admin.forms import UserDeleteForm, UserEditForm, InviteUserForm, \
-    NewScopeForm, ImportScopeForm, ScopeToggleForm, ScopeDeleteForm
+    NewScopeForm, ImportScopeForm, ImportBlacklistForm, ScopeToggleForm, ScopeDeleteForm
 from app.models import User, ScopeItem
 from app.auth.email import send_user_invite_email
 from app.auth.wrappers import isAuthenticated, isAdmin
+import ipaddress
 
 @bp.route('/', methods=['GET'])
 @isAuthenticated
@@ -98,29 +99,26 @@ def toggleUser(id):
 @isAuthenticated
 @isAdmin
 def scope():
-    if current_user.is_admin:
-        scope = ScopeItem.getScope()
-        scopeSize = current_app.ScopeManager.getScopeSize()
-        if scopeSize == 0: # if it's zero, let's update the app's scopemanager
-            current_app.ScopeManager.update()
-            scopeSize = current_app.ScopeManager.getScopeSize() # if it's zero again that's fine, we just had to check
-        newForm = NewScopeForm()
-        delForm = ScopeDeleteForm()
-        editForm = ScopeToggleForm()
-        importForm = ImportScopeForm()
-        if newForm.validate_on_submit():
-            if '/' not in newForm.target.data:
-                newForm.target.data = newForm.target.data + '/32'
-            newTarget = ScopeItem(target=newForm.target.data, blacklist=False)
-            db.session.add(newTarget)
-            db.session.commit()
-            current_app.ScopeManager.updateScope()
-            flash('%s added!' % newTarget.target, 'success')
-            return redirect(url_for('admin.scope'))
-        return render_template("admin/scope.html", scope=scope, scopeSize=scopeSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
-    else:
-        flash("You're not an admin!", 'danger')
-        return redirect(url_for('main.index'))
+    scope = ScopeItem.getScope()
+    scopeSize = current_app.ScopeManager.getScopeSize()
+    if scopeSize == 0: # if it's zero, let's update the app's scopemanager
+        current_app.ScopeManager.update()
+        scopeSize = current_app.ScopeManager.getScopeSize() # if it's zero again that's fine, we just had to check
+    newForm = NewScopeForm()
+    delForm = ScopeDeleteForm()
+    editForm = ScopeToggleForm()
+    importForm = ImportScopeForm()
+    if newForm.validate_on_submit():
+        if '/' not in newForm.target.data:
+            newForm.target.data = newForm.target.data + '/32'
+        target = ipaddress.ip_network(newForm.target.data, False)
+        newTarget = ScopeItem(target=target.with_prefixlen, blacklist=False)
+        db.session.add(newTarget)
+        db.session.commit()
+        current_app.ScopeManager.updateScope()
+        flash('%s added!' % newTarget.target, 'success')
+        return redirect(url_for('admin.scope'))
+    return render_template("admin/scope.html", scope=scope, scopeSize=scopeSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
 
 
 @bp.route('/blacklist', methods=['GET', 'POST'])
@@ -133,11 +131,12 @@ def blacklist():
         newForm = NewScopeForm()
         delForm = ScopeDeleteForm()
         editForm = ScopeToggleForm()
-        importForm = ImportScopeForm()
+        importForm = ImportBlacklistForm()
         if newForm.validate_on_submit():
             if '/' not in newForm.target.data:
                 newForm.target.data = newForm.target.data + '/32'
-            newTarget = ScopeItem(target=newForm.target.data, blacklist=True)
+            target = ipaddress.ip_network(newForm.target.data, False)
+            newTarget = ScopeItem(target=target.with_prefixlen, blacklist=True)
             db.session.add(newTarget)
             db.session.commit()
             current_app.ScopeManager.updateBlacklist()
@@ -149,92 +148,76 @@ def blacklist():
         return redirect(url_for('main.index'))
 
 
-@bp.route('/scope/import', methods=['POST'])
+@bp.route('/import/<string:scopetype>', methods=['POST'])
 @isAuthenticated
 @isAdmin
-def importScope():
+def importScope(scopetype=''):
     if current_user.is_admin:
-        importForm = ImportScopeForm()
+        if scopetype == 'blacklist':
+            importBlacklist = True
+            importForm = ImportBlacklistForm()
+        elif scopetype == 'scope':
+            importBlacklist = False
+            importForm = ImportScopeForm()
+        else:
+            abort(404)
         if importForm.validate_on_submit():
-            successImport = 0
+            successImport = []
+            alreadyExists = []
+            failedImport = []
             newScopeItems = importForm.scope.data.split('\n')
             for item in newScopeItems:
                 item = item.strip()
                 if '/' not in item:
                     item = item + '/32'
-                exists = ScopeItem.query.filter_by(target=item).first()
-                if exists:
+                try:
+                    target = ipaddress.ip_network(item, False)
+                except ValueError as e:
+                    failedImport.append(item) # this item couldn't be validated as an ip network
                     continue
-                newTarget = ScopeItem(target=item, blacklist=False)
+                exists = ScopeItem.query.filter_by(target=target.with_prefixlen).first()
+                if exists:
+                    alreadyExists.append(target.with_prefixlen) # this range is already a scope item
+                    continue
+                newTarget = ScopeItem(target=target.with_prefixlen, blacklist=importBlacklist)
                 db.session.add(newTarget)
-                db.session.commit()
-                successImport += 1
-            current_app.ScopeManager.updateScope()
-            flash('%s targets added to scope!' % successImport, 'success')
-            return redirect(url_for('admin.scope'))
+                successImport.append(newTarget.target)
+            db.session.commit()
+            current_app.ScopeManager.update()
+            if len(successImport) > 0:
+                flash('%s targets added to %s!' % (len(successImport), scopetype), 'success')
+            if len(alreadyExists) > 0:
+                flash('%s targets already existed!' % len(alreadyExists), 'info')
+            if len(failedImport) > 0:
+                flash('%s targets failed to import!' % len(failedImport), 'danger')
+                for item in failedImport:
+                    flash('%s' % item, 'danger')
+            return redirect(url_for('admin.%s' % scopetype))
         else:
             for field, errors in importForm.errors.items():
                 for error in errors:
                     flash(error, 'danger')
-            return redirect(url_for('admin.scope'))
+            return redirect(url_for('admin.%s' % scopetype))
     else:
         flash("You're not an admin!", 'danger')
         return redirect(url_for('main.index'))
 
-
-@bp.route('/blacklist/import', methods=['POST'])
+@bp.route('/export/<string:scopetype>', methods=['GET'])
 @isAuthenticated
 @isAdmin
-def importBlacklist():
+def exportScope(scopetype=''):
     if current_user.is_admin:
-        importForm = ImportScopeForm()
-        if importForm.validate_on_submit():
-            successImport = 0
-            newScopeItems = importForm.scope.data.split('\n')
-            for item in newScopeItems:
-                item = item.strip()
-                if '/' not in item:
-                    item = item + '/32'
-                exists = ScopeItem.query.filter_by(target=item).first()
-                if exists:
-                    continue
-                newTarget = ScopeItem(target=item, blacklist=True)
-                db.session.add(newTarget)
-                db.session.commit()
-                successImport += 1
-            current_app.ScopeManager.updateBlacklist()
-            flash('%s targets added to blacklist!' % successImport, 'success')
-            return redirect(url_for('admin.blacklist'))
+        if scopetype == 'blacklist':
+            exportBlacklist = True
+        elif scopetype == 'scope':
+            exportBlacklist = False
         else:
-            for field, errors in importForm.errors.items():
-                for error in errors:
-                    flash(error, 'danger')
-            return redirect(url_for('admin.blacklist'))
+            abort(404)
+        items = ScopeItem.query.filter_by(blacklist=exportBlacklist).all()
+        return Response('\n'.join(str(item.target) for item in items), mimetype='text/plain')
     else:
         flash("You're not an admin!", 'danger')
         return redirect(url_for('main.index'))
-
-
-@bp.route('/blacklist/export', methods=['GET'])
-@isAuthenticated
-@isAdmin
-def exportBlacklist():
-    if current_user.is_admin:
-        blacklistItems = ScopeItem.query.filter_by(blacklist=True).all()
-        return "<br />".join(str(item.target) for item in blacklistItems)
-    else:
-        flash("You're not an admin!", 'danger')
-        return redirect(url_for('main.index'))
-
-
-@bp.route('/scope/export', methods=['GET'])
-@isAuthenticated
-@isAdmin
-def exportScope():
-    if current_user.is_admin:
-        scopeItems = ScopeItem.query.filter_by(blacklist=False).all()
-        return "<br />".join(str(item.target) for item in scopeItems)
-
 
 @bp.route('/scope/<int:id>/delete', methods=['POST'])
 @isAuthenticated
@@ -271,16 +254,15 @@ def toggleScopeItem(id):
             item = ScopeItem.query.filter_by(id=id).first()
             if item.blacklist:
                 item.blacklist = False
-                db.session.commit()
-                current_app.ScopeManager.update()
+                redirectLoc = 'admin.blacklist'
                 flash('%s removed from blacklist!' % item.target, 'success')
-                return redirect(url_for('admin.blacklist'))
             else:
                 item.blacklist = True
-                db.session.commit()
-                current_app.ScopeManager.update()
+                redirectLoc = 'admin.scope'
                 flash('%s blacklisted!' % item.target, 'success')
-                return redirect(url_for('admin.scope'))
+            db.session.commit()
+            current_app.ScopeManager.update()
+            return redirect(url_for('admin.scope'))
         else:
             flash("Form couldn't validate!", 'danger')
             return redirect(url_for('admin.scope'))

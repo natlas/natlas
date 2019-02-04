@@ -28,7 +28,7 @@ class ScopeManager():
         from app.models import ScopeItem
         newScopeSize = 0
         for item in ScopeItem.getScope():
-            newItem = ipaddress.ip_network(item.target)
+            newItem = ipaddress.ip_network(item.target, False)
             self.scope.append(newItem)
             newScopeSize += newItem.num_addresses
         self.scopeSize = newScopeSize
@@ -38,7 +38,7 @@ class ScopeManager():
         from app.models import ScopeItem
         newBlacklistSize = 0
         for item in ScopeItem.getBlacklist():
-            newItem = ipaddress.ip_network(item.target)
+            newItem = ipaddress.ip_network(item.target, False)
             self.blacklist.append(newItem)
             newBlacklistSize += newItem.num_addresses
         self.blacklistSize = newBlacklistSize
