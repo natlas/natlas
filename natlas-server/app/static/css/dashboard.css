@@ -182,3 +182,23 @@ a.preview_link, a:hover.preview_link {
 .export-btn {
   margin-top:1em;
 }
+
+div.expand-img {
+  cursor: zoom-in;
+}
+
+.imagetitle {
+  display:inline;
+}
+
+@media only screen and (min-width:1000px) {
+  .modal-dialog {
+    width: 1000px;
+  }
+}
+
+@media only screen and (min-width:1200px) {
+  .modal-dialog {
+    width: 1170px;
+  }
+}

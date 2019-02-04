@@ -19,19 +19,19 @@
                 {% endif %}
                 {% if host.headshot %}
                   <h5>Unknown Headshot</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ host.headshot }}"></br>
+                  <div class="expand-img"><img style="width:200px;" src="data:image/jpeg;base64,{{ host.headshot }}" alt="Unknown Screenshot"></div></br>
                 {% endif %}
                 {% if host.vncheadshot %}
                   <h5>VNC</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ host.vncheadshot }}"></br>
+                  <div class="expand-img"><img style="width:200px;" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div></br>
                 {% endif %}
                 {% if host.httpheadshot %}
                   <h5>HTTP</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ host.httpheadshot }}"></br>
+                  <div class="expand-img"><img style="width:200px;" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div></br>
                 {% endif %}
                 {% if host.httpsheadshot %}
                   <h5>HTTPS</h5>
-                  <img width=200 src="data:image/jpeg;base64,{{ host.httpsheadshot }}"></br>
+                  <div class="expand-img"><img style="width:200px;" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div></br>
                 {% endif %}
               </td>
               <td>
