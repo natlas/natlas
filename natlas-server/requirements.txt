@@ -13,7 +13,6 @@ Jinja2==2.10
 Mako==1.0.7
 MarkupSafe==1.1.0
 netaddr==0.7.19
-pkg-resources==0.0.0
 PyJWT==1.7.1
 python-dateutil==2.7.5
 python-dotenv==0.10.1
