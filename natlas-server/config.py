@@ -13,8 +13,14 @@ class Config(object):
     REGISTER_ALLOWED = os.environ.get('REGISTER_ALLOWED') or False
 
     # Display Config
-    RESULTS_PER_PAGE = 100
-    PREVIEW_LENGTH = 100
+    if os.environ.get('RESULTS_PER_PAGE'):
+        RESULTS_PER_PAGE = int(os.environ.get('RESULTS_PER_PAGE'))
+    else:
+        RESULTS_PER_PAGE = 100
+    if os.environ.get('PREVIEW_LENGTH'):
+        PREVIEW_LENGTH = int(os.environ.get('PREVIEW_LENGTH'))
+    else:
+        PREVIEW_LENGTH = 100
     PREFERRED_URL_SCHEME = 'https'
 
     # Data store config
