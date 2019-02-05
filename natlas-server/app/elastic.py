@@ -36,14 +36,14 @@ class Elastic:
 
     def gethost(self, ip):
         result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {"query_string": {
-                                'query': ip, "fields": ["nmap_data"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+                                'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
         if result['hits']['total'] == 0:
             return 0, None
         return result['hits']['total'], result['hits']['hits'][0]['_source']
 
     def gethost_history(self, ip, limit, offset):
         result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": limit, "from": offset, "query": {
-                                "query_string": {'query': ip, "fields": ["nmap_data"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+                                "query_string": {'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
 
         results = []  # collate results
         for thing in result['hits']['hits']:
