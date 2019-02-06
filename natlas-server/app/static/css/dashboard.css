@@ -206,6 +206,6 @@ div.expand-img {
 label.config-form {
   margin-top:4px;
 }
-form.config-form>div {
+form.config-form>div, form.pwchange-form>div {
   margin-top:1em;
 }

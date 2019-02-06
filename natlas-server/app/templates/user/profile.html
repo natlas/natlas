@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% set title = current_user.email ~ " | Profile" %}
+{% set active_page = "profile" %}
+{% block content %}
+        {% include 'user/_header.html' %}
+    	<div class="row">
+	    	<div class="col-xs-12 col-sm-6 col-md-4">
+	    		<legend>Change Password</legend>
+		    	<form class="form-horizontal pwchange-form" action="" method="post">
+                    {{ changePasswordForm.hidden_tag() }}
+			    	<div class="form-group">
+			    		{{ changePasswordForm.old_password.label(class="control-label") }}
+			    		{{ changePasswordForm.old_password(class="form-control") }}
+			    		{% for error in changePasswordForm.old_password.errors %}
+		                <span style="color: red;">{{ error }}</span>
+		                {% endfor %}
+			    	</div>
+			    	<div class="form-group">
+			    		{{ changePasswordForm.password.label(class="control-label") }}
+			    		{{ changePasswordForm.password(class="form-control") }}
+			    		{% for error in changePasswordForm.password.errors %}
+		                <span style="color: red;">{{ error }}</span>
+		                {% endfor %}
+			    	</div>
+			    	<div class="form-group">
+			    		{{ changePasswordForm.password2.label(class="control-label") }}
+			    		{{ changePasswordForm.password2(class="form-control") }}
+			    		{% for error in changePasswordForm.password2.errors %}
+		                <span style="color: red;">{{ error }}</span>
+		                {% endfor %}
+			    	</div>
+			    	<div>{{ changePasswordForm.changePassword(class="btn btn-primary") }}</div>
+		    	</form>
+		    </div>
+            <div class="col-xs-12 col-sm-5 col-sm-offset-1 col-md-3 col-md-offset-1">
+                <legend>Display Settings</legend>
+                <form class="form-horizontal display-form" action="" method="post">
+                    {{ displaySettingsForm.hidden_tag() }}
+                    <div class="form-group">
+                        {{ displaySettingsForm.results_per_page.label(class="control-label") }}
+                        {{ displaySettingsForm.results_per_page(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ displaySettingsForm.preview_length.label(class="control-label") }}
+                        {{ displaySettingsForm.preview_length(class="form-control") }}
+                    </div>
+                    <div>{{ displaySettingsForm.updateDisplaySettings(class="btn btn-primary") }}</div>
+            </div>
+		</div>
+{% endblock %}
