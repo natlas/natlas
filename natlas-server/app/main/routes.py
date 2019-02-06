@@ -1,11 +1,8 @@
 from flask import redirect, url_for, flash, render_template, Response, current_app, g, request
+from flask_login import current_user
 from app.main import bp
 from app.util import hostinfo
 from app.auth.wrappers import isAuthenticated, isAdmin
-
-@bp.before_app_request
-def before_request():
-    g.preview_length = current_app.config['PREVIEW_LENGTH']
 
 @bp.route('/')
 @isAuthenticated
@@ -20,12 +17,11 @@ def search():
     format = request.args.get('f', '')
     scan_ids = request.args.get('s', '')
 
-    searchOffset = current_app.config['RESULTS_PER_PAGE'] * (page-1)
-    count, context = current_app.elastic.search(
-        query, current_app.config['RESULTS_PER_PAGE'], searchOffset)
+    searchOffset = current_user.results_per_page * (page-1)
+    count, context = current_app.elastic.search(query, current_user.results_per_page, searchOffset)
 
-    next_url = url_for('main.search', q=query, p=page + 1) \
-        if count > page * current_app.config['RESULTS_PER_PAGE'] else None
+    next_url = url_for('main.search', q=query, p=page+1) \
+         if count > page * current_user.results_per_page else None
     prev_url = url_for('main.search', q=query, p=page - 1) \
         if page > 1 else None
 

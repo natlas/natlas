@@ -36,10 +36,10 @@
               </td>
               <td>
                   {% set lines = host.nmap_data.split('\n') %}
-                  {% if lines|length > g.preview_length and hosts %}
+                  {% if lines|length > current_user.preview_length and hosts %}
                     {% set nmap_preview = [] %}
                     {% for line in lines %}
-                      {% if loop.index <= g.preview_length %}
+                      {% if loop.index <= current_user.preview_length %}
                         {% do nmap_preview.append(line) %}
                       {% endif %}
                     {% endfor %}

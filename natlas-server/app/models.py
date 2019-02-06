@@ -6,12 +6,13 @@ from flask_login import UserMixin
 from app import login
 import jwt
 
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean)
+    results_per_page = db.Column(db.Integer, default=100)
+    preview_length = db.Column(db.Integer, default=100)
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
