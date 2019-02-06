@@ -202,3 +202,10 @@ div.expand-img {
     width: 1170px;
   }
 }
+
+label.config-form {
+  margin-top:4px;
+}
+form.config-form>div {
+  margin-top:1em;
+}

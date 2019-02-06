@@ -66,3 +66,10 @@ class ScopeItem(db.Model):
 
     def getScope():
         return ScopeItem.query.filter_by(blacklist=False).all()
+
+
+class ConfigItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), unique=True)
+    type = db.Column(db.String(256))
+    value = db.Column(db.String(256))

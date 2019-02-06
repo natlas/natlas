@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
-from config import Config
+from config import Config, populate_defaults
 from app.elastic import Elastic
 from app.scope import ScopeManager
 import sqlalchemy
@@ -25,7 +25,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 
-def create_app(config_class=Config):
+def create_app(config_class=Config, load_config=False):
     app = Flask(__name__)
     app.config.from_object(Config)
     app.jinja_env.add_extension('jinja2.ext.do')
@@ -35,7 +35,36 @@ def create_app(config_class=Config):
     login.init_app(app)
     mail.init_app(app)
 
-    app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])
+    if load_config:
+        print("Loading Config from database")
+        with app.app_context():
+            from app.models import ConfigItem
+            try: # This is gross but we need it because otherwise flask db operations won't work to create the ConfigItem table in the first place.
+                conf = ConfigItem.query.all()
+                if not conf: # We'll hit this if the table exists but there's no data
+                    populate_defaults(verbose=False)
+                    conf = ConfigItem.query.all() # populate_defaults should populate data that we can query now
+                    if not conf: # if it didn't, then we don't have config items that we need in order to run, so exit.
+                        raise(SystemExit())
+                
+                for item in conf:
+                    if item.type == "int":
+                        app.config[item.name] = int(item.value)
+                    elif item.type == "bool":
+                        if item.value == "True":
+                            app.config[item.name] = True
+                        else:
+                            app.config[item.name] = False
+                    elif item.type == "string":
+                        app.config[item.name] = item.value
+                    else:
+                        print("Unsupported config type %s:%s:%s" % (item.name, item.type, item.value))
+            except Exception as e:
+                print("ConfigItem table doesn't exist yet. Ignore this if you're running flask db upgrade right now.")
+
+        # Grungy thing so we can use flask db and flask shell before the config items are initially populated
+        if "ELASTICSEARCH_URL" in app.config: 
+            app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])
     app.ScopeManager = ScopeManager()
 
     from app.errors import bp as errors_bp

@@ -84,6 +84,8 @@ pip3 install -r requirements.txt
 echo "[+] Initializing metadata database"
 export FLASK_APP=natlas-server.py
 flask db upgrade
+echo "[+] Populating database with default configs"
+python3 config.py
 echo "[+] Exiting virtual environment"
 deactivate
 echo "[+] Setup Complete"

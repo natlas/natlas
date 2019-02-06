@@ -1,8 +1,21 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, BooleanField, SubmitField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, ValidationError, Email
 from app.models import User, ScopeItem
 import ipaddress
+
+
+class ConfigForm(FlaskForm):
+    login_required = BooleanField('Login Required')
+    register_allowed = BooleanField('Registration Allowed')
+    elasticsearch_url = StringField("Elastic URL")
+    mail_from = StringField("From Address", validators=[Email()])
+    mail_server = StringField("Mail Server")
+    mail_port = StringField("Mail Port")
+    mail_use_tls = BooleanField("Use TLS")
+    mail_username = StringField("Mail username")
+    mail_password = PasswordField("Mail password")
+    submit = SubmitField("Save Changes")
 
 class InviteUserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])

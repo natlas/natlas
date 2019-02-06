@@ -3,18 +3,31 @@ from flask_login import current_user
 from app import db
 from app.admin import bp
 from app.admin.forms import UserDeleteForm, UserEditForm, InviteUserForm, \
-    NewScopeForm, ImportScopeForm, ImportBlacklistForm, ScopeToggleForm, ScopeDeleteForm
-from app.models import User, ScopeItem
+    NewScopeForm, ImportScopeForm, ImportBlacklistForm, ScopeToggleForm, ScopeDeleteForm, \
+    ConfigForm
+from app.models import User, ScopeItem, ConfigItem
 from app.auth.email import send_user_invite_email
 from app.auth.wrappers import isAuthenticated, isAdmin
 import ipaddress
 
-@bp.route('/', methods=['GET'])
+@bp.route('/', methods=['GET', 'POST'])
 @isAuthenticated
 @isAdmin
 def admin():
     if current_user.is_admin:
-        return render_template("admin/index.html")
+        configForm = ConfigForm()
+        configItems = current_app.config
+        if configForm.validate_on_submit():
+            for fieldname, fieldvalue in configForm.data.items():
+                if fieldname.upper() in ["SUBMIT", "CSRF_TOKEN"]:
+                    continue
+                current_app.config[fieldname.upper()] = fieldvalue
+                confitem = ConfigItem.query.filter_by(name=fieldname.upper()).first()
+                confitem.value=str(fieldvalue)
+                db.session.add(confitem)
+            db.session.commit()
+            #return render_template("admin/index.html", configForm=configForm, configItems=configItems)
+        return render_template("admin/index.html", configForm=configForm, configItems=configItems)
     else:
         flash("You're not an admin!", 'danger')
         return redirect(url_for('main.index'))
