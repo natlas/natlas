@@ -108,24 +108,12 @@ body {
   margin-top: 0;
 }
 
+.data-column {
+  width:80%;
+}
 
-/*
- * Placeholder dashboard ideas
- */
-
-.placeholders {
-  margin-bottom: 30px;
-  text-align: center;
-}
-.placeholders h4 {
-  margin-bottom: 0;
-}
-.placeholder {
-  margin-bottom: 20px;
-}
-.placeholder img {
-  display: inline-block;
-  border-radius: 50%;
+.info-column {
+  width:20%;
 }
 
 .nmap_data {

@@ -1,5 +1,5 @@
 <tr>
-              <td>
+              <td class="info-column">
                 {% if pagetype == 'search' %}
                   <h3><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
                 {% endif %}
@@ -34,7 +34,7 @@
                   <div class="expand-img"><img style="width:200px;" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div></br>
                 {% endif %}
               </td>
-              <td>
+              <td class="data-column">
                   {% set lines = host.nmap_data.split('\n') %}
                   {% if lines|length > current_user.preview_length and hosts %}
                     {% set nmap_preview = [] %}
