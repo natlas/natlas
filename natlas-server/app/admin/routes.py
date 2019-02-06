@@ -38,7 +38,7 @@ def users():
     editForm = UserEditForm()
     inviteForm = InviteUserForm()
     if inviteForm.validate_on_submit():
-        newUser = User(email=inviteForm.email.data)
+        newUser = User(email=inviteForm.email.data.lower())
         db.session.add(newUser)
         db.session.commit()
         send_user_invite_email(newUser)

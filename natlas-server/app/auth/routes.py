@@ -14,7 +14,7 @@ def login():
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data.lower()).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid email or password', 'danger')
             return redirect(url_for('auth.login'))
@@ -41,7 +41,7 @@ def register():
         return redirect(url_for('auth.login'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data)
+        user = User(email=form.email.data.lower())
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -56,7 +56,7 @@ def reset_password_request():
         return redirect(url_for('main.index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data.lower()).first()
         if user:
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password', "info")
