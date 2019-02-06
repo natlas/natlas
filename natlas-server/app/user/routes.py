@@ -25,7 +25,6 @@ def profile():
             user = User.query.get(current_user.id)
             user.results_per_page = displaySettingsForm.results_per_page.data
             user.preview_length = displaySettingsForm.preview_length.data
-            db.session.add(user)
             db.session.commit()
             flash("Display settings updated.", "success")
             return redirect(url_for('user.profile'))
