@@ -40,8 +40,8 @@ def users():
     if inviteForm.validate_on_submit():
         newUser = User(email=inviteForm.email.data)
         db.session.add(newUser)
-        send_user_invite_email(newUser)
         db.session.commit()
+        send_user_invite_email(newUser)
         flash('Invitation Sent!', 'success')
         return redirect(url_for('admin.users'))
     return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
