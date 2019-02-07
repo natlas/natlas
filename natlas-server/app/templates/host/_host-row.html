@@ -36,9 +36,9 @@
               </td>
               <td class="data-column">
                   {% set lines = host.nmap_data.split('\n') %}
-                  {% if lines|length > current_user.preview_length and hosts %}
+                  {% if lines|length > current_user.preview_length and pagetype in ('multi', 'search') %}
                     {% set nmap_preview = [] %}
-                    {% for line in lines %}
+                    {% for line in lines[1:] %}
                       {% if loop.index <= current_user.preview_length %}
                         {% do nmap_preview.append(line) %}
                       {% endif %}
@@ -49,6 +49,8 @@
                     {% else %}
                     <div class="preview_nmap">Unfortunately we are unable to display the rest of this scan because we can't find a scan identifier!</div>
                     {% endif %}
+                  {% elif pagetype != 'single' %}
+                    <pre class="nmap_data">{{ host.nmap_data.split('\n')[1:-3]|join('\n') }}</pre>
                   {% else %}
                     <pre class="nmap_data">{{ host.nmap_data }}</pre>
                   {% endif %}
