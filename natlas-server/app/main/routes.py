@@ -51,14 +51,14 @@ def host(ip):
 def host_history(ip):
     info, context = hostinfo(ip)
     page = int(request.args.get('p', 1))
-    searchOffset = current_app.config['RESULTS_PER_PAGE'] * (page-1)
+    searchOffset = current_user.results_per_page * (page-1)
 
     count, context = current_app.elastic.gethost_history(
-        ip, current_app.config['RESULTS_PER_PAGE'], searchOffset)
+        ip, current_user.results_per_page, searchOffset)
     if count == 0:
         abort(404)
     next_url = url_for('main.host_history', ip=ip, p=page + 1) \
-        if count > page * current_app.config['RESULTS_PER_PAGE'] else None
+        if count > page * current_user.results_per_page else None
     prev_url = url_for('main.host_history', ip=ip, p=page - 1) \
         if page > 1 else None
 
