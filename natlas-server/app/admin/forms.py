@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from wtforms import StringField, BooleanField, SubmitField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, ValidationError, Email
 from app.models import User, ScopeItem
@@ -66,3 +67,8 @@ class ScopeDeleteForm(FlaskForm):
 
 class ScopeToggleForm(FlaskForm):
     toggleScopeItem = SubmitField('Toggle Blacklist')
+
+
+class ServicesUploadForm(FlaskForm):
+    serviceFile = FileField('Select a file to upload')
+    uploadFile = SubmitField('Upload Services File')

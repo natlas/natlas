@@ -6,3 +6,5 @@ start.log
 data/
 metadata.db
 .env
+*.bak
+natlas-services

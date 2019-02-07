@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set title = "Services Information" %}
+{% set active_page = "services" %}
+{% block content %}
+  <div class="row">
+    {% include 'admin/_header.html' %}
+    <div class="col-xs-12 col-sm-6 col-md-4">
+      <legend>Upload Services File</legend>
+      <form class="form-inline" action="" method="post" enctype="multipart/form-data">
+      {{ uploadForm.hidden_tag() }} 
+      <div class="input-group">
+          {{ uploadForm.serviceFile(class="btn btn-default")}}
+          {{ uploadForm.uploadFile(class="btn btn-primary", style="margin-top:1em;") }}
+          <span class="help-block">Please see the <a href="https://github.com/natlas/natlas/wiki/Example-NatlasServices-Document">natlas wiki</a> for more information. Trailing newlines will be stripped, but any other newlines will be preserved.</span>
+        </div>
+        </form>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <legend>Current Services Info</legend>
+        <h3>Current Services ID:</h3> 
+        {{ current_services.id }}
+        <h3>Current Services SHA256:</h3> 
+        {{ current_services.sha256 }}
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <legend>Current Services</legend>
+          <pre class="services-box">
+{{ current_services.services }}
+          </pre>
+          <a href="{{ url_for('admin.exportServices') }}" class="btn btn-primary export-btn" role="button">Export Services</a>
+      </div>
+  </div>
+{% endblock %}

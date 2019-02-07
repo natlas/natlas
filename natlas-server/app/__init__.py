@@ -61,10 +61,21 @@ def create_app(config_class=Config, load_config=False):
                         print("Unsupported config type %s:%s:%s" % (item.name, item.type, item.value))
             except Exception as e:
                 print("ConfigItem table doesn't exist yet. Ignore this if you're running flask db upgrade right now.")
-
+            
+            from app.models import NatlasServices
+            try:
+                current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
+                if current_services:
+                    app.current_services = current_services.as_dict()
+                else:
+                    app.current_services = {"id":"None","sha256":"None","services":"None"} # default values until we load something
+            except Exception as e:
+                print("NatlasServices table probably doesn't exist yet. Ignore if you're running flask db upgrade.")
+        
         # Grungy thing so we can use flask db and flask shell before the config items are initially populated
         if "ELASTICSEARCH_URL" in app.config: 
             app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])
+
     app.ScopeManager = ScopeManager()
 
     from app.errors import bp as errors_bp

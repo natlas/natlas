@@ -73,3 +73,12 @@ class ConfigItem(db.Model):
     name = db.Column(db.String(256), unique=True)
     type = db.Column(db.String(256))
     value = db.Column(db.String(256))
+
+# While generally I prefer to use a singular model name, each record here is going to be storing a set of services
+class NatlasServices(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sha256 = db.Column(db.String(64))
+    services = db.Column(db.Text)
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

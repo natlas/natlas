@@ -4,11 +4,11 @@ from app import db
 from app.admin import bp
 from app.admin.forms import UserDeleteForm, UserEditForm, InviteUserForm, \
     NewScopeForm, ImportScopeForm, ImportBlacklistForm, ScopeToggleForm, ScopeDeleteForm, \
-    ConfigForm
-from app.models import User, ScopeItem, ConfigItem
+    ConfigForm, ServicesUploadForm
+from app.models import User, ScopeItem, ConfigItem, NatlasServices
 from app.auth.email import send_user_invite_email
 from app.auth.wrappers import isAuthenticated, isAdmin
-import ipaddress
+import ipaddress, hashlib
 
 @bp.route('/', methods=['GET', 'POST'])
 @isAuthenticated
@@ -247,3 +247,32 @@ def toggleScopeItem(id):
     else:
         flash("Form couldn't validate!", 'danger')
         return redirect(url_for('admin.scope'))
+
+@bp.route('/services', methods=['GET', 'POST'])
+@isAuthenticated
+@isAdmin
+def services():
+    uploadForm = ServicesUploadForm()
+
+    if uploadForm.validate_on_submit():
+        newServicesContent = uploadForm.serviceFile.data.read().decode("utf-8").rstrip('\r\n')
+        newServicesSha = hashlib.sha256(newServicesContent.encode()).hexdigest()
+        if newServicesSha != current_app.current_services["sha256"]:
+            ns = NatlasServices(sha256=newServicesSha, services=newServicesContent)
+            db.session.add(ns)
+            db.session.commit()
+            current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
+            flash("New services file with hash %s has been uploaded." % current_app.current_services["sha256"], "success")
+            return redirect(url_for('admin.services'))
+        else:
+            flash("That file is an exact match for our current services file!", "warning")
+            return redirect(url_for('admin.services'))
+
+
+    return render_template('admin/services.html', uploadForm=uploadForm, current_services=current_app.current_services)
+
+@bp.route('/services/export', methods=['GET'])
+@isAuthenticated
+@isAdmin
+def exportServices():
+    return Response(str(current_app.current_services["services"]), mimetype='text/plain')

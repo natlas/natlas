@@ -11,6 +11,7 @@ import json
 import base64
 import argparse
 import shutil
+import hashlib
 
 import threading
 import queue
@@ -26,18 +27,21 @@ MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of ou
 
 RTTVAR_MSG = "RTTVAR has grown to over"
 
-
-def fetch_target_from_server():
-    print("[+] Fetching Target from %s" % config.server)
+def make_request(endpoint, reqType="GET", postData=None, contentType="application/json", statusCode=200):
     try:
-        target_request = requests.get(config.server+"/api/getwork", timeout=config.request_timeout)
-        if target_request.status_code != requests.codes.ok:
-            print("[!] Server returned %s" % target_request.status_code)
-            return False
-        if target_request.headers['content-type'] != "application/json":
-            print("[!] Expected application/json, received %s" % target_request.headers['content-type'])
-            return False
-        target_data = target_request.json()
+        if reqType == "GET":
+            req = requests.get(config.server+endpoint, timeout=config.request_timeout)
+            if req.status_code != statusCode:
+                print("[!] Expected %s, received %s" % (statusCode, req.status_code))
+                return False
+            if req.headers['content-type'] != contentType:
+                print("[!] Expected %s, received %s" % (contentType, req.headers['content-type']))
+                return False
+        elif reqType == "POST" and postData:
+            req = requests.post(config.server+endpoint, json=postData, timeout=config.request_timeout)
+            if req.status_code != statusCode:
+                print("[!] Expected %s, received %s" % (statusCode, req.status_code))
+                return False
     except requests.ConnectionError as e:
         print("[!] Connection Error connecting to %s." % config.server)
         return False
@@ -48,20 +52,50 @@ def fetch_target_from_server():
         print("[!] Error: %s" % e)
         return False
 
-    return target_data
+    return req
 
-def fetch_target():
+def backoff_request(*args, **kwargs):
     attempt = 0
-    target_data = None
-    while not target_data:
-        target_data = fetch_target_from_server()
-        if not target_data:
+    result = None
+    while not result:
+        result = make_request(*args, **kwargs)
+        if not result:
             attempt += 1
             jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
             current_sleep = min(config.backoff_max, config.backoff_base * 2 ** attempt) + jitter
-            print("[!] Failed to acquire target from %s. Waiting %s seconds before retrying." % (config.server, current_sleep))
+            print("[!] Request to %s failed. Waiting %s seconds before retrying." % (config.server, current_sleep))
             time.sleep(current_sleep)
+    return result
 
+def get_services_file():
+    print("[+] Fetching natlas-services file from %s" % config.server)
+    response = backoff_request(endpoint="/api/natlas-services")
+    if response:
+        serviceData = response.json()
+        if serviceData["id"] == "None":
+            print("[!] Error: %s doesn't have a service file for us" % config.server)
+            return False
+        if not hashlib.sha256(serviceData["services"].encode()).hexdigest() == serviceData["sha256"]:
+            print("[!] Error: hash provided by %s doesn't match locally computed hash of services" % config.server)
+            return False
+        with open("natlas-services", "w") as f:
+            f.write(serviceData["services"])
+        with open("natlas-services", "r") as f:
+            if not hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() == serviceData["sha256"]:            
+                print("[!] Error: hash of local file doesn't match hash provided by server")
+                return False
+    else:
+        return False # return false if we were unable to get a response from the server
+    return serviceData["sha256"] # return True if we got a response and everything checks out
+
+
+def fetch_target():
+    print("[+] Fetching Target from %s" % config.server)
+    response = backoff_request(endpoint="/api/getwork")
+    if response:
+        target_data = response.json()
+    else:
+        return False # failed to fetch target from server
     return target_data
 
 def validate_target(target):
@@ -86,7 +120,7 @@ def scan(target=None, scan_id=None):
     print("[+] Target: %s" % target)
     print("[+] Scan ID: %s" % scan_id)
 
-    command = ["nmap", "-oA", "data/natlas."+scan_id, "-sV", "-O","-sC", "-open", target]
+    command = ["nmap", "-oA", "data/natlas."+scan_id, "-sV", "-O","-sC", "-open", "--servicedb", "./natlas-services", target]
 
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
@@ -163,8 +197,8 @@ def scan(target=None, scan_id=None):
 
     # submit result
     print("[+] (%s) Submitting work" % scan_id)
-    response = requests.post(config.server+"/api/submit", json=json.dumps(result)).text
-    print("[+] (%s) Response:\n%s" % (scan_id, response))
+    response = backoff_request(endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
+    print("[+] (%s) Response: %s" % (scan_id, response.status_code))
 
 class ThreadScan(threading.Thread):
     def __init__(self, queue):
@@ -190,6 +224,16 @@ def main():
     args = parser.parse_args()
     
     q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
+
+    servicesSha = ""
+
+    if os.path.isfile("natlas-services"):
+        servicesSha = hashlib.sha256(open("natlas-services", "r").read().rstrip('\r\n').encode()).hexdigest()
+    else:
+        servicesSha = get_services_file()
+        if not servicesSha:
+            print("[!] Failed to get valid services file from %s" % config.server)
+            return False
 
     # Start threads that will wait for items in queue and then scan them
     for i in range(int(config.max_threads)):
@@ -238,6 +282,11 @@ def main():
     else:
         while True:
             target_data = fetch_target()
+            if target_data["services_hash"] != servicesSha:
+                servicesSha = get_services_file()
+                if not servicesSha:
+                    print("Failed to get updated services from %s" % config.server)
+
             q.put(target_data)
 
 

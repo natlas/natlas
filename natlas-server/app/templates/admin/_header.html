@@ -14,4 +14,7 @@
   <li role="presentation" class="{{ 'active' if active_page == 'blacklist' else '' }}">
     <a id="scope" href="{{ url_for('admin.blacklist') }}">Blacklist</a>
   </li>
+  <li role="presentation" class="{{ 'active' if active_page == 'services' else '' }}">
+    <a id="scope" href="{{ url_for('admin.services') }}">Services</a>
+  </li>
 </ul>

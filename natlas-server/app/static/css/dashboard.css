@@ -197,3 +197,7 @@ label.config-form {
 form.config-form>div, form.pwchange-form>div {
   margin-top:1em;
 }
+
+.services-box {
+  max-height:20em;
+}

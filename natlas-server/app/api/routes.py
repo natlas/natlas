@@ -3,6 +3,7 @@ import random, os, json, ipaddress, string
 
 from datetime import datetime
 
+from app.models import NatlasServices
 from app.api import bp
 from app.util import isAcceptableTarget
 from app.nmap_parser import NmapParser
@@ -25,7 +26,7 @@ def getwork():
     attempts = 0
     work = {}
     work['type'] = 'nmap'
-
+    work["services_hash"] = current_app.current_services["sha256"]
     scan_id = ''
     while scan_id == '':
         rand = ''.join(random.choice(string.ascii_lowercase + string.digits)
@@ -85,3 +86,9 @@ def submit():
     current_app.elastic.newhost(newhost)
 
     return "[+] nmap successful and submitted for ip: "+newhost['ip']
+
+@bp.route('/natlas-services', methods=['GET'])
+def natlasServices():
+    if current_app.current_services["id"] != "None":
+        return json.dumps(current_app.current_services), 200, {'content-type':'application/json'}
+    return json.dumps(current_app.current_services), 404, {'content-type':'application/json'}
