@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, current_app, flash, Respon
 from flask_login import current_user
 from app import db
 from app.admin import bp
+from app.elastic import Elastic
 from app.admin.forms import UserDeleteForm, UserEditForm, InviteUserForm, \
     NewScopeForm, ImportScopeForm, ImportBlacklistForm, ScopeToggleForm, ScopeDeleteForm, \
     ConfigForm, ServicesUploadForm
@@ -20,6 +21,8 @@ def admin():
         for fieldname, fieldvalue in configForm.data.items():
             if fieldname.upper() in ["SUBMIT", "CSRF_TOKEN"]:
                 continue
+            if fieldname.upper() == "ELASTICSEARCH_URL" and fieldvalue != current_app.config["ELASTICSEARCH_URL"]: # if we've got a new elasticsearch address, update our current handle to elastic
+                current_app.elastic = Elastic(fieldvalue)
             current_app.config[fieldname.upper()] = fieldvalue
             confitem = ConfigItem.query.filter_by(name=fieldname.upper()).first()
             confitem.value=str(fieldvalue)

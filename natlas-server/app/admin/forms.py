@@ -4,7 +4,7 @@ from wtforms import StringField, BooleanField, SubmitField, TextAreaField, Passw
 from wtforms.validators import DataRequired, ValidationError, Email
 from app.models import User, ScopeItem
 import ipaddress
-
+from app.elastic import Elastic
 
 class ConfigForm(FlaskForm):
     login_required = BooleanField('Login Required')
@@ -17,6 +17,11 @@ class ConfigForm(FlaskForm):
     mail_username = StringField("Mail username")
     mail_password = PasswordField("Mail password")
     submit = SubmitField("Save Changes")
+
+    def validate_elasticsearch_url(self, elasticsearch_url):
+        tmpElasticInstance = Elastic(elasticsearch_url.data)
+        if not tmpElasticInstance.status:
+            raise ValidationError("%s : %s" % (tmpElasticInstance.errorinfo, elasticsearch_url.data))
 
 class InviteUserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])

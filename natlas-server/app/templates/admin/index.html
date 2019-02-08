@@ -16,6 +16,9 @@
     	<div class="input-group">
     		{{ configForm.elasticsearch_url.label(class="control-label") }}
     		{{ configForm.elasticsearch_url(value=configItems["ELASTICSEARCH_URL"], class="form-control", placeholder="http://localhost:9200") }}
+            {% for error in configForm.elasticsearch_url.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
     	</div>
     	<legend>Mail Settings</legend>
     	<span id="helpBlock" class="help-block">Mail settings are used to send invitation emails and password resets.</span>
