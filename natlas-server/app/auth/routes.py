@@ -1,4 +1,4 @@
-from flask import redirect, url_for, flash, render_template, request
+from flask import redirect, url_for, flash, render_template, request, current_app
 from flask_login import login_user, logout_user, current_user
 from app import db
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, \
@@ -36,7 +36,7 @@ def logout():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    if current_app.config['REGISTER_ALLOWED'].lower() == "false":
+    if not current_app.config['REGISTER_ALLOWED']:
         flash("Sorry, we're not currently accepting new users. If you feel you've received this message in error, please contact an administrator.", "warning")
         return redirect(url_for('auth.login'))
     form = RegistrationForm()

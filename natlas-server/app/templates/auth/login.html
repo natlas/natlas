@@ -25,7 +25,7 @@
             </div>
             {{ form.submit(class="btn btn-primary") }}
         </form>
-        {% if config.REGISTER_ALLOWED == "True" %}
+        {% if config["REGISTER_ALLOWED"] %}
         <p class="register-link"><a href="{{ url_for('auth.register') }}">New User?</a></p>
         {% endif %}
         <p><a href="{{ url_for('auth.reset_password_request') }}">Forgot Your Password?</a></p>
