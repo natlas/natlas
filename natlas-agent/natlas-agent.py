@@ -165,9 +165,10 @@ def scan(target=None, scan_id=None):
             if getheadshot(target, scan_id, 'http') is True:
                 screenshotPath = "data/aquatone." + scan_id + ".http/screenshots/http__" +target.replace('.','_') + ".png"
                 if not os.path.isfile(screenshotPath):
-                    pass
+                    shutil.rmtree("data/aquatone." + scan_id + ".http/")
                 else:
-                    result['httpheadshot'] = str(base64.b64encode(
+                    result["screenshots"] = {}
+                    result["screenshots"]['httpheadshot'] = str(base64.b64encode(
                         open(screenshotPath, 'rb').read()))[2:-1]
                     shutil.rmtree("data/aquatone." + scan_id + ".http/")
                     print("[+] (%s) HTTP snapshot acquired" % scan_id)
@@ -177,7 +178,7 @@ def scan(target=None, scan_id=None):
             if getheadshot(target, scan_id, 'https') is True:
                 screenshotPath = "data/aquatone." + scan_id + ".https/screenshots/https__" +target.replace('.','_') + ".png"
                 if not os.path.isfile(screenshotPath):
-                    pass
+                    shutil.rmtree("data/aquatone." + scan_id + ".https/")
                 else:
                     result['httpsheadshot'] = str(base64.b64encode(
                         open(screenshotPath, 'rb').read()))[2:-1]
