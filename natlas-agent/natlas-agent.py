@@ -167,8 +167,7 @@ def scan(target=None, scan_id=None):
                 if not os.path.isfile(screenshotPath):
                     shutil.rmtree("data/aquatone." + scan_id + ".http/")
                 else:
-                    result["screenshots"] = {}
-                    result["screenshots"]['httpheadshot'] = str(base64.b64encode(
+                    result['httpheadshot'] = str(base64.b64encode(
                         open(screenshotPath, 'rb').read()))[2:-1]
                     shutil.rmtree("data/aquatone." + scan_id + ".http/")
                     print("[+] (%s) HTTP snapshot acquired" % scan_id)
