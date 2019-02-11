@@ -8,6 +8,7 @@ from app.elastic import Elastic
 from app.scope import ScopeManager
 import sqlalchemy
 import os
+import hashlib
 
 class AnonUser(AnonymousUserMixin):
 
@@ -67,9 +68,16 @@ def create_app(config_class=Config, load_config=False):
                 current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
                 if current_services:
                     app.current_services = current_services.as_dict()
-                else:
-                    app.current_services = {"id":"None","sha256":"None","services":"None"} # default values until we load something
+                else: # Let's populate server defaults
+                    defaultServices = open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")).read().rstrip('\r\n')
+                    defaultSha = hashlib.sha256(defaultServices.encode()).hexdigest()
+                    current_services = NatlasServices(sha256=defaultSha, services=defaultServices) # default values until we load something
+                    db.session.add(current_services)
+                    db.session.commit()
+                    print("NatlasServices populated with defaults from defaults/natlas-services")
+                    app.current_services = current_services.as_dict()
             except Exception as e:
+                print(e)
                 print("NatlasServices table probably doesn't exist yet. Ignore if you're running flask db upgrade.")
         
         # Grungy thing so we can use flask db and flask shell before the config items are initially populated

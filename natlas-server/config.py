@@ -1,12 +1,12 @@
 import os, argparse
 from dotenv import load_dotenv
 
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(BASEDIR, '.env'))
-
 # Things in the Class object are config options we will likely never want to change from the database.
 class Config(object):
-    
+
+    BASEDIR = os.path.abspath(os.path.dirname(__file__))
+    load_dotenv(os.path.join(BASEDIR, '.env'))
+
     # We aren't storing this in the database because it wouldn't be a very good secret then
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-should-set-a-secret-key'
 
