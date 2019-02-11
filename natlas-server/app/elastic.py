@@ -30,8 +30,6 @@ class Elastic:
             return 0,[]
         if query == '':
             query = 'nmap'
-        if query == 'screenshot:true':
-            query = "httpheadshot:* OR httpsheadshot:* OR vncsheadshot:*"
         try:
             result = self.es.search(index="nmap", doc_type="_doc", body={"size": limit, "from": offset, "query": {"query_string": {
                                     'query': query, "fields": ["nmap_data"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
