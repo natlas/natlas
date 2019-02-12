@@ -20,13 +20,20 @@
         <h3>Current Services ID:</h3> 
         {{ current_services.id }}
         <h3>Current Services SHA256:</h3> 
-        {{ current_services.sha256 }}
+        <abbr title="{{ current_services.sha256 }}" id="sha256" style="border-bottom:none; cursor:default;">{{ current_services.sha256|truncate(32) }}</abbr>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
         <legend>Current Services</legend>
-          <pre class="services-box">
-{{ current_services.services }}
-          </pre>
+        <form class="form-inline" action="" method="post">
+          {{ addServiceForm.hidden_tag() }}
+          <div class="form-group">
+            {{ addServiceForm.serviceName(size=16, class="form-control", placeholder="service-name")}}
+            {{ addServiceForm.servicePort(size=5, class="form-control", placeholder="22")}}
+            {{ addServiceForm.serviceProtocol(class="form-control")}}
+          </div>
+          {{ addServiceForm.addService(class="btn btn-primary", style="margin-top:1em; margin-bottom:1em;") }}
+        </form>
+          <pre class="services-box">{{ current_services.services }}</pre>
           <a href="{{ url_for('admin.exportServices') }}" class="btn btn-primary export-btn" role="button">Export Services</a>
       </div>
   </div>

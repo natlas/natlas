@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from wtforms import StringField, BooleanField, SubmitField, TextAreaField, PasswordField
+from wtforms import StringField, BooleanField, SubmitField, TextAreaField, PasswordField, IntegerField, SelectField
 from wtforms.validators import DataRequired, ValidationError, Email
 from app.models import User, ScopeItem
 import ipaddress
@@ -77,3 +77,13 @@ class ScopeToggleForm(FlaskForm):
 class ServicesUploadForm(FlaskForm):
     serviceFile = FileField('Select a file to upload')
     uploadFile = SubmitField('Upload Services File')
+
+class AddServiceForm(FlaskForm):
+    serviceName = StringField('Service Name', validators=[DataRequired()])
+    servicePort = IntegerField('Service Port', validators=[DataRequired()])
+    serviceProtocol = SelectField("Protocol", validators=[DataRequired()])
+    addService = SubmitField('Add Service')
+
+    def validate_serviceName(self, serviceName):
+        if ' ' in serviceName.data:
+            raise ValidationError('Service names cannot contain spaces! Use - instead.')

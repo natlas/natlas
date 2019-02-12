@@ -5,7 +5,7 @@ from app.admin import bp
 from app.elastic import Elastic
 from app.admin.forms import UserDeleteForm, UserEditForm, InviteUserForm, \
     NewScopeForm, ImportScopeForm, ImportBlacklistForm, ScopeToggleForm, ScopeDeleteForm, \
-    ConfigForm, ServicesUploadForm
+    ConfigForm, ServicesUploadForm, AddServiceForm
 from app.models import User, ScopeItem, ConfigItem, NatlasServices
 from app.auth.email import send_user_invite_email
 from app.auth.wrappers import isAuthenticated, isAdmin
@@ -256,8 +256,9 @@ def toggleScopeItem(id):
 @isAdmin
 def services():
     uploadForm = ServicesUploadForm()
-
-    if uploadForm.validate_on_submit():
+    addServiceForm = AddServiceForm()
+    addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp","UDP")]
+    if uploadForm.uploadFile.data and uploadForm.validate_on_submit():
         newServicesContent = uploadForm.serviceFile.data.read().decode("utf-8").rstrip('\r\n')
         newServicesSha = hashlib.sha256(newServicesContent.encode()).hexdigest()
         if newServicesSha != current_app.current_services["sha256"]:
@@ -271,8 +272,24 @@ def services():
             flash("That file is an exact match for our current services file!", "warning")
             return redirect(url_for('admin.services'))
 
+    if addServiceForm.addService.data and addServiceForm.validate_on_submit():
+        newServiceName = addServiceForm.serviceName.data
+        newServicePort = str(addServiceForm.servicePort.data) + '/' + addServiceForm.serviceProtocol.data
+        if '\t' + newServicePort in str(current_app.current_services['services']):
+            flash("A service with port %s already exists!" % newServicePort, "danger")
+            return redirect(url_for('admin.services'))
+        else:
+            newServices = current_app.current_services["services"] + "\n" + newServiceName + "\t" + newServicePort
+            newSha = hashlib.sha256(newServices.encode()).hexdigest()
+            ns = NatlasServices(sha256=newSha, services=newServices)
+            db.session.add(ns)
+            db.session.commit()
+            current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
+            flash("New service %s on port %s has been added." % (newServiceName, newServicePort), "success")
+            return redirect(url_for('admin.services'))
 
-    return render_template('admin/services.html', uploadForm=uploadForm, current_services=current_app.current_services)
+
+    return render_template('admin/services.html', uploadForm=uploadForm, addServiceForm=addServiceForm, current_services=current_app.current_services)
 
 @bp.route('/services/export', methods=['GET'])
 @isAuthenticated
