@@ -15,5 +15,5 @@ then
 else
     echo "`date` : Production" >> start.log
     echo "`date` : Production"
-    gunicorn natlas-server:app
+    gunicorn -b 127.0.0.1:5000 natlas-server:app
 fi
