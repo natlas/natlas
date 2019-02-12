@@ -4,10 +4,16 @@ export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
 export FLASK_APP=./natlas-server.py
 
+source .env
 source venv/bin/activate
-while [ 1 == 1 ]
-do
-  echo `date` >> start.log
-  flask run --with-threads # --host=0.0.0.0
-  sleep 5
-done
+DEPLOY_ENV=${FLASK_ENV:-production}
+if [ $DEPLOY_ENV == "development" ]
+then
+    echo "`date` : Development" >> start.log
+    echo "`date` : Development"
+    flask run --with-threads # --host=0.0.0.0
+else
+    echo "`date` : Production" >> start.log
+    echo "`date` : Production"
+    gunicorn natlas-server:app
+fi
