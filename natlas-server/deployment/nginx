@@ -1,0 +1,44 @@
+server {
+        listen 80;
+        listen [::]:80;
+        server_name <host>;
+        # The below location block is for Let's Encrypt, feel free to delete if you're not using LE.
+        location ~ /.well-known { 
+            allow all;
+        }
+        return 301 https://$host$request_uri;
+}
+
+server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name <host>;
+
+        ssl_certificate /etc/ssl/certs/<cert>.cert;
+        ssl_certificate_key /etc/ssl/private/<key>.key;
+        ssl_session_timeout 10m;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_tickets off;
+        ssl_stapling on;
+        ssl_stapling_verify on;
+        ssl_protocols TLSv1.2;
+        ssl_prefer_server_ciphers on;
+        ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+        ssl_ecdh_curve secp384r1;
+#        ssl_dhparam /etc/nginx/dhparam.pem; # you should generate strong dhparams and then enable this
+
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Robots-Tag none;
+#        add_header Strict-Transport-Security "max-age=31536000"; # enable this after you've confirmed things are working
+
+        location / {
+                proxy_set_header Host $host;
+                proxy_set_header REMOTE_ADDR $remote_addr;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_pass http://127.0.0.1:5000;
+        }
+}
