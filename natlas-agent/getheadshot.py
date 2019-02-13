@@ -18,7 +18,7 @@ def getheadshot(ip, rand, service):
         if "DISPLAY" not in os.environ:
             return False
         print("[+] (%s) Attempting to take vnc snapshot" % rand)
-        process = subprocess.Popen(["vncsnapshot", "-quality", "50", ip, "data/natlas." +
+        process = subprocess.Popen(["xvfb-run", "vncsnapshot", "-quality", "50", ip, "data/natlas." +
                                     rand + "." + service + ".headshot.jpg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
             out, err = process.communicate(timeout=60)

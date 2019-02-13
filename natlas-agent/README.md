@@ -11,8 +11,14 @@ $ ./setup-agent.sh
 
 The Config
 ------------
-To make modifications to your agent, you can modify `config.py` to match your specifications. Currently, the agent pulls the max number of simultaneous threads to run, the timeout before you should consider a scan as too long and kill it, and the server to fetch work from. The defaults assume that your natlas-server is running on the same host as your natlas-agent, however it's easily changed as you deploy agents to more nodes.
+To make modifications to your agent, you can modify environment variables to match your specifications. Available options include:
 
+- `NATLAS_SERVER_ADDRESS` defaults to `http://127.0.0.1:5000` - The server to get work from and submit work to.
+- `NATLAS_MAX_THREADS` defaults to `3` - Maximum number of concurrent scanning threads
+- `NATLAS_SCAN_LOCAL` defaults to `False` - Don't scan local addresses
+- `NATLAS_REQUEST_TIMEOUT` defaults to `15` (seconds) - Time to wait for the server to respond
+- `NATLAS_BACKOFF_MAX` defaults to `300` (seconds) - Maximum time for exponential backoff after failed requests
+- `NATLAS_BACKOFF_BASE` defaults to `1` (second) - Incremental time for exponential backoff after failed requests
 
 Starting the Agent
 ------------
@@ -31,7 +37,7 @@ The Natlas agent now supports the use of Aquatone if it's available. Aquatone re
 The setup script will check for the existence of chromium-browser and try to install it if you're running as root, however you can manually install it like so:
 
 ```
-$ sudo apt install chromium-browser
+$ sudo apt install -y chromium-browser
 ```
 
 
@@ -39,30 +45,15 @@ $ sudo apt install chromium-browser
 [Optional] vncsnapshot
 ------------
 
-The Natlas agent uses the `vncsnapshot` to gather snapshots of vnc servers it scans.  `vncsnapshot` can be found in most distribution repositories. This tool also requires an active X session to work, so you may need to get creative if you are trying to run natlas-agent on a headless server.  I've found that the easiest solution to this problem is to run a VNC server, and you may need to hard code the DISPLAY variable into the getheadshot.py file.
+The Natlas agent uses the `vncsnapshot` to gather snapshots of vnc servers it scans.  `vncsnapshot` can be found in most distribution repositories. In order to use vncsnapshot in a headless environment, we're going to take advantage of `xvfb-run`. 
 
 The setup script above will attempt to automatically install this, however you can manually install them like so:
 
 ```
-$ sudo apt install vncsnapshot
+$ sudo apt install -y xvfb-run vncsnapshot
 ```
 
 
 Example Systemd Unit
 ------------------
-Below is an example systemd unit you can use to get natlas-agent running in systemd.
-
-```
-[Unit]
-Description=Natlas Agent
-After=network.target
- 
-[Service]
-Type=simple
-WorkingDirectory=/opt/natlas/natlas-agent
-ExecStart=/usr/bin/python3 /opt/natlas/natlas-agent/natlas-agent.py
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
+An example systemd unit is provided in `deployment/natlas-agent.service`
