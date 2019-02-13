@@ -1,5 +1,6 @@
 import ipaddress
-
+from netaddr import *
+from app.ipscanmanager import IPScanManager
 
 class ScopeManager():
 
@@ -7,6 +8,7 @@ class ScopeManager():
     blacklist = []
     scopeSize = 0
     blacklistSize = 0
+    scanmanager = None
 
     def __init__(self):
         self.scope = []
@@ -44,7 +46,15 @@ class ScopeManager():
         self.blacklistSize = newBlacklistSize
         #print("Blacklist Size: %s" % self.blacklistSize)
 
+    def updateScanManager(self):
+        from app.models import ScopeItem
+        self.scanmanager = IPScanManager([IPNetwork(n.target) for n in ScopeItem.getScope()], [IPNetwork(n.target) for n in ScopeItem.getBlacklist()])
+
+    def getScanManager(self):
+        return self.scanmanager
+
     def update(self):
         self.updateScope()
         self.updateBlacklist()
+        self.updateScanManager()
         print("ScopeManager Updated")
