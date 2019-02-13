@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, current_app, flash, Response, abort
+from flask import render_template, redirect, url_for, current_app, flash, Response, abort, request
 from flask_login import current_user
 from app import db
 from app.user import bp
@@ -10,6 +10,11 @@ import ipaddress
 @bp.route('/', methods=['GET', 'POST'])
 @isAuthenticated
 def profile():
+    # Handle this case because isAuthenticated only applies when LOGIN_REQUIRED is true
+    if current_user.is_anonymous:
+        flash("You must be a user to access %s" % request.path, "warning")
+        return redirect(url_for('main.index'))
+
     changePasswordForm = ChangePasswordForm(prefix="change-password")
     displaySettingsForm = DisplaySettingsForm(prefix="display-settings", results_per_page=current_user.results_per_page, \
         preview_length=current_user.preview_length)
