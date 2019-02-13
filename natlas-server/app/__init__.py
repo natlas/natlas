@@ -27,9 +27,7 @@ migrate = Migrate()
 
 @login.unauthorized_handler
 def unauthorized():
-    print("UNAUTHORIZED")
     if current_user.is_anonymous:
-        print("CURRENT_USER IS ANONYMOUS")
         flash("You must login to continue.", "warning")
         return redirect(url_for('auth.login'))
     if not current_user.is_admin:
