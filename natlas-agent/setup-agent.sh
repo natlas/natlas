@@ -9,11 +9,13 @@ then
     echo '[+] Setup running without permissions. System-wide changes cannot be made.'
 else
     echo '[+] Setup running with permissions. Automatic installation will be attempted.'
+    echo "[+] Updating apt repositories"
+    apt-get update
 fi
 
 if ! which python3 >/dev/null
 then
-    echo '[!] Python3 not found'
+    echo '[!] Python3 not found: apt-get install -y python3.6'
     if [ $WHOAMI == "root" ]
     then
         apt-get install -y python3.6
@@ -26,7 +28,7 @@ fi
 
 if ! which pip3 >/dev/null
 then
-    echo "[!] pip3 not found"
+    echo "[!] pip3 not found: apt-get -y install python3-pip"
     if [ $WHOAMI == "root" ]
     then
         apt-get -y install python3-pip
@@ -39,7 +41,7 @@ fi
 
 if ! which virtualenv >/dev/null
 then
-    echo "[!] virtualenv not found"
+    echo "[!] virtualenv not found: pip3 install virtualenv"
     if [ $WHOAMI == "root" ]
     then
         pip3 install virtualenv
@@ -58,7 +60,7 @@ fi
 
 if [ ! -e venv/bin/activate ]
 then
-    echo "[!] No venv activate script found"
+    echo "[!] No venv activate script found: venv/bin/activate"
     exit 1
 else
     echo "[+] Entering virtual environment"
@@ -71,7 +73,7 @@ fi
 
 if ! which nmap >/dev/null
 then
-    echo '[!] nmap not found'
+    echo '[!] nmap not found: apt-get install -y nmap'
     if [ $WHOAMI == "root" ]
     then
         apt-get install -y nmap
@@ -84,7 +86,7 @@ fi
 
 if ! which chromium-browser >/dev/null
 then
-    echo '[!] chromium-browser not found.'
+    echo '[!] chromium-browser not found: apt-get install -y chromium-browser'
     if [ $WHOAMI == "root" ]
     then
         apt-get install -y chromium-browser
@@ -97,14 +99,15 @@ fi
 
 if ! which aquatone >/dev/null
 then
-    echo '[!] aquatone not found. Please install it by reviewing the instructions: https://github.com/michenriksen/aquatone#installation'
+    AQUAMSG='[!] aquatone not found. Please install it by reviewing the instructions: https://github.com/michenriksen/aquatone#installation'
+    echo $AQUAMSG
 else
 	echo '[+] aquatone found'
 fi
 
 if ! which xvfb-run >/dev/null
 then
-    echo '[!] xvfb not found'
+    echo '[!] xvfb not found: apt-get install -y xvfb'
     if [ $WHOAMI == "root" ] 
     then
         apt-get install -y xvfb
@@ -117,7 +120,7 @@ fi
 
 if ! which vncsnapshot >/dev/null
 then
-    echo '[!] vncsnapshot not found'
+    echo '[!] vncsnapshot not found: apt-get install -y vncsnapshot'
     if [ $WHOAMI == "root" ]
     then
         apt-get install -y vncsnapshot
@@ -132,5 +135,6 @@ if [ $FAIL == "true" ]
 then
     echo '[!] Errors occurred during setup. Please review the log and make sure all dependencies are installed.'
 else
+    echo $AQUAMSG
     echo '[+] Setup Complete'
 fi
