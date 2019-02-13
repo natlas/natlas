@@ -3,6 +3,7 @@
 
 WHOAMI=$(whoami)
 FAIL=false
+AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.4.3/aquatone_linux_amd64_1.4.3.zip'
 
 if [ $WHOAMI != "root" ]
 then
@@ -97,10 +98,35 @@ else
     echo '[+] chromium-browser found'
 fi
 
+if ! which unzip >/dev/null
+then
+    echo "[!] unzip not found: apt-get install -y unzip"
+    if [ $WHOAMI == "root" ]
+    then
+        apt-get install -y unzip
+    else
+        FAIL=true
+    fi
+else
+    echo "[+] unzip found"
+
 if ! which aquatone >/dev/null
 then
     AQUAMSG='[!] aquatone not found. Please install it by reviewing the instructions: https://github.com/michenriksen/aquatone#installation'
     echo $AQUAMSG
+    if [ $WHOAMI == "root" ]
+    then
+        wget $AQUATONEURL -O /tmp/aquatone.zip && unzip /tmp/aquatone.zip -d /tmp/aquatone && cp /tmp/aquatone/aquatone /usr/local/bin/aquatone
+        rm -rf /tmp/aquatone.zip /tmp/aquatone
+        if ! which aquatone >/dev/null
+        then
+            echo "[!] Aquatone failed to install automatically"
+        else
+            echo "[+] Aquatone installed successfully"
+        fi
+    else
+        FAIL=true
+    fi
 else
 	echo '[+] aquatone found'
 fi
