@@ -82,3 +82,17 @@ class NatlasServices(db.Model):
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class AgentConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    versionDetection = db.Column(db.Boolean, default=True)
+    osDetection = db.Column(db.Boolean, default=True)
+    defaultScripts = db.Column(db.Boolean, default=True)
+    onlyOpens = db.Column(db.Boolean, default=True)
+    scanTimeout = db.Column(db.Integer, default=300)
+    webScreenshots = db.Column(db.Boolean, default=True)
+    vncScreenshots = db.Column(db.Boolean, default=True)
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

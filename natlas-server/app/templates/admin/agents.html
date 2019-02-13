@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% set title = "Agent Configuration" %}
+{% set active_page = "agents" %}
+{% block content %}
+
+{% include 'admin/_header.html' %}
+  <form class="form" action="" method="post">
+  <div class="row">
+    <div class="col-xs-12 col-md-3">
+      <legend>Nmap Config</legend>
+      {{ agentForm.hidden_tag() }} 
+        <div class="checkbox">
+            <label>
+            {{ agentForm.versionDetection }}
+            {{ agentForm.versionDetection.label(class="control-label config-form") }}
+            </label> 
+        </div>
+        <div class="checkbox">
+            <label>
+            {{ agentForm.osDetection }}
+            {{ agentForm.osDetection.label(class="control-label config-form") }}
+          </label>
+        </div>
+        <div class="checkbox">
+            <label>
+            {{ agentForm.defaultScripts }} 
+            {{ agentForm.defaultScripts.label(class="control-label config-form") }}</label>
+        </div>
+        <div class="checkbox">
+            <label>
+            {{ agentForm.onlyOpens }} 
+            {{ agentForm.onlyOpens.label(class="control-label config-form") }}
+          </label>
+        </div>
+        <div class="form-group">
+          {{ agentForm.scanTimeout.label }}
+          <div class="input-group">
+            {{ agentForm.scanTimeout(class="form-control", placeholder="300")}}
+            <div class="input-group-addon">seconds</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-3">
+        <legend>Screenshot Settings</legend>
+        <div class="checkbox">
+            <label>
+            {{ agentForm.webScreenshots }} 
+          {{ agentForm.webScreenshots.label(class="control-label config-form") }}
+        </label>
+        </div>
+        <div class="checkbox">
+            <label>
+              {{ agentForm.vncScreenshots }}
+             {{ agentForm.vncScreenshots.label(class="control-label config-form") }}
+           </label>
+        </div>
+      </div>
+    </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6 text-center">
+            {{ agentForm.updateAgents(class="btn btn-primary", style="margin-top:1em;") }}
+          </div>
+        </div>
+
+        </form>
+      </div>
+  </div>
+{% endblock %}

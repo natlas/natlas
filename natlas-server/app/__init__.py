@@ -61,7 +61,7 @@ def create_app(config_class=Config, load_config=False):
                     else:
                         print("Unsupported config type %s:%s:%s" % (item.name, item.type, item.value))
             except Exception as e:
-                print("ConfigItem table doesn't exist yet. Ignore this if you're running flask db upgrade right now.")
+                print("ConfigItem table doesn't exist yet. Ignore if flask db upgrade.")
             
             from app.models import NatlasServices
             try:
@@ -78,8 +78,23 @@ def create_app(config_class=Config, load_config=False):
                     app.current_services = current_services.as_dict()
             except Exception as e:
                 print(e)
-                print("NatlasServices table probably doesn't exist yet. Ignore if you're running flask db upgrade.")
-        
+                print("NatlasServices table doesn't exist yet. Ignore if flask db upgrade.")
+            
+            # Load the current agent config, otherwise create it.
+            from app.models import AgentConfig
+            try:
+                agentConfig = AgentConfig.query.get(1) # the agent config is updated in place so only 1 record
+                if agentConfig:
+                    app.agentConfig = agentConfig.as_dict()
+                else:
+                    newAgentConfig = AgentConfig() # populate an agent config with database defaults
+                    db.session.add(newAgentConfig)
+                    db.session.commit()
+                    print("AgentConfig populated with defaults")
+                    app.agentConfig = newAgentConfig.as_dict()
+            except Exception as e:
+                print("AgentConfig table doesn't exist yet. Ignore if flask db upgrade.")
+
         # Grungy thing so we can use flask db and flask shell before the config items are initially populated
         if "ELASTICSEARCH_URL" in app.config: 
             app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])

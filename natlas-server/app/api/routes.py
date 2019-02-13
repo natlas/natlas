@@ -26,6 +26,7 @@ def getwork():
     attempts = 0
     work = {}
     work['type'] = 'nmap'
+    work['agent_config'] = current_app.agentConfig
     work["services_hash"] = current_app.current_services["sha256"]
     scan_id = ''
     while scan_id == '':

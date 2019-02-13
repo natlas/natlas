@@ -87,3 +87,13 @@ class AddServiceForm(FlaskForm):
     def validate_serviceName(self, serviceName):
         if ' ' in serviceName.data:
             raise ValidationError('Service names cannot contain spaces! Use - instead.')
+
+class AgentConfigForm(FlaskForm):
+    versionDetection = BooleanField("Enable Version Detection")
+    osDetection = BooleanField("Enable OS Detection")
+    defaultScripts = BooleanField("Enable Default Scripts")
+    onlyOpens = BooleanField("Show Open Ports Only")
+    scanTimeout = IntegerField("Scan Timeout")
+    webScreenshots = BooleanField("Enable Web Screenshots")
+    vncScreenshots = BooleanField("Enable VNC Screenshots")
+    updateAgents = SubmitField("Update Agent Config")

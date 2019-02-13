@@ -112,19 +112,31 @@ def validate_target(target):
 def generate_scan_id():
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
 
-def scan(target=None, scan_id=None):
+def scan(target_data=None):
     
-    if not validate_target(target):
-        print("[!] Failed to validate target %s" % target)
+    if not validate_target(target_data["target"]):
+        print("[!] Failed to validate target %s" % target_data["target"])
         return False
-    print("[+] Target: %s" % target)
-    print("[+] Scan ID: %s" % scan_id)
+    print("[+] Target: %s" % target_data["target"])
+    print("[+] Scan ID: %s" % target_data["scan_id"])
+    
+    target = target_data["target"]
+    scan_id = target_data["scan_id"]
+    agentConfig = target_data["agent_config"]
 
-    command = ["nmap", "-oA", "data/natlas."+scan_id, "-sV", "-O","-sC", "-open", "--servicedb", "./natlas-services", target]
-
+    command = ["nmap", "-oA", "data/natlas."+scan_id, "--servicedb", "./natlas-services"]
+    if agentConfig["versionDetection"]:
+        command.append("-sV")
+    if agentConfig["osDetection"]:
+        command.append("-O")
+    if agentConfig["defaultScripts"]:
+        command.append("-sC")
+    if agentConfig["onlyOpens"]:
+        command.append("--open")
+    command.append(target_data["target"])
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
-        out, err = process.communicate(timeout=config.scan_timeout)  # 6 minutes
+        out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
     except:
         try:
             print("[+] (%s) Killing slacker process" % scan_id)
@@ -160,7 +172,7 @@ def scan(target=None, scan_id=None):
                 new_data += line + '\n'
         result['nmap_data'] = new_data.rstrip('\n')
 
-    if shutil.which("aquatone") is not None:
+    if target_data["agent_config"]["webScreenshots"] and shutil.which("aquatone") is not None:
         if "80/tcp" in result['nmap_data']:
             if getheadshot(target, scan_id, 'http') is True:
                 screenshotPath = "data/aquatone." + scan_id + ".http/screenshots/http__" +target.replace('.','_') + ".png"
@@ -185,7 +197,7 @@ def scan(target=None, scan_id=None):
                     print("[+] (%s) HTTPS snapshot acquired" % scan_id)
             else:
                 print("[!] (%s) Failed to acquire HTTPS snapshot" % scan_id)
-    if shutil.which("vncsnapshot") is not None:
+    if target_data["agent_config"]["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
         if "5900/tcp" in result['nmap_data']:
             if getheadshot(target, scan_id, 'vnc') is True:
                 result['vncsheadshot'] = str(base64.b64encode(
@@ -208,7 +220,7 @@ class ThreadScan(threading.Thread):
     def run(self):
         while True:
             target_data = self.queue.get()
-            scan(target_data["target"], target_data["scan_id"])
+            scan(target_data)
             self.queue.task_done()
 
 def main():

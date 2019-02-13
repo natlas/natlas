@@ -3,10 +3,8 @@ from flask_login import current_user
 from app import db
 from app.admin import bp
 from app.elastic import Elastic
-from app.admin.forms import UserDeleteForm, UserEditForm, InviteUserForm, \
-    NewScopeForm, ImportScopeForm, ImportBlacklistForm, ScopeToggleForm, ScopeDeleteForm, \
-    ConfigForm, ServicesUploadForm, AddServiceForm
-from app.models import User, ScopeItem, ConfigItem, NatlasServices
+from app.admin.forms import *
+from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig
 from app.auth.email import send_user_invite_email
 from app.auth.wrappers import isAuthenticated, isAdmin
 import ipaddress, hashlib
@@ -296,3 +294,18 @@ def services():
 @isAdmin
 def exportServices():
     return Response(str(current_app.current_services["services"]), mimetype='text/plain')
+
+@bp.route('/agents', methods=['GET', 'POST'])
+@isAuthenticated
+@isAdmin
+def agentConfig():
+    agentConfig = AgentConfig.query.get(1)
+    agentForm = AgentConfigForm(obj=agentConfig) # pass the model to the form to populate
+
+    if agentForm.validate_on_submit():
+        agentForm.populate_obj(agentConfig) # populate the object from the form data
+        db.session.commit()
+        current_app.agentConfig = agentConfig.as_dict()
+
+
+    return render_template('admin/agents.html', agentForm=agentForm)
