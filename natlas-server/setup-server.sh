@@ -15,6 +15,20 @@ else
     apt-get update
 fi
 
+
+if ! id natlas >/dev/null 2>&1; then
+    echo "[!] Natlas user doesn't exist: useradd -M -N -r -s /bin/false -d /opt/natlas natlas"
+    if [ $WHOAMI == "root" ]; then
+        echo "[+] Creating natlas user"
+        useradd -M -N -r -s /bin/false -d /opt/natlas natlas
+        cat /etc/passwd | grep "natlas"
+    else
+        echo "[!] Natlas user doesn't exist, please create if you're using the provided systemd file"
+    fi
+else
+    echo "[+] natlas user exists: `cat /etc/passwd | grep natlas`"
+fi
+
 ELASTIC=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9200/_nodes)
 if [ $ELASTIC != "200" ]
 then
