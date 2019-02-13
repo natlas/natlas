@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import StringField, BooleanField, SubmitField, TextAreaField, PasswordField, IntegerField, SelectField
-from wtforms.validators import DataRequired, ValidationError, Email
+from wtforms.validators import DataRequired, ValidationError, Email, Optional
 from app.models import User, ScopeItem
 import ipaddress
 from app.elastic import Elastic
@@ -10,7 +10,7 @@ class ConfigForm(FlaskForm):
     login_required = BooleanField('Login Required')
     register_allowed = BooleanField('Registration Allowed')
     elasticsearch_url = StringField("Elastic URL")
-    mail_from = StringField("From Address", validators=[Email()])
+    mail_from = StringField("From Address", validators=[Email(), Optional()])
     mail_server = StringField("Mail Server")
     mail_port = StringField("Mail Port")
     mail_use_tls = BooleanField("Use TLS")
