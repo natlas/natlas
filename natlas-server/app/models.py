@@ -55,6 +55,9 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
 
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class ScopeItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -67,12 +70,19 @@ class ScopeItem(db.Model):
     def getScope():
         return ScopeItem.query.filter_by(blacklist=False).all()
 
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class ConfigItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=True)
     type = db.Column(db.String(256))
     value = db.Column(db.String(256))
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 # While generally I prefer to use a singular model name, each record here is going to be storing a set of services
 class NatlasServices(db.Model):
