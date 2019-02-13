@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/opt/natlas/natlas-agent
-ExecStart=/usr/bin/python3 /opt/natlas/natlas-agent/natlas-agent.py
+ExecStart=/opt/natlas/natlas-agent/venv/bin/python3 /opt/natlas/natlas-agent/natlas-agent.py
 Restart=always
 
 [Install]
