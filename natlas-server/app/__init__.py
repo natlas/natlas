@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, flash, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager, AnonymousUserMixin
+from flask_login import LoginManager, AnonymousUserMixin, current_user
 from flask_mail import Mail
 from config import Config, populate_defaults
 from app.elastic import Elastic
@@ -24,6 +24,17 @@ login.session_protection = "strong"
 mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
+
+@login.unauthorized_handler
+def unauthorized():
+    print("UNAUTHORIZED")
+    if current_user.is_anonymous:
+        print("CURRENT_USER IS ANONYMOUS")
+        flash("You must login to continue.", "warning")
+        return redirect(url_for('auth.login'))
+    if not current_user.is_admin:
+        flash("You must be an admin to access %s." % request.path, "warning")
+        return redirect(url_for('main.index'))
 
 
 def create_app(config_class=Config, load_config=False):
