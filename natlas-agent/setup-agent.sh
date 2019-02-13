@@ -109,6 +109,7 @@ then
     fi
 else
     echo "[+] unzip found"
+fi
 
 if ! which aquatone >/dev/null
 then
@@ -161,6 +162,9 @@ if [ $FAIL == "true" ]
 then
     echo '[!] Errors occurred during setup. Please review the log and make sure all dependencies are installed.'
 else
-    echo $AQUAMSG
+    if ! which aquatone >/dev/null
+    then
+        echo $AQUAMSG
+    fi
     echo '[+] Setup Complete'
 fi
