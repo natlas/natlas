@@ -26,7 +26,6 @@ def admin():
             confitem.value=str(fieldvalue)
             db.session.add(confitem)
         db.session.commit()
-        #return render_template("admin/index.html", configForm=configForm, configItems=configItems)
     return render_template("admin/index.html", configForm=configForm, configItems=configItems)
 
 
