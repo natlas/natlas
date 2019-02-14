@@ -10,20 +10,16 @@ from app.nmap_parser import NmapParser
 
 @bp.route('/getwork', methods=['GET'])
 def getwork():
-
-    random.seed(os.urandom(200))
-
-    # how many hosts are in scope?
-    scopeSize = current_app.ScopeManager.getScopeSize()
-    blacklistSize = current_app.ScopeManager.getBlacklistSize()
-    if scopeSize == 0: # if zero, update to make sure that the scopemanager has been populated
+    scanmanager = current_app.ScopeManager.getScanManager()
+    if scanmanager == None:
         current_app.ScopeManager.update()
-        scopeSize = current_app.ScopeManager.getScopeSize()
-        blacklistSize = current_app.ScopeManager.getBlacklistSize()
-        if scopeSize == 0: # if it's still zero after an update, then there are no scope items.
-            return "Scope Not Found", 404, {'content-type':'text/plain'}
+        scanmanager = current_app.ScopeManager.getScanManager()
 
-    attempts = 0
+        if scanmanager == None:
+            return json.dumps({ 'errorcode': 404, 'message': 'No scope is currently configured.' }), 404, {'content-type':'application/json'}
+
+    ip = scanmanager.getNextIP()
+
     work = {}
     work['type'] = 'nmap'
     work['agent_config'] = current_app.agentConfig
@@ -36,25 +32,9 @@ def getwork():
         if count == 0:
             scan_id = rand
     work['scan_id'] = scan_id
+    work['target'] = str(ip)
 
-    while attempts < 1000:
-        # pick one
-        index = random.randint(0, scopeSize-1)
-        attempts = attempts+1
-
-        target = ""
-        for network in current_app.ScopeManager.getScope():
-            if index >= network.num_addresses:
-                index -= network.num_addresses
-            else:
-                isgood = True
-                for badnet in current_app.ScopeManager.getBlacklist():  # run through the blacklist looking for match
-                    if network[index] in badnet:
-                        isgood = False
-                if isgood:
-                    work['target'] = str(network[index])
-                    return json.dumps(work), 200, {'content-type':'application/json'}
-    return "Couldn't find a target that wasn't blacklisted.", 404, {'content-type':'text/plain'}
+    return json.dumps(work), 200, {'content-type':'application/json'}
 
 
 @bp.route('/submit', methods=['POST'])
