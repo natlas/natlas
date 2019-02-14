@@ -11,6 +11,9 @@ from app.nmap_parser import NmapParser
 @bp.route('/getwork', methods=['GET'])
 def getwork():
     scanmanager = current_app.ScopeManager.getScanManager()
+    if scanmanager == None:
+            return json.dumps({ 'errorcode': 404, 'message': 'No scope is currently configured.' }), 404, {'content-type':'application/json'}
+
     ip = scanmanager.getNextIP()
 
     work = {}

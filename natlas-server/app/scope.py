@@ -1,5 +1,5 @@
 import ipaddress
-from netaddr import *
+from netaddr import IPNetwork
 from app.ipscanmanager import IPScanManager
 
 class ScopeManager():
@@ -48,6 +48,7 @@ class ScopeManager():
 
     def updateScanManager(self):
         from app.models import ScopeItem
+        self.scanmanager = None
         self.scanmanager = IPScanManager([IPNetwork(n.target) for n in ScopeItem.getScope()], [IPNetwork(n.target) for n in ScopeItem.getBlacklist()])
 
     def getScanManager(self):

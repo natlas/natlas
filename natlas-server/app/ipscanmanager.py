@@ -1,5 +1,5 @@
-from netaddr import *
-from app.cyclicprng import *
+from netaddr import IPSet, IPNetwork
+from app.cyclicprng import CyclicPRNG
 
 class IPScanManager:
 	networks = []
@@ -33,17 +33,7 @@ class IPScanManager:
 		return self.total
 
 	def getNextIP(self):
-		def binarysearch(networks, i):
-			middle = int(len(networks)/2)
-			network = networks[middle]
-			if i < network["index"]:
-				return binarysearch(networks[:middle], i)
-			elif i >= (network["index"] + network["size"]):
-				return binarysearch(networks[middle+1:], i)
-			else:
-				return network["network"][i - network["index"]]
-		index = self.rng.getRandom()
-		return binarysearch(self.networks, index)
+		return getIP(index)
 
 	def getIP(self, index):
 		def binarysearch(networks, i):
