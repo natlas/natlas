@@ -10,6 +10,11 @@ class IPScanManager:
 		set = IPSet([])
 		for block in whitelist:
 			set.add(IPNetwork(block))
+			# Remove invalid broadcast and network addresses
+			if block.broadcast != None:
+				set.remove(IPNetwork(block.broadcast))
+			if block.size > 2:
+				set.remove(IPNetwork(block.network))
 		for block in blacklist:
 			set.remove(IPNetwork(block))
 		for block in set.iter_cidrs():
@@ -22,7 +27,7 @@ class IPScanManager:
 
 		def blockcomp(b):
 			return b["start"]
-		self.networks.sort(key=blockcomp)		
+		self.networks.sort(key=blockcomp)
 
 		start = 1
 		for i in range(0, len(self.networks)):
@@ -33,7 +38,8 @@ class IPScanManager:
 		return self.total
 
 	def getNextIP(self):
-		return getIP(index)
+		index = self.rng.getRandom()
+		return self.getIP(index)
 
 	def getIP(self, index):
 		def binarysearch(networks, i):
