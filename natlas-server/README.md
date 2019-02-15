@@ -2,33 +2,18 @@
 
 Installing Elasticsearch
 ------------------------
-Natlas uses Elasticsearch 6.x to store all of the scan results. Unfortunately there isn't an easily automatable way to fetch the latest elasticsearch package that I've found, so you'll have to install it yourself. Alternatively, if you already have an elastic cluster that you'd like to use, you can point to it in the `.env` file with the name `ELASTICSEARCH_URL`. Otherwise, download the latest 6.x version and set it up like so.
+Natlas uses Elasticsearch 6.6 to store all of the scan results. If you want to run Elasticsearch locally on your natlas-server, simply run the `./setup-elastic.sh` script. 
 
-https://www.elastic.co/downloads/elasticsearch
-
-```
-$ sudo apt-get install default-jre
-$ sudo dpkg -i elasticsearch-XXXXXX.deb
-$ sudo systemctl start elasticsearch
-```
+Alternatively, if you already have an elastic cluster that you'd like to use, you can add it to the `.env` file with the name `ELASTICSEARCH_URL`.
 
 
 The Setup
 ------------------
-Most people will be able to just do:
+The setup script has been tested on Ubuntu 18.10:
 
 ```
-$ git clone https://github.com/natlas/natlas.git
-$ cd natlas/natlas-server/
-$ ./setup-server.sh
+$ sudo ./setup-server.sh
 ```
-
-If you run the setup script as root, it will automatically attempt to install the necessary prerequisites for you. If you run it without permissions, it will tell you what it was able to determine about setup. The following packages are necessary:
-
-- apt install python3
-- apt install python3-pip
-- apt install python3-venv
-
 
 The Config
 ------------------
@@ -38,6 +23,8 @@ Can't be changed via the web interface (only `.env`):
 
 - `SECRET_KEY` defaults to `you-should-set-a-secret-key` and you should **absolutely** set this to a secret value
 - `SQLALCHEMY_DATABASE_URI` defaults to a sqlite database in the natlas-server directory `sqlite:///metadata.db`
+- `FLASK_ENV` defaults to `production` and should not be changed unless you are developing for natlas.
+- `FLASK_APP` defaults to `natlas-server.py` and should not be changed. It's what allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.
 
 Can be changed via the web interface:
 
@@ -59,7 +46,6 @@ Initializing the Database
 The database should be initialized automatically during the `./setup-server` script, but if it is not for whatever reason, this is the manual steps required to intiialize or upgrade the database.
 
 ```
-$ cd natlas/natlas-server
 $ source venv/bin/activate
 $ export FLASK_APP=./natlas-server.py
 $ flask db upgrade
@@ -72,7 +58,6 @@ Setting the Scope
 The scope and blacklist can be set server side without using the admin interface by running the `./add-scope.py` script from within the natlas `venv` with the `--scope` and `--blacklist` arguments, respectively. These each take a file name to read scope from. You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the scope. A scope is **REQUIRED** for agents to do any work, however a blacklist is optional.
 
 ```
-$ cd natlas/natlas-server
 $ source venv/bin/activate
 $ python3 add-scope.py --scope myscopefile.txt
 $ python3 add-scope.py --blacklist myblacklist.txt
@@ -93,7 +78,6 @@ In order to get started interacting with Natlas, you'll need an administrator ac
 To create a new admin account, simply run `./add-admin.py` from within the natlas `venv` with an email as the only argument. If this email doesn't already exist in the User table, it will be created with admin privileges and a random password will be generated and spit out to the command line. If the email *does* already exist in the User table, it will be toggled to be an admin. This can be helpful if you accidentally remove yourself as an admin and can't get back into the admin interface.
 
 ```
-$ cd natlas/natlas-server
 $ source venv/bin/activate
 $ python3 add-admin.py user@example.com
 ```
@@ -113,7 +97,7 @@ As mentioned above, it is not really advisable to run the flask application dire
 To install nginx, you can simply `sudo apt-get install nginx`. Once it's installed, let's make a copy of provided nginx config:
 
 ```
-sudo cp natlas/natlas-server/deployment/nginx /etc/nginx/sites-available/natlas
+$ sudo cp natlas/natlas-server/deployment/nginx /etc/nginx/sites-available/natlas
 ```
 
 This nginx config expects that you'll be using TLS for your connections to the server. If you're hosting on the internet, letsencrypt makes this really easy. If you're not, you'll want to remove the TLS redirects. You should really be using a TLS certificate, though, even if it's only self-signed. All communications between both the users and the server, and the agents and the server will happen over this connection.  Go ahead and modify the lines that say `server_name <host>` and change `<host>` to whatever hostname your server will be listening on. Then, in the second server block, you'll want to set the `ssl_certificate` and `ssl_certificate_key` values to point to the correct SSL certificate and key. The final `location /` block is where the reverse proxying actually happens, specifically line `proxy_pass http://127.0.0.1:5000;`. 
@@ -121,4 +105,10 @@ This nginx config expects that you'll be using TLS for your connections to the s
 
 Example Systemd Unit
 ------------------
-An example systemd unit file is provided in `natlas/natlas-server/deployment/natlas-server.service`
+An example systemd unit file is provided in `deployment/natlas-server.service`. It can be installed by copying it to `/etc/systemd/system/` and reloading the systemctl daemon.
+
+```
+$ sudo cp deployment/natlas-server.service /etc/systemd/system/natlas-server.service
+$ sudo systemctl daemon-reload
+$ sudo systemctl start natlas-server
+```

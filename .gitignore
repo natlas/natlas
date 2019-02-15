@@ -2,7 +2,7 @@ venv
 *~
 __pycache__
 *.pyc
-start.log
+*.log
 data/
 metadata.db
 .env

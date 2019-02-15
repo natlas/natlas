@@ -2,10 +2,10 @@
 
 The Setup
 ------------
-To get started using the natlas-agent, you should be able to simply run `setup-agent.sh`. Similar to the server, if this script is run with permissions it will try to automatically install the necessary packages, otherwise it will simply check for their existence and alert you if something was missing.
+To get started using the natlas-agent, you should be able to simply run `setup-agent.sh`. This script requires elevated privileges in order to install the necessary packages to run an agent. This script has been tested on Ubuntu 18.10.
 
 ```
-$ ./setup-agent.sh
+$ sudo ./setup-agent.sh
 ```
 
 
@@ -25,35 +25,18 @@ Starting the Agent
 Once you've gone through the setup and made any necessary changes to the config, starting the agent is very easy:
 
 ```
-python3 natlas-agent.py
+$ source venv/bin/activate
+$ sudo python3 natlas-agent.py
 ```
 
-
-[Optional] Aquatone
-------------
-
-The Natlas agent now supports the use of Aquatone if it's available. Aquatone relies on Chrome or Chromium. [More information about installing aquatone](https://github.com/michenriksen/aquatone#installation).
-
-The setup script will check for the existence of chromium-browser and try to install it if you're running as root, however you can manually install it like so:
-
-```
-$ sudo apt install -y chromium-browser
-```
-
-
-
-[Optional] vncsnapshot
-------------
-
-The Natlas agent uses the `vncsnapshot` to gather snapshots of vnc servers it scans.  `vncsnapshot` can be found in most distribution repositories. In order to use vncsnapshot in a headless environment, we're going to take advantage of `xvfb-run`. 
-
-The setup script above will attempt to automatically install this, however you can manually install them like so:
-
-```
-$ sudo apt install -y xvfb-run vncsnapshot
-```
-
+You may want to run the agent in the background once you've confirmed everything is working. This can be achieved by running the above commands in a screen session, or alternatively (preferably) running it as a system service.
 
 Example Systemd Unit
 ------------------
-An example systemd unit is provided in `deployment/natlas-agent.service`
+An example systemd unit is provided in `deployment/natlas-agent.service`. It can be installed by copying it to `/etc/systemd/system/` and reloading the systemctl daemon.
+
+```
+$ sudo cp deployment/natlas-agent.service /etc/systemd/system/natlas-agent.service
+$ sudo systemctl daemon-reload
+$ sudo systemctl start natlas-agent
+```

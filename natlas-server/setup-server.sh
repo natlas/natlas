@@ -3,111 +3,103 @@
 export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
 
-WHOAMI=$(whoami)
-FAIL=false
-
-if [ $WHOAMI != "root" ]
-then
-    echo "[+] Setup running without permissions. System-wide changes cannot be made."
-else
-    echo "[+] Setup running with permissions. Automatic installation will be attempted."
-    echo "[+] Updating apt repositories"
-    apt-get update
+if [[ "$EUID" -ne 0 ]]; then
+  echo "[!] This script needs elevated permissions to run."
+  exit 2
 fi
 
+echo "[+] Updating apt repositories"
+apt-get update
 
-if ! id natlas >/dev/null 2>&1; then
-    echo "[!] Natlas user doesn't exist: useradd -M -N -r -s /bin/false -d /opt/natlas natlas"
-    if [ $WHOAMI == "root" ]; then
-        echo "[+] Creating natlas user"
-        useradd -M -N -r -s /bin/false -d /opt/natlas natlas
-        cat /etc/passwd | grep "natlas"
+if [ ! id natlas >/dev/null 2>&1 ]; then
+    echo "[+] Creating natlas user: useradd -M -N -r -s /bin/false -d /opt/natlas natlas"
+    useradd -M -N -r -s /bin/false -d /opt/natlas natlas
+    if [ ! id natlas >/dev/null 2>&1 ]; then
+        echo "[!] Failed to create natlas user"
     else
-        echo "[!] Natlas user doesn't exist, please create if you're using the provided systemd file"
+        echo "[+] Successfully created natlas user"
     fi
 else
-    echo "[+] natlas user exists: `cat /etc/passwd | grep natlas`"
+    echo "[+] Found natlas user"
 fi
 
 ELASTIC=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9200/_nodes)
 if [ $ELASTIC != "200" ]
 then
-    ELASTICMSG="[!] Could not detect elasticsearch running on localhost:9200. Make sure you connect the server to an elasticsearch instance"
+    ELASTICMSG="[!] Elasticsearch not found on localhost:9200: Make sure you connect natlas to an elasticsearch instance."
     echo $ELASTICMSG
 else
-    echo "[+] We got a response for http://localhost:9200/_nodes, we're assuming this is elasticsearch."
+    echo "[+] Elasticsearch found: http://localhost:9200/_nodes"
 fi
 
-if ! which python3 >/dev/null
-then
-    echo "[!] python3 not found: apt-get -y install python3.6"
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get -y install python3.6
+if ! which python3 >/dev/null; then
+    echo "[+] Installing python3: apt-get -y install python3.6"
+    apt-get -y install python3.6
+    if ! which python3 >/dev/null; then
+        echo "[!] Failed to install python3" && exit 1
     else
-        FAIL=true
+        echo "[+] Successfully installed python3: `which python3`"
     fi
 else
-    echo "[+] python3 found"
+    echo "[+] Found python3: `which python3`"
 fi
 
-if ! which pip3 >/dev/null
-then
-    echo "[!] pip3 not found: apt-get -y install python3-pip"
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get -y install python3-pip
+if ! which pip3 >/dev/null; then
+    echo "[+] Installing pip3: apt-get -y install python3-pip"
+    apt-get -y install python3-pip
+    if ! which pip3 >/dev/null; then
+        echo "[!] Failed to install pip3" && exit 2
     else
-        FAIL=true
+        echo "[+] Successfully installed python3: `which pip3`"
     fi
 else
-    echo "[+] pip3 found"
+    echo "[+] Found pip3: `which pip3`"
 fi
 
-if ! which virtualenv >/dev/null
-then
-    echo "[!] virtualenv not found: pip3 install virtualenv"
-    if [ $WHOAMI == "root" ]
-    then
-        pip3 install virtualenv
+if ! which virtualenv >/dev/null; then
+    echo "[!] Installing virtualenv: pip3 install virtualenv"
+    pip3 install virtualenv
+    if ! which virtualenv >/dev/null; then
+        echo "[!] Failed to install virtualenv" && exit 3
     else
-        FAIL=true
+        echo "[+] Successfully installed virtualenv: `which virtualenv`"
     fi
 else
-    echo "[+] virtualenv found"
+    echo "[+] Found virtualenv: `which virtualenv`"
 fi
 
-if [ $FAIL == true ]
-then
-    echo "[!] Failed during python environment setup, we can't continue!"
-    exit 1
-fi
-
-if [ ! -d venv ]
-then
+if [ ! -d venv ]; then
     echo "[+] Creating new python3 virtualenv named venv"
     virtualenv -p /usr/bin/python3 venv
+    if [ ! -d venv ]; then
+        echo "[!] Failed to create virtualenv named venv" && exit 4
+    else
+        echo "[+] Successfully created virtualenv named venv"
+    fi
+else
+    echo "[+] Found virtualenv named venv"
 fi
 
-if [ ! -e venv/bin/activate ]
-then
-    echo "[!] No venv activate script found: venv/bin/activate"
-    exit 1
+if [ ! -e venv/bin/activate ]; then
+    echo "[!] No venv activate script found: venv/bin/activate" && exit 5
+else
+    echo "[+] Entering virtual environment"
+    source venv/bin/activate
+    echo "[+] Installing/updating natlas-server python dependencies"
+    pip3 install -r requirements.txt --log pip.log -q
+    echo "[+] Initializing/upgrading metadata database"
+    echo "FLASK_APP=natlas-server.py" >> .env
+    flask db upgrade
+    echo "[+] Exiting virtual environment"
+    deactivate
 fi
 
-echo "[+] Entering virtual environment"
-source venv/bin/activate
-echo "[+] Attempting to install python dependencies"
-pip3 install -r requirements.txt
-echo "[+] Initializing metadata database"
-echo "FLASK_APP=natlas-server.py" >> .env
-flask db upgrade
-echo "[+] Populating database with default configs"
-python3 config.py
-echo "[+] Exiting virtual environment"
-deactivate
+
 echo "[+] Setup Complete"
-echo $ELASTICMSG
+echo "------------------"
+if [ ! -z ${ELASTICMSG+x} ]; then
+    echo $ELASTICMSG
+fi
 echo "[+] An example systemd script can be found in deployment/natlas-server.service"
 echo "[+] An example nginx config can be found in deployment/nginx"
 echo "[+] We highly recommend you use nginx to proxy connections to the flask application."

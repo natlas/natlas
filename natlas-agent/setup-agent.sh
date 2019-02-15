@@ -1,170 +1,145 @@
 #!/bin/bash
 # sudo bash setup-agent.sh
 
-WHOAMI=$(whoami)
-FAIL=false
 AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.4.3/aquatone_linux_amd64_1.4.3.zip'
 
-if [ $WHOAMI != "root" ]
-then
-    echo '[+] Setup running without permissions. System-wide changes cannot be made.'
-else
-    echo '[+] Setup running with permissions. Automatic installation will be attempted.'
-    echo "[+] Updating apt repositories"
-    apt-get update
+if [[ "$EUID" -ne 0 ]]; then
+  echo "[!] This script needs elevated permissions to run."
+  exit 2
 fi
 
-if ! which python3 >/dev/null
-then
-    echo '[!] Python3 not found: apt-get install -y python3.6'
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get install -y python3.6
+echo "[+] Updating apt repositories"
+apt-get update
+
+
+if ! which python3 >/dev/null; then
+    echo "[+] Installing python3: apt-get -y install python3.6"
+    apt-get -y install python3.6
+    if ! which python3 >/dev/null; then
+        echo "[!] Failed to install python3" && exit 1
     else
-        FAIL=true
+        echo "[+] Successfully installed python3: `which python3`"
     fi
 else
-	echo '[+] Python3 found'
+    echo "[+] Found python3: `which python3`"
 fi
 
-if ! which pip3 >/dev/null
-then
-    echo "[!] pip3 not found: apt-get -y install python3-pip"
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get -y install python3-pip
+if ! which pip3 >/dev/null; then
+    echo "[+] Installing pip3: apt-get -y install python3-pip"
+    apt-get -y install python3-pip
+    if ! which pip3 >/dev/null; then
+        echo "[!] Failed to install pip3" && exit 2
     else
-        FAIL=true
+        echo "[+] Successfully installed python3: `which pip3`"
     fi
 else
-    echo "[+] pip3 found"
+    echo "[+] Found pip3: `which pip3`"
 fi
 
-if ! which virtualenv >/dev/null
-then
-    echo "[!] virtualenv not found: pip3 install virtualenv"
-    if [ $WHOAMI == "root" ]
-    then
-        pip3 install virtualenv
+if ! which virtualenv >/dev/null; then
+    echo "[!] Installing virtualenv: pip3 install virtualenv"
+    pip3 install virtualenv
+    if ! which virtualenv >/dev/null; then
+        echo "[!] Failed to install virtualenv" && exit 3
     else
-        FAIL=true
+        echo "[+] Successfully installed virtualenv: `which virtualenv`"
     fi
 else
-    echo "[+] virtualenv found"
+    echo "[+] Found virtualenv: `which virtualenv`"
 fi
 
-if [ ! -d venv ]
-then
+if [ ! -d venv ]; then
     echo "[+] Creating new python3 virtualenv named venv"
     virtualenv -p /usr/bin/python3 venv
+    if [ ! -d venv ]; then
+        echo "[!] Failed to create virtualenv named venv" && exit 4
+    else
+        echo "[+] Successfully created virtualenv named venv"
+    fi
+else
+    echo "[+] Found virtualenv named venv"
 fi
 
-if [ ! -e venv/bin/activate ]
-then
-    echo "[!] No venv activate script found: venv/bin/activate"
-    exit 1
+if [ ! -e venv/bin/activate ]; then
+    echo "[!] No venv activate script found: venv/bin/activate" && exit 5
 else
     echo "[+] Entering virtual environment"
     source venv/bin/activate
-    echo "[+] Attempting to install python dependencies"
-    pip3 install -r requirements.txt
+    echo "[+] Installing/upgrading natlas-agent python dependencies"
+    pip3 install -r requirements.txt --log pip.log -q
     echo "[+] Exiting virtual environment"
     deactivate
 fi
 
-if ! which nmap >/dev/null
-then
-    echo '[!] nmap not found: apt-get install -y nmap'
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get install -y nmap
+if ! which nmap >/dev/null; then
+    echo '[+] Installing nmap: apt-get install -y nmap'
+    apt-get install -y nmap
+    if ! which nmap >/dev/null; then
+        echo "[!] Failed to install nmap" && exit 6
     else
-        FAIL=true
+        echo "[+] Successfully installed nmap: `which nmap`"
     fi
 else
-	echo '[+] nmap found'
+	echo "[+] Found nmap: `which nmap`"
 fi
 
-if ! which chromium-browser >/dev/null
-then
-    echo '[!] chromium-browser not found: apt-get install -y chromium-browser'
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get install -y chromium-browser
+if ! which chromium-browser >/dev/null; then
+    echo '[+] Installing chromium-browser: apt-get install -y chromium-browser'
+    apt-get install -y chromium-browser
+    if ! which chromium-browser >/dev/null; then
+        echo "[!] Failed to install chromium-browser" && exit 7
     else
-        FAIL=true
+        echo "[+] Successfully installed chromium-browser: `which chromium-browser`"
     fi
 else
-    echo '[+] chromium-browser found'
+    echo "[+] Found chromium-browser: `which chromium-browser`"
 fi
 
-if ! which unzip >/dev/null
-then
-    echo "[!] unzip not found: apt-get install -y unzip"
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get install -y unzip
+if ! which unzip >/dev/null; then
+    echo '[+] Installing unzip: apt-get install -y unzip'
+    apt-get install -y unzip
+    if ! which unzip >/dev/null; then
+        echo "[!] Failed to install unzip" && exit 8
     else
-        FAIL=true
+        echo "[+] Successfully installed unzip: `which unzip`"
     fi
 else
-    echo "[+] unzip found"
+    echo "[+] Found unzip: `which unzip`"
 fi
 
-if ! which aquatone >/dev/null
-then
-    AQUAMSG='[!] aquatone not found. Please install it by reviewing the instructions: https://github.com/michenriksen/aquatone#installation'
-    echo $AQUAMSG
-    if [ $WHOAMI == "root" ]
-    then
-        wget $AQUATONEURL -O /tmp/aquatone.zip && unzip /tmp/aquatone.zip -d /tmp/aquatone && cp /tmp/aquatone/aquatone /usr/local/bin/aquatone
-        rm -rf /tmp/aquatone.zip /tmp/aquatone
-        if ! which aquatone >/dev/null
-        then
-            echo "[!] Aquatone failed to install automatically"
-        else
-            echo "[+] Aquatone installed successfully"
-        fi
+if ! which xvfb-run >/dev/null; then
+    echo '[+] Installing xvfb-run: apt-get install -y xvfb'
+    apt-get install -y xvfb
+    if ! which xvfb-run >/dev/null; then
+        echo "[!] Failed to install xvfb-run" && exit 9
     else
-        FAIL=true
+        echo "[+] Successfully installed xvfb-run: `which xvfb-run`"
     fi
 else
-	echo '[+] aquatone found'
+    echo "[+] Found xvfb-run: `which xvfb-run`"
 fi
 
-if ! which xvfb-run >/dev/null
-then
-    echo '[!] xvfb not found: apt-get install -y xvfb'
-    if [ $WHOAMI == "root" ] 
-    then
-        apt-get install -y xvfb
+if ! which vncsnapshot >/dev/null; then
+    echo '[+] Installing vncsnapshot: apt-get install -y vncsnapshot'
+    apt-get install -y vncsnapshot
+    if ! which vncsnapshot >/dev/null; then
+        echo "[!] Failed to install vncsnapshot" && exit 10
     else
-        FAIL=true
+        echo "[+] Successfully installed vncsnapshot: `which vncsnapshot`"
     fi
 else
-    echo '[+] xvfb found'
+    echo "[+] Found vncsnapshot: `which vncsnapshot`"
 fi
 
-if ! which vncsnapshot >/dev/null
-then
-    echo '[!] vncsnapshot not found: apt-get install -y vncsnapshot'
-    if [ $WHOAMI == "root" ]
-    then
-        apt-get install -y vncsnapshot
+if ! which aquatone >/dev/null; then
+    echo '[+] Downloading Aquatone'
+    wget $AQUATONEURL -O /tmp/aquatone.zip -q && unzip /tmp/aquatone.zip -d /tmp/aquatone && cp /tmp/aquatone/aquatone /usr/local/bin/aquatone
+    rm -rf /tmp/aquatone.zip /tmp/aquatone
+    if ! which aquatone >/dev/null; then
+        echo "[!] Failed to install Aquatone" && exit 11
     else
-        FAIL=true
+        echo "[+] Successfully installed Aquatone: `which aquatone`"
     fi
 else
-	echo '[+] vncsnapshot found'
-fi
-
-if [ $FAIL == "true" ]
-then
-    echo '[!] Errors occurred during setup. Please review the log and make sure all dependencies are installed.'
-else
-    if ! which aquatone >/dev/null
-    then
-        echo $AQUAMSG
-    fi
-    echo '[+] Setup Complete'
+	echo "[+] Found Aquatone: `which aquatone`"
 fi
