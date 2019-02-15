@@ -88,7 +88,9 @@ else
     echo "[+] Installing/updating natlas-server python dependencies"
     pip3 install -r requirements.txt --log pip.log -q
     echo "[+] Initializing/upgrading metadata database"
-    echo "FLASK_APP=natlas-server.py" >> .env
+    if ! cat .env 2>/dev/null | grep "FLASK_APP" >/dev/null; then
+        echo "FLASK_APP=natlas-server.py" >> .env
+    fi
     flask db upgrade
     echo "[+] Exiting virtual environment"
     deactivate
