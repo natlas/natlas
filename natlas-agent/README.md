@@ -11,7 +11,7 @@ $ sudo ./setup-agent.sh
 
 The Config
 ------------
-To make modifications to your agent, you can modify environment variables to match your specifications. Available options include:
+To make modifications to your agent, you can modify environment variables to match your specifications. These options can be placed in a file called `.env` in the `natlas-agent` directory. Available options include:
 
 - `NATLAS_SERVER_ADDRESS` defaults to `http://127.0.0.1:5000` - The server to get work from and submit work to.
 - `NATLAS_MAX_THREADS` defaults to `3` - Maximum number of concurrent scanning threads

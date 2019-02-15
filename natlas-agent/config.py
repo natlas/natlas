@@ -1,6 +1,10 @@
 import os
+from dotenv import load_dotenv
 
 class Config:
+
+    BASEDIR = os.path.abspath(os.path.dirname(__file__))
+    load_dotenv(os.path.join(BASEDIR, '.env'))
 
     def __init__(self):
         self.server = os.environ.get('NATLAS_SERVER_ADDRESS') or 'http://127.0.0.1:5000' # url of server to get/submit work to
