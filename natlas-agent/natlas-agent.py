@@ -22,6 +22,8 @@ from config import Config
 
 import ipaddress
 
+ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
+
 config = Config()
 MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
 
@@ -116,7 +118,7 @@ def scan(target_data=None):
     
     if not validate_target(target_data["target"]):
         print("[!] Failed to validate target %s" % target_data["target"])
-        return False
+        return ERR["INVALIDTARGET"]
     print("[+] Target: %s" % target_data["target"])
     print("[+] Scan ID: %s" % target_data["scan_id"])
     
@@ -139,8 +141,9 @@ def scan(target_data=None):
         out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
     except:
         try:
-            print("[+] (%s) Killing slacker process" % scan_id)
+            print("[!] (%s) Scan timed out" % scan_id)
             process.kill()
+            return ERR["SCANTIMEOUT"]
         except:
             pass
 
@@ -149,18 +152,22 @@ def scan(target_data=None):
     result = {}
     result['scan_id'] = scan_id
     for ext in 'nmap', 'gnmap', 'xml':
-        result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
-        os.remove("data/natlas."+scan_id+"."+ext)
-        print("[+] (%s) Cleaning up: natlas.%s.%s" % (scan_id, scan_id, ext))
+        try: 
+            result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
+            os.remove("data/natlas."+scan_id+"."+ext)
+            print("[+] (%s) Cleaning up: natlas.%s.%s" % (scan_id, scan_id, ext))
+        except:
+            print("[!] (%s) Nmap data not found" % scan_id)
+            return ERR["DATANOTFOUND"]
 
     if len(result['nmap_data']) < 250:
         print("[!] (%s) Nmap data is too short" % scan_id)
-        return
+        return ERR["INVALIDDATA"]
     elif 'Nmap scan report for' not in result['nmap_data']: # checking for this on the agent saves bandwidth
         print("[!] (%s) Nmap scan report not found" % scan_id)
-        return
+        return ERR["INVALIDDATA"]
     else:
-        print("[+] (%s) scan size: %s" % (scan_id, len(result['nmap_data'])))
+        print("[+] (%s) Scan size: %s" % (scan_id, len(result['nmap_data'])))
 
     if RTTVAR_MSG in result['nmap_data']:
         orig_data = result['nmap_data'].splitlines()
@@ -220,10 +227,12 @@ class ThreadScan(threading.Thread):
     def run(self):
         while True:
             target_data = self.queue.get()
-            scan(target_data)
+            result = scan(target_data)
             self.queue.task_done()
 
 def main():
+    if not os.geteuid() == 0:
+        raise SystemExit("Please run as a privileged user in order to use nmap's features.")
     if not os.path.isdir("data"):
         os.mkdir("data")
 
@@ -238,14 +247,14 @@ def main():
     q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
     servicesSha = ""
-
-    if os.path.isfile("natlas-services"):
-        servicesSha = hashlib.sha256(open("natlas-services", "r").read().rstrip('\r\n').encode()).hexdigest()
+    BASEDIR = os.path.abspath(os.path.dirname(__file__))
+    SERVICESPATH = os.path.join(BASEDIR, "natlas-services")
+    if os.path.isfile(SERVICESPATH):
+        servicesSha = hashlib.sha256(open(SERVICESPATH, "r").read().rstrip('\r\n').encode()).hexdigest()
     else:
         servicesSha = get_services_file()
         if not servicesSha:
-            print("[!] Failed to get valid services file from %s" % config.server)
-            return False
+            raise SystemExit("[!] Failed to get valid services file from %s" % config.server)
 
     # Start threads that will wait for items in queue and then scan them
     for i in range(int(config.max_threads)):
