@@ -33,6 +33,8 @@ server {
         add_header X-Robots-Tag none;
 #        add_header Strict-Transport-Security "max-age=31536000"; # enable this after you've confirmed things are working
 
+        client_max_body_size 10M;
+
         location / {
                 proxy_set_header Host $host;
                 proxy_set_header REMOTE_ADDR $remote_addr;
