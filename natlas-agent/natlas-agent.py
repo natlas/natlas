@@ -217,7 +217,7 @@ def scan(target_data=None):
     # submit result
     print("[+] (%s) Submitting work" % scan_id)
     response = backoff_request(endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
-    print("[+] (%s) Response: %s" % (scan_id, response.status_code))
+    print("[+] (%s) Response: %s" % (scan_id, response.text))
 
 class ThreadScan(threading.Thread):
     def __init__(self, queue):
@@ -262,19 +262,21 @@ def main():
         t.setDaemon(True)
         t.start()
 
+    # Use a default agent config of all options enabled if we are in standalone mode
+    defaultAgentConfig = {"id": 0, "versionDetection": True, "osDetection": True, "defaultScripts": True, "onlyOpens": True, "scanTimeout": 300, "webScreenshots": True, "vncScreenshots": True}
     if args.target:
         print("[+] Scanning: %s" % args.target)
 
         targetNetwork = ipaddress.ip_interface(args.target)
         if targetNetwork.with_prefixlen.endswith('/32'):
             scan_id = generate_scan_id()
-            target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id}
+            target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id, "agent_config":defaultAgentConfig}
             q.put(target_data)
         else:    
             # Iterate over usable hosts in target, queue.put will block until a queue slot is available
             for t in targetNetwork.network.hosts(): 
                 scan_id = generate_scan_id()
-                target_data = {"target": str(t), "scan_id": scan_id}
+                target_data = {"target": str(t), "scan_id": scan_id, "agent_config":defaultAgentConfig}
                 q.put(target_data)
 
         q.join()
@@ -288,12 +290,12 @@ def main():
             targetNetwork = ipaddress.ip_interface(target.strip())
             if targetNetwork.with_prefixlen.endswith('/32'):
                 scan_id = generate_scan_id()
-                target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id}
+                target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id, "agent_config":defaultAgentConfig}
                 q.put(target_data)
             else:
                 for t in targetNetwork.network.hosts():
                     scan_id = generate_scan_id()
-                    target_data = {"target": str(t), "scan_id": scan_id}
+                    target_data = {"target": str(t), "scan_id": scan_id, "agent_config":defaultAgentConfig}
                     q.put(target_data)
         q.join()
         print("[+] Finished scanning the target file %s" % args.tfile)
