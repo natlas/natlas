@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
 from flask_mail import Mail
+from flask_wtf.csrf import CSRFProtect
 from config import Config, populate_defaults
 from app.elastic import Elastic
 from app.scope import ScopeManager
@@ -24,6 +25,7 @@ login.session_protection = "strong"
 mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
+csrf = CSRFProtect()
 
 @login.unauthorized_handler
 def unauthorized():
@@ -44,6 +46,7 @@ def create_app(config_class=Config, load_config=False):
     migrate.init_app(app,db)
     login.init_app(app)
     mail.init_app(app)
+    csrf.init_app(app)
 
     if load_config:
         print("Loading Config from database")
@@ -118,6 +121,7 @@ def create_app(config_class=Config, load_config=False):
 
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
+    csrf.exempt(api_bp)
 
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
