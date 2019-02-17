@@ -1,5 +1,5 @@
 <div class="row host-row">
-  <div class="col-xs-6 col-sm-3">
+  <div class="col-xs-12 col-sm-4 col-md-3">
     {% if pagetype == 'search' %}
       <h3><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
     {% endif %}
@@ -17,9 +17,9 @@
     <h4>Scan ID</h4> 
     <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a>
     <h4>Export</h4>
-    <a class="btn btn-primary btn-block" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">XML</a>
-    <a class="btn btn-primary btn-block" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">nmap</a>
-    <a class="btn btn-primary btn-block" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">gnmap</a>
+    <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>
+    <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>
+    <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>
     {% endif %}
     {% if host.headshot %}
       <h5>Unknown Headshot</h5>
@@ -38,7 +38,7 @@
       <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div></br>
     {% endif %}
   </div>
-  <div class="col-xs-12 col-sm-9">
+  <div class="col-xs-12 col-sm-8 col-md-9">
       {% set lines = host.nmap_data.split('\n') %}
       {% if lines|length > current_user.preview_length and pagetype in ('multi', 'search') %}
         {% set nmap_preview = [] %}
