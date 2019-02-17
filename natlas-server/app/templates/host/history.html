@@ -5,16 +5,12 @@
 {% block content %}
   <div class="row">
     {% include 'host/_header.html' %}
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <tbody>
-          {% for host in hosts %}
-            {% include 'host/_host-row.html' %}
-          {% endfor %}
-        </tbody>
-      </table>
-      {% include 'host/_imagemodal.html' %}
-    </div>
+  </div>
+  {% for host in hosts %}
+    {% include 'host/_host-row.html' %}
+  {% endfor %}
+  {% include 'host/_imagemodal.html' %}
+  <div class="row">
     {% include 'includes/pagination.html' %}
   </div>
 {% endblock %}

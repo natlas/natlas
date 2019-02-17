@@ -108,14 +108,6 @@ body {
   margin-top: 0;
 }
 
-.data-column {
-  width:80%;
-}
-
-.info-column {
-  width:20%;
-}
-
 .nmap_data {
   white-space: pre-wrap;
   margin-bottom:0px;
@@ -200,4 +192,15 @@ form.config-form>div, form.pwchange-form>div {
 
 .services-box {
   max-height:20em;
+}
+
+.host-row:nth-child(odd) {
+  background-color: #f9f9f9;
+  border-top: 1px solid #f0f0f0;
+  margin-top:1em;
+}
+
+img.screenshot-thumb {
+  max-width:200px;
+  width:100%;
 }
