@@ -15,7 +15,12 @@
     {% endif %}
     {% if host.scan_id %}
     <h4>Scan ID</h4> 
+    <span class="scan-id">
     <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a>
+    {% if current_user.is_admin and pagetype =='single' %}
+    <form method="POST" class="inline-submit" action="{{ url_for('admin.deleteScan', scan_id=host.scan_id) }}">{{ delForm.hidden_tag() }} <button class="glyphicon glyphicon-trash red btn-trash" id="deleteScan" name="deleteScan" title="Delete Scan" aria-hidden="true" onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')" type="submit" ></button></form>
+    {% endif %}
+  </span>
     <h4>Export</h4>
     <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>
     <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>

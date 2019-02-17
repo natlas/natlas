@@ -80,3 +80,37 @@ class Elastic:
         if result['hits']['total'] == 0:
             return 0, None
         return result['hits']['total'], result['hits']['hits'][0]['_source']
+
+
+    def delete_scan(self, scan_id):
+        if not self.status:
+            return -1
+
+        migrate = False
+        hostResult = self.es.search(index='nmap', doc_type='_doc', body={"size": 1, "query": {
+                                "query_string": {'query': scan_id, "fields": ["scan_id"]}}})
+        if hostResult['hits']['total'] != 0:
+            # we're deleting the most recent scan result and need to pull the next most recent into the nmap index
+            # otherwise you won't find the host when doing searches or browsing
+            ipaddr = hostResult['hits']['hits'][0]['_source']['ip']
+            twoscans = self.es.search(index="nmap_history", doc_type="_doc", body={"size":2, "query": {
+                           "query_string": {"query": ipaddr, "fields": ["ip"]}}, "sort": {"ctime": {"order": "desc"}}})
+
+            if len(twoscans['hits']['hits']) != 2:
+                # we're deleting the only scan for this host so we don't need to migrate old scan data into the nmap index
+                migrate = False
+            else:
+                migrate = True
+        result = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body={"query": {
+                                 "query_string": {"query": scan_id, "fields": ["scan_id"], "default_operator": "AND"}}})
+        if migrate:
+            self.es.index(index='nmap', doc_type='_doc', id=ipaddr, body=twoscans['hits']['hits'][1]['_source'])
+        return result["deleted"]
+
+    def delete_host(self, ip):
+        if not self.status:
+            return -1
+
+        deleted = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body={"query": {
+                                "query_string": {'query': ip, "fields": ["ip", "id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+        return deleted["deleted"]

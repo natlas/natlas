@@ -3,6 +3,7 @@ from flask_login import current_user
 from app.main import bp
 from app.util import hostinfo
 from app.auth.wrappers import isAuthenticated, isAdmin
+from app.admin.forms import DeleteForm
 
 @bp.route('/')
 @isAuthenticated
@@ -16,6 +17,7 @@ def search():
     page = int(request.args.get('p', 1))
     format = request.args.get('f', '')
     scan_ids = request.args.get('s', '')
+    
 
     searchOffset = current_user.results_per_page * (page-1)
     count, context = current_app.elastic.search(query, current_user.results_per_page, searchOffset)
@@ -42,7 +44,9 @@ def search():
 @isAuthenticated
 def host(ip):
     info, context = hostinfo(ip)
-    return render_template("host/summary.html", **context, host=context, info=info)
+    delForm = DeleteForm()
+    delHostForm = DeleteForm()
+    return render_template("host/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm)
 
 
 @bp.route('/host/<ip>/history')
@@ -52,6 +56,8 @@ def host_history(ip):
     info, context = hostinfo(ip)
     page = int(request.args.get('p', 1))
     searchOffset = current_user.results_per_page * (page-1)
+    
+    delHostForm = DeleteForm()
 
     count, context = current_app.elastic.gethost_history(
         ip, current_user.results_per_page, searchOffset)
@@ -62,15 +68,16 @@ def host_history(ip):
     prev_url = url_for('main.host_history', ip=ip, p=page - 1) \
         if page > 1 else None
 
-    return render_template("host/history.html", ip=ip, info=info, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
+    return render_template("host/history.html", ip=ip, info=info, page=page, hosts=context, next_url=next_url, prev_url=prev_url, delHostForm=delHostForm)
 
 @bp.route('/host/<ip>/<scan_id>')
 @isAuthenticated
 def host_historical_result(ip, scan_id):
-
+    delForm = DeleteForm()
+    delHostForm = DeleteForm()
     info, context = hostinfo(ip)
     count, context = current_app.elastic.gethost_scan_id(scan_id)
-    return render_template("host/summary.html", host=context, info=info, **context)
+    return render_template("host/summary.html", host=context, info=info, **context, delForm=delForm, delHostForm=delHostForm)
 
 @bp.route('/host/<ip>/<scan_id>.xml')
 @isAuthenticated
@@ -97,6 +104,6 @@ def export_scan_gnmap(ip, scan_id):
 @bp.route('/host/<ip>/headshots/')
 @isAuthenticated
 def host_headshots(ip):
-
+    delHostForm = DeleteForm()
     info, context = hostinfo(ip)
-    return render_template("host/headshots.html", **context, info=info)
+    return render_template("host/headshots.html", **context, info=info, delHostForm=delHostForm)

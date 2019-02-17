@@ -1,6 +1,6 @@
 import ipaddress
 from app.models import ScopeItem
-from flask import current_app
+from flask import current_app, abort
 
 
 def hostinfo(ip):

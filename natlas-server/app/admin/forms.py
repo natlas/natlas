@@ -97,3 +97,6 @@ class AgentConfigForm(FlaskForm):
     webScreenshots = BooleanField("Enable Web Screenshots")
     vncScreenshots = BooleanField("Enable VNC Screenshots")
     updateAgents = SubmitField("Update Agent Config")
+
+class DeleteForm(FlaskForm):
+    delete = SubmitField("Delete")

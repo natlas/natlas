@@ -145,3 +145,14 @@ form.config-form>div, form.pwchange-form>div {
 .btn-export {
   max-width:100px;
 }
+
+.btn-trash {
+  background:none;
+  border:none;
+  padding:0;
+}
+
+.inline-submit {
+  display:inline-block;
+  margin:0;
+}
