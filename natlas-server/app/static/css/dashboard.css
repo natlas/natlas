@@ -23,9 +23,11 @@ body {
  * Global add-ons
  */
 
-.sub-header {
-  padding-bottom: 10px;
+.search-header {
   border-bottom: 1px solid #eee;
+}
+.pagenav {
+  display:inline-block;
 }
 
 /*
@@ -153,7 +155,6 @@ form.config-form>div, form.pwchange-form>div {
 .host-row:nth-child(odd) {
   background-color: #f9f9f9;
   border-top: 1px solid #f0f0f0;
-  margin-top:1em;
 }
 
 .btn-export {
