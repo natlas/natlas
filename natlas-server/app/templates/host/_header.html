@@ -1,18 +1,29 @@
-<div class="page-header">
-    <h1>{{ ip }} <small>{% if pagetype=='single' %}- {{ host.scan_id }}{% endif %}</small>
+<div class="row page-header">
+    <h1>{{ ip }}
     {% if current_user.is_admin %}
-    <form method="POST" class="inline-submit" action="{{ url_for('admin.deleteHost', ip=host.ip) }}">{{ delHostForm.hidden_tag() }} <button class="glyphicon glyphicon-trash red btn-trash" id="deleteHost" name="deleteHost" title="Delete Host" aria-hidden="true" onclick="return confirm('Are you sure you want to delete host: {{ host.ip }}')" type="submit" ></button></form>
+    <form method="POST" class="inline-submit" action="{{ url_for('admin.deleteHost', ip=ip) }}">{{ delHostForm.hidden_tag() }} <button class="red btn-trash" id="deleteHost" name="deleteHost" title="Delete Host" aria-hidden="true" onclick="return confirm('Are you sure you want to delete host: {{ ip }}')" type="submit" ><i class="fas fa-trash-alt"></i></button></form>
     {% endif %}
     </h1>
 </div>
-<ul class="nav nav-tabs host-nav" role="tablist">
-  <li role="presentation" class="{{ 'active' if active_page == 'summary' else '' }}">
-  	<a id="summary" href="{{ url_for('main.host', ip=ip) }}">Summary</a>
-  </li>
-  <li role="presentation" class="{{ 'active' if active_page == 'history' else '' }}">
-  	<a id="history" href="{{ url_for('main.host_history', ip=ip) }}">History <span class="badge">{{ info.history }}</span></a>
-  </li>
-  <li role="presentation" class="{{ 'active' if active_page == 'headshots' else '' }}">
-  	<a id="headshots" href="{{ url_for('main.host_headshots', ip=ip) }}">Headshots <span class="badge">{{ info.headshots }}</span></a>
-  </li>
-</ul>
+{% if pagetype=='single' %}
+    <div class="row mb-3">
+        <small class="text-muted"><strong>Scan ID:</strong> {{ host.scan_id }}
+        {% if current_user.is_admin %}
+        <form method="POST" class="inline-submit" action="{{ url_for('admin.deleteScan', scan_id=host.scan_id) }}">{{ delForm.hidden_tag() }} <button class="red btn-trash" id="deleteScan" name="deleteScan" title="Delete Scan" aria-hidden="true" onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')" type="submit" ><i class="fas fa-trash-alt"></i></button></form>
+        {% endif %}
+        </small>
+    </div>
+{% endif %}
+<div class="row">
+  <ul class="nav nav-tabs host-nav">
+    <li role="presentation" class="nav-item">
+    	<a id="summary" class="nav-link{{ ' active' if active_page == 'summary' }}" href="{{ url_for('main.host', ip=ip) }}">Summary</a>
+    </li>
+    <li role="presentation" class="nav-item">
+    	<a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('main.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
+    </li>
+    <li role="presentation" class="nav-item">
+    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'headshots' }}" href="{{ url_for('main.host_headshots', ip=ip) }}">Headshots <span class="badge badge-dark">{{ info.headshots }}</span></a>
+    </li>
+  </ul>
+</div>

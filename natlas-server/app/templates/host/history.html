@@ -3,9 +3,7 @@
 {% set active_page = "history" %}
 {% set pagetype = 'multi' %}
 {% block content %}
-  <div class="row">
-    {% include 'host/_header.html' %}
-  </div>
+  {% include 'host/_header.html' %}
   {% for host in hosts %}
     {% include 'host/_host-row.html' %}
   {% endfor %}

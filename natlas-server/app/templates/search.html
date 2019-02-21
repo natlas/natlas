@@ -8,15 +8,17 @@
 
 {% block content %}
   <div class="row">
-    {% include 'includes/pagination.html' %}
-
+    <div class="col">
     {% if query != '' %}
       <h2 class="sub-header">{{numresults}} search results for '{{query}}'
       <a href="?q={{query}}&p={{page}}&f=hostlist"> [hostlist]</a></h2>
     {% else %}
       <h2 class="sub-header">{{numresults}} hosts scanned</h2>
     {% endif %}
+    {% include 'includes/pagination.html' %}
+    </div>
   </div>
+  
   {% for host in hosts %}
     {% include 'host/_host-row.html' %}
   {% endfor %}

@@ -3,10 +3,21 @@
  */
 
 /* Move down content because we have a fixed navbar that is 50px tall */
-body {
-  padding-top: 50px;
+html {
+  height:100%;
+  box-sizing: border-box;
 }
-
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+body {
+  position:relative;
+  min-height:100%;
+}
+.main-content{
+  padding-top:100px;
+  padding-bottom:100px;
+}
 
 /*
  * Global add-ons
@@ -29,16 +40,19 @@ body {
  * Footer
  */
 .global-footer {
+  position: absolute;
+  right:0;
+  bottom:0;
+  left:0;
+  padding: 1rem;
   text-align:left;
-  padding-top:50px;
-  padding-bottom:50px;
   margin-top:100px;
   color:#99979c;
   background-color:#222;
 }
 .footer-links {
   padding-left:0;
-  margin-bottom:20px;
+  margin-bottom:0;
 }
 .footer-links li {
   display:inline-block;
@@ -60,14 +74,14 @@ body {
   margin-top:1em;
 }
 .preview_nmap {
-  background-color:rgba(0,0,0,0.5);
+  background-color:rgba(0,0,0,0.75);
   text-align:center;
   line-height:4em;
   margin-top:-4em;
   color:#fff;
 }
 .preview_nmap:hover {
-  background-color:rgba(0,0,0,0.75);
+  background-color:rgba(0,0,0,1);
 }
 a.preview_link, a:hover.preview_link {
   color:#fff;

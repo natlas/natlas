@@ -1,23 +1,25 @@
-<div class="page-header">
+<div class="row page-header">
     <h1>Admin Panel</h1>
 </div>
+<div class="row">
 <ul class="nav nav-tabs host-nav" role="tablist">
-  <li role="presentation" class="{{ 'active' if active_page == 'config' else '' }}">
-  	<a id="nav-summary" href="{{ url_for('admin.admin') }}">Config</a>
+  <li class="nav-item" role="presentation">
+    <a id="nav-summary" class="nav-link{{ ' active' if active_page == 'config' }}" href="{{ url_for('admin.admin') }}">Config</a>
   </li>
-  <li role="presentation" class="{{ 'active' if active_page == 'users' else '' }}">
-  	<a id="nav-users" href="{{ url_for('admin.users') }}">Users</a>
+  <li class="nav-item" role="presentation">
+  	<a class="nav-link{{ ' active' if active_page == 'users' }}" id="nav-users" href="{{ url_for('admin.users') }}">Users</a>
   </li>
-  <li role="presentation" class="{{ 'active' if active_page == 'scope' else '' }}">
-  	<a id="nav-scope" href="{{ url_for('admin.scope') }}">Scope</a>
+  <li class="nav-item" role="presentation">
+  	<a class="nav-link{{ ' active' if active_page == 'scope' }}" id="nav-scope" href="{{ url_for('admin.scope') }}">Scope</a>
   </li>
-  <li role="presentation" class="{{ 'active' if active_page == 'blacklist' else '' }}">
-    <a id="nav-blacklist" href="{{ url_for('admin.blacklist') }}">Blacklist</a>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link{{ ' active' if active_page == 'blacklist' }}" id="nav-blacklist" href="{{ url_for('admin.blacklist') }}">Blacklist</a>
   </li>
-  <li role="presentation" class="{{ 'active' if active_page == 'services' else '' }}">
-    <a id="nav-services" href="{{ url_for('admin.services') }}">Services</a>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link{{ ' active' if active_page == 'services' }}" id="nav-services" href="{{ url_for('admin.services') }}">Services</a>
   </li>
-  <li role="presentation" class="{{ 'active' if active_page == 'agents' else '' }}">
-    <a id="nav-agents" href="{{ url_for('admin.agentConfig') }}">Agents</a>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link{{ ' active' if active_page == 'agents' }}" id="nav-agents" href="{{ url_for('admin.agentConfig') }}">Agents</a>
   </li>
 </ul>
+</div>

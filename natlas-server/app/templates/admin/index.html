@@ -2,18 +2,21 @@
 {% set title = "Manage Configuration" %}
 {% set active_page = "config" %}
 {% block content %}
-  <div class="row">
-    {% include 'admin/_header.html' %}
+  {% include 'admin/_header.html' %}
+   <div class="row">
+    <div class="col">
     <form class="form config-form" action="" method="post">
     	<legend>General Settings</legend>
     	{{ configForm.hidden_tag() }}
-    	<div class="checkbox">
-            <label>{{ configForm.login_required(checked=configItems["LOGIN_REQUIRED"], class="") }} {{ configForm.login_required.label(class="control-label config-form") }}</label>
+    	<div class="form-check">
+            {{ configForm.login_required(checked=configItems["LOGIN_REQUIRED"], class="form-check-input", id="loginRequired") }} 
+            {{ configForm.login_required.label(class="form-check-label", for="loginRequired") }}
         </div>
-        <div class="checkbox">
-            <label>{{ configForm.register_allowed(checked=configItems["REGISTER_ALLOWED"], class="") }} {{ configForm.register_allowed.label(class="control-label config-form") }}</label>
+        <div class="form-check">
+            {{ configForm.register_allowed(checked=configItems["REGISTER_ALLOWED"], class="form-check-input", id="registerAllowed") }} 
+            {{ configForm.register_allowed.label(class="form-check-label", for="registerAllowed") }}
         </div>
-    	<div class="input-group">
+    	<div class="form-group">
     		{{ configForm.elasticsearch_url.label(class="control-label") }}
     		{{ configForm.elasticsearch_url(value=configItems["ELASTICSEARCH_URL"], class="form-control", placeholder="http://localhost:9200") }}
             {% for error in configForm.elasticsearch_url.errors %}
@@ -21,33 +24,37 @@
             {% endfor %}
     	</div>
     	<legend>Mail Settings</legend>
-    	<span id="helpBlock" class="help-block">Mail settings are used to send invitation emails and password resets.</span>
-    	<div class="input-group">
+    	<small id="mailSettingsHelp" class="form-text text-muted">Mail settings are used to send invitation emails and password resets.</small>
+    	<div class="form-group">
     		{{ configForm.mail_from.label(class="control-label") }}
     		{{ configForm.mail_from(value=configItems["MAIL_FROM"], class="form-control") }}
     	</div>
-    	<div class="input-group">
+    	<div class="form-group">
     		{{ configForm.mail_server.label(class="control-label") }}
     		{{ configForm.mail_server(value=configItems["MAIL_SERVER"], class="form-control") }}
     	</div>
-    	<div class="input-group">
+    	<div class="form-group">
     		{{ configForm.mail_port.label(class="control-label") }}
     		{{ configForm.mail_port(value=configItems["MAIL_PORT"], class="form-control") }}
     	</div>
-    	<div class="checkbox">
-            <label>{{ configForm.mail_use_tls(checked=configItems["MAIL_USE_TLS"], class="") }} {{ configForm.mail_use_tls.label(class="control-label config-form") }}</label>
+    	<div class="form-check">
+            {{ configForm.mail_use_tls(checked=configItems["MAIL_USE_TLS"], class="form-check-input") }} 
+            {{ configForm.mail_use_tls.label(class="form-check-label") }}
         </div>
-    	<div class="input-group">
+    	<div class="form-group">
     		{{ configForm.mail_username.label(class="control-label") }}
     		{{ configForm.mail_username(value=configItems["MAIL_USERNAME"], class="form-control", readonly="readonly", onfocus="javascript: this.removeAttribute('readonly')") }}
-    		<span id="helpBlock" class="help-block">Click the field to make changes</span>
+    		<small id="usernameHelpBlock" class="form-text text-muted">Click the field to make changes</small>
     	</div>
-    	<div class="input-group">
+    	<div class="form-group">
     		{{ configForm.mail_password.label(class="control-label") }}
     		{{ configForm.mail_password(value=configItems["MAIL_PASSWORD"], class="form-control", readonly="readonly", onfocus="javascript: this.removeAttribute('readonly')") }}
-    		<span id="helpBlock" class="help-block">Click the field to make changes</span>
+    		<small id="passwordHelpBlock" class="form-text text-muted">Click the field to make changes</small>
     	</div>
     	{{ configForm.submit(class="btn btn-primary") }}
     </form>
-  </div>
+    </div>
+    <div class="col">
+    </div>
+</div>
 {% endblock %}

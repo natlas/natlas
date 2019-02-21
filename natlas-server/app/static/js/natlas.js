@@ -5,3 +5,8 @@ $(function() {
 			$('#imagemodal').modal('show');   
 		});		
 });
+
+
+$(document).ready(function() {
+    $('.dataTable').DataTable();
+});

@@ -9,49 +9,47 @@
     <div class="col-xs-12 col-md-3">
       <legend>Nmap Config</legend>
       {{ agentForm.hidden_tag() }} 
-        <div class="checkbox">
-            <label>
-            {{ agentForm.versionDetection }}
-            {{ agentForm.versionDetection.label(class="control-label config-form") }}
-            </label> 
+        <div class="form-check">
+            {{ agentForm.versionDetection(class="form-check-input") }}
+            {{ agentForm.versionDetection.label(class="form-check-label") }}
         </div>
-        <div class="checkbox">
+        <div class="form-check">
             <label>
-            {{ agentForm.osDetection }}
-            {{ agentForm.osDetection.label(class="control-label config-form") }}
+            {{ agentForm.osDetection(class="form-check-input") }}
+            {{ agentForm.osDetection.label(class="form-check-label") }}
           </label>
         </div>
-        <div class="checkbox">
+        <div class="form-check">
             <label>
-            {{ agentForm.defaultScripts }} 
-            {{ agentForm.defaultScripts.label(class="control-label config-form") }}</label>
+            {{ agentForm.defaultScripts(class="form-check-input") }} 
+            {{ agentForm.defaultScripts.label(class="form-check-label") }}</label>
         </div>
-        <div class="checkbox">
+        <div class="form-check">
             <label>
-            {{ agentForm.onlyOpens }} 
-            {{ agentForm.onlyOpens.label(class="control-label config-form") }}
+            {{ agentForm.onlyOpens(class="form-check-input") }} 
+            {{ agentForm.onlyOpens.label(class="form-check-label") }}
           </label>
         </div>
         <div class="form-group">
           {{ agentForm.scanTimeout.label }}
           <div class="input-group">
             {{ agentForm.scanTimeout(class="form-control", placeholder="300")}}
-            <div class="input-group-addon">seconds</div>
+            <div class="input-group-append"><div class="input-group-text">seconds</div></div>
           </div>
         </div>
       </div>
       <div class="col-xs-12 col-md-3">
         <legend>Screenshot Settings</legend>
-        <div class="checkbox">
+        <div class="form-check">
             <label>
-            {{ agentForm.webScreenshots }} 
-          {{ agentForm.webScreenshots.label(class="control-label config-form") }}
+            {{ agentForm.webScreenshots(class="form-check-input") }} 
+          {{ agentForm.webScreenshots.label(class="form-check-label") }}
         </label>
         </div>
-        <div class="checkbox">
+        <div class="form-check">
             <label>
-              {{ agentForm.vncScreenshots }}
-             {{ agentForm.vncScreenshots.label(class="control-label config-form") }}
+              {{ agentForm.vncScreenshots(class="form-check-input") }}
+             {{ agentForm.vncScreenshots.label(class="form-check-label") }}
            </label>
         </div>
       </div>
