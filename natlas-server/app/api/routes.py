@@ -1,12 +1,12 @@
 from flask import current_app, request
 import random, os, json, ipaddress, string
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.models import NatlasServices
 from app.api import bp
 from app.util import isAcceptableTarget
-from app.nmap_parser import NmapParser
+from libnmap.parser import NmapParser
 
 @bp.route('/getwork', methods=['GET'])
 def getwork():
@@ -39,29 +39,49 @@ def getwork():
 
 @bp.route('/submit', methods=['POST'])
 def submit():
-    nmap = NmapParser()
+    
     data = request.get_json()
-
+    
     newhost = {}
     newhost = json.loads(data)
+    nmap = NmapParser.parse(newhost['xml_data'])
+    
+    # Some quick checks to ensure there are hosts in the scan data
+    if len(nmap.hosts) < 1:
+        return "[!] No hosts found in scan data"
+    elif len(nmap.hosts) > 1:
+        return "[!] Too many hosts found in scan data"
 
-    if not nmap.has_scan_report(newhost['nmap_data']):
-        return "[!] No scan report found! Make sure your scan includes \"%s\"" % nmap.REPORT
+    newhost['ip'] = nmap.hosts[0].address
+    if not isAcceptableTarget(newhost['ip']):
+        return "[!] This address isn't in our authorized scope!"
 
-    try:
-        newhost['ip'] = nmap.get_ip(newhost['nmap_data'])
-        if not isAcceptableTarget(newhost['ip']):
-            return "[!] This address isn't in our authorized scope!"
-        newhost['hostname'] = nmap.get_hostname(newhost['nmap_data'])
-        newhost['ports'] = str(nmap.get_ports(newhost['nmap_data']))
-        newhost['ctime'] = datetime.now()
-    except Exception as e:
-        return "[!] Couldn't find necessary nmap_data\n" + str(e)
+    if len(nmap.hosts[0].hostnames) > 0:
+        newhost['hostname'] = nmap.hosts[0].hostnames[0]
+    else:
+        newhost['hostname'] = ''
 
-    if len(newhost['ports']) == 0:
+    newhost['ctime'] = datetime.now(timezone.utc)
+    newhost['is_up'] = nmap.hosts[0].is_up()
+    if not newhost['is_up']:
+        current_app.elastic.newhost(newhost)
+        return "[+] Thanks for telling us that this host is down" + newhost['ip']
+
+    tmpports = []
+    newhost['structured_ports'] = {'tcp': {}, 'udp': {}}
+    for port in nmap.hosts[0].get_ports():
+        tmpports.append(str(port[0]))
+        nmapservice = nmap.hosts[0].get_service(port[0])
+        newhost['structured_ports'][port[1]][port[0]] = nmapservice.get_dict()
+        if nmapservice.scripts_results:
+            newhost['structured_ports'][port[1]][port[0]]['scripts_results'] = nmapservice.scripts_results
+    
+    newhost['ports'] = ', '.join(tmpports) 
+
+    if len(newhost['structured_ports']['tcp']) == 0 and len(newhost['structured_ports']['udp']) == 0:
         return "[!] No open ports found!"
 
-    if len(newhost['ports']) > 500:
+    if len(newhost['structured_ports']['tcp']) + len(newhost['structured_ports']['udp']) > 500:
         return "[!] More than 500 ports found. This is probably an IDS/IPS. We're going to throw the data out."
 
     current_app.elastic.newhost(newhost)

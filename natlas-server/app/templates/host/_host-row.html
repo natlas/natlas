@@ -11,7 +11,7 @@
     {% endif %}
     {% if host.ctime %}
     <h4>Date Added</h4>
-    <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }} UTC">{{ host.ctime | ctime }}</time>
+    <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
     {% endif %}
     {% if host.scan_id %}
     <h4>Scan ID</h4> 

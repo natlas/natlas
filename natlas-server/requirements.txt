@@ -19,6 +19,7 @@ PyJWT==1.7.1
 python-dateutil==2.7.5
 python-dotenv==0.10.1
 python-editor==1.0.3
+python-libnmap==0.7.0
 six==1.12.0
 SQLAlchemy==1.2.15
 sympy==1.3
