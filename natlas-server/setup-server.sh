@@ -2,6 +2,7 @@
 
 export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
+BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [[ "$EUID" -ne 0 ]]; then
   echo "[!] This script needs elevated permissions to run."
@@ -9,11 +10,13 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 echo "[+] Updating apt repositories"
-apt-get update
+apt-get update >/dev/null
 
-if [ ! id natlas >/dev/null 2>&1 ]; then
+if ! id -u "natlas" >/dev/null 2>&1; then
+    echo "[+] Creating natlas group: groupadd -r natlas"
+    groupadd -r natlas
     echo "[+] Creating natlas user: useradd -M -N -r -s /bin/false -d /opt/natlas natlas"
-    useradd -M -N -r -s /bin/false -d /opt/natlas natlas
+    useradd -M -N -r -s /bin/false -g natlas -d /opt/natlas natlas
     if [ ! id natlas >/dev/null 2>&1 ]; then
         echo "[!] Failed to create natlas user"
     else
@@ -58,7 +61,7 @@ fi
 
 if ! which virtualenv >/dev/null; then
     echo "[!] Installing virtualenv: pip3 install virtualenv"
-    pip3 install virtualenv
+    pip3 --disable-pip-version-check install virtualenv
     if ! which virtualenv >/dev/null; then
         echo "[!] Failed to install virtualenv" && exit 3
     else
@@ -86,7 +89,7 @@ else
     echo "[+] Entering virtual environment"
     source venv/bin/activate
     echo "[+] Installing/updating natlas-server python dependencies"
-    pip3 install -r requirements.txt --log pip.log -q
+    pip3 --disable-pip-version-check install -r requirements.txt --log pip.log -q
     echo "[+] Initializing/upgrading metadata database"
     if ! cat .env 2>/dev/null | grep "FLASK_APP" >/dev/null; then
         echo "FLASK_APP=natlas-server.py" >> .env
@@ -96,6 +99,8 @@ else
     deactivate
 fi
 
+echo "[+] Giving natlas user ownership of all project files"
+chown -R natlas:natlas $BASEDIR
 
 echo "[+] Setup Complete"
 echo "------------------"
