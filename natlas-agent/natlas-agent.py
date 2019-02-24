@@ -122,8 +122,7 @@ def scan(target_data=None):
     if not validate_target(target_data["target"]):
         print("[!] Failed to validate target %s" % target_data["target"])
         return ERR["INVALIDTARGET"]
-    print("[+] Target: %s" % target_data["target"])
-    print("[+] Scan ID: %s" % target_data["scan_id"])
+    print("[+] (%s) Target: %s" % (target_data["scan_id"], target_data["target"]))
     
     target = target_data["target"]
     scan_id = target_data["scan_id"]
@@ -226,12 +225,25 @@ def scan(target_data=None):
         print("[+] (%s) Response: %s" % (scan_id, response.text))
 
 class ThreadScan(threading.Thread):
-    def __init__(self, queue):
+    def __init__(self, queue, auto=False, servicesSha=''):
         threading.Thread.__init__(self)
         self.queue = queue
+        self.auto = auto
+        self.servicesSha = servicesSha
 
     def run(self):
-        while True:
+        # If we're in auto mode, the threads handle getting work from the server
+        if self.auto:
+            while True: 
+                target_data = fetch_target()
+                if target_data["services_hash"] != self.servicesSha:
+                    self.servicesSha = get_services_file()
+                    if not self.servicesSha:
+                        print("Failed to get updated services from %s" % config.server)
+                result = scan(target_data)
+        
+        else:
+            #If we're not in auto mode, then the queue is populated with work from local data
             target_data = self.queue.get()
             result = scan(target_data)
             self.queue.task_done()
@@ -250,6 +262,10 @@ def main():
     mutually_exclusive.add_argument('--target-file', metavar='FILENAME', help="A file of line separated target IPv4 addresses or CIDR ranges", dest='tfile')
     args = parser.parse_args()
     
+    autoScan = True
+    if args.target or args.tfile:
+        autoScan = False
+
     q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
     servicesSha = ""
@@ -264,7 +280,7 @@ def main():
 
     # Start threads that will wait for items in queue and then scan them
     for i in range(int(config.max_threads)):
-        t = ThreadScan(q)
+        t = ThreadScan(q, autoScan, servicesSha)
         t.setDaemon(True)
         t.start()
 
@@ -310,13 +326,7 @@ def main():
     # This is the default behavior of fetching work from the server
     else:
         while True:
-            target_data = fetch_target()
-            if target_data["services_hash"] != servicesSha:
-                servicesSha = get_services_file()
-                if not servicesSha:
-                    print("Failed to get updated services from %s" % config.server)
-
-            q.put(target_data)
+            time.sleep(60)
 
 
 if __name__ == "__main__":
