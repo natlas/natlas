@@ -56,13 +56,16 @@ def make_request(endpoint, reqType="GET", postData=None, contentType="applicatio
 
     return req
 
-def backoff_request(*args, **kwargs):
+def backoff_request(giveup=False, *args, **kwargs):
     attempt = 0
     result = None
     while not result:
         result = make_request(*args, **kwargs)
         if not result:
             attempt += 1
+            if giveup and attempt == config.max_retries:
+                print("[!] Request to %s failed %s times. Giving up" % (config.server, config.max_retries))
+                return None
             jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
             current_sleep = min(config.backoff_max, config.backoff_base * 2 ** attempt) + jitter
             print("[!] Request to %s failed. Waiting %s seconds before retrying." % (config.server, current_sleep))
@@ -216,8 +219,11 @@ def scan(target_data=None):
 
     # submit result
     print("[+] (%s) Submitting work" % scan_id)
-    response = backoff_request(endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
-    print("[+] (%s) Response: %s" % (scan_id, response.text))
+    response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
+    if not response:
+        print("[!] (%s) Something went wrong!" % scan_id)
+    else:
+        print("[+] (%s) Response: %s" % (scan_id, response.text))
 
 class ThreadScan(threading.Thread):
     def __init__(self, queue):

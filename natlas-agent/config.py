@@ -25,3 +25,4 @@ class Config:
         self.request_timeout = self.getInt('NATLAS_REQUEST_TIMEOUT') or 15 # seconds, default time to wait for the server to respond
         self.backoff_max = self.getInt('NATLAS_BACKOFF_MAX') or 300 # seconds, 5 minutes default
         self.backoff_base = self.getInt('NATLAS_BACKOFF_BASE') or 1 # seconds
+        self.max_retries = self.getInt('NATLAS_MAX_RETRIES') or 10 # number of times to retry a submission before giving up
