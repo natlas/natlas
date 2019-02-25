@@ -60,8 +60,8 @@ else
 fi
 
 if ! which virtualenv >/dev/null; then
-    echo "[!] Installing virtualenv: pip3 install virtualenv"
-    pip3 --disable-pip-version-check install virtualenv
+    echo "[!] Installing virtualenv: apt-get -y install virtualenv"
+    apt-get -y install virtualenv
     if ! which virtualenv >/dev/null; then
         echo "[!] Failed to install virtualenv" && exit 3
     else
