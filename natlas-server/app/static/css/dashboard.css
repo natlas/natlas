@@ -78,8 +78,8 @@ body {
 .preview_nmap {
   background-color:rgba(0,0,0,0.75);
   text-align:center;
-  line-height:4em;
-  margin-top:-4em;
+  line-height:2em;
+  margin-top:-1em;
   color:#fff;
 }
 .preview_nmap:hover {
