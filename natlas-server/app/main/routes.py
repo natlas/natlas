@@ -21,6 +21,7 @@ def search():
 
     searchOffset = current_user.results_per_page * (page-1)
     count, context = current_app.elastic.search(query, current_user.results_per_page, searchOffset)
+    totalHosts = current_app.elastic.totalHosts()
 
     next_url = url_for('main.search', q=query, p=page+1) \
          if count > page * current_user.results_per_page else None
@@ -37,7 +38,7 @@ def search():
                 hostlist.append(str(host['ip']))
         return Response('\n'.join(hostlist), mimetype='text/plain')
     else:
-        return render_template("search.html", query=query, numresults=count, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
+        return render_template("search.html", query=query, numresults=count, totalHosts=totalHosts, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
 @bp.route('/host/<ip>')
 @bp.route('/host/<ip>/')
@@ -68,7 +69,7 @@ def host_history(ip):
     prev_url = url_for('main.host_history', ip=ip, p=page - 1) \
         if page > 1 else None
 
-    return render_template("host/history.html", ip=ip, info=info, page=page, hosts=context, next_url=next_url, prev_url=prev_url, delHostForm=delHostForm)
+    return render_template("host/history.html", ip=ip, info=info, page=page, numresults=count, hosts=context, next_url=next_url, prev_url=prev_url, delHostForm=delHostForm)
 
 @bp.route('/host/<ip>/<scan_id>')
 @isAuthenticated

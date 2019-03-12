@@ -12,6 +12,9 @@ import base64
 import argparse
 import shutil
 import hashlib
+import glob
+from datetime import datetime,timezone
+from libnmap.parser import NmapParser
 
 import threading
 import queue
@@ -120,13 +123,16 @@ def generate_scan_id():
 def scan(target_data=None):
     
     if not validate_target(target_data["target"]):
-        print("[!] Failed to validate target %s" % target_data["target"])
         return ERR["INVALIDTARGET"]
     print("[+] (%s) Target: %s" % (target_data["scan_id"], target_data["target"]))
     
+    result = {}
     target = target_data["target"]
+    result['ip'] = target
     scan_id = target_data["scan_id"]
+    result['scan_id'] = scan_id
     agentConfig = target_data["agent_config"]
+    result['scan_start'] = datetime.now(timezone.utc).isoformat()
 
     command = ["nmap", "-oA", "data/natlas."+scan_id, "--servicedb", "./natlas-services"]
     if agentConfig["versionDetection"]:
@@ -138,6 +144,7 @@ def scan(target_data=None):
     if agentConfig["onlyOpens"]:
         command.append("--open")
     command.append(target_data["target"])
+
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
         out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
@@ -145,14 +152,11 @@ def scan(target_data=None):
         try:
             print("[!] (%s) Scan timed out" % scan_id)
             process.kill()
-            return ERR["SCANTIMEOUT"]
         except:
             pass
 
     print("[+] Scan Complete: " + scan_id)
 
-    result = {}
-    result['scan_id'] = scan_id
     for ext in 'nmap', 'gnmap', 'xml':
         try: 
             result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
@@ -162,24 +166,34 @@ def scan(target_data=None):
             print("[!] (%s) Nmap data not found" % scan_id)
             return ERR["DATANOTFOUND"]
 
-    if len(result['nmap_data']) < 250:
-        print("[!] (%s) Nmap data is too short" % scan_id)
-        return ERR["INVALIDDATA"]
-    elif 'Nmap scan report for' not in result['nmap_data']: # checking for this on the agent saves bandwidth
-        print("[!] (%s) Nmap scan report not found" % scan_id)
-        return ERR["INVALIDDATA"]
-    else:
-        print("[+] (%s) Scan size: %s" % (scan_id, len(result['nmap_data'])))
+    nmap_report = NmapParser.parse(result['xml_data'])
 
-    if RTTVAR_MSG in result['nmap_data']:
-        orig_data = result['nmap_data'].splitlines()
-        new_data = ''
-        for line in orig_data:
-            if line.startswith(RTTVAR_MSG):
-                continue
-            else:
-                new_data += line + '\n'
-        result['nmap_data'] = new_data.rstrip('\n')
+    if nmap_report.hosts_total < 1:
+        print("[!] (%s) No hosts found in scan data" % scan_id)
+        return "[!] No hosts found in scan data"
+    elif nmap_report.hosts_total > 1:
+        print("[!] (%s) Too many hosts found in scan data" % scan_id)
+        return "[!] Too many hosts found in scan data"
+    elif nmap_report.hosts_down == 1:
+        # host is down
+        result['is_up'] = False
+        result['port_count'] = 0
+        result['scan_stop'] = datetime.now(timezone.utc).isoformat()
+        print("[+] (%s) Submitting host down notice for %s" % (scan_id, result['ip']))
+        response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
+        return
+    elif nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
+        # host is up but no reportable ports were found
+        result['is_up'] = True
+        result['port_count'] = 0
+        result['scan_stop'] = datetime.now(timezone.utc).isoformat()
+        print("[+] (%s) Submitting %s ports for %s" % (scan_id, result['port_count'], result['ip']))
+        response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
+        return
+    else:
+        # host is up and reportable ports were found
+        result['is_up'] = nmap_report.hosts[0].is_up()
+        result['port_count'] = len(nmap_report.hosts[0].get_ports())
 
     if target_data["agent_config"]["webScreenshots"] and shutil.which("aquatone") is not None:
         if "80/tcp" in result['nmap_data']:
@@ -217,7 +231,8 @@ def scan(target_data=None):
                 print("[!] (%s) Failed to acquire VNC snapshot" % scan_id)
 
     # submit result
-    print("[+] (%s) Submitting work" % scan_id)
+    result['scan_stop'] = datetime.now(timezone.utc).isoformat()
+    print("[+] (%s) Submitting %s ports for %s" % (scan_id, result['port_count'], result['ip']))
     response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
     if not response:
         print("[!] (%s) Something went wrong!" % scan_id)

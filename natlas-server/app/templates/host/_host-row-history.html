@@ -1,0 +1,38 @@
+<div class="row host-row py-1 no-gutters">
+    <div class="col col-md-2">
+      <span class="host-row-text">
+      {% if host.is_up and host.port_count == 0 %}
+        <i class="fas fa-circle pr-2 text-warning"></i>No ports open
+      {% elif not host.is_up %}
+        <i class="fas fa-circle pr-2 text-danger"></i>Host down
+      {% elif host.is_up and host.port_count > 0 %}
+        <i class="fas fa-circle pr-2 text-success"></i>{{ host.ports }}
+      {% endif %}
+      </span>
+    </div>
+    <div class="col col-md-2">
+      <span class="host-row-text">
+        <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
+          <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
+        </a>
+      </span>
+    </div>
+    <div class="col col-md-7 pr-2">
+      {% if host.is_up and host.port_count > 0 %}
+        <pre class="nmap_data nmap_history px-2 py-2 mt-2" style="">{{ host.nmap_data }}</pre>
+      {% endif %}
+    </div>
+    <div class="col col-md-1">
+       <div class="btn-group host-history-export" role="group">
+        <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Export
+        </button>
+        <div class="dropdown-menu" aria-labelledby="exportGroup-{{host.scan_id}}">
+          <a class="dropdown-item" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>
+          <a class="dropdown-item" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>
+          <a class="dropdown-item" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>
+        </div>
+      </div>
+      
+    </div>
+</div>

@@ -8,4 +8,4 @@ bp = Blueprint('filters', __name__)
 def ctime(s, human=False):
     if human:
         return parser.parse(s).strftime("%Y-%m-%d %H:%M:%S %Z")
-    return parser.parse(s).strftime("%Y-%m-%d")
+    return parser.parse(s).strftime("%Y-%m-%d %H:%M")

@@ -1,7 +1,9 @@
 from flask import current_app, request
 import random, os, json, ipaddress, string
 
-from datetime import datetime, timezone
+from datetime import datetime as dt
+from datetime import timezone as tz
+import dateutil.parser
 
 from app.models import NatlasServices
 from app.api import bp
@@ -44,13 +46,20 @@ def submit():
     
     newhost = {}
     newhost = json.loads(data)
+    if newhost['scan_start'] and newhost['scan_stop']:
+        elapsed = dateutil.parser.parse(newhost['scan_stop']) - dateutil.parser.parse(newhost['scan_start'])
+        newhost['elapsed'] = elapsed.seconds
+    # If the agent data has an is_up and it's false, store that in the database
+    if not newhost["is_up"] or (newhost["is_up"] and newhost["port_count"] == 0):
+        newhost["ctime"] = dt.now(tz.utc)
+        current_app.elastic.newhost(newhost)
+        return "[+] We've received your report for: " + newhost['ip']
+
     nmap = NmapParser.parse(newhost['xml_data'])
     
     # Some quick checks to ensure there are hosts in the scan data
-    if len(nmap.hosts) < 1:
-        return "[!] No hosts found in scan data"
-    elif len(nmap.hosts) > 1:
-        return "[!] Too many hosts found in scan data"
+    if nmap.hosts_total != 1:
+        return "[!] We require exactly one host in scan results right now"
 
     newhost['ip'] = nmap.hosts[0].address
     if not isAcceptableTarget(newhost['ip']):
@@ -61,7 +70,7 @@ def submit():
     else:
         newhost['hostname'] = ''
 
-    newhost['ctime'] = datetime.now(timezone.utc)
+    newhost['ctime'] = dt.now(tz.utc)
     newhost['is_up'] = nmap.hosts[0].is_up()
     if not newhost['is_up']:
         current_app.elastic.newhost(newhost)
@@ -69,12 +78,12 @@ def submit():
 
     tmpports = []
     newhost['structured_ports'] = {'tcp': {}, 'udp': {}}
+    idx = 0
     for port in nmap.hosts[0].get_ports():
         tmpports.append(str(port[0]))
         nmapservice = nmap.hosts[0].get_service(port[0])
-        newhost['structured_ports'][port[1]][port[0]] = nmapservice.get_dict()
-        if nmapservice.scripts_results:
-            newhost['structured_ports'][port[1]][port[0]]['scripts_results'] = nmapservice.scripts_results
+        newhost['structured_ports'][port[1]][idx] = nmapservice.get_dict()
+        idx += 1
     
     newhost['ports'] = ', '.join(tmpports) 
 

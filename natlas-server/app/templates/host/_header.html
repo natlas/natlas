@@ -1,19 +1,25 @@
 <div class="row page-header">
-    <h1>{{ ip }}
+    <div class="col-xs-12 col-sm">
+        <h1>{{ ip }}{% if host %}<small class="text-muted host-header-date"> - {{ host.ctime | ctime }}</small>{% endif %}</h1>
+    </div>
     {% if current_user.is_admin %}
-    <form method="POST" class="inline-submit" action="{{ url_for('admin.deleteHost', ip=ip) }}">{{ delHostForm.hidden_tag() }} <button class="red btn-trash" id="deleteHost" name="deleteHost" title="Delete Host" aria-hidden="true" onclick="return confirm('Are you sure you want to delete host: {{ ip }}')" type="submit" ><i class="fas fa-trash-alt"></i></button></form>
+    <div class="col-xs-12 col-sm-1">
+        <div class="btn-group host-history-export" role="group">
+            <button id="deleteGroup" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Delete
+            </button>
+            <div class="dropdown-menu" aria-labelledby="deleteGroup">
+            {% if host %}
+                <form method="POST" class="dropdown-item" action="{{ url_for('admin.deleteScan', scan_id=host.scan_id) }}">{{ delForm.hidden_tag() }} <button class="dropdown-item" id="deleteScan" name="deleteScan" title="Delete Scan" aria-hidden="true" onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')" type="submit" ><i class="fas fa-trash-alt text-danger"></i> Delete Scan</button></form>
+            {% endif %}
+              <form method="POST" class="dropdown-item" action="{{ url_for('admin.deleteHost', ip=ip) }}">{{ delHostForm.hidden_tag() }} <button class="dropdown-item" id="deleteHost" name="deleteHost" title="Delete Host" aria-hidden="true" onclick="return confirm('Are you sure you want to delete host: {{ ip }}')" type="submit" ><i class="fas fa-dumpster-fire text-danger"></i> Delete Host</button></form>
+
+            </div>
+        </div>
     {% endif %}
     </h1>
-</div>
-{% if pagetype=='single' %}
-    <div class="row mb-3">
-        <small class="text-muted"><strong>Scan ID:</strong> {{ host.scan_id }}
-        {% if current_user.is_admin %}
-        <form method="POST" class="inline-submit" action="{{ url_for('admin.deleteScan', scan_id=host.scan_id) }}">{{ delForm.hidden_tag() }} <button class="red btn-trash" id="deleteScan" name="deleteScan" title="Delete Scan" aria-hidden="true" onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')" type="submit" ><i class="fas fa-trash-alt"></i></button></form>
-        {% endif %}
-        </small>
     </div>
-{% endif %}
+</div>
 <div class="row">
   <ul class="nav nav-tabs host-nav">
     <li role="presentation" class="nav-item">

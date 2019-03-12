@@ -17,7 +17,17 @@ class Elastic:
             if self.status:
                 for index in self.natlasIndices: # initialize nmap and nmap_history and give them mappings for known necessary types
                     if not self.es.indices.exists(index):
-                        myIndexInit = {"mappings":{"_doc":{"properties":{"ctime":{"type":"date"}, "ip":{"type":"ip"}, "scan_id":{"type":"keyword"}}}}}
+                        myIndexInit = {"mappings":{"_doc":{"properties":{
+                            "ctime": {"type":"date"},
+                            "scan_start": {"type":"date"},
+                            "scan_stop": {"type":"date"},
+                            "elapsed": {"type":"integer"},
+                            "port_count": {"type":"integer"},
+                            "port_str": {"type":"text"},
+                            "is_up": {"type":"boolean"},
+                            "ip": {"type":"ip"},
+                            "scan_id": {"type":"keyword"}
+                            }}}}
                         self.es.indices.create(index, body=myIndexInit)
         except elasticsearch.exceptions.NotFoundError:
             self.errorinfo = 'Cluster Not Found'
@@ -31,8 +41,41 @@ class Elastic:
         if query == '':
             query = 'nmap'
         try:
-            result = self.es.search(index="nmap", doc_type="_doc", body={"size": limit, "from": offset, "query": {"query_string": {
-                                    'query': query, "fields": ["nmap_data"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+            result = self.es.search(index="nmap", doc_type="_doc", body=\
+                {
+                    "size": limit,
+                    "from": offset,
+                    "query": {
+                        "bool": {
+                           "must": [
+                                {
+                                    "query_string": {
+                                        "query": query,
+                                        "fields": ["nmap_data"],
+                                        "default_operator": "AND"
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "is_up": True
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "port_count": {
+                                            "gt": 0
+                                            }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "sort": {
+                        "ctime": {
+                            "order": "desc"
+                            }
+                        }
+                })
         except:
             return 0, []  # search borked, return nothing
 
@@ -41,6 +84,10 @@ class Elastic:
             results.append(thing['_source'])
 
         return result['hits']['total'], results
+
+    def totalHosts(self):
+        result = self.es.count(index="nmap", doc_type="_doc")
+        return result["count"]
 
     def newhost(self, host):
         if not self.status:

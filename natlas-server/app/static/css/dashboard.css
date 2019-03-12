@@ -71,9 +71,9 @@ body {
  */
 
 .nmap_data {
-  white-space: pre-wrap;
-  margin-bottom:0px;
-  margin-top:1em;
+  background-color:rgba(0,0,0,0.05);
+  border-radius:10px;
+  font-size: 75%;
 }
 .preview_nmap {
   background-color:rgba(0,0,0,0.75);
@@ -156,9 +156,28 @@ form.config-form>div, form.pwchange-form>div {
   background-color: #f9f9f9;
   border-top: 1px solid #f0f0f0;
 }
+.host-row-text {
+  padding: .375rem .75rem;
+  display: block;
+}
 
-.btn-export {
-  max-width:100px;
+.host-history-export {
+  padding-top: .375rem;
+  padding-left: 0rem;
+  display:block;
+}
+
+.host-header-date {
+  font-size:50%;
+}
+
+.nmap_history {
+  max-height: 10rem; 
+  overflow: scroll;
+}
+
+.export-group {
+  display:block;
 }
 
 .btn-trash {
