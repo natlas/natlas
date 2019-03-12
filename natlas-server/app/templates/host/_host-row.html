@@ -49,6 +49,7 @@
     {% endif %}
   </div>
   <div class="col-xs-12 col-sm-8 col-md-9">
+    {% if host.nmap_data %}
       {% set lines = host.nmap_data.split('\n') %}
       {% if lines|length > current_user.preview_length and pagetype in ('multi', 'search') %}
         {% set nmap_preview = [] %}
@@ -66,5 +67,6 @@
       {% else %}
         <pre class="nmap_data px-2 py-2 mt-2">{{ host.nmap_data }}</pre>
       {% endif %}
+    {% endif %}
   </div>
 </div>

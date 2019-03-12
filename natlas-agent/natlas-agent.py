@@ -14,7 +14,7 @@ import shutil
 import hashlib
 import glob
 from datetime import datetime,timezone
-from libnmap.parser import NmapParser
+from libnmap.parser import NmapParser, NmapParserException
 
 import threading
 import queue
@@ -120,6 +120,11 @@ def validate_target(target):
 def generate_scan_id():
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
 
+def cleanup_files(scan_id):
+    print("[+] (%s) Cleaning up files" % scan_id)
+    for file in glob.glob("data/*."+scan_id+".*"):
+        os.remove(file)
+
 def scan(target_data=None):
     
     if not validate_target(target_data["target"]):
@@ -145,6 +150,7 @@ def scan(target_data=None):
         command.append("--open")
     command.append(target_data["target"])
 
+    TIMEDOUT = False
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
         out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
@@ -152,16 +158,25 @@ def scan(target_data=None):
         try:
             print("[!] (%s) Scan timed out" % scan_id)
             process.kill()
+            TIMEDOUT = True
         except:
             pass
 
-    print("[+] Scan Complete: " + scan_id)
+    if TIMEDOUT:
+        result['is_up'] = False
+        result['port_count'] = 0
+        result['scan_stop'] = datetime.now(timezone.utc).isoformat()
+        result['timed_out'] = True
+        cleanup_files(scan_id)
+        print("[+] (%s) Submitting scan timeout notice for %s" % (scan_id, result['ip']))
+        response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
+        return
+    else:
+        print("[+] (%s) Scan Complete" % scan_id)
 
     for ext in 'nmap', 'gnmap', 'xml':
         try: 
             result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
-            os.remove("data/natlas."+scan_id+"."+ext)
-            print("[+] (%s) Cleaning up: natlas.%s.%s" % (scan_id, scan_id, ext))
         except:
             print("[!] (%s) Nmap data not found" % scan_id)
             return ERR["DATANOTFOUND"]
@@ -179,6 +194,7 @@ def scan(target_data=None):
         result['is_up'] = False
         result['port_count'] = 0
         result['scan_stop'] = datetime.now(timezone.utc).isoformat()
+        cleanup_files(scan_id)
         print("[+] (%s) Submitting host down notice for %s" % (scan_id, result['ip']))
         response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
         return
@@ -187,6 +203,7 @@ def scan(target_data=None):
         result['is_up'] = True
         result['port_count'] = 0
         result['scan_stop'] = datetime.now(timezone.utc).isoformat()
+        cleanup_files(scan_id)
         print("[+] (%s) Submitting %s ports for %s" % (scan_id, result['port_count'], result['ip']))
         response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
         return
@@ -232,6 +249,7 @@ def scan(target_data=None):
 
     # submit result
     result['scan_stop'] = datetime.now(timezone.utc).isoformat()
+    cleanup_files(scan_id)
     print("[+] (%s) Submitting %s ports for %s" % (scan_id, result['port_count'], result['ip']))
     response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
     if not response:

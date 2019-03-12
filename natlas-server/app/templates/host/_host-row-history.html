@@ -3,6 +3,8 @@
       <span class="host-row-text">
       {% if host.is_up and host.port_count == 0 %}
         <i class="fas fa-circle pr-2 text-warning"></i>No ports open
+      {% elif not host.is_up and host.timed_out %}
+        <i class="fas fa-circle pr-2 text-warning"></i>Scan Timed Out
       {% elif not host.is_up %}
         <i class="fas fa-circle pr-2 text-danger"></i>Host down
       {% elif host.is_up and host.port_count > 0 %}
@@ -18,21 +20,29 @@
       </span>
     </div>
     <div class="col col-md-7 pr-2">
-      {% if host.is_up and host.port_count > 0 %}
+      {% if host.is_up and host.port_count > 0 and host.nmap_data %}
         <pre class="nmap_data nmap_history px-2 py-2 mt-2" style="">{{ host.nmap_data }}</pre>
       {% endif %}
     </div>
+    
     <div class="col col-md-1">
+      {% if host.nmap_data or host.xml_data or host.gnmap_data %}
        <div class="btn-group host-history-export" role="group">
         <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Export
         </button>
         <div class="dropdown-menu" aria-labelledby="exportGroup-{{host.scan_id}}">
-          <a class="dropdown-item" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>
-          <a class="dropdown-item" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>
-          <a class="dropdown-item" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>
+          {% if host.xml_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>{% endif %}
+          {% if host.nmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>{% endif %}
+          {% if host.gnmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>{% endif %}
         </div>
       </div>
-      
+    {% else %}
+      <div class="btn-group host-history-export" role="group">
+        <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" disabled data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="No data available to export">
+          Export
+        </button>
+      </div>
+    {% endif %}
     </div>
 </div>
