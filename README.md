@@ -4,7 +4,7 @@ You've got a lot of maps and they are getting pretty unruly. What do you do? You
 
 Getting Started
 ----------------
-To get started with your own deployment of Natlas, you're going to need at one server and at least one agent. The quickest way to accomplish this is to run an agent on the same host as the server. Installation instructions for the server and the agent are linked below in their associated readmes.
+To get started with your own deployment of Natlas, you're going to need a minimum of one server and one agent. The quickest way to accomplish this is to run an agent on the same host as the server. Installation instructions for the server and the agent are linked below in their associated readmes.
 
 To begin with natlas:
 ```
