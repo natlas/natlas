@@ -156,16 +156,6 @@ form.config-form>div, form.pwchange-form>div {
   background-color: #f9f9f9;
   border-top: 1px solid #f0f0f0;
 }
-.host-row-text {
-  padding: .375rem .75rem;
-  display: block;
-}
-
-.host-history-export {
-  padding-top: .375rem;
-  padding-left: 0rem;
-  display:block;
-}
 
 .host-header-date {
   font-size:50%;
@@ -237,4 +227,10 @@ form.config-form>div, form.pwchange-form>div {
 }
 .service-extrainfo {
   font-size:0.7rem;
+}
+
+.vert-flex-mid {
+  display:flex;
+  justify-content:center;
+  flex-direction:column;
 }
