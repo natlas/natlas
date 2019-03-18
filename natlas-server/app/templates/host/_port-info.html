@@ -1,0 +1,45 @@
+<div class="row port-row py-3">
+    <div class="col-xs-6 col-sm-2 port-summary">
+        <div class="port-number">
+            {{ port.port }}
+        </div>
+        <div class="port-protocol">
+            {{ port.protocol }}
+        </div>
+        <div class="port-service">
+            {{ port.service.name }}
+        </div>
+        {% if 'http' in port.service.name %}
+        <div class="port-link">
+            <a href="{% if port.service.tunnel == 'ssl' %}https://{% else %}http://{% endif %}{{ host.ip }}{% if port.port not in [80,443] %}:{{ port.port }}{% endif %}"><i class="fas fa-external-link-alt"></i></a>
+        </div>
+        {% endif %}
+    </div><!--end port-summary-->
+
+    <div class="col-xs-12 col-sm-10 port-details">
+        <h5 class="service-header">{{ port.service.product }} <small class="text-muted">{{ port.service.version }} {% if port.service.extrainfo %}<small class="text-muted">{{ port.service.extrainfo }}</small>{% endif %}</small></h5>
+        {% if port.banner %}
+            <div class="row port-banner">
+                <div class="col">
+                    <p><small class="text-muted">{{ port.banner }}</small></p>
+                </div>
+            </div>
+        {% endif %}
+        {% if port.scripts %}
+            {% for script in port.scripts %}
+            <div class="row script-header">
+                <div class="col">
+                    <div class="script-container" id="{{ port.protocol }}-{{ port.port }}-{{ script.id }}-{{ host.scan_id }}">
+                        <h5 class="text-muted script-id">{{ script.id }}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="row script-data">
+                <div class="col">
+                    <pre class="script-output pl-2 pt-2">{{ script.output }}</pre>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %} <!--end scripts-->
+    </div><!--end port-details-->
+</div><!--end port-->

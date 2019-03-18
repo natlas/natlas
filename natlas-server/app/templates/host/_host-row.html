@@ -3,9 +3,9 @@
     {% if pagetype == 'search' %}
       <h3 class="mt-2"><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
     {% endif %}
-    {% if host.port_count > 0 %}
+    {% if host.ports|length > 0 %}
       <h4 class="mt-2">Open Ports</h4>
-      {{ host.ports }}
+      {{ host.port_str }}
     {% elif host.port_count == 0 and host.is_up %}
       <h4 class="mt-2">No open ports</h4>
     {% elif not host.is_up %}
@@ -31,42 +31,22 @@
           <a class="dropdown-item" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>
         </div>
       </div>
-    {% if host.headshot %}
-      <h5 class="mt-2">Unknown Headshot</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.headshot }}" alt="Unknown Screenshot"></div></br>
-    {% endif %}
     {% if host.vncheadshot %}
       <h5 class="mt-2">VNC</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div></br>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div>
     {% endif %}
     {% if host.httpheadshot %}
       <h5 class="mt-2">HTTP</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div></br>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div>
     {% endif %}
     {% if host.httpsheadshot %}
       <h5 class="mt-2">HTTPS</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div></br>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div>
     {% endif %}
-  </div>
+  </div><!--meta column-->
   <div class="col-xs-12 col-sm-8 col-md-9">
-    {% if host.nmap_data %}
-      {% set lines = host.nmap_data.split('\n') %}
-      {% if lines|length > current_user.preview_length and pagetype in ('multi', 'search') %}
-        {% set nmap_preview = [] %}
-        {% for line in lines %}
-          {% if loop.index <= current_user.preview_length %}
-            {% do nmap_preview.append(line) %}
-          {% endif %}
-        {% endfor %}
-        <pre class="nmap_data px-2 py-2 mt-2">{{ nmap_preview|join('\n') }}</pre>
-        {% if host.scan_id %}
-        <a class="preview_link" href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}"><div class="preview_nmap">Click here to see all {{ lines|length }} lines for {{ host.ip }} ({{ host.scan_id }})</div></a>
-        {% else %}
-        <div class="preview_nmap">Unfortunately we are unable to display the rest of this scan because we can't find a scan identifier!</div>
-        {% endif %}
-      {% else %}
-        <pre class="nmap_data px-2 py-2 mt-2">{{ host.nmap_data }}</pre>
-      {% endif %}
-    {% endif %}
-  </div>
-</div>
+      {% for port in host.ports %}
+          {% include  'host/_port-info.html' %}
+      {% endfor %}
+    </div><!--data column-->
+</div><!-- end host row -->

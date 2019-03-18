@@ -1,6 +1,6 @@
 <div class="row page-header">
     <div class="col-xs-12 col-sm">
-        <h1>{{ ip }}{% if host %}<small class="text-muted host-header-date"> - {{ host.ctime | ctime }}</small>{% endif %}</h1>
+        <h1>{% if host %}{% include 'host/_host-status.html' %}{% endif %}{{ ip }}{% if host %}<small class="text-muted host-header-date"> - {{ host.ctime | ctime }}</small>{% endif %}</h1>
     </div>
     {% if current_user.is_admin %}
     <div class="col-xs-12 col-sm-1">
@@ -28,7 +28,7 @@
     	<a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('main.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
     </li>
     <li role="presentation" class="nav-item">
-    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'headshots' }}" href="{{ url_for('main.host_headshots', ip=ip) }}">Headshots <span class="badge badge-dark">{{ info.headshots }}</span></a>
+    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'headshots' }}" href="{{ url_for('main.host_headshots', ip=ip) }}">Screenshots <span class="badge badge-dark">{{ info.headshots }}</span></a>
     </li>
   </ul>
 </div>

@@ -67,8 +67,6 @@ def submit():
 
     if len(nmap.hosts[0].hostnames) > 0:
         newhost['hostname'] = nmap.hosts[0].hostnames[0]
-    else:
-        newhost['hostname'] = ''
 
     newhost['ctime'] = dt.now(tz.utc)
     newhost['is_up'] = nmap.hosts[0].is_up()
@@ -77,20 +75,27 @@ def submit():
         return "[+] Thanks for telling us that this host is down" + newhost['ip']
 
     tmpports = []
-    newhost['structured_ports'] = {'tcp': {}, 'udp': {}}
-    idx = 0
+    newhost['ports'] = []
+
     for port in nmap.hosts[0].get_ports():
         tmpports.append(str(port[0]))
-        nmapservice = nmap.hosts[0].get_service(port[0])
-        newhost['structured_ports'][port[1]][idx] = nmapservice.get_dict()
-        idx += 1
-    
-    newhost['ports'] = ', '.join(tmpports) 
+        srv = nmap.hosts[0].get_service(port[0])
+        portinfo = srv.get_dict()
+        portinfo['service'] = srv.service_dict
+        portinfo['scripts'] = []
+        for script in srv.scripts_results:
+            scriptsave = {"id": script['id'], "output": script["output"]}
+            portinfo['scripts'].append(scriptsave)
 
-    if len(newhost['structured_ports']['tcp']) == 0 and len(newhost['structured_ports']['udp']) == 0:
+
+        newhost['ports'].append(portinfo)
+    
+    newhost['port_str'] = ', '.join(tmpports) 
+
+    if len(newhost['ports']) == 0:
         return "[!] No open ports found!"
 
-    if len(newhost['structured_ports']['tcp']) + len(newhost['structured_ports']['udp']) > 500:
+    if len(newhost['ports']) > 500:
         return "[!] More than 500 ports found. This is probably an IDS/IPS. We're going to throw the data out."
 
     current_app.elastic.newhost(newhost)

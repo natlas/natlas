@@ -1,14 +1,15 @@
 <div class="row host-row py-1 no-gutters">
     <div class="col col-md-2">
       <span class="host-row-text">
+      {% include 'host/_host-status.html' %}
       {% if host.is_up and host.port_count == 0 %}
-        <i class="fas fa-circle pr-2 text-warning"></i>No ports open
+        No ports open
       {% elif not host.is_up and host.timed_out %}
-        <i class="fas fa-circle pr-2 text-warning"></i>Scan Timed Out
+        Scan Timed Out
       {% elif not host.is_up %}
-        <i class="fas fa-circle pr-2 text-danger"></i>Host down
+        Host down
       {% elif host.is_up and host.port_count > 0 %}
-        <i class="fas fa-circle pr-2 text-success"></i>{{ host.ports }}
+        {% for port in host.ports %}{{ port.port }}{% if not loop.last %}, {% endif %}{% endfor %}
       {% endif %}
       </span>
     </div>
@@ -20,8 +21,22 @@
       </span>
     </div>
     <div class="col col-md-7 pr-2">
-      {% if host.is_up and host.port_count > 0 and host.nmap_data %}
-        <pre class="nmap_data nmap_history px-2 py-2 mt-2" style="">{{ host.nmap_data }}</pre>
+      {% if host.is_up and host.port_count > 0 %}
+      <div class="row">
+      {% for port in host.ports %}
+        <div class="col-xs-4 col-sm-2 port-summary">
+          <div class="port-number">
+              {{ port.port }}
+          </div>
+          <div class="port-protocol">
+              {{port.protocol}}
+          </div>
+          <div class="port-service">
+              {{ port.service.name }}
+          </div>
+        </div><!--end port-summary-->
+      {% endfor %}
+      </div>
       {% endif %}
     </div>
     

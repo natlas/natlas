@@ -190,3 +190,45 @@ form.config-form>div, form.pwchange-form>div {
   display:inline-block;
   margin:0;
 }
+
+.script-id {
+  font-size: 0.9rem;
+}
+
+.script-output {
+  font-size: 0.75rem;
+}
+
+.port-row {
+  border-bottom:1px solid #d6d6d6;
+}
+
+.port-summary {
+  text-align:center;
+}
+
+.port-number {
+  background-color:#36978D; 
+  color:white;
+}
+
+.port-protocol {
+  background-color:#62A9E3; 
+  color:white;
+}
+
+.port-service {
+  background-color:#2B2D33; 
+  color:white;
+}
+
+.port-link {
+  background-color:#79d65e;
+}
+.port-link>a {
+  color:white;
+}
+
+.service-header {
+  border-bottom:1px dotted #e3e3e3;
+}

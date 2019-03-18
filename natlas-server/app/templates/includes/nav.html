@@ -1,6 +1,6 @@
     <nav class="navbar navbar-dark bg-dark fixed-top navbar-expand-md">
       <div class="container">
-        <a class="navbar-brand" href="/">Natlas</a>
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">Natlas</a>
           <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
           </button>
           
@@ -32,7 +32,7 @@
 
           <form class="form-inline" action="{{ url_for('main.search') }}" name="search">
             <div class="input-group">
-              <input type="text" class="form-control" type="search" aria-label="Search" value="{{query}}" name="q" placeholder="Search..." aria=describedby="search-addon"/>
+              <input type="text" class="form-control" type="search" aria-label="Search" value="{{query}}" name="q" placeholder="Search..." aria-describedby="search-addon"/>
               <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="submit" id="search-addon"><i class="fas fa-search"></i></button>
               </div>

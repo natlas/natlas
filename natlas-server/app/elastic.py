@@ -26,7 +26,41 @@ class Elastic:
                             "port_str": {"type":"text"},
                             "is_up": {"type":"boolean"},
                             "ip": {"type":"ip"},
-                            "scan_id": {"type":"keyword"}
+                            "scan_id": {"type":"keyword"},
+                            "nmap_data": {"type": "text"},
+                            "xml_data": {"type": "text", "index":"false"},
+                            "gnmap_data": {"type": "text", "index": "false"},
+                            "httpsheadshot": {"type": "binary"},
+                            "httpsheadshot": {"type": "binary"},
+                            "vncheadshot": {"type":"binary"},
+                            "ports": {"type": "nested", "properties": {
+                                "id" : {"type": "keyword"},
+                                "number" : {"type": "integer"},
+                                "protocol": {"type": "keyword"},
+                                "state": {"type": "keyword"},
+                                "reason": {"type": "text"},
+                                "banner": {"type": "text"},
+                                "service": {
+                                   "properties": {
+                                       "name": {"type": "keyword"},
+                                       "product": {"type": "keyword"},
+                                       "version": {"type": "keyword"},
+                                       "ostype": {"type": "keyword"},
+                                       "conf": {"type": "integer"},
+                                       "cpelist": {"type": "text"},
+                                       "method": {"type": "text"},
+                                       "extrainfo": {"type": "text"},
+                                       "tunnel": {"type": "keyword"}
+                                     }
+                                   },
+                                   "scripts": {
+                                        "properties": {
+                                            "id": {"type": "text"},
+                                            "output": {"type": "text"}
+                                        }
+                                   }
+
+                            }}
                             }}}}
                         self.es.indices.create(index, body=myIndexInit)
         except elasticsearch.exceptions.NotFoundError:
