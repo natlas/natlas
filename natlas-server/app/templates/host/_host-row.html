@@ -39,6 +39,7 @@
   </div><!--meta column-->
   <div class="col-xs-12 col-sm-8 col-md-9">
       {% for port in host.ports %}
+          {% set portloop = loop %}
           {% include  'host/_port-info.html' %}
       {% endfor %}
     </div><!--data column-->

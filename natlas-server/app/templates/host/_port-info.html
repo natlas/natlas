@@ -1,4 +1,4 @@
-<div class="row port-row py-3">
+<div class="row py-3{% if not portloop.last %} port-row{% endif %}">
     <div class="col-xs-6 col-sm-2 port-summary">
         <div class="port-number">
             {{ port.port }}
