@@ -42,16 +42,7 @@
     
     <div class="col col-md-1">
       {% if host.nmap_data or host.xml_data or host.gnmap_data %}
-       <div class="btn-group host-history-export" role="group">
-        <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Export
-        </button>
-        <div class="dropdown-menu" aria-labelledby="exportGroup-{{host.scan_id}}">
-          {% if host.xml_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>{% endif %}
-          {% if host.nmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>{% endif %}
-          {% if host.gnmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>{% endif %}
-        </div>
-      </div>
+       {% include 'host/_host-export.html' %}
     {% else %}
       <div class="btn-group host-history-export" role="group">
         <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" disabled data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="No data available to export">

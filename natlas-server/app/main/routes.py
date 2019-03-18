@@ -4,6 +4,7 @@ from app.main import bp
 from app.util import hostinfo
 from app.auth.wrappers import isAuthenticated, isAdmin
 from app.admin.forms import DeleteForm
+import json
 
 @bp.route('/')
 @isAuthenticated
@@ -100,6 +101,12 @@ def export_scan_gnmap(ip, scan_id):
     
     count, context = current_app.elastic.gethost_scan_id(scan_id)
     return Response(context['gnmap_data'], mimetype="text/plain")
+
+@bp.route('/host/<ip>/<scan_id>.json')
+@isAuthenticated
+def export_scan_json(ip, scan_id):
+    count, context = current_app.elastic.gethost_scan_id(scan_id)
+    return Response(json.dumps(context), mimetype="application/json")
 
 @bp.route('/host/<ip>/headshots')
 @bp.route('/host/<ip>/headshots/')

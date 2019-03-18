@@ -1,0 +1,11 @@
+<div class="btn-group host-history-export" role="group">
+        <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Export
+        </button>
+        <div class="dropdown-menu" aria-labelledby="exportGroup-{{host.scan_id}}">
+          {% if host.xml_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>{% endif %}
+          {% if host.nmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>{% endif %}
+          {% if host.gnmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>{% endif %}
+          <a class="dropdown-item" href="{{ url_for('main.export_scan_json', ip=host.ip, scan_id=host.scan_id) }}">.json</a>
+        </div>
+      </div>
