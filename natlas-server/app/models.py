@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from app import login
 import jwt
 
+# Users and related configs
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), index=True, unique=True)
@@ -59,6 +60,7 @@ class User(UserMixin, db.Model):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
+# Scope and blacklist items
 class ScopeItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     target = db.Column(db.String, index=True, unique=True)
@@ -74,6 +76,7 @@ class ScopeItem(db.Model):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
+# Server configuration options
 class ConfigItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=True)
@@ -90,10 +93,28 @@ class NatlasServices(db.Model):
     sha256 = db.Column(db.String(64))
     services = db.Column(db.Text)
 
+    def services_as_list(self):
+        servlist = []
+        idx = 1
+        for line in self.services.splitlines():
+            # any empty newlines will be skipped, or comment lines (for uploaded files)
+            if line == '' or line.startswith('#'):
+                continue
+
+            # split on whitespace, store as tuple
+            portnum = line.split()[1].split('/')[0]
+            portproto = line.split()[1].split('/')[1]
+            servlist.append((idx, portnum, portproto, line.split()[0]))
+            idx += 1
+        return servlist
+
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        servdict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        servdict['as_list'] = self.services_as_list()
+        return servdict
 
 
+# Agent configuration options
 class AgentConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     versionDetection = db.Column(db.Boolean, default=True)

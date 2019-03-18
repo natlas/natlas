@@ -10,31 +10,58 @@
       {{ uploadForm.hidden_tag() }} 
       <div class="input-group">
           {{ uploadForm.serviceFile(class="btn btn-default")}}
-          {{ uploadForm.uploadFile(class="btn btn-primary", style="margin-top:1em;") }}
-          <span class="help-block">Upload a whole new nmap-services file. Trailing newlines will be stripped, but any other newlines will be preserved.</span>
+          {{ uploadForm.uploadFile(class="btn btn-primary", style="margin-top:1em;", onclick="return confirm('Are you sure you upload a whole new services file? This will change all the services you're scanning for.)") }}
         </div>
         </form>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-8">
-        <legend>Current Services</legend>
+        <legend>Current Service Information</legend>
         <h5>Version:
           <small>{{ current_services.id }}</small>
         </h5> 
         
         <h5>SHA256:
           <small>
-            <abbr title="{{ current_services.sha256 }}" id="sha256" style="border-bottom:none; cursor:default;">{{ current_services.sha256|truncate(32) }}</abbr>
+            <abbr style="cursor:default;" title="{{ current_services.sha256 }}" id="sha256">{{ current_services.sha256|truncate(32) }}</abbr>
           </small>
         </h5>
         <form class="form-inline" action="" method="post">
           {{ addServiceForm.hidden_tag() }}
-            {{ addServiceForm.serviceName(size=12, class="form-control", placeholder="service-name")}}
-            {{ addServiceForm.servicePort(size=5, class="form-control", placeholder="22")}}
-            {{ addServiceForm.serviceProtocol(class="custom-select")}}
+            {{ addServiceForm.serviceName(size=12, class="form-control mx-1 my-1", placeholder="service-name")}}
+            {{ addServiceForm.servicePort(size=5, class="form-control mx-1 my-1", placeholder="22")}}
+            {{ addServiceForm.serviceProtocol(class="custom-select mx-1 my-1")}}
           <button id="addService" name="addService" title="Add Service" aria-hidden="true" type="submit" class="inline-submit btn-trash text-success ml-2"><i class="fas fa-plus-circle"></i></button>
         </form>
-          <pre class="services-box mt-3">{{ current_services.services }}</pre>
-          <a href="{{ url_for('admin.exportServices') }}" class="btn btn-primary export-btn" role="button">Export Services</a>
+          <a href="{{ url_for('admin.exportServices') }}" class="btn btn-primary export-btn my-3" role="button">Export Services</a>
       </div>
+  </div>
+  <div class="row my-2">
+    <div class="col">
+      <legend>Current Services</legend>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+<table class="table table-striped dataTable" id="servicesTable">
+        <thead>
+          <tr>
+            <th scope="col">Line Number</th>
+            <th scope="col">Port</th>
+            <th scope="col">Protocol</th>
+            <th scope="col">Service-name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in servlist %}
+          <tr>
+            <th scope="row">{{ item[0] }}</th>
+            <td>{{ item[1] }}</td>
+            <td>{{ item[2] }}</td>
+            <td>{{ item[3] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 {% endblock %}

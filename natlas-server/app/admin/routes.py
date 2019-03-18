@@ -286,7 +286,7 @@ def services():
             return redirect(url_for('admin.services'))
 
 
-    return render_template('admin/services.html', uploadForm=uploadForm, addServiceForm=addServiceForm, current_services=current_app.current_services)
+    return render_template('admin/services.html', uploadForm=uploadForm, addServiceForm=addServiceForm, current_services=current_app.current_services, servlist=current_app.current_services['as_list'])
 
 @bp.route('/services/export', methods=['GET'])
 @isAuthenticated
