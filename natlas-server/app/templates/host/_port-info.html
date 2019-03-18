@@ -17,7 +17,9 @@
     </div><!--end port-summary-->
 
     <div class="col-xs-12 col-sm-10 port-details">
-        <h5 class="service-header">{{ port.service.product }} <small class="text-muted">{{ port.service.version }} {% if port.service.extrainfo %}<small class="text-muted">{{ port.service.extrainfo }}</small>{% endif %}</small></h5>
+        {% if port.service.product or port.service.version or port.service.extrainfo %}
+        <h5 class="service-header">{{ port.service.product }}{% if port.service.version %}<small class="text-muted service-version pl-2">{{ port.service.version }}</small>{% endif %}{% if port.service.extrainfo %}<small class="text-muted service-extrainfo pl-2">{{ port.service.extrainfo }}</small>{% endif %}</h5>
+        {% endif %}
         {% if port.banner %}
             <div class="row port-banner">
                 <div class="col">

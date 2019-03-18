@@ -232,3 +232,9 @@ form.config-form>div, form.pwchange-form>div {
 .service-header {
   border-bottom:1px dotted #e3e3e3;
 }
+.service-version {
+  font-size:0.95rem;
+}
+.service-extrainfo {
+  font-size:0.7rem;
+}
