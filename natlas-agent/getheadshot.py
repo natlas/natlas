@@ -10,14 +10,9 @@ import time
 
 def getheadshot(ip, rand, service):
 
-    # display hack, wkhtmltoimage doesn't like to run headless
-    # this requires you to run a vncserver or something
-    # os.environ["DISPLAY"]=':1'
-
     if service in ("vnc"):
         if "DISPLAY" not in os.environ:
             return False
-        print("[+] (%s) Attempting to take vnc snapshot" % rand)
         process = subprocess.Popen(["xvfb-run", "vncsnapshot", "-quality", "50", ip, "data/natlas." +
                                     rand + "." + service + ".headshot.jpg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
@@ -26,13 +21,13 @@ def getheadshot(ip, rand, service):
                 return True
         except:
             try:
-                print("[+] (%s) Killing slacker process" % rand)
+                print("[!] (%s) Killing slacker process" % rand)
                 process.kill()
+                return False
             except:
                 pass
 
     if service in ("http", "https"):
-        print("[+] (%s) Attempting to take %s snapshot" % (rand, service))
         #process = subprocess.Popen(["wkhtmltoimage", "--javascript-delay", "3000", "--width", "800", "--height", "600", "--quality",
         #                            "80", "-f", "jpg", service+"://"+ip, "data/natlas."+rand+"." + service + ".headshot.jpg"], stdout=FNULL, stderr=FNULL)
         p1 = subprocess.Popen(["echo", service+"://"+ip], stdout=subprocess.PIPE)
@@ -45,7 +40,7 @@ def getheadshot(ip, rand, service):
                 time.sleep(0.5) # a small sleep to make sure all file handles are closed so that the agent can read them
                 return True
         except subprocess.TimeoutExpired:
-            print("[+] (%s) Killing slacker process" % rand)
+            print("[!] (%s) Killing slacker process" % rand)
             process.kill()
         
 

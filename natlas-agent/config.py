@@ -16,10 +16,13 @@ class Config:
         tmp = os.environ.get(varname)
         if tmp and tmp.upper() == "TRUE":
             return True
+        if tmp and tmp.upper() == "FALSE":
+            return False
         return None
 
     def __init__(self):
         self.server = os.environ.get('NATLAS_SERVER_ADDRESS') or 'http://127.0.0.1:5000' # url of server to get/submit work to
+        self.ignore_ssl_warn = self.getBool('NATLAS_IGNORE_SSL_WARN') or False # verify SSL connections to self.server
         self.max_threads = self.getInt('NATLAS_MAX_THREADS') or 3 # maximum number of threads to utilize
         self.scan_local = self.getBool('NATLAS_SCAN_LOCAL') or False # Are we allowed to scan local addresses?
         self.request_timeout = self.getInt('NATLAS_REQUEST_TIMEOUT') or 15 # seconds, default time to wait for the server to respond

@@ -15,15 +15,16 @@ import hashlib
 import glob
 from datetime import datetime,timezone
 from libnmap.parser import NmapParser, NmapParserException
+import ipaddress
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 import threading
 import queue
 
+
 # my script for headshotting servers
 from getheadshot import getheadshot
 from config import Config
-
-import ipaddress
 
 ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
 
@@ -32,29 +33,39 @@ MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of ou
 
 RTTVAR_MSG = "RTTVAR has grown to over"
 
+def print_err(message):
+    threadname = threading.current_thread().name
+    print("[!] %s: %s" % (threadname, message))
+
+def print_info(message):
+    threadname = threading.current_thread().name
+    print("[+] %s: %s" % (threadname, message))
+
+if config.ignore_ssl_warn:
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def make_request(endpoint, reqType="GET", postData=None, contentType="application/json", statusCode=200):
     try:
         if reqType == "GET":
-            req = requests.get(config.server+endpoint, timeout=config.request_timeout)
+            req = requests.get(config.server+endpoint, timeout=config.request_timeout, verify=(not config.ignore_ssl_warn))
             if req.status_code != statusCode:
-                print("[!] Expected %s, received %s" % (statusCode, req.status_code))
+                print_err("Expected %s, received %s" % (statusCode, req.status_code))
                 return False
             if req.headers['content-type'] != contentType:
-                print("[!] Expected %s, received %s" % (contentType, req.headers['content-type']))
+                print_err("Expected %s, received %s" % (contentType, req.headers['content-type']))
                 return False
         elif reqType == "POST" and postData:
-            req = requests.post(config.server+endpoint, json=postData, timeout=config.request_timeout)
+            req = requests.post(config.server+endpoint, json=postData, timeout=config.request_timeout, verify=(not config.ignore_ssl_warn))
             if req.status_code != statusCode:
-                print("[!] Expected %s, received %s" % (statusCode, req.status_code))
+                print_err("Expected %s, received %s" % (statusCode, req.status_code))
                 return False
     except requests.ConnectionError as e:
-        print("[!] Connection Error connecting to %s." % config.server)
+        print_err("Connection Error connecting to %s" % config.server)
         return False
     except requests.Timeout as e:
-        print("[!] Request timed out after %s seconds." % config.request_timeout)
+        print_err("Request timed out after %s seconds." % config.request_timeout)
         return False
     except ValueError as e:
-        print("[!] Error: %s" % e)
+        print_err("Error: %s" % e)
         return False
 
     return req
@@ -67,30 +78,30 @@ def backoff_request(giveup=False, *args, **kwargs):
         if not result:
             attempt += 1
             if giveup and attempt == config.max_retries:
-                print("[!] Request to %s failed %s times. Giving up" % (config.server, config.max_retries))
+                print_err("Request to %s failed %s times. Giving up" % (config.server, config.max_retries))
                 return None
             jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
             current_sleep = min(config.backoff_max, config.backoff_base * 2 ** attempt) + jitter
-            print("[!] Request to %s failed. Waiting %s seconds before retrying." % (config.server, current_sleep))
+            print_err("Request to %s failed. Waiting %s seconds before retrying." % (config.server, current_sleep))
             time.sleep(current_sleep)
     return result
 
 def get_services_file():
-    print("[+] Fetching natlas-services file from %s" % config.server)
+    print_info("Fetching natlas-services file from %s" % config.server)
     response = backoff_request(endpoint="/api/natlas-services")
     if response:
         serviceData = response.json()
         if serviceData["id"] == "None":
-            print("[!] Error: %s doesn't have a service file for us" % config.server)
+            print_err("%s doesn't have a service file for us" % config.server)
             return False
         if not hashlib.sha256(serviceData["services"].encode()).hexdigest() == serviceData["sha256"]:
-            print("[!] Error: hash provided by %s doesn't match locally computed hash of services" % config.server)
+            print_err("hash provided by %s doesn't match locally computed hash of services" % config.server)
             return False
         with open("natlas-services", "w") as f:
             f.write(serviceData["services"])
         with open("natlas-services", "r") as f:
             if not hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() == serviceData["sha256"]:            
-                print("[!] Error: hash of local file doesn't match hash provided by server")
+                print_err("hash of local file doesn't match hash provided by server")
                 return False
     else:
         return False # return false if we were unable to get a response from the server
@@ -98,7 +109,7 @@ def get_services_file():
 
 
 def fetch_target():
-    print("[+] Fetching Target from %s" % config.server)
+    print_info("Fetching Target from %s" % config.server)
     response = backoff_request(endpoint="/api/getwork")
     if response:
         target_data = response.json()
@@ -110,10 +121,10 @@ def validate_target(target):
     try:
         iptarget = ipaddress.ip_address(target)
         if iptarget.is_private and not config.scan_local:
-            print("[!] We're not configured to scan local addresses!")
+            print_err("We're not configured to scan local addresses!")
             return False
     except ipaddress.AddressValueError:
-        print("[!] %s is not a valid IP Address" % target)
+        print_err("%s is not a valid IP Address" % target)
         return False
     return True
 
@@ -121,7 +132,7 @@ def generate_scan_id():
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
 
 def cleanup_files(scan_id):
-    print("[+] (%s) Cleaning up files" % scan_id)
+    print_info("Cleaning up files for %s" % scan_id)
     for file in glob.glob("data/*."+scan_id+".*"):
         os.remove(file)
 
@@ -129,7 +140,7 @@ def scan(target_data=None):
     
     if not validate_target(target_data["target"]):
         return ERR["INVALIDTARGET"]
-    print("[+] (%s) Target: %s" % (target_data["scan_id"], target_data["target"]))
+    print_info("Target: %s" % target_data["target"])
     
     result = {}
     target = target_data["target"]
@@ -156,7 +167,7 @@ def scan(target_data=None):
         out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
     except:
         try:
-            print("[!] (%s) Scan timed out" % scan_id)
+            print_err("Scan %s timed out" % scan_id)
             process.kill()
             TIMEDOUT = True
         except:
@@ -168,26 +179,26 @@ def scan(target_data=None):
         result['scan_stop'] = datetime.now(timezone.utc).isoformat()
         result['timed_out'] = True
         cleanup_files(scan_id)
-        print("[+] (%s) Submitting scan timeout notice for %s" % (scan_id, result['ip']))
+        print_info("Submitting scan timeout notice for %s" % result['ip'])
         response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
         return
     else:
-        print("[+] (%s) Scan Complete" % scan_id)
+        print_info("Scan  %s Complete" % scan_id)
 
     for ext in 'nmap', 'gnmap', 'xml':
         try: 
             result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
         except:
-            print("[!] (%s) Nmap data not found" % scan_id)
+            print_err("Couldn't read natlas.%s.%s" % (scan_id, ext))
             return ERR["DATANOTFOUND"]
 
     nmap_report = NmapParser.parse(result['xml_data'])
 
     if nmap_report.hosts_total < 1:
-        print("[!] (%s) No hosts found in scan data" % scan_id)
+        print_err("No hosts found in scan data")
         return "[!] No hosts found in scan data"
     elif nmap_report.hosts_total > 1:
-        print("[!] (%s) Too many hosts found in scan data" % scan_id)
+        print_err("Too many hosts found in scan data")
         return "[!] Too many hosts found in scan data"
     elif nmap_report.hosts_down == 1:
         # host is down
@@ -195,7 +206,7 @@ def scan(target_data=None):
         result['port_count'] = 0
         result['scan_stop'] = datetime.now(timezone.utc).isoformat()
         cleanup_files(scan_id)
-        print("[+] (%s) Submitting host down notice for %s" % (scan_id, result['ip']))
+        print_info("Submitting host down notice for %s" % (result['ip']))
         response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
         return
     elif nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
@@ -204,7 +215,7 @@ def scan(target_data=None):
         result['port_count'] = 0
         result['scan_stop'] = datetime.now(timezone.utc).isoformat()
         cleanup_files(scan_id)
-        print("[+] (%s) Submitting %s ports for %s" % (scan_id, result['port_count'], result['ip']))
+        print_info("Submitting %s ports for %s" % (result['port_count'], result['ip']))
         response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
         return
     else:
@@ -215,6 +226,7 @@ def scan(target_data=None):
     if target_data["agent_config"]["webScreenshots"] and shutil.which("aquatone") is not None:
         if "80/tcp" in result['nmap_data']:
             if getheadshot(target, scan_id, 'http') is True:
+                print_info("Attempting to take HTTP screenshot for %s" % result['ip'])
                 screenshotPath = "data/aquatone." + scan_id + ".http/screenshots/http__" +target.replace('.','_') + ".png"
                 if not os.path.isfile(screenshotPath):
                     shutil.rmtree("data/aquatone." + scan_id + ".http/")
@@ -222,11 +234,13 @@ def scan(target_data=None):
                     result['httpheadshot'] = str(base64.b64encode(
                         open(screenshotPath, 'rb').read()))[2:-1]
                     shutil.rmtree("data/aquatone." + scan_id + ".http/")
-                    print("[+] (%s) HTTP snapshot acquired" % scan_id)
+                    print_info("HTTP screenshot acquired for %s" % result['ip'])
             else:
-                print("[!] (%s) Failed to acquire HTTP snapshot" % scan_id)
+                print_err("Failed to acquire HTTP screenshot for %s" % result['ip'])
+
         if "443/tcp" in result['nmap_data']:
             if getheadshot(target, scan_id, 'https') is True:
+                print_info("Attempting to take HTTPS screenshot for %s" % result['ip'])
                 screenshotPath = "data/aquatone." + scan_id + ".https/screenshots/https__" +target.replace('.','_') + ".png"
                 if not os.path.isfile(screenshotPath):
                     shutil.rmtree("data/aquatone." + scan_id + ".https/")
@@ -234,28 +248,30 @@ def scan(target_data=None):
                     result['httpsheadshot'] = str(base64.b64encode(
                         open(screenshotPath, 'rb').read()))[2:-1]
                     shutil.rmtree("data/aquatone." + scan_id + ".https/")
-                    print("[+] (%s) HTTPS snapshot acquired" % scan_id)
+                    print_info("HTTPS screenshot acquired for %s" % result['ip'])
             else:
-                print("[!] (%s) Failed to acquire HTTPS snapshot" % scan_id)
+                print_err("Failed to acquire HTTPS screenshot for %s" % result['ip'])
+
     if target_data["agent_config"]["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
         if "5900/tcp" in result['nmap_data']:
+            print_info("Attempting to take vnc screenshot for %s" % result['ip'])
             if getheadshot(target, scan_id, 'vnc') is True:
                 result['vncsheadshot'] = str(base64.b64encode(
                     open("data/natlas."+scan_id+".vnc.headshot.jpg", 'rb').read()))[2:-1]
                 os.remove("data/natlas."+scan_id+".vnc.headshot.jpg")
-                print("[+] (%s) VNC snapshot acquired" % scan_id)
+                print_info("VNC screenshot acquired for %s" % result['ip'])
             else:
-                print("[!] (%s) Failed to acquire VNC snapshot" % scan_id)
+                print_err("Failed to acquire screenshot for %s" % result['ip'])
 
     # submit result
     result['scan_stop'] = datetime.now(timezone.utc).isoformat()
     cleanup_files(scan_id)
-    print("[+] (%s) Submitting %s ports for %s" % (scan_id, result['port_count'], result['ip']))
+    print_info("Submitting %s ports for %s" % (result['port_count'], result['ip']))
     response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
     if not response:
-        print("[!] (%s) Something went wrong!" % scan_id)
+        print_err("Something went wrong submitting results for %s" % result['ip'])
     else:
-        print("[+] (%s) Response: %s" % (scan_id, response.text))
+        print_info("Response: %s" % (response.text))
 
 class ThreadScan(threading.Thread):
     def __init__(self, queue, auto=False, servicesSha=''):
@@ -272,7 +288,7 @@ class ThreadScan(threading.Thread):
                 if target_data["services_hash"] != self.servicesSha:
                     self.servicesSha = get_services_file()
                     if not self.servicesSha:
-                        print("Failed to get updated services from %s" % config.server)
+                        print_err("Failed to get updated services from %s" % config.server)
                 result = scan(target_data)
         
         else:
@@ -320,7 +336,7 @@ def main():
     # Use a default agent config of all options enabled if we are in standalone mode
     defaultAgentConfig = {"id": 0, "versionDetection": True, "osDetection": True, "defaultScripts": True, "onlyOpens": True, "scanTimeout": 300, "webScreenshots": True, "vncScreenshots": True}
     if args.target:
-        print("[+] Scanning: %s" % args.target)
+        print_info("Scanning: %s" % args.target)
 
         targetNetwork = ipaddress.ip_interface(args.target)
         if targetNetwork.with_prefixlen.endswith('/32'):
@@ -335,11 +351,11 @@ def main():
                 q.put(target_data)
 
         q.join()
-        print("[+] Finished scanning: %s" % args.target)
+        print_info("Finished scanning: %s" % args.target)
         return
 
     elif args.tfile:
-        print("[+] Reading scope from file: %s" % args.tfile)
+        print_info("Reading scope from file: %s" % args.tfile)
 
         for target in open(args.tfile, "r"):
             targetNetwork = ipaddress.ip_interface(target.strip())
@@ -353,7 +369,7 @@ def main():
                     target_data = {"target": str(t), "scan_id": scan_id, "agent_config":defaultAgentConfig}
                     q.put(target_data)
         q.join()
-        print("[+] Finished scanning the target file %s" % args.tfile)
+        print_info("Finished scanning the target file %s" % args.tfile)
         return
 
     # This is the default behavior of fetching work from the server
