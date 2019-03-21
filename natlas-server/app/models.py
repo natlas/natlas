@@ -4,7 +4,9 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
+from datetime import datetime, timezone
 import jwt
+from .util import utcnow_tz
 
 # Users and related configs
 class User(UserMixin, db.Model):
@@ -14,6 +16,7 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean)
     results_per_page = db.Column(db.Integer, default=100)
     preview_length = db.Column(db.Integer, default=100)
+    rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -124,6 +127,45 @@ class AgentConfig(db.Model):
     scanTimeout = db.Column(db.Integer, default=300)
     webScreenshots = db.Column(db.Boolean, default=True)
     vncScreenshots = db.Column(db.Boolean, default=True)
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class RescanTask(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date_added = db.Column(db.DateTime, index=True, default=utcnow_tz, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    target = db.Column(db.String, index=True)
+    dispatched = db.Column(db.Boolean, default=False, index=True)
+    date_dispatched = db.Column(db.DateTime, index=True)
+    complete = db.Column(db.Boolean, default=False, index=True)
+    date_completed = db.Column(db.DateTime, index=True)
+    scan_id = db.Column(db.String, index=True, unique=True)
+
+    def dispatchTask(self):
+        self.dispatched = True
+        self.date_dispatched = utcnow_tz()
+
+    def completeTask(self, scan_id):
+        self.scan_id = scan_id
+        self.complete = True
+        self.date_completed = utcnow_tz()
+
+    @staticmethod
+    def getPendingTasks(): # Tasks that haven't been completed and haven't been dispatched
+        return RescanTask.query.filter_by(complete=False).filter_by(dispatched=False).all()
+
+    @staticmethod
+    def getDispatchedTasks(): # Tasks that have been dispatched but haven't been completed
+        return RescanTask.query.filter_by(dispatched=True).filter_by(complete=False).all()
+
+    @staticmethod
+    def getIncompleteTasks(): #All tasks that haven't been marked as complete
+        return RescanTask.query.filter_by(complete=False).all()
+
+    @staticmethod
+    def getIncompleteTaskForTarget(ip):
+        return RescanTask.query.filter_by(target=ip).filter_by(complete=False).all()
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -5,6 +5,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 import dateutil.parser
 
+from app import db
 from app.models import NatlasServices
 from app.api import bp
 from app.util import isAcceptableTarget
@@ -12,17 +13,34 @@ from libnmap.parser import NmapParser
 
 @bp.route('/getwork', methods=['GET'])
 def getwork():
-    scanmanager = current_app.ScopeManager.getScanManager()
-    if scanmanager == None:
-        current_app.ScopeManager.update()
-        scanmanager = current_app.ScopeManager.getScanManager()
-
-        if scanmanager == None:
-            return json.dumps({ 'errorcode': 404, 'message': 'No scope is currently configured.' }), 404, {'content-type':'application/json'}
-
-    ip = scanmanager.getNextIP()
-
     work = {}
+    rescans = current_app.ScopeManager.getPendingRescans()
+    if len(rescans) == 0: # If there aren't any rescans, update the Rescan Queue and get it again, because of lazy loading
+        current_app.ScopeManager.updatePendingRescans()
+        rescans = current_app.ScopeManager.getPendingRescans()
+
+    if len(rescans) == 0: # if we don't have rescans, use the ScanManager
+        scanmanager = current_app.ScopeManager.getScanManager()
+        if scanmanager == None:
+            current_app.ScopeManager.update()
+            scanmanager = current_app.ScopeManager.getScanManager()
+
+            if scanmanager == None:
+                return json.dumps({ 'errorcode': 404, 'message': 'No scope is currently configured.' }), 404, {'content-type':'application/json'}
+
+        ip = scanmanager.getNextIP()
+        work['scan_reason'] = 'auto'
+    
+    else: # Get the ip from the rescan queue, mark the job as dispatched, update the PendingRescans for other requests
+        ip = rescans[0].target
+        work['scan_reason'] = 'requested'
+        rescans[0].dispatchTask()
+        db.session.add(rescans[0])
+        db.session.commit()
+        current_app.ScopeManager.updatePendingRescans()
+        current_app.ScopeManager.updateDispatchedRescans()
+
+
     work['type'] = 'nmap'
     work['agent_config'] = current_app.agentConfig
     work["services_hash"] = current_app.current_services["sha256"]
@@ -46,6 +64,16 @@ def submit():
     
     newhost = {}
     newhost = json.loads(data)
+    if newhost['scan_reason'] != 'auto':
+        dispatched = current_app.ScopeManager.getDispatchedRescans()
+        for scan in dispatched:
+            if scan.target == newhost['ip']:
+                scan.completeTask(newhost['scan_id'])
+                db.session.add(scan)
+                db.session.commit()
+                current_app.ScopeManager.updateDispatchedRescans()
+                break
+
     if newhost['scan_start'] and newhost['scan_stop']:
         elapsed = dateutil.parser.parse(newhost['scan_stop']) - dateutil.parser.parse(newhost['scan_start'])
         newhost['elapsed'] = elapsed.seconds
@@ -105,5 +133,7 @@ def submit():
 @bp.route('/natlas-services', methods=['GET'])
 def natlasServices():
     if current_app.current_services["id"] != "None":
-        return json.dumps(current_app.current_services), 200, {'content-type':'application/json'}
+        tmpdict = current_app.current_services
+        del tmpdict['as_list'] # don't return the "as_list" version of the services, which is only used for making a pretty table.
+        return json.dumps(tmpdict), 200, {'content-type':'application/json'}
     return json.dumps(current_app.current_services), 404, {'content-type':'application/json'}

@@ -1,10 +1,14 @@
 from flask import redirect, url_for, flash, render_template, Response, current_app, g, request
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app.main import bp
-from app.util import hostinfo
+from app.util import hostinfo, isAcceptableTarget
 from app.auth.wrappers import isAuthenticated, isAdmin
 from app.admin.forms import DeleteForm
+from app.main.forms import RescanForm
+from app.models import RescanTask
+from app import db
 import json
+from datetime import datetime, timedelta
 
 @bp.route('/')
 @isAuthenticated
@@ -48,7 +52,9 @@ def host(ip):
     info, context = hostinfo(ip)
     delForm = DeleteForm()
     delHostForm = DeleteForm()
-    return render_template("host/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm)
+    rescanForm = RescanForm()
+    return render_template("host/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
+        rescanForm=rescanForm)
 
 
 @bp.route('/host/<ip>/history')
@@ -60,6 +66,7 @@ def host_history(ip):
     searchOffset = current_user.results_per_page * (page-1)
     
     delHostForm = DeleteForm()
+    rescanForm = RescanForm()
 
     count, context = current_app.elastic.gethost_history(
         ip, current_user.results_per_page, searchOffset)
@@ -70,16 +77,18 @@ def host_history(ip):
     prev_url = url_for('main.host_history', ip=ip, p=page - 1) \
         if page > 1 else None
 
-    return render_template("host/history.html", ip=ip, info=info, page=page, numresults=count, hosts=context, next_url=next_url, prev_url=prev_url, delHostForm=delHostForm)
+    return render_template("host/history.html", ip=ip, info=info, page=page, numresults=count, hosts=context, next_url=next_url, prev_url=prev_url, \
+        delHostForm=delHostForm, rescanForm=rescanForm)
 
 @bp.route('/host/<ip>/<scan_id>')
 @isAuthenticated
 def host_historical_result(ip, scan_id):
     delForm = DeleteForm()
     delHostForm = DeleteForm()
+    rescanForm = RescanForm()
     info, context = hostinfo(ip)
     count, context = current_app.elastic.gethost_scan_id(scan_id)
-    return render_template("host/summary.html", host=context, info=info, **context, delForm=delForm, delHostForm=delHostForm)
+    return render_template("host/summary.html", host=context, info=info, **context, delForm=delForm, delHostForm=delHostForm, rescanForm=rescanForm)
 
 @bp.route('/host/<ip>/<scan_id>.xml')
 @isAuthenticated
@@ -113,5 +122,48 @@ def export_scan_json(ip, scan_id):
 @isAuthenticated
 def host_headshots(ip):
     delHostForm = DeleteForm()
+    rescanForm = RescanForm()
     info, context = hostinfo(ip)
-    return render_template("host/headshots.html", **context, info=info, delHostForm=delHostForm)
+    return render_template("host/headshots.html", **context, info=info, delHostForm=delHostForm, rescanForm=rescanForm)
+
+@bp.route('/host/<ip>/rescan', methods=['POST'])
+# login_required ensures that an actual user is logged in to make the request
+# opposed to isAuthenticated checking site config to see if login is required first
+@login_required
+def rescan_host(ip):
+    rescanForm = RescanForm()
+
+    if rescanForm.validate_on_submit():
+        if not isAcceptableTarget(ip):
+            # Someone is requesting we scan an ip that isn't allowed
+            flash("We're not allowed to scan %s" % ip, "danger")
+            return redirect(request.referrer)
+
+        incompleteScans = current_app.ScopeManager.getIncompleteScans()
+
+        for scan in incompleteScans:
+            if ip == scan.target:
+                if scan.dispatched == True:
+                    status = "dispatched"
+                    if (datetime.utcnow() - scan.date_dispatched).seconds > 1200:
+                        # 20 minutes have past since dispatch, something probably wen't seriously wrong
+                        # move it back to not dispatched and update the cached rescan data
+                        scan.dispatched = False
+                        db.session.add(scan)
+                        db.session.commit()
+                        current_app.ScopeManager.updatePendingRescans()
+                        current_app.ScopeManager.updateDispatchedRescans()
+                        flash("Refreshed existing rescan request for %s" % ip, "success")
+                        return redirect(request.referrer)
+                else:
+                    status = "pending"
+                flash("There's already a %s rescan request for %s" % (status, ip), "warning")
+                return redirect(request.referrer)
+
+        rescan = RescanTask(user_id=current_user.id, target=ip)
+        db.session.add(rescan)
+        db.session.commit()
+        flash("Requested rescan of %s" % ip, "success")
+        current_app.ScopeManager.updatePendingRescans()
+        current_app.ScopeManager.updateDispatchedRescans()
+        return redirect(request.referrer)

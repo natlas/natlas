@@ -6,6 +6,8 @@ class ScopeManager():
 
     scope = []
     blacklist = []
+    pendingRescans = []
+    dispatchedRescans = []
     scopeSize = 0
     blacklistSize = 0
     scanmanager = None
@@ -25,6 +27,27 @@ class ScopeManager():
 
     def getBlacklist(self):
         return self.blacklist
+
+    def getPendingRescans(self):
+        return self.pendingRescans
+
+    def getDispatchedRescans(self):
+        return self.dispatchedRescans
+
+    def getIncompleteScans(self):
+        if self.pendingRescans == [] or self.dispatchedRescans == []:
+            from app.models import RescanTask
+            self.pendingRescans = RescanTask.getPendingTasks()
+            self.dispatchedRescans = RescanTask.getDispatchedTasks()
+        return self.pendingRescans + self.dispatchedRescans
+
+    def updateDispatchedRescans(self):
+        from app.models import RescanTask
+        self.dispatchedRescans = RescanTask.getDispatchedTasks()
+
+    def updatePendingRescans(self):
+        from app.models import RescanTask
+        self.pendingRescans = RescanTask.getPendingTasks()
 
     def updateScope(self):
         from app.models import ScopeItem
