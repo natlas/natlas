@@ -1,12 +1,13 @@
-from flask import current_app, request
+from flask import current_app, request, jsonify
 import random, os, json, ipaddress, string
 
 from datetime import datetime as dt
 from datetime import timezone as tz
 import dateutil.parser
+from ipaddress import ip_network
 
 from app import db
-from app.models import NatlasServices
+from app.models import NatlasServices, ScopeItem, Tag
 from app.api import bp
 from app.util import isAcceptableTarget
 from libnmap.parser import NmapParser
@@ -39,6 +40,15 @@ def getwork():
         db.session.commit()
         current_app.ScopeManager.updatePendingRescans()
         current_app.ScopeManager.updateDispatchedRescans()
+
+    targetnet = ip_network(ip)
+    tags = []
+    for scope in current_app.ScopeManager.getScope():
+        if scope.overlaps(targetnet):
+            scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags.all()
+            for tag in scopetags:
+                tags.append(tag.name)
+    work['tags'] = tags
 
 
     work['type'] = 'nmap'

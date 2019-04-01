@@ -100,3 +100,11 @@ class AgentConfigForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     delete = SubmitField("Delete")
+
+class AddTagForm(FlaskForm):
+    tagname = StringField("Tag Name", validators=[DataRequired()])
+    addTag = SubmitField("Add Tag")
+
+class TagScopeForm(FlaskForm):
+    tagname = SelectField("Tag Name", validators=[DataRequired()])
+    addTagToScope = SubmitField("Add Tag to Scope")

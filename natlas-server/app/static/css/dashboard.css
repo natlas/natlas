@@ -234,3 +234,11 @@ form.config-form>div, form.pwchange-form>div {
   justify-content:center;
   flex-direction:column;
 }
+
+a > .badge-tag {
+  color:white;
+}
+
+.dropright .dropdown-no-arrow::after {
+  display:none;
+}

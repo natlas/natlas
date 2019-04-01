@@ -21,6 +21,12 @@
       <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
     </a>
     {% endif %}
+    {% if host.tags %}
+    <h4 class="mt-2">Tags</h4>
+      {% for tag in host.tags %}
+        <a href="{{ url_for('main.search', q="tags:" + tag)}}"><span class="badge badge-secondary badge-tag">{{ tag }}</span></a>
+      {% endfor %}
+    {% endif %}
     <div class="btn-group export-group mt-2" role="group">
         {% include 'host/_host-export.html' %}
       </div>

@@ -16,6 +16,9 @@
     <a class="nav-link{{ ' active' if active_page == 'blacklist' }}" id="nav-blacklist" href="{{ url_for('admin.blacklist') }}">Blacklist</a>
   </li>
   <li class="nav-item" role="presentation">
+    <a class="nav-link{{ ' active' if active_page == 'tags' }}" id="nav-tags" href="{{ url_for('admin.tags') }}">Tags</a>
+  </li>
+  <li class="nav-item" role="presentation">
     <a class="nav-link{{ ' active' if active_page == 'services' }}" id="nav-services" href="{{ url_for('admin.services') }}">Services</a>
   </li>
   <li class="nav-item" role="presentation">

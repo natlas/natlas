@@ -8,6 +8,13 @@ from datetime import datetime, timezone
 import jwt
 from .util import utcnow_tz
 
+
+scopetags = db.Table('scopetags',
+    db.Column('scope_id', db.Integer, db.ForeignKey('scope_item.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
+)
+
+
 # Users and related configs
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,12 +75,26 @@ class ScopeItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     target = db.Column(db.String, index=True, unique=True)
     blacklist = db.Column(db.Boolean, index=True)
+    tags = db.relationship('Tag', secondary=scopetags,
+        primaryjoin=(scopetags.c.scope_id == id),
+        backref=db.backref('scope', lazy='dynamic'), lazy='dynamic')
 
     def getBlacklist():
         return ScopeItem.query.filter_by(blacklist=True).all()
 
     def getScope():
         return ScopeItem.query.filter_by(blacklist=False).all()
+
+    def addTag(self, tag):
+        if not self.is_tagged(tag):
+            self.tags.append(tag)
+
+    def delTag(self, tag):
+        if self.is_tagged(tag):
+            self.tags.remove(tag)
+
+    def is_tagged(self, tag):
+        return self.tags.filter(scopetags.c.tag_id == tag.id).count() > 0
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -134,8 +155,8 @@ class AgentConfig(db.Model):
 class RescanTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_added = db.Column(db.DateTime, index=True, default=utcnow_tz, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    target = db.Column(db.String, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    target = db.Column(db.String, index=True, nullable=False)
     dispatched = db.Column(db.Boolean, default=False, index=True)
     date_dispatched = db.Column(db.DateTime, index=True)
     complete = db.Column(db.Boolean, default=False, index=True)
@@ -169,3 +190,8 @@ class RescanTask(db.Model):
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, index=True, unique=True, nullable=False)

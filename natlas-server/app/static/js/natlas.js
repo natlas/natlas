@@ -8,5 +8,10 @@ $(function() {
 
 
 $(document).ready(function() {
-    $('.dataTable').DataTable();
+    $('.dataTable').DataTable( {
+        "columnDefs": [
+            { "orderable": false, "targets": 'table-controls' }
+        ]
+    });
+    $('[data-toggle="popover"]').popover()
 });

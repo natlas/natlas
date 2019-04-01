@@ -146,6 +146,7 @@ def scan(target_data=None):
     target = target_data["target"]
     result['ip'] = target
     result['scan_reason'] = target_data['scan_reason']
+    result['tags'] = target_data['tags']
     scan_id = target_data["scan_id"]
     result['scan_id'] = scan_id
     agentConfig = target_data["agent_config"]

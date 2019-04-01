@@ -23,6 +23,7 @@ class Elastic:
                             "scan_start": {"type":"date"},
                             "scan_stop": {"type":"date"},
                             "elapsed": {"type":"integer"},
+                            "tags": {"type":"keyword"},
                             "port_count": {"type":"integer"},
                             "port_str": {"type":"text"},
                             "is_up": {"type":"boolean"},

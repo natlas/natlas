@@ -26,8 +26,8 @@
           <tr>
             <th scope="col">#</th>
             <th scope="col">Target</th>
-            <th scope="col"></th>
-            <th scope="col"></th>
+            <th scope="col">Tags</th>
+            <th class="table-controls" scope="col"></th>
           </tr>
         </thead>
         <tbody>
@@ -35,8 +35,10 @@
           <tr>
             <th scope="row">{{ item.id }}</th>
             <td>{{ item.target }}</td>
-            <td><form method="POST" action="{{ url_for('admin.deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger", onclick="return confirm('Are you sure you want to delete this blacklist item?')", value="Delete") }}</form></td>
-            <td><form method="POST" action="{{ url_for('admin.toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning", onclick="return confirm('Are you sure you want to put this item back in scope?')", value="Scope") }}</form></td>
+            <td>{% for tag in item.tags %}{{ tag.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+            <td style="text-align:center;">
+              {% include 'admin/_scope_menu.html' %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>
