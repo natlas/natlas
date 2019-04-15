@@ -62,7 +62,7 @@ def reset_password_request():
         flash('Check your email for the instructions to reset your password', "info")
         return redirect(url_for('auth.login'))
     return render_template('auth/password_reset.html',
-                           title='Reset Password', form=form, pwrequest=True)
+                           title='Request Password Reset', form=form, pwrequest=True)
 
 
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -77,8 +77,8 @@ def reset_password(token):
         user.set_password(form.password.data)
         db.session.commit()
         flash('Your password has been reset.', "success")
-        return redirect(url_for('main.login'))
-    return render_template('auth/password_reset.html', form=form)
+        return redirect(url_for('auth.login'))
+    return render_template('auth/password_reset.html', title="Reset Password", form=form)
 
 
 @bp.route('/invite/<token>', methods=['GET', 'POST'])
@@ -96,4 +96,4 @@ def invite_user(token):
         db.session.commit()
         flash('Your password has been set.', "success")
         return redirect(url_for('auth.login'))
-    return render_template('auth/accept_invite.html', form=form)
+    return render_template('auth/accept_invite.html', title="Accept Invitation", form=form)

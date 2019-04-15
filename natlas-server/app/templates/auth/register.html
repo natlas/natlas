@@ -3,7 +3,7 @@
 
 {% block content %}
     <h1>Register</h1>
-    <form action="" method="post">
+    <form action="{{url_for('auth.register')}}" method="post">
         {{ form.hidden_tag() }}
         <p>
             {{ form.email.label }}<br>
