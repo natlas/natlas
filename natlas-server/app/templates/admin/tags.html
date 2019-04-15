@@ -6,9 +6,9 @@
   <div class="row">
     <div class="col">
       <h3>Add Tag</h3>
-        <form class="form-inline" action="" method="post">
+        <form class="form-inline" action="{{url_for('admin.tags')}}" method="post">
         {{ addForm.hidden_tag() }}
-        {{ addForm.tagname.label(class="sr-only", for="")}}
+        {{ addForm.tagname.label(class="sr-only", for="tagname")}}
         {{ addForm.tagname(size=32, class="form-control", placeholder="example-tag") }}
         {% for error in addForm.tagname.errors %}
         <span style="color: red;">{{ error }}</span>

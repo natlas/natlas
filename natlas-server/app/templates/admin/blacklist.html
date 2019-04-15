@@ -6,7 +6,7 @@
   <div class="row">
     <div class="col">
       <h3>Add Blacklist</h3>
-      <form class="form-inline" action="" method="post">
+      <form class="form-inline" action="{{url_for('admin.blacklist')}}" method="post">
         {{ newForm.hidden_tag() }}
         <div class="input-group">
           {{ newForm.target(size=32, class="form-control", placeholder="E.g. 10.0.0.0/8") }}
@@ -52,7 +52,7 @@
         {{ importForm.hidden_tag() }}
         {{ importForm.scope(rows='10', cols='30') }}
         <br />
-        {{ importForm.submit(class="btn btn-primary") }}
+        {{ importForm.submit(class="btn btn-primary", id="import-submit") }}
         <a href="{{ url_for('admin.exportScope', scopetype='blacklist') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Blacklist</a>
       </form>
     </div>

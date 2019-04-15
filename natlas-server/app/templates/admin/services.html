@@ -5,8 +5,8 @@
   {% include 'admin/_header.html' %}
   <div class="row">
     <div class="col-xs-12 col-sm-6 col-md-4">
-      <legend>Upload Services File</legend>
-      <form class="form-inline" action="" method="post" enctype="multipart/form-data">
+      <h3>Upload Services File</h3>
+      <form class="form-inline" action="{{url_for('admin.services')}}" method="post" enctype="multipart/form-data">
       {{ uploadForm.hidden_tag() }} 
       <div class="input-group">
           {{ uploadForm.serviceFile(class="btn btn-default")}}
@@ -15,7 +15,7 @@
         </form>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-8">
-        <legend>Current Service Information</legend>
+        <h3>Current Service Information</h3>
         <h5>Version:
           <small>{{ current_services.id }}</small>
         </h5> 
@@ -25,7 +25,7 @@
             <abbr style="cursor:default;" title="{{ current_services.sha256 }}" id="sha256">{{ current_services.sha256|truncate(32) }}</abbr>
           </small>
         </h5>
-        <form class="form-inline" action="" method="post">
+        <form class="form-inline" action="{{url_for('admin.services')}}" method="post">
           {{ addServiceForm.hidden_tag() }}
             {{ addServiceForm.serviceName(size=12, class="form-control mx-1 my-1", placeholder="service-name")}}
             {{ addServiceForm.servicePort(size=5, class="form-control mx-1 my-1", placeholder="22")}}
@@ -37,7 +37,7 @@
   </div>
   <div class="row my-2">
     <div class="col">
-      <legend>Current Services</legend>
+      <h3>Current Services</h3>
     </div>
   </div>
   <div class="row">

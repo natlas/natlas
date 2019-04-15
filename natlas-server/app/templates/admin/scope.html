@@ -6,7 +6,7 @@
    <div class="row">
     <div class="col">
       <h3>Add Scope</h3>
-      <form class="form-inline" action="" method="post">
+      <form class="form-inline" action="{{url_for('admin.scope')}}" method="post">
         {{ newForm.hidden_tag() }}
         <div class="input-group">
           {{ newForm.target(size=32, class="form-control", placeholder="E.g. 10.0.0.0/8") }}
@@ -56,7 +56,7 @@
         {{ importForm.hidden_tag() }}
         {{ importForm.scope(rows='10', cols='30') }}
         <br />
-        {{ importForm.submit(class="btn btn-primary") }}
+        {{ importForm.submit(class="btn btn-primary", id="submit-import") }}
         <a href="{{ url_for('admin.exportScope', scopetype='scope') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Scope</a>
       </form>
     </div>
@@ -71,16 +71,15 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <form method="POST" action="" id="tagScopeForm">
-          {{ addTagForm.hidden_tag() }}
-          {{ addTagForm.tagname(class="custom-select") }}
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" id="tagScopeSubmit" class="btn btn-primary">Add Tag</button>
-      </div>
+      <form method="POST" action="{{url_for('admin.scope')}}" id="tagScopeForm">
+        <div class="modal-body">
+            {{ addTagForm.hidden_tag() }}
+            {{ addTagForm.tagname(class="custom-select") }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="tagScopeSubmit" class="btn btn-primary">Add Tag</button>
+        </div>
       </form>
     </div>
   </div>

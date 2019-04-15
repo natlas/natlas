@@ -4,31 +4,26 @@
 {% block content %}
 
 {% include 'admin/_header.html' %}
-  <form class="form" action="" method="post">
+  <form class="form" action="{{url_for('admin.agentConfig')}}" method="post">
   <div class="row">
     <div class="col-xs-12 col-md-3">
-      <legend>Nmap Config</legend>
+      <h3>Nmap Config</h3>
       {{ agentForm.hidden_tag() }} 
         <div class="form-check">
             {{ agentForm.versionDetection(class="form-check-input") }}
             {{ agentForm.versionDetection.label(class="form-check-label") }}
         </div>
         <div class="form-check">
-            <label>
             {{ agentForm.osDetection(class="form-check-input") }}
             {{ agentForm.osDetection.label(class="form-check-label") }}
-          </label>
         </div>
         <div class="form-check">
-            <label>
             {{ agentForm.defaultScripts(class="form-check-input") }} 
-            {{ agentForm.defaultScripts.label(class="form-check-label") }}</label>
+            {{ agentForm.defaultScripts.label(class="form-check-label") }}
         </div>
         <div class="form-check">
-            <label>
             {{ agentForm.onlyOpens(class="form-check-input") }} 
             {{ agentForm.onlyOpens.label(class="form-check-label") }}
-          </label>
         </div>
         <div class="form-group">
           {{ agentForm.scanTimeout.label }}
@@ -39,18 +34,14 @@
         </div>
       </div>
       <div class="col-xs-12 col-md-3">
-        <legend>Screenshot Settings</legend>
+        <h3>Screenshot Settings</h3>
         <div class="form-check">
-            <label>
             {{ agentForm.webScreenshots(class="form-check-input") }} 
           {{ agentForm.webScreenshots.label(class="form-check-label") }}
-        </label>
         </div>
         <div class="form-check">
-            <label>
               {{ agentForm.vncScreenshots(class="form-check-input") }}
              {{ agentForm.vncScreenshots.label(class="form-check-label") }}
-           </label>
         </div>
       </div>
     </div>
@@ -59,8 +50,5 @@
             {{ agentForm.updateAgents(class="btn btn-primary", style="margin-top:1em;") }}
           </div>
         </div>
-
-        </form>
-      </div>
-  </div>
+  </form>
 {% endblock %}

@@ -5,8 +5,8 @@
   {% include 'admin/_header.html' %}
    <div class="row">
     <div class="col">
-    <form class="form config-form" action="" method="post">
-    	<legend>General Settings</legend>
+    <form class="form config-form" action="{{url_for('admin.admin')}}" method="post">
+    	<h3>General Settings</h3>
     	{{ configForm.hidden_tag() }}
     	<div class="form-check">
             {{ configForm.login_required(checked=configItems["LOGIN_REQUIRED"], class="form-check-input", id="loginRequired") }} 
@@ -27,7 +27,7 @@
                 <span style="color: red;">{{ error }}</span>
             {% endfor %}
     	</div>
-    	<legend>Mail Settings</legend>
+    	<h3>Mail Settings</h3>
     	<small id="mailSettingsHelp" class="form-text text-muted">Mail settings are used to send invitation emails and password resets.</small>
     	<div class="form-group">
     		{{ configForm.mail_from.label(class="control-label") }}
