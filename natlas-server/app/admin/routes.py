@@ -289,8 +289,8 @@ def untagScopeItem(id):
 @isAuthenticated
 @isAdmin
 def services():
-    uploadForm = ServicesUploadForm()
-    addServiceForm = AddServiceForm()
+    uploadForm = ServicesUploadForm(prefix="upload-services")
+    addServiceForm = AddServiceForm(prefix="add-service")
     addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp","UDP")]
     if uploadForm.uploadFile.data and uploadForm.validate_on_submit():
         newServicesContent = uploadForm.serviceFile.data.read().decode("utf-8").rstrip('\r\n')
@@ -306,7 +306,7 @@ def services():
             flash("That file is an exact match for our current services file!", "warning")
             return redirect(url_for('admin.services'))
 
-    if addServiceForm.addService.data and addServiceForm.validate_on_submit():
+    if addServiceForm.serviceName.data and addServiceForm.validate_on_submit():
         newServiceName = addServiceForm.serviceName.data
         newServicePort = str(addServiceForm.servicePort.data) + '/' + addServiceForm.serviceProtocol.data
         if '\t' + newServicePort in str(current_app.current_services['services']):

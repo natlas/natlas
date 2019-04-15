@@ -89,6 +89,10 @@ class AddServiceForm(FlaskForm):
         if ' ' in serviceName.data:
             raise ValidationError('Service names cannot contain spaces! Use - instead.')
 
+    def validate_servicePort(self, servicePort):
+        if servicePort.data > 65535 or servicePort.data < 0:
+            raise ValidationError('Port has to be withing range of 0-65535')
+
 class AgentConfigForm(FlaskForm):
     versionDetection = BooleanField("Enable Version Detection")
     osDetection = BooleanField("Enable OS Detection")

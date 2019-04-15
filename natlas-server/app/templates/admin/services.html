@@ -6,7 +6,7 @@
   <div class="row">
     <div class="col-xs-12 col-sm-6 col-md-4">
       <h3>Upload Services File</h3>
-      <form class="form-inline" action="{{url_for('admin.services')}}" method="post" enctype="multipart/form-data">
+      <form class="form-inline" action="{{url_for('admin.services')}}" name="uploadForm" method="post" enctype="multipart/form-data">
       {{ uploadForm.hidden_tag() }} 
       <div class="input-group">
           {{ uploadForm.serviceFile(class="btn btn-default")}}
@@ -25,7 +25,7 @@
             <abbr style="cursor:default;" title="{{ current_services.sha256 }}" id="sha256">{{ current_services.sha256|truncate(32) }}</abbr>
           </small>
         </h5>
-        <form class="form-inline" action="{{url_for('admin.services')}}" method="post">
+        <form class="form-inline" action="{{url_for('admin.services')}}" name="addServiceForm" method="post">
           {{ addServiceForm.hidden_tag() }}
             {{ addServiceForm.serviceName(size=12, class="form-control mx-1 my-1", placeholder="service-name")}}
             {{ addServiceForm.servicePort(size=5, class="form-control mx-1 my-1", placeholder="22")}}
