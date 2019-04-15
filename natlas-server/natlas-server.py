@@ -1,5 +1,6 @@
 from app import create_app, db
-from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, RescanTask, Tag
+from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, RescanTask, Tag, \
+                        Agent
 
 app = create_app(load_config=True)
 
@@ -7,4 +8,4 @@ app = create_app(load_config=True)
 def make_shell_context():
 	return {'db':db, 'User':User, 'ScopeItem':ScopeItem, 'ConfigItem':ConfigItem,
     'NatlasServices':NatlasServices, 'AgentConfig':AgentConfig, 'RescanTask':RescanTask,
-    'Tag':Tag}
+    'Tag':Tag, 'Agent':Agent}

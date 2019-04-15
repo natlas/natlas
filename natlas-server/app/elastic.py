@@ -19,6 +19,7 @@ class Elastic:
                     if not self.es.indices.exists(index):
                         myIndexInit = {"mappings":{"_doc":{"properties":{
                             "ctime": {"type":"date"},
+                            "agent": {"type":"keyword"},
                             "scan_reason": {"type":"keyword"},
                             "scan_start": {"type":"date"},
                             "scan_stop": {"type":"date"},

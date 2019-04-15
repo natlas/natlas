@@ -242,3 +242,10 @@ a > .badge-tag {
 .dropright .dropdown-no-arrow::after {
   display:none;
 }
+
+.showtoken {
+  color:#777 !important;
+}
+.showtoken:hover {
+  color:#111 !important;
+}

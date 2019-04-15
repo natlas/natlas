@@ -26,6 +26,7 @@ def populate_defaults(verbose=False):
                     # NAME,             TYPE, DEFAULT
     defaultConfig = [("LOGIN_REQUIRED","bool","False"),
                  ("REGISTER_ALLOWED","bool","False"),
+                 ("AGENT_AUTHENTICATION", "bool", "False"),
                  ("ELASTICSEARCH_URL","string","http://localhost:9200"),
                  ("MAIL_SERVER","string","localhost"),
                  ("MAIL_PORT","int","25"),

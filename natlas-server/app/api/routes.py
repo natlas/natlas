@@ -11,8 +11,10 @@ from app.models import NatlasServices, ScopeItem, Tag
 from app.api import bp
 from app.util import isAcceptableTarget
 from libnmap.parser import NmapParser
+from app.auth.wrappers import isAgentAuthenticated
 
 @bp.route('/getwork', methods=['GET'])
+@isAgentAuthenticated
 def getwork():
     work = {}
     rescans = current_app.ScopeManager.getPendingRescans()
@@ -68,6 +70,7 @@ def getwork():
 
 
 @bp.route('/submit', methods=['POST'])
+@isAgentAuthenticated
 def submit():
     
     data = request.get_json()
@@ -141,6 +144,7 @@ def submit():
     return "[+] nmap successful and submitted for ip: "+newhost['ip']
 
 @bp.route('/natlas-services', methods=['GET'])
+@isAgentAuthenticated
 def natlasServices():
     if current_app.current_services["id"] != "None":
         tmpdict = current_app.current_services

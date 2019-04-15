@@ -27,11 +27,13 @@ from getheadshot import getheadshot
 from config import Config
 
 ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
+AGENT_VERSION="0.6.0"
 
 config = Config()
 MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
 
 RTTVAR_MSG = "RTTVAR has grown to over"
+
 
 def print_err(message):
     threadname = threading.current_thread().name
@@ -44,9 +46,16 @@ def print_info(message):
 if config.ignore_ssl_warn:
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def make_request(endpoint, reqType="GET", postData=None, contentType="application/json", statusCode=200):
+    headers = {'user-agent': 'natlas-agent/{}'.format(AGENT_VERSION)}
+    if config.agent_id and config.auth_token:
+        authheader = config.agent_id + ":" + config.auth_token
+        headers['Authorization'] = 'Bearer {}'.format(authheader)
     try:
         if reqType == "GET":
-            req = requests.get(config.server+endpoint, timeout=config.request_timeout, verify=(not config.ignore_ssl_warn))
+            req = requests.get(config.server+endpoint, timeout=config.request_timeout, headers=headers, verify=(not config.ignore_ssl_warn))
+            if req.status_code == 403:
+                print_err("Unauthorized request, please set NATLAS_AGENT_TOKEN to your authorization token and restart the script")
+                os._exit(403)
             if req.status_code != statusCode:
                 print_err("Expected %s, received %s" % (statusCode, req.status_code))
                 return False
@@ -54,7 +63,7 @@ def make_request(endpoint, reqType="GET", postData=None, contentType="applicatio
                 print_err("Expected %s, received %s" % (contentType, req.headers['content-type']))
                 return False
         elif reqType == "POST" and postData:
-            req = requests.post(config.server+endpoint, json=postData, timeout=config.request_timeout, verify=(not config.ignore_ssl_warn))
+            req = requests.post(config.server+endpoint, json=postData, timeout=config.request_timeout, headers=headers, verify=(not config.ignore_ssl_warn))
             if req.status_code != statusCode:
                 print_err("Expected %s, received %s" % (statusCode, req.status_code))
                 return False
@@ -143,6 +152,15 @@ def scan(target_data=None):
     print_info("Target: %s" % target_data["target"])
     
     result = {}
+
+    # If agent authentication is required, this agent id has to match a server side agent id
+    # If it's not required and an agent_id is set, we'll use that in scan data
+    # If it's not required and an agent_id is not set, we'll consider it an anonymous scan.
+    if config.agent_id: 
+        result['agent'] = config.agent_id
+    else:
+        result['agent'] = "anonymous"
+    
     target = target_data["target"]
     result['ip'] = target
     result['scan_reason'] = target_data['scan_reason']
@@ -307,7 +325,8 @@ def main():
 
     PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
     PARSER_EPILOG = "Report problems to https://github.com/natlas/natlas"
-    parser = argparse.ArgumentParser(description=PARSER_DESC, epilog=PARSER_EPILOG)
+    parser = argparse.ArgumentParser(description=PARSER_DESC, epilog=PARSER_EPILOG, prog='natlas-agent')
+    parser.add_argument('--version', action='version', version='%(prog)s {}'.format(AGENT_VERSION))
     mutually_exclusive = parser.add_mutually_exclusive_group()
     mutually_exclusive.add_argument('--target', metavar='IPADDR', help="An IPv4 address or CIDR range to scan. e.g. 192.168.0.1, 192.168.0.1/24", dest='target')
     mutually_exclusive.add_argument('--target-file', metavar='FILENAME', help="A file of line separated target IPv4 addresses or CIDR ranges", dest='tfile')

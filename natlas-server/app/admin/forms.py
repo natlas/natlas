@@ -9,6 +9,7 @@ from app.elastic import Elastic
 class ConfigForm(FlaskForm):
     login_required = BooleanField('Login Required')
     register_allowed = BooleanField('Registration Allowed')
+    agent_authentication = BooleanField('Agent Authentication Required')
     elasticsearch_url = StringField("Elastic URL")
     mail_from = StringField("From Address", validators=[Email(), Optional()])
     mail_server = StringField("Mail Server")

@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
 from datetime import datetime, timezone
-import jwt
+import jwt, string, random
 from .util import utcnow_tz
 
 
@@ -13,7 +13,6 @@ scopetags = db.Table('scopetags',
     db.Column('scope_id', db.Integer, db.ForeignKey('scope_item.id'), primary_key=True),
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
 )
-
 
 # Users and related configs
 class User(UserMixin, db.Model):
@@ -24,6 +23,7 @@ class User(UserMixin, db.Model):
     results_per_page = db.Column(db.Integer, default=100)
     preview_length = db.Column(db.Integer, default=100)
     rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
+    agents = db.relationship('Agent', backref='user', lazy=True)
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -195,3 +195,32 @@ class RescanTask(db.Model):
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True, unique=True, nullable=False)
+
+
+class Agent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # agent identification string for storing in reports
+    agentid = db.Column(db.String(16), index=True, unique=True, nullable=False) 
+    date_created = db.Column(db.DateTime, nullable=False, default=utcnow_tz)
+    # auth token
+    token = db.Column(db.String(32), index=True, unique=True)
+    # optional friendly name for viewing on user page
+    friendly_name = db.Column(db.String(32), default="")
+
+    def verify_token(self, token):
+        if self.token == token:
+            return True
+        return False
+
+    @staticmethod
+    def load_agent(agentid):
+        return Agent.query.filter_by(agentid=agentid).first()
+
+    @staticmethod
+    def generate_token():
+        return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(32))
+
+    @staticmethod
+    def generate_agentid():
+        return "%x" % random.randrange(16**16)

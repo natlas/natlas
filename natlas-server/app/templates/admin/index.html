@@ -16,6 +16,10 @@
             {{ configForm.register_allowed(checked=configItems["REGISTER_ALLOWED"], class="form-check-input", id="registerAllowed") }} 
             {{ configForm.register_allowed.label(class="form-check-label", for="registerAllowed") }}
         </div>
+        <div class="form-check">
+            {{ configForm.agent_authentication(checked=configItems["AGENT_AUTHENTICATION"], class="form-check-input", id="agentAuthentication") }} 
+            {{ configForm.agent_authentication.label(class="form-check-label", for="agentAuthentication") }}
+        </div>
     	<div class="form-group">
     		{{ configForm.elasticsearch_url.label(class="control-label") }}
     		{{ configForm.elasticsearch_url(value=configItems["ELASTICSEARCH_URL"], class="form-control", placeholder="http://localhost:9200") }}
