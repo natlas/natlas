@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 import jwt, string, random
 from .util import utcnow_tz
 
-
+# Many:Many table mapping scope items to tags and vice versa.
 scopetags = db.Table('scopetags',
     db.Column('scope_id', db.Integer, db.ForeignKey('scope_item.id'), primary_key=True),
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
@@ -101,6 +101,8 @@ class ScopeItem(db.Model):
 
 
 # Server configuration options
+# This uses a generic key,value style schema so that we can avoid changing the model for every new feature
+# Default config options are defined in natlas-server/config.py
 class ConfigItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=True)
@@ -112,6 +114,7 @@ class ConfigItem(db.Model):
 
 
 # While generally I prefer to use a singular model name, each record here is going to be storing a set of services
+# Each record in this table is a complete nmap-services db
 class NatlasServices(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sha256 = db.Column(db.String(64))
@@ -141,17 +144,45 @@ class NatlasServices(db.Model):
 # Agent configuration options
 class AgentConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    versionDetection = db.Column(db.Boolean, default=True)
-    osDetection = db.Column(db.Boolean, default=True)
-    defaultScripts = db.Column(db.Boolean, default=True)
-    onlyOpens = db.Column(db.Boolean, default=True)
-    scanTimeout = db.Column(db.Integer, default=300)
-    webScreenshots = db.Column(db.Boolean, default=True)
-    vncScreenshots = db.Column(db.Boolean, default=True)
+    versionDetection = db.Column(db.Boolean, default=True) # Enable Version Detection (-sV)
+    osDetection = db.Column(db.Boolean, default=True) # Enable OS Detection (-O)
+    enableScripts = db.Column(db.Boolean, default=True) # Enable Nmap Scripting Engine (loads all AgentScripts)
+    onlyOpens = db.Column(db.Boolean, default=True) # Only report open ports (--open)
+    scanTimeout = db.Column(db.Integer, default=660) # SIGKILL nmap if it's running longer than this
+    webScreenshots = db.Column(db.Boolean, default=True) # Attempt to take web screenshots (aquatone)
+    vncScreenshots = db.Column(db.Boolean, default=True) # Attempt to take VNC screenshots (xvfb+vncsnapshot)
+
+    scriptTimeout = db.Column(db.Integer, default=60) # --script-timeout (s)
+    hostTimeout = db.Column(db.Integer, default=600) # --host-timeout (s)
+    osScanLimit = db.Column(db.Boolean, default=True) # --osscan-limit
+    noPing = db.Column(db.Boolean, default=False) # -Pn
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# Scripts for agents to run
+# These will be named according to the command line value that gets passed to nmap
+# groups of scripts are also accepted, such as "safe" and "default"
+# auth, broadcast, default. discovery, dos, exploit, external, fuzzer, intrusive, malware, safe, version, and vuln
+# https://nmap.org/book/nse-usage.html#nse-categories
+class AgentScript(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, index=True, unique=True)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+    @staticmethod
+    def getScriptsString(scriptList=None):
+        if scriptList: # optionally pass in existing query and convert to string
+            return ','.join(s.name for s in scriptList)
+        return ','.join(s.name for s in AgentScript.query.all())
+
+
+# Rescan Queue
+# Each record represents a user-requested rescan of a given target.
+# Tracks when it was dispatched, when it was completed, and the scan id of the complete scan.
 class RescanTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_added = db.Column(db.DateTime, index=True, default=utcnow_tz, nullable=False)
@@ -192,11 +223,15 @@ class RescanTask(db.Model):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
+# Simple tags that can be added to scope items for automatic tagging
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True, unique=True, nullable=False)
 
 
+# Agent registration
+# Users can have many agents, each agent has an ID and a secret (token)
+# Friendly name is purely for identification of agents in the management page
 class Agent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

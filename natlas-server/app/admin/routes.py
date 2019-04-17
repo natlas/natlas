@@ -337,6 +337,8 @@ def exportServices():
 def agentConfig():
     agentConfig = AgentConfig.query.get(1)
     agentForm = AgentConfigForm(obj=agentConfig) # pass the model to the form to populate
+    addScriptForm = AddScriptForm(prefix="add-script")
+    delScriptForm = DeleteForm(prefix="del-script")
 
     if agentForm.validate_on_submit():
         agentForm.populate_obj(agentConfig) # populate the object from the form data
@@ -344,8 +346,44 @@ def agentConfig():
         current_app.agentConfig = agentConfig.as_dict()
 
 
-    return render_template('admin/agents.html', agentForm=agentForm)
+    return render_template('admin/agents.html', agentForm=agentForm, scripts=current_app.agentScripts, \
+        addScriptForm=addScriptForm, delScriptForm=delScriptForm)
 
+@bp.route('/agents/script/add', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def addScript():
+    addScriptForm = AddScriptForm(prefix="add-script")
+
+    if addScriptForm.validate_on_submit():
+        newscript = AgentScript(name=addScriptForm.scriptName.data)
+        db.session.add(newscript)
+        db.session.commit()
+        current_app.agentScripts = AgentScript.query.all()
+        current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)
+        flash("%s successfully added to scripts" % newscript.name, "success")
+        return redirect(request.referrer)
+    else:
+        flash("%s couldn't be added to scripts" % addScriptForm.scriptName.data, "danger")
+        return redirect(request.referrer)
+
+@bp.route('/agents/script/<string:name>/delete', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def deleteScript(name):
+    deleteForm = DeleteForm()
+
+    if deleteForm.validate_on_submit():
+        delScript = AgentScript.query.filter_by(name=name).first()
+        if delScript:
+            db.session.delete(delScript)
+            db.session.commit()
+            current_app.agentScripts = AgentScript.query.all()
+            current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)            
+            flash("%s successfully deleted." % name, "success")
+        else:
+            flash("%s doesn't exist" % name, "danger")
+        return redirect(request.referrer)
 
 @bp.route('/scans/delete/<scan_id>', methods=['POST'])
 @isAuthenticated

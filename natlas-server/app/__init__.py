@@ -89,7 +89,6 @@ def create_app(config_class=Config, load_config=False):
                     print("NatlasServices populated with defaults from defaults/natlas-services")
                     app.current_services = current_services.as_dict()
             except Exception as e:
-                print(e)
                 print("NatlasServices table doesn't exist yet. Ignore if flask db upgrade.")
             
             # Load the current agent config, otherwise create it.
@@ -106,6 +105,21 @@ def create_app(config_class=Config, load_config=False):
                     app.agentConfig = newAgentConfig.as_dict()
             except Exception as e:
                 print("AgentConfig table doesn't exist yet. Ignore if flask db upgrade.")
+
+            # Load the current agent config, otherwise create it.
+            from app.models import AgentScript
+            try:
+                agentScripts = AgentScript.query.all()
+                if not agentScripts:
+                    defaultAgentScript = AgentScript(name="default")
+                    db.session.add(defaultAgentScript)
+                    db.session.commit()
+                    print("AgentScript populated with default")
+                    agentScripts = AgentScript.query.all()
+                app.agentScripts = agentScripts
+                app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
+            except Exception as e:
+                print("AgentScript table doesn't exist yet. Ignore if flask db upgrade.")
 
         # Grungy thing so we can use flask db and flask shell before the config items are initially populated
         if "ELASTICSEARCH_URL" in app.config: 

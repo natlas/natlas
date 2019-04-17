@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import StringField, BooleanField, SubmitField, TextAreaField, PasswordField, IntegerField, SelectField
 from wtforms.validators import DataRequired, ValidationError, Email, Optional
-from app.models import User, ScopeItem
+from app.models import User, ScopeItem, AgentScript
 import ipaddress
 from app.elastic import Elastic
 
@@ -94,14 +94,28 @@ class AddServiceForm(FlaskForm):
             raise ValidationError('Port has to be withing range of 0-65535')
 
 class AgentConfigForm(FlaskForm):
-    versionDetection = BooleanField("Enable Version Detection")
-    osDetection = BooleanField("Enable OS Detection")
-    defaultScripts = BooleanField("Enable Default Scripts")
-    onlyOpens = BooleanField("Show Open Ports Only")
-    scanTimeout = IntegerField("Scan Timeout")
-    webScreenshots = BooleanField("Enable Web Screenshots")
-    vncScreenshots = BooleanField("Enable VNC Screenshots")
+    versionDetection = BooleanField("Version Detection (-sV)")
+    osDetection = BooleanField("OS Detection (-O)")
+    enableScripts = BooleanField("Scripting Engine (--script)")
+    onlyOpens = BooleanField("Open Ports Only (--open)")
+    scanTimeout = IntegerField("Maximum Nmap Run Time")
+    webScreenshots = BooleanField("Web Screenshots (aquatone)")
+    vncScreenshots = BooleanField("VNC Screenshots (vncsnapshot)")
+    scriptTimeout = IntegerField("Script Timeout (--script-timeout)")
+    hostTimeout = IntegerField("Host Timeout (--host-timeout)")
+    osScanLimit = BooleanField("Limit OS Scan (--osscan-limit)")
+    noPing = BooleanField("No Ping (-Pn)")
+
     updateAgents = SubmitField("Update Agent Config")
+
+class AddScriptForm(FlaskForm):
+    scriptName = StringField("Script Name", validators=[DataRequired()])
+    addScript = SubmitField("Add Script")
+
+    def validate_scriptname(self, scriptName):
+        script = AgentScript.query.filter_by(name=scriptName).first()
+        if script is not None:
+            raise ValidationError('%s already exists!' % script.name)
 
 class DeleteForm(FlaskForm):
     delete = SubmitField("Delete")

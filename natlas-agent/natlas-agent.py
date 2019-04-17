@@ -175,10 +175,22 @@ def scan(target_data=None):
         command.append("-sV")
     if agentConfig["osDetection"]:
         command.append("-O")
-    if agentConfig["defaultScripts"]:
-        command.append("-sC")
+    if agentConfig["enableScripts"] and agentConfig["scripts"]:
+        command.append("--script")
+        command.append(agentConfig["scripts"])
+    if agentConfig["scriptTimeout"]:
+        command.append("--script-timeout")
+        command.append(str(agentConfig["scriptTimeout"]))
+    if agentConfig["hostTimeout"]:
+        command.append("--host-timeout")
+        command.append(str(agentConfig["hostTimeout"]))
+    if agentConfig["osScanLimit"]:
+        command.append("--osscan-limit")
+    if agentConfig["noPing"]:
+        command.append("-Pn")
     if agentConfig["onlyOpens"]:
         command.append("--open")
+
     command.append(target_data["target"])
 
     TIMEDOUT = False
