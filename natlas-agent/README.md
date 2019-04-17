@@ -14,11 +14,13 @@ The Config
 To make modifications to your agent, you can modify environment variables to match your specifications. These options can be placed in a file called `.env` in the `natlas-agent` directory. Available options include:
 
 - `NATLAS_SERVER_ADDRESS` defaults to `http://127.0.0.1:5000` - The server to get work from and submit work to.
+- `NATLAS_IGNORE_SSL_WARN` defaults to `False` - Ignore certificate errors when connecting to `NATLAS_SERVER_ADDRESS`
 - `NATLAS_MAX_THREADS` defaults to `3` - Maximum number of concurrent scanning threads
 - `NATLAS_SCAN_LOCAL` defaults to `False` - Don't scan local addresses
 - `NATLAS_REQUEST_TIMEOUT` defaults to `15` (seconds) - Time to wait for the server to respond
 - `NATLAS_BACKOFF_MAX` defaults to `300` (seconds) - Maximum time for exponential backoff after failed requests
 - `NATLAS_BACKOFF_BASE` defaults to `1` (second) - Incremental time for exponential backoff after failed requests
+- `NATLAS_MAX_RETRIES` defaults to `10` - Number of times to retry a request to the server before giving up
 
 Starting the Agent
 ------------

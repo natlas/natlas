@@ -1,9 +1,8 @@
 import ipaddress
-from app.models import ScopeItem
-from flask import current_app
-
+from datetime import datetime, timezone
 
 def hostinfo(ip):
+    from flask import current_app, abort
     hostinfo = {}
     count, context = current_app.elastic.gethost(ip)
     if count == 0:
@@ -22,6 +21,7 @@ def hostinfo(ip):
 
 
 def isAcceptableTarget(target):
+    from flask import current_app, abort
     targetAddr = ipaddress.IPv4Address(target)
     inScope = False
     # if zero, update to make sure that the scopemanager has been populated
@@ -47,3 +47,6 @@ def isAcceptableTarget(target):
             return False
 
     return True
+
+def utcnow_tz():
+    return datetime.now(timezone.utc)

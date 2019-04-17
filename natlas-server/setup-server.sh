@@ -94,6 +94,17 @@ else
     if ! cat .env 2>/dev/null | grep "FLASK_APP" >/dev/null; then
         echo "FLASK_APP=natlas-server.py" >> .env
     fi
+
+    if ! cat .env 2>/dev/null | grep "SECRET_KEY" >/dev/null; then
+        if [ ! -z "$SECRET_KEY" ]; then
+            echo "SECRET_KEY=$SECRET_KEY" >> .env
+            echo "[+] Copying \$SECRET_KEY to .env"
+        else
+            echo "SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" >> .env
+            echo "[+] Generating random SECRET_KEY"
+        fi
+    fi
+
     flask db upgrade
     echo "[+] Exiting virtual environment"
     deactivate

@@ -1,10 +1,10 @@
-from flask import render_template, redirect, url_for, current_app, flash, Response, abort
+from flask import render_template, redirect, url_for, current_app, flash, Response, abort, request
 from flask_login import current_user
 from app import db
 from app.admin import bp
 from app.elastic import Elastic
 from app.admin.forms import *
-from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig
+from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, Tag
 from app.auth.email import send_user_invite_email
 from app.auth.wrappers import isAuthenticated, isAdmin
 import ipaddress, hashlib
@@ -105,6 +105,8 @@ def scope():
     delForm = ScopeDeleteForm()
     editForm = ScopeToggleForm()
     importForm = ImportScopeForm()
+    addTagForm = TagScopeForm()
+    addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
     if newForm.validate_on_submit():
         if '/' not in newForm.target.data:
             newForm.target.data = newForm.target.data + '/32'
@@ -112,10 +114,11 @@ def scope():
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=False)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.ScopeManager.updateScope()
+        current_app.ScopeManager.update()
         flash('%s added!' % newTarget.target, 'success')
         return redirect(url_for('admin.scope'))
-    return render_template("admin/scope.html", scope=scope, scopeSize=scopeSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
+    return render_template("admin/scope.html", scope=scope, scopeSize=scopeSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm, \
+        addTagForm=addTagForm)
 
 
 @bp.route('/blacklist', methods=['GET', 'POST'])
@@ -135,7 +138,7 @@ def blacklist():
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=True)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.ScopeManager.updateBlacklist()
+        current_app.ScopeManager.update()
         flash('%s blacklisted!' % newTarget.target, 'success')
         return redirect(url_for('admin.blacklist'))
     return render_template("admin/blacklist.html", scope=scope, blacklistSize=blacklistSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
@@ -243,17 +246,51 @@ def toggleScopeItem(id):
             flash('%s blacklisted!' % item.target, 'success')
         db.session.commit()
         current_app.ScopeManager.update()
-        return redirect(url_for('admin.scope'))
+        return redirect(request.referrer)
     else:
         flash("Form couldn't validate!", 'danger')
-        return redirect(url_for('admin.scope'))
+        return redirect(request.referrer)
+
+@bp.route('/scope/<int:id>/tag', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def tagScopeItem(id):
+    addTagForm = TagScopeForm()
+    addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
+    if addTagForm.validate_on_submit():
+        scope = ScopeItem.query.get(id)
+        mytag = Tag.query.filter_by(name=addTagForm.tagname.data).first()
+        scope.addTag(mytag)
+        db.session.commit()
+        flash("Tag \"%s\" added to %s" % (mytag.name, scope.target), "success")
+        return redirect(request.referrer)
+    else:
+        flash("Form couldn't validate!", 'danger')
+        return redirect(request.referrer)
+
+@bp.route('/scope/<int:id>/untag', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def untagScopeItem(id):
+    delTagForm = TagScopeForm()
+    scope = ScopeItem.query.get(id)
+    delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags.all()]
+    if delTagForm.validate_on_submit():
+        mytag = Tag.query.filter_by(name=delTagForm.tagname.data).first()
+        scope.delTag(mytag)
+        db.session.commit()
+        flash("Tag \"%s\" removed from %s" % (mytag.name, scope.target), "success")
+        return redirect(request.referrer)
+    else:
+        flash("Form couldn't validate!", 'danger')
+        return redirect(request.referrer)
 
 @bp.route('/services', methods=['GET', 'POST'])
 @isAuthenticated
 @isAdmin
 def services():
-    uploadForm = ServicesUploadForm()
-    addServiceForm = AddServiceForm()
+    uploadForm = ServicesUploadForm(prefix="upload-services")
+    addServiceForm = AddServiceForm(prefix="add-service")
     addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp","UDP")]
     if uploadForm.uploadFile.data and uploadForm.validate_on_submit():
         newServicesContent = uploadForm.serviceFile.data.read().decode("utf-8").rstrip('\r\n')
@@ -269,7 +306,7 @@ def services():
             flash("That file is an exact match for our current services file!", "warning")
             return redirect(url_for('admin.services'))
 
-    if addServiceForm.addService.data and addServiceForm.validate_on_submit():
+    if addServiceForm.serviceName.data and addServiceForm.validate_on_submit():
         newServiceName = addServiceForm.serviceName.data
         newServicePort = str(addServiceForm.servicePort.data) + '/' + addServiceForm.serviceProtocol.data
         if '\t' + newServicePort in str(current_app.current_services['services']):
@@ -286,7 +323,7 @@ def services():
             return redirect(url_for('admin.services'))
 
 
-    return render_template('admin/services.html', uploadForm=uploadForm, addServiceForm=addServiceForm, current_services=current_app.current_services)
+    return render_template('admin/services.html', uploadForm=uploadForm, addServiceForm=addServiceForm, current_services=current_app.current_services, servlist=current_app.current_services['as_list'])
 
 @bp.route('/services/export', methods=['GET'])
 @isAuthenticated
@@ -300,6 +337,8 @@ def exportServices():
 def agentConfig():
     agentConfig = AgentConfig.query.get(1)
     agentForm = AgentConfigForm(obj=agentConfig) # pass the model to the form to populate
+    addScriptForm = AddScriptForm(prefix="add-script")
+    delScriptForm = DeleteForm(prefix="del-script")
 
     if agentForm.validate_on_submit():
         agentForm.populate_obj(agentConfig) # populate the object from the form data
@@ -307,4 +346,100 @@ def agentConfig():
         current_app.agentConfig = agentConfig.as_dict()
 
 
-    return render_template('admin/agents.html', agentForm=agentForm)
+    return render_template('admin/agents.html', agentForm=agentForm, scripts=current_app.agentScripts, \
+        addScriptForm=addScriptForm, delScriptForm=delScriptForm)
+
+@bp.route('/agents/script/add', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def addScript():
+    addScriptForm = AddScriptForm(prefix="add-script")
+
+    if addScriptForm.validate_on_submit():
+        newscript = AgentScript(name=addScriptForm.scriptName.data)
+        db.session.add(newscript)
+        db.session.commit()
+        current_app.agentScripts = AgentScript.query.all()
+        current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)
+        flash("%s successfully added to scripts" % newscript.name, "success")
+        return redirect(request.referrer)
+    else:
+        flash("%s couldn't be added to scripts" % addScriptForm.scriptName.data, "danger")
+        return redirect(request.referrer)
+
+@bp.route('/agents/script/<string:name>/delete', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def deleteScript(name):
+    deleteForm = DeleteForm()
+
+    if deleteForm.validate_on_submit():
+        delScript = AgentScript.query.filter_by(name=name).first()
+        if delScript:
+            db.session.delete(delScript)
+            db.session.commit()
+            current_app.agentScripts = AgentScript.query.all()
+            current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)            
+            flash("%s successfully deleted." % name, "success")
+        else:
+            flash("%s doesn't exist" % name, "danger")
+        return redirect(request.referrer)
+
+@bp.route('/scans/delete/<scan_id>', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def deleteScan(scan_id):
+    
+    delForm = DeleteForm()
+
+    if delForm.validate_on_submit():
+        deleted = current_app.elastic.delete_scan(scan_id)
+        if deleted in [1,2]:
+            flash("Successfully deleted scan %s." % scan_id, "success")
+            if request.referrer:
+                if scan_id in request.referrer:
+                    redirectLoc = request.referrer.rsplit(scan_id)[0]
+                else:
+                    redirectLoc = request.referrer
+            else:
+                redirectLoc = url_for('main.search')
+            return redirect(redirectLoc)
+        else:
+            flash("Could not delete scan %s." % scan_id, "danger")
+            return redirect(request.referrer or url_for('main.search'))
+    else:
+        flash("Couldn't validate form!")
+        return redirect(request.referrer)
+
+@bp.route('/hosts/delete/<ip>', methods=['POST'])
+@isAuthenticated
+@isAdmin
+def deleteHost(ip):
+    
+    delForm = DeleteForm()
+
+    if delForm.validate_on_submit():
+        deleted = current_app.elastic.delete_host(ip)
+        if deleted > 0:
+            flash("Successfully deleted host %s" % ip, "success")
+            return redirect(url_for('main.search'))
+        else:
+            flash("Couldn't delete host: %s" % ip, "danger")
+    else:
+        flash("Couldn't validate form!")
+        return redirect(request.referrer)
+
+@bp.route('/tags', methods=['GET', 'POST'])
+@isAuthenticated
+@isAdmin
+def tags():
+    tags = Tag.query.all()
+
+    addForm = AddTagForm()
+    if addForm.validate_on_submit():
+        newTag = Tag(name=addForm.tagname.data.lower())
+        db.session.add(newTag)
+        db.session.commit()
+        flash('Successfully added tag %s' % newTag.name, 'success')
+        return redirect(url_for('admin.tags'))
+    return render_template("admin/tags.html", tags=tags, addForm=addForm)

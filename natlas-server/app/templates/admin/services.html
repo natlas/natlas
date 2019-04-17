@@ -2,39 +2,66 @@
 {% set title = "Services Information" %}
 {% set active_page = "services" %}
 {% block content %}
+  {% include 'admin/_header.html' %}
   <div class="row">
-    {% include 'admin/_header.html' %}
     <div class="col-xs-12 col-sm-6 col-md-4">
-      <legend>Upload Services File</legend>
-      <form class="form-inline" action="" method="post" enctype="multipart/form-data">
+      <h3>Upload Services File</h3>
+      <form class="form-inline" action="{{url_for('admin.services')}}" name="uploadForm" method="post" enctype="multipart/form-data">
       {{ uploadForm.hidden_tag() }} 
       <div class="input-group">
           {{ uploadForm.serviceFile(class="btn btn-default")}}
-          {{ uploadForm.uploadFile(class="btn btn-primary", style="margin-top:1em;") }}
-          <span class="help-block">Please see the <a href="https://github.com/natlas/natlas/wiki/Example-NatlasServices-Document">natlas wiki</a> for more information. Trailing newlines will be stripped, but any other newlines will be preserved.</span>
+          {{ uploadForm.uploadFile(class="btn btn-primary", style="margin-top:1em;", onclick="return confirm('Are you sure you upload a whole new services file? This will change all the services you're scanning for.)") }}
         </div>
         </form>
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-4">
-        <legend>Current Services Info</legend>
-        <h3>Current Services ID:</h3> 
-        {{ current_services.id }}
-        <h3>Current Services SHA256:</h3> 
-        <abbr title="{{ current_services.sha256 }}" id="sha256" style="border-bottom:none; cursor:default;">{{ current_services.sha256|truncate(32) }}</abbr>
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-4">
-        <legend>Current Services</legend>
-        <form class="form-inline" action="" method="post">
+      <div class="col-xs-12 col-sm-6 col-md-8">
+        <h3>Current Service Information</h3>
+        <h5>Version:
+          <small>{{ current_services.id }}</small>
+        </h5> 
+        
+        <h5>SHA256:
+          <small>
+            <abbr style="cursor:default;" title="{{ current_services.sha256 }}" id="sha256">{{ current_services.sha256|truncate(32) }}</abbr>
+          </small>
+        </h5>
+        <form class="form-inline" action="{{url_for('admin.services')}}" name="addServiceForm" method="post">
           {{ addServiceForm.hidden_tag() }}
-          <div class="form-group">
-            {{ addServiceForm.serviceName(size=16, class="form-control", placeholder="service-name")}}
-            {{ addServiceForm.servicePort(size=5, class="form-control", placeholder="22")}}
-            {{ addServiceForm.serviceProtocol(class="form-control")}}
-          </div>
-          {{ addServiceForm.addService(class="btn btn-primary", style="margin-top:1em; margin-bottom:1em;") }}
+            {{ addServiceForm.serviceName(size=12, class="form-control mx-1 my-1", placeholder="service-name")}}
+            {{ addServiceForm.servicePort(size=5, class="form-control mx-1 my-1", placeholder="22")}}
+            {{ addServiceForm.serviceProtocol(class="custom-select mx-1 my-1")}}
+          <button id="addService" name="addService" title="Add Service" aria-hidden="true" type="submit" class="inline-submit btn-trash text-success ml-2"><i class="fas fa-plus-circle"></i></button>
         </form>
-          <pre class="services-box">{{ current_services.services }}</pre>
-          <a href="{{ url_for('admin.exportServices') }}" class="btn btn-primary export-btn" role="button">Export Services</a>
+          <a href="{{ url_for('admin.exportServices') }}" class="btn btn-primary export-btn my-3" role="button">Export Services</a>
       </div>
+  </div>
+  <div class="row my-2">
+    <div class="col">
+      <h3>Current Services</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+<table class="table table-striped dataTable" id="servicesTable">
+        <thead>
+          <tr>
+            <th scope="col">Line Number</th>
+            <th scope="col">Port</th>
+            <th scope="col">Protocol</th>
+            <th scope="col">Service-name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in servlist %}
+          <tr>
+            <th scope="row">{{ item[0] }}</th>
+            <td>{{ item[1] }}</td>
+            <td>{{ item[2] }}</td>
+            <td>{{ item[3] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 {% endblock %}

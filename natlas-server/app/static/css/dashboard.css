@@ -3,18 +3,31 @@
  */
 
 /* Move down content because we have a fixed navbar that is 50px tall */
-body {
-  padding-top: 50px;
+html {
+  height:100%;
+  box-sizing: border-box;
 }
-
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+body {
+  position:relative;
+  min-height:100%;
+}
+.main-content{
+  padding-top:100px;
+  padding-bottom:100px;
+}
 
 /*
  * Global add-ons
  */
 
-.sub-header {
-  padding-bottom: 10px;
+.search-header {
   border-bottom: 1px solid #eee;
+}
+.pagenav {
+  display:inline-block;
 }
 
 /*
@@ -29,16 +42,19 @@ body {
  * Footer
  */
 .global-footer {
+  position: absolute;
+  right:0;
+  bottom:0;
+  left:0;
+  padding: 1rem;
   text-align:left;
-  padding-top:50px;
-  padding-bottom:50px;
   margin-top:100px;
   color:#99979c;
   background-color:#222;
 }
 .footer-links {
   padding-left:0;
-  margin-bottom:20px;
+  margin-bottom:0;
 }
 .footer-links li {
   display:inline-block;
@@ -55,19 +71,19 @@ body {
  */
 
 .nmap_data {
-  white-space: pre-wrap;
-  margin-bottom:0px;
-  margin-top:1em;
+  background-color:rgba(0,0,0,0.05);
+  border-radius:10px;
+  font-size: 75%;
 }
 .preview_nmap {
-  background-color:rgba(0,0,0,0.5);
+  background-color:rgba(0,0,0,0.75);
   text-align:center;
-  line-height:4em;
-  margin-top:-4em;
+  line-height:2em;
+  margin-top:-1em;
   color:#fff;
 }
 .preview_nmap:hover {
-  background-color:rgba(0,0,0,0.75);
+  background-color:rgba(0,0,0,1);
 }
 a.preview_link, a:hover.preview_link {
   color:#fff;
@@ -139,9 +155,123 @@ form.config-form>div, form.pwchange-form>div {
 .host-row:nth-child(odd) {
   background-color: #f9f9f9;
   border-top: 1px solid #f0f0f0;
-  margin-top:1em;
 }
 
-.btn-export {
-  max-width:100px;
+.host-header-date {
+  font-size:50%;
+}
+
+.nmap_history {
+  max-height: 10rem; 
+  overflow: scroll;
+}
+
+.export-group {
+  display:block;
+}
+
+.btn-trash {
+  background:none;
+  border:none;
+  padding:0;
+}
+
+.inline-submit {
+  display:inline-block;
+  margin:0;
+}
+
+.script-id {
+  font-size: 0.9rem;
+}
+
+.script-output {
+  font-size: 0.75rem;
+}
+
+.port-row {
+  border-bottom:1px solid #d6d6d6;
+}
+
+.port-summary {
+  text-align:center;
+}
+
+.port-number {
+  background-color:#36978D; 
+  color:white;
+}
+
+.port-protocol {
+  background-color:#62A9E3; 
+  color:white;
+}
+
+.port-service {
+  background-color:#2B2D33; 
+  color:white;
+}
+
+.port-link {
+  background-color:#79d65e;
+}
+.port-link>a {
+  color:white;
+}
+
+.service-header {
+  border-bottom:1px dotted #e3e3e3;
+}
+.service-version {
+  font-size:0.95rem;
+}
+.service-extrainfo {
+  font-size:0.7rem;
+}
+
+.vert-flex-mid {
+  display:flex;
+  justify-content:center;
+  flex-direction:column;
+}
+
+a > .badge-tag {
+  color:white;
+}
+
+.dropright .dropdown-no-arrow::after {
+  display:none;
+}
+
+.showtoken {
+  color:#777 !important;
+}
+.showtoken:hover {
+  color:#111 !important;
+}
+
+
+.github-corner:hover .octo-arm {
+  animation:octocat-wave 560ms ease-in-out;
+}
+
+@keyframes octocat-wave{
+  0%,100% {
+    transform:rotate(0)
+    }
+    20%,60% {
+      transform:rotate(-25deg)
+    }
+    40%,80% {
+      transform:rotate(10deg)
+    }
+  }
+
+@media (max-width:500px) {
+  .github-corner:hover .octo-arm {
+    animation:none
+  }
+  .github-corner .octo-arm {
+    animation:octocat-wave 560ms ease-in-out
+  }
 }

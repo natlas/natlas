@@ -5,3 +5,13 @@ $(function() {
 			$('#imagemodal').modal('show');   
 		});		
 });
+
+
+$(document).ready(function() {
+    $('.dataTable').DataTable( {
+        "columnDefs": [
+            { "orderable": false, "targets": 'table-controls' }
+        ]
+    });
+    $('[data-toggle="popover"]').popover()
+});

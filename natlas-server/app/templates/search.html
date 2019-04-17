@@ -7,21 +7,31 @@
 {% endif %}
 
 {% block content %}
-  <div class="row">
-    {% include 'includes/pagination.html' %}
-
+  <div class="row search-header mb-3">
+    <div class="col">
     {% if query != '' %}
       <h2 class="sub-header">{{numresults}} search results for '{{query}}'
-      <a href="?q={{query}}&p={{page}}&f=hostlist"> [hostlist]</a></h2>
+      <small><a href="?q={{query}}&p={{page}}&f=hostlist"> [hostlist]</a></small></h2>
     {% else %}
-      <h2 class="sub-header">{{numresults}} hosts scanned</h2>
+      <h2 class="sub-header">{{ totalHosts }} hosts scanned, {{ numresults }} hosts up</h2>
+    {% endif %}
+    </div>
+    {% if numresults > current_user.results_per_page %}
+      <div class="col-xs-12 col-sm-1">
+        {% include 'includes/pagination.html' %}
+      </div>
     {% endif %}
   </div>
+  
   {% for host in hosts %}
     {% include 'host/_host-row.html' %}
   {% endfor %}
   {% include 'host/_imagemodal.html' %}
-  <div class="row">
-    {% include 'includes/pagination.html' %}
-  </div>
+  {% if numresults > current_user.results_per_page %}
+    <div class="row">
+      <div class="col text-center my-2">
+        {% include 'includes/pagination.html' %}
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

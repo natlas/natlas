@@ -1,62 +1,52 @@
-<div class="row host-row">
+<div class="row host-row py-1">
   <div class="col-xs-12 col-sm-4 col-md-3">
     {% if pagetype == 'search' %}
-      <h3><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
+      <h3 class="mt-2"><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
     {% endif %}
-    <h4>Open Ports</h4>
-    {{ host.ports }}<br>
+    {% if host.ports|length > 0 %}
+      <h4 class="mt-2">Open Ports</h4>
+      {{ host.port_str }}
+    {% elif host.port_count == 0 and host.is_up %}
+      <h4 class="mt-2">No open ports</h4>
+    {% elif not host.is_up %}
+      <h4 class="mt-2">Host down</h4>
+    {% endif %}
     {% if host.hostname %}
-    <h4>Hostname</h4>
+    <h4 class="mt-2">Hostname</h4>
     {{ host.hostname }}
     {% endif %}
     {% if host.ctime %}
-    <h4>Date Added</h4>
-    <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }} UTC">{{ host.ctime | ctime }}</time>
+    <h4 class="mt-2">Date Added</h4>
+    <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
+      <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
+    </a>
     {% endif %}
-    {% if host.scan_id %}
-    <h4>Scan ID</h4> 
-    <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">{{ host.scan_id }}</a>
-    <h4>Export</h4>
-    <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_xml', ip=host.ip, scan_id=host.scan_id) }}">.xml</a>
-    <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_nmap', ip=host.ip, scan_id=host.scan_id) }}">.nmap</a>
-    <a class="btn btn-primary btn-block btn-export" href="{{ url_for('main.export_scan_gnmap', ip=host.ip, scan_id=host.scan_id) }}">.gnmap</a>
+    {% if host.tags %}
+    <h4 class="mt-2">Tags</h4>
+      {% for tag in host.tags %}
+        <a href="{{ url_for('main.search', q="tags:" + tag)}}"><span class="badge badge-secondary badge-tag">{{ tag }}</span></a>
+      {% endfor %}
     {% endif %}
-    {% if host.headshot %}
-      <h5>Unknown Headshot</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.headshot }}" alt="Unknown Screenshot"></div></br>
-    {% endif %}
+    <div class="btn-group export-group mt-2" role="group">
+        {% include 'host/_host-export.html' %}
+      </div>
     {% if host.vncheadshot %}
-      <h5>VNC</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div></br>
+      <h5 class="mt-2">VNC</h5>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div>
     {% endif %}
     {% if host.httpheadshot %}
-      <h5>HTTP</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div></br>
+      <h5 class="mt-2">HTTP</h5>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div>
     {% endif %}
     {% if host.httpsheadshot %}
-      <h5>HTTPS</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div></br>
+      <h5 class="mt-2">HTTPS</h5>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div>
     {% endif %}
-  </div>
+  </div><!--meta column-->
   <div class="col-xs-12 col-sm-8 col-md-9">
-      {% set lines = host.nmap_data.split('\n') %}
-      {% if lines|length > current_user.preview_length and pagetype in ('multi', 'search') %}
-        {% set nmap_preview = [] %}
-        {% for line in lines[1:] %}
-          {% if loop.index <= current_user.preview_length %}
-            {% do nmap_preview.append(line) %}
-          {% endif %}
-        {% endfor %}
-        <pre class="nmap_data">{{ nmap_preview|join('\n') }}</pre>
-        {% if host.scan_id %}
-        <a class="preview_link" href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}"><div class="preview_nmap">Click here to see all {{ lines|length }} lines for {{ host.ip }} ({{ host.scan_id }})</div></a>
-        {% else %}
-        <div class="preview_nmap">Unfortunately we are unable to display the rest of this scan because we can't find a scan identifier!</div>
-        {% endif %}
-      {% elif pagetype != 'single' %}
-        <pre class="nmap_data">{{ host.nmap_data.split('\n')[1:-3]|join('\n') }}</pre>
-      {% else %}
-        <pre class="nmap_data">{{ host.nmap_data }}</pre>
-      {% endif %}
-  </div>
-</div>
+      {% for port in host.ports %}
+          {% set portloop = loop %}
+          {% include  'host/_port-info.html' %}
+      {% endfor %}
+    </div><!--data column-->
+</div><!-- end host row -->

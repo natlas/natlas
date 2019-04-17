@@ -2,47 +2,124 @@
 {% set title = "Manage Scope" %}
 {% set active_page = "scope" %}
 {% block content %}
-  <div class="row">
-    {% include 'admin/_header.html' %}
-    <h3>Add Scope</h3>
-    <form class="form-inline" action="" method="post">
-      {{ newForm.hidden_tag() }}
-      <div class="input-group">
-        {{ newForm.target(size=32, class="form-control", placeholder="E.g. 10.0.0.0/8") }}
-        {% for error in newForm.target.errors %}
-        <span style="color: red;">{{ error }}</span>
-        {% endfor %}
-      </div>
-      {{ newForm.submit(class="btn btn-primary") }}
-    </form>
-    <h3>Manage Scope ({{ scopeSize }} hosts)</h3>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Target</th>
-          <th scope="col"></th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in scope %}
-        <tr>
-          <th scope="row">{{ item.id }}</th>
-          <td>{{ item.target }}</td>
-          <td><form method="POST" action="{{ url_for('admin.deleteScopeItem', id=item.id) }}">{{ delForm.hidden_tag() }} {{ delForm.deleteScopeItem(class="btn btn-danger", onclick="return confirm('Are you sure you want to delete this scope item?')") }}</form></td>
-          <td><form method="POST" action="{{ url_for('admin.toggleScopeItem', id=item.id) }}">{{ editForm.hidden_tag() }}{{ editForm.toggleScopeItem(class="btn btn-warning", onclick="return confirm('Are you sure you want to toggle the blacklist status for this scope item?')") }}</form></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <h3>Import Scope</h3>
-    <form method="POST" action="{{ url_for('admin.importScope', scopetype='scope') }}">
-      {{ importForm.hidden_tag() }}
-      {{ importForm.scope(rows='10', cols='80') }}
-      <br />
-      {{ importForm.submit(class="btn btn-primary") }}
-    </form>
-    <a href="{{ url_for('admin.exportScope', scopetype='scope') }}" class="btn btn-primary export-btn" role="button">Export Scope</a>
+  {% include 'admin/_header.html' %}
+   <div class="row">
+    <div class="col">
+      <h3>Add Scope</h3>
+      <form class="form-inline" action="{{url_for('admin.scope')}}" method="post">
+        {{ newForm.hidden_tag() }}
+        <div class="input-group">
+          {{ newForm.target(size=32, class="form-control", placeholder="E.g. 10.0.0.0/8") }}
+          {% for error in newForm.target.errors %}
+          <span style="color: red;">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {{ newForm.submit(class="btn btn-primary ml-3") }}
+      </form>
+    </div>
   </div>
+  <div class="row">
+    <div class="col">
+      <h3 class="mt-3">Manage Scope ({{ scopeSize }} hosts)</h3>
+      <table class="table table-striped dataTable">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Target</th>
+            <th scope="col">Tags</th>
+            <th class="table-controls" scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in scope %}
+          <tr>
+            <th scope="row">{{ item.id }}</th>
+            <td>{{ item.target }}</td>
+            <td id="scopeTags-{{item.id}}">
+              {% for tag in item.tags %}
+              {{ tag.name }}{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </td>
+            <td style="text-align:center;">
+              {% include 'admin/_scope_menu.html' %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h3>Import Scope</h3>
+      <form method="POST" action="{{ url_for('admin.importScope', scopetype='scope') }}">
+        {{ importForm.hidden_tag() }}
+        {{ importForm.scope(rows='10', cols='30') }}
+        <br />
+        {{ importForm.submit(class="btn btn-primary", id="submit-import") }}
+        <a href="{{ url_for('admin.exportScope', scopetype='scope') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Scope</a>
+      </form>
+    </div>
+  </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="tagmodal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Tag</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{{url_for('admin.scope')}}" id="tagScopeForm">
+        <div class="modal-body">
+            {{ addTagForm.hidden_tag() }}
+            {{ addTagForm.tagname(class="custom-select") }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="tagScopeSubmit" class="btn btn-primary">Add Tag</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+$('#tagmodal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var scopeid = button.data('scopeid') // Extract info from data-* attributes
+  var scopetarget = button.data('scopetarget') // Extract info from data-* attributes
+  var tagaction = button.data('action')
+  var tagstr = $('#scopeTags-'+scopeid).text().replace(/\s+/g,'')
+  var tags = tagstr.split(',')
+  var modal = $(this)
+  if (tagaction == 'add') {
+    modal.find('.modal-title').text('Add tag to ' + scopetarget)
+    modal.find('#tagScopeForm').attr('action', "/admin/scope/"+scopeid+"/tag")
+    modal.find('#tagScopeSubmit').text('Add Tag')
+    if (tagstr != ''){
+      tags.forEach(function(item) {
+        $("option[value="+item+"]").attr('hidden', '')
+        $("option[value="+item+"]").attr('disabled', '')
+      });
+    }
+
+
+  } else {
+    modal.find('.modal-title').text('Remove tag from ' + scopetarget)
+    modal.find('#tagScopeForm').attr('action', "/admin/scope/"+scopeid+"/untag")
+    modal.find('#tagScopeSubmit').text('Remove Tag')
+    $("select[name='tagname']")[0].options.length = 0;
+    
+    tags.forEach(function(item) {
+      $("#tagname").append(
+        $('<option>', {
+          value: item,
+          text: item
+        })
+      );
+    });
+  }
+})
+</script>
 {% endblock %}

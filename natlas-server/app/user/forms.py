@@ -23,3 +23,15 @@ class DisplaySettingsForm(FlaskForm):
     results_per_page = SelectField('Results Per Page', coerce=int)
     preview_length = SelectField('Preview Length', coerce=int)
     updateDisplaySettings = SubmitField("Submit Changes")
+
+
+class GenerateTokenForm(FlaskForm):
+    generateToken = SubmitField("Generate Token")
+
+class AgentNameForm(FlaskForm):
+    agent_name = StringField("New Agent Name", validators=[DataRequired()])
+    change_name = SubmitField("Change Name")
+
+    def validate_agent_name(self, agent_name):
+        if len(agent_name.data) > 32:
+            raise ValidationError("Name must be less than 32 characters")
