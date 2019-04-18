@@ -59,6 +59,11 @@ else
     systemctl restart elasticsearch
 fi
 
+if ! systemctl is-enabled --quiet elasticsearch; then
+    echo "[+] Enabling Elasticsearch"
+    systemctl enable elasticsearch
+fi
+
 if ! systemctl is-active --quiet elasticsearch; then
     echo "[!] Failed to start Elasticsearch!" && exit 3
 fi
