@@ -148,7 +148,7 @@ def submit():
 @isAgentAuthenticated
 def natlasServices():
     if current_app.current_services["id"] != "None":
-        tmpdict = current_app.current_services
+        tmpdict = current_app.current_services.copy() # make an actual copy of the dict so that we can remove the list
         del tmpdict['as_list'] # don't return the "as_list" version of the services, which is only used for making a pretty table.
         return json.dumps(tmpdict), 200, {'content-type':'application/json'}
     return json.dumps(current_app.current_services), 404, {'content-type':'application/json'}
