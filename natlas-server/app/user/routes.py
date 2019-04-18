@@ -15,7 +15,6 @@ def profile():
         flash("You must be a user to access %s" % request.path, "warning")
         return redirect(url_for('main.index'))
     myagents = current_user.agents
-    print("Myagents: %s" % myagents)
     changePasswordForm = ChangePasswordForm(prefix="change-password")
     displaySettingsForm = DisplaySettingsForm(prefix="display-settings", results_per_page=current_user.results_per_page, \
         preview_length=current_user.preview_length)
@@ -39,7 +38,6 @@ def profile():
             flash("Display settings updated.", "success")
             return redirect(url_for('user.profile'))
     if agentNameForm.change_name.data and agentNameForm.validate_on_submit():
-        flash("fuck my life", "danger")
         return redirect(url_for('user.profile'))
     return render_template("user/profile.html", changePasswordForm=changePasswordForm, displaySettingsForm=displaySettingsForm, \
         agents=myagents, generateTokenForm=generateTokenForm, agentNameForm=agentNameForm)
@@ -81,16 +79,13 @@ def newAgent():
     newAgentForm = AgentNameForm()
 
     if newAgentForm.validate_on_submit():
-        print("form validated")
         myAgent = Agent(user_id=current_user.id, agentid=Agent.generate_agentid(), token=Agent.generate_token(), \
             friendly_name=newAgentForm.agent_name.data)
-        print(myAgent.agentid)
         db.session.add(myAgent)
         db.session.commit()
         flash("New Agent named %s created. Agent ID: %s Agent Token: %s" \
             % (myAgent.friendly_name, myAgent.agentid, myAgent.token), "success")
         return redirect(request.referrer)
     else:
-        print("form not validated")
         flash("Couldn't create new agent", "danger")
         return redirect(request.referrer)
