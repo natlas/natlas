@@ -2,13 +2,17 @@
   <div class="container justify-content-between">
         <div class="px-2 my-flex">
             <ul class="footer-links">
-              <li><a href="https://github.com/natlas/natlas">GitHub</a></li>
-              <li><a href="https://github.com/natlas/natlas/issues/new">Issues</a></li>
-              <li><a href="https://github.com/natlas/natlas/wiki">Wiki</a></li>
+              <li><a title="Check out Natlas on Github" href="https://github.com/natlas/natlas">GitHub</a></li>
+              <li><a title="Checkout the issues" href="https://github.com/natlas/natlas/issues">Issues</a></li>
+              <li><a title="Visit the wiki" href="https://github.com/natlas/natlas/wiki">Wiki</a></li>
+              <li><a title="View our license" href="https://github.com/natlas/natlas/blob/master/LICENSE">License</a></li>
             </ul>
         </div>
         <div class="px-2 my-flex">
-            <a href="{{ url_for('main.index') }}"><img class="img-fluid natlas-name" src="/static/img/natlas-name.png" alt="Natlas"></a>
+          <span>v{{ config.NATLAS_VERSION }}</span>
+        </div>
+        <div class="px-2 my-flex">
+            <a href="{{ url_for('main.index') }}"><img class="img-fluid natlas-name" src="/static/img/natlas-name.png" title="Natlas {{ config.NATLAS_VERSION }}" alt="Natlas"></a>
         </div>
   </div>
 </footer>

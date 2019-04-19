@@ -27,7 +27,6 @@ from getheadshot import getheadshot
 from config import Config
 
 ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
-AGENT_VERSION="0.6.0"
 
 config = Config()
 MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
@@ -46,7 +45,7 @@ def print_info(message):
 if config.ignore_ssl_warn:
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def make_request(endpoint, reqType="GET", postData=None, contentType="application/json", statusCode=200):
-    headers = {'user-agent': 'natlas-agent/{}'.format(AGENT_VERSION)}
+    headers = {'user-agent': 'natlas-agent/{}'.format(config.NATLAS_VERSION)}
     if config.agent_id and config.auth_token:
         authheader = config.agent_id + ":" + config.auth_token
         headers['Authorization'] = 'Bearer {}'.format(authheader)
@@ -330,19 +329,21 @@ class ThreadScan(threading.Thread):
             self.queue.task_done()
 
 def main():
-    if not os.geteuid() == 0:
-        raise SystemExit("Please run as a privileged user in order to use nmap's features.")
-    if not os.path.isdir("data"):
-        os.mkdir("data")
-
     PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
     PARSER_EPILOG = "Report problems to https://github.com/natlas/natlas"
     parser = argparse.ArgumentParser(description=PARSER_DESC, epilog=PARSER_EPILOG, prog='natlas-agent')
-    parser.add_argument('--version', action='version', version='%(prog)s {}'.format(AGENT_VERSION))
+    parser.add_argument('--version', action='version', version='%(prog)s {}'.format(config.NATLAS_VERSION))
     mutually_exclusive = parser.add_mutually_exclusive_group()
     mutually_exclusive.add_argument('--target', metavar='IPADDR', help="An IPv4 address or CIDR range to scan. e.g. 192.168.0.1, 192.168.0.1/24", dest='target')
     mutually_exclusive.add_argument('--target-file', metavar='FILENAME', help="A file of line separated target IPv4 addresses or CIDR ranges", dest='tfile')
     args = parser.parse_args()
+    
+    
+    if not os.geteuid() == 0:
+        raise SystemExit("Please run as a privileged user in order to use nmap's features.")
+    if not os.path.isdir("data"):
+        os.mkdir("data")
+    
     
     autoScan = True
     if args.target or args.tfile:

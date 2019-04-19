@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 
 class Config:
 
+    # Current Version
+    NATLAS_VERSION="0.6.1"
+
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     load_dotenv(os.path.join(BASEDIR, '.env'))
 
