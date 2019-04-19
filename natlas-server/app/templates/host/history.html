@@ -4,9 +4,11 @@
 {% set pagetype = 'multi' %}
 {% block content %}
   {% include 'host/_header.html' %}
+  <div class="host-rows">
   {% for host in hosts %}
     {% include 'host/_host-row-history.html' %}
   {% endfor %}
+  </div>
   {% include 'host/_imagemodal.html' %}
   {% if numresults > current_user.results_per_page %}
     <div class="row">

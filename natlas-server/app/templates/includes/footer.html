@@ -1,11 +1,14 @@
 <footer class="navbar global-footer navbar-dark bg-dark">
-  <div class="container">
-
-    <ul class="footer-links">
-      <li><a href="https://github.com/natlas/natlas">GitHub</a></li>
-      <li><a href="https://github.com/natlas/natlas/issues/new">Issues</a></li>
-      <li><a href="https://github.com/natlas/natlas/wiki">Wiki</a></li>
-    </ul>
-
+  <div class="container justify-content-between">
+        <div class="px-2 my-flex">
+            <ul class="footer-links">
+              <li><a href="https://github.com/natlas/natlas">GitHub</a></li>
+              <li><a href="https://github.com/natlas/natlas/issues/new">Issues</a></li>
+              <li><a href="https://github.com/natlas/natlas/wiki">Wiki</a></li>
+            </ul>
+        </div>
+        <div class="px-2 my-flex">
+            <a href="{{ url_for('main.index') }}"><img class="img-fluid natlas-name" src="/static/img/natlas-name.png" alt="Natlas"></a>
+        </div>
   </div>
 </footer>

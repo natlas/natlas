@@ -1,8 +1,26 @@
 /*
- * Base structure
- */
+* Natlas custom styles
+* Really needs to be organized and minified
+*
+*/
 
-/* Move down content because we have a fixed navbar that is 50px tall */
+.natlas-pink {
+  color:#ed1e79;
+}
+
+.natlas-purple {
+  color:#620ee1;
+}
+
+.natlas-blue {
+  color:#0b59bd;
+}
+
+.natlas-soft-blue {
+  color:#0064b7;
+}
+
+
 html {
   height:100%;
   box-sizing: border-box;
@@ -13,6 +31,7 @@ html {
 body {
   position:relative;
   min-height:100%;
+  background-color:#f1f1f1;
 }
 .main-content{
   padding-top:100px;
@@ -30,12 +49,13 @@ body {
   display:inline-block;
 }
 
-/*
- * Top navigation
- * Hide default border to remove 1px line.
- */
-.navbar-fixed-top {
-  border: 0;
+.natlas-logo {
+  max-height:50px;
+  height:100%;
+}
+.natlas-name {
+  max-height:32px;
+  height:100%;
 }
 
 /*
@@ -152,8 +172,22 @@ form.config-form>div, form.pwchange-form>div {
   max-height:20em;
 }
 
+.host-row:first-of-type {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.host-row:last-of-type {
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
 .host-row:nth-child(odd) {
   background-color: #f9f9f9;
+  border-top: 1px solid #f0f0f0;
+}
+.host-row:nth-child(even) {
+  background-color: #dfdfdf;
   border-top: 1px solid #f0f0f0;
 }
 
@@ -198,22 +232,32 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .port-number {
-  background-color:#36978D; 
-  color:white;
+  background-color: #36978D; 
+  color: white;
+  border-top-left-radius: 10px;
+  width: 50%;
+  float: left;
 }
 
 .port-protocol {
-  background-color:#62A9E3; 
-  color:white;
+  background-color: #62A9E3; 
+  color: white;
+  border-top-right-radius: 10px;
+  width: 50%;
+  float:left;
 }
 
 .port-service {
-  background-color:#2B2D33; 
-  color:white;
+  background-color: #2B2D33; 
+  color: white;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 .port-link {
-  background-color:#79d65e;
+  background-color: #79d65e;
+  border-radius: 10px;
+  margin-top: 0.75rem;
 }
 .port-link>a {
   color:white;
@@ -274,4 +318,34 @@ a > .badge-tag {
   .github-corner .octo-arm {
     animation:octocat-wave 560ms ease-in-out
   }
+}
+
+
+#backtotop {
+  display: inline-block;
+  color: #ed1e79;
+  font-size:2em;
+  text-align: center;
+  border-radius: 4px;
+  margin: 5px;
+  position: fixed;
+  bottom: 5px;
+  right: 5px;
+  z-index: 1000;
+  transition: color .3s 
+    opacity .5s, visibility .5s;
+  opacity: 0;
+  visibility: hidden;
+}
+#backtotop:hover {
+  cursor: pointer;
+  color: #620ee1;
+}
+#backtotop:active {
+  color: #ed1e79;
+}
+
+#backtotop.show {
+  opacity: 1;
+  visibility: visible;
 }

@@ -1,17 +1,20 @@
 <div class="row py-3{% if not portloop.last %} port-row{% endif %}">
     <div class="col-xs-6 col-sm-2 port-summary">
-        <div class="port-number">
-            {{ port.port }}
-        </div>
-        <div class="port-protocol">
-            {{ port.protocol }}
+        <div class="port-num-proto d-block">
+            <div class="port-number">
+                {{ port.port }}
+            </div>
+            <div class="port-protocol">
+                {{ port.protocol }}
+            </div>
+            <div class="clearfix"></div>
         </div>
         <div class="port-service">
             {{ port.service.name }}
         </div>
         {% if 'http' in port.service.name %}
         <div class="port-link">
-            <a href="{% if port.service.tunnel == 'ssl' %}https://{% else %}http://{% endif %}{{ host.ip }}{% if port.port not in [80,443] %}:{{ port.port }}{% endif %}"><i class="fas fa-external-link-alt"></i></a>
+            <a class="d-block" href="{% if port.service.tunnel == 'ssl' %}https://{% else %}http://{% endif %}{{ host.ip }}{% if port.port not in [80,443] %}:{{ port.port }}{% endif %}"><i class="fas fa-external-link-alt"></i></a>
         </div>
         {% endif %}
     </div><!--end port-summary-->

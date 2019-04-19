@@ -1,0 +1,30 @@
+# This is the official list of people who can contribute (and
+# typically have contributed) code to the Moistpetal repository.
+# The AUTHORS file lists the copyright holders; this file
+# lists people.
+#
+# Names should be added to this file only after verifying that
+# the individual or the individual's organization has agreed to
+# the appropriate Contributor License Agreement, found here:
+#
+#     https://cla.github.com/
+#
+# The agreement for individuals can be filled out on the web.
+#
+# When adding J Random Contributor's name to this file,
+# either J's name or J's organization's name should be
+# added to the AUTHORS file, depending on whether the
+# individual or corporate CLA was used.
+
+# Names should be added to this file like so:
+#     Individual's name <submission email address>
+#     Individual's name <submission email address> <email2> <emailN>
+#
+# An entry with multiple email addresses specifies that the
+# first address should be used in the submit logs and
+# that the other addresses should be recognized as the
+# same person.
+
+# Please keep the list sorted.
+
+0xdade <dade@tutanota.com>
