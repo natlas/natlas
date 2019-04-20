@@ -110,8 +110,8 @@ cp LICENSE natlas-agent/
 cp CHANGELOG.md natlas-agent/
 
 # Create tarballs for components
-tar cvzf natlas-server-$NEW_VERSION.tgz natlas-server/
-tar cvzf natlas-agent-$NEW_VERSION.tgz natlas-agent/
+tar cvzf natlas-server-$NEW_VERSION.tgz --exclude-from=.gitignore natlas-server/
+tar cvzf natlas-agent-$NEW_VERSION.tgz --exclude-from=.gitignore natlas-agent/
 
 
 echo "[+] Version v$NEW_VERSION released."
