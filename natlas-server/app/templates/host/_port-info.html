@@ -32,18 +32,20 @@
         {% endif %}
         {% if port.scripts %}
             {% for script in port.scripts %}
-            <div class="row script-header">
-                <div class="col">
-                    <div class="script-container" id="{{ port.protocol }}-{{ port.port }}-{{ script.id }}-{{ host.scan_id }}">
-                        <h5 class="text-muted script-id">{{ script.id }}</h5>
+                {% if script.output.rstrip() != "" %}
+                <div class="row script-header">
+                    <div class="col">
+                        <div class="script-container" id="{{ port.protocol }}-{{ port.port }}-{{ script.id }}-{{ host.scan_id }}">
+                            <h5 class="text-muted script-id">{{ script.id }}</h5>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row script-data">
-                <div class="col">
-                    <pre class="script-output pl-2 pt-2">{{ script.output }}</pre>
+                <div class="row script-data">
+                    <div class="col">
+                        <pre class="script-output pl-2 pt-2">{{ script.output }}</pre>
+                    </div>
                 </div>
-            </div>
+                {% endif %}
             {% endfor %}
         {% endif %} <!--end scripts-->
     </div><!--end port-details-->
