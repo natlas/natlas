@@ -16,6 +16,11 @@ from app.auth.wrappers import isAgentAuthenticated
 @bp.route('/getwork', methods=['GET'])
 @isAgentAuthenticated
 def getwork():
+    if "natlas-agent" in request.headers["user-agent"]:
+        verstr = request.headers["user-agent"].split('/')[1]
+        if verstr != current_app.config["NATLAS_VERSION"]:
+            errmsg = "The server detected you were running version {} but the server is running {}".format(verstr, current_app.config["NATLAS_VERSION"])
+            return json.dumps({'status': 400, 'message': errmsg, 'retry':False}), 400, {'content-type':'application/json'}
     work = {}
     rescans = current_app.ScopeManager.getPendingRescans()
     if len(rescans) == 0: # If there aren't any rescans, update the Rescan Queue and get it again, because of lazy loading
@@ -29,7 +34,7 @@ def getwork():
             scanmanager = current_app.ScopeManager.getScanManager()
 
             if scanmanager == None:
-                return json.dumps({ 'errorcode': 404, 'message': 'No scope is currently configured.' }), 404, {'content-type':'application/json'}
+                return json.dumps({ 'status': 404, 'message': 'No scope is currently configured.', "retry": True }), 404, {'content-type':'application/json'}
 
         ip = scanmanager.getNextIP()
         work['scan_reason'] = 'auto'
@@ -66,6 +71,8 @@ def getwork():
             scan_id = rand
     work['scan_id'] = scan_id
     work['target'] = str(ip)
+    work['status'] = 200
+    work['message'] = "Target: " + str(ip)
 
     return json.dumps(work), 200, {'content-type':'application/json'}
 
@@ -95,17 +102,18 @@ def submit():
     if not newhost["is_up"] or (newhost["is_up"] and newhost["port_count"] == 0):
         newhost["ctime"] = dt.now(tz.utc)
         current_app.elastic.newhost(newhost)
-        return "[+] We've received your report for: " + newhost['ip']
+
+        return json.dumps({"status":200, "message": "Received: " + newhost['ip']}), 200, {'content-type':'application/json'}
 
     nmap = NmapParser.parse(newhost['xml_data'])
     
     # Some quick checks to ensure there are hosts in the scan data
     if nmap.hosts_total != 1:
-        return "[!] We require exactly one host in scan results right now"
+        return json.dumps({"status":400, "message":"XML had too many hosts in it", 'retry':False}), 400, {'content-type':'application/json'}
 
     newhost['ip'] = nmap.hosts[0].address
     if not isAcceptableTarget(newhost['ip']):
-        return "[!] This address isn't in our authorized scope!"
+        return json.dumps({"status":400, "message":"Out of scope: " + newhost['ip'], 'retry':False}), 400, {'content-type':'application/json'}
 
     if len(nmap.hosts[0].hostnames) > 0:
         newhost['hostname'] = nmap.hosts[0].hostnames[0]
@@ -114,7 +122,7 @@ def submit():
     newhost['is_up'] = nmap.hosts[0].is_up()
     if not newhost['is_up']:
         current_app.elastic.newhost(newhost)
-        return "[+] Thanks for telling us that this host is down" + newhost['ip']
+        return json.dumps({"status":200, "message":"Thanks for telling us " + newhost['ip'] +" is down"}), 200, {'content-type':'application/json'}
 
     tmpports = []
     newhost['ports'] = []
@@ -135,14 +143,14 @@ def submit():
     newhost['port_str'] = ', '.join(tmpports) 
 
     if len(newhost['ports']) == 0:
-        return "[!] No open ports found!"
+        return json.dumps({"status":200, "message":"Expected open ports but didn't find any for %s" % newhost['ip']}), 200, {"content-type":"application/json"}
 
     if len(newhost['ports']) > 500:
-        return "[!] More than 500 ports found. This is probably an IDS/IPS. We're going to throw the data out."
+        return json.dumps({"status":200, "message":"More than 500 ports found, throwing data out"}), 200, {"content-type":"application/json"}
 
     current_app.elastic.newhost(newhost)
 
-    return "[+] nmap successful and submitted for ip: "+newhost['ip']
+    return json.dumps({"status":200, "message":"Received %s ports for %s" % (len(newhost['ports']), newhost['ip'])}), 200, {"content-type":"application/json"}
 
 @bp.route('/natlas-services', methods=['GET'])
 @isAgentAuthenticated

@@ -5,9 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project (roughly) adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+### Added
 * Branding improvements
+* Version is now visible in the server footer
 * Back-to-top button
+* Server doesn't interact with mismatched versions
+
+### Changed
 * Style improvements
+* Communication between agent and server has been more standardized around json messaging
+
+### Fixed
+* Agent standalone mode got broken with the agent configurations, fixed the standalone default scanning options
 
 ## [v0.6.1] - Bugfixes
 More information can be found at [natlas/v0.6.1](https://github.com/natlas/natlas/releases/tag/v0.6.1)

@@ -20,6 +20,7 @@ class Elastic:
                         myIndexInit = {"mappings":{"_doc":{"properties":{
                             "ctime": {"type":"date"},
                             "agent": {"type":"keyword"},
+                            "agent_version": {"type":"keyword"},
                             "scan_reason": {"type":"keyword"},
                             "scan_start": {"type":"date"},
                             "scan_stop": {"type":"date"},

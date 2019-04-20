@@ -52,20 +52,47 @@ def make_request(endpoint, reqType="GET", postData=None, contentType="applicatio
     try:
         if reqType == "GET":
             req = requests.get(config.server+endpoint, timeout=config.request_timeout, headers=headers, verify=(not config.ignore_ssl_warn))
+            if req.status_code == 200:
+                if 'message' in req.json():
+                    print_info("[Server] " + req.json()['message'])
+                return req
             if req.status_code == 403:
-                print_err("Unauthorized request, please set NATLAS_AGENT_TOKEN to your authorization token and restart the script")
-                os._exit(403)
+                if 'message' in req.json():
+                    print_err("[Server] " + req.json()['message'])
+                if 'retry' in req.json() and not req.json()['retry']:
+                    os._exit(403)
+            if req.status_code == 400:
+                if 'message' in req.json():
+                    print_info("[Server] " + req.json()['message'])
+                return req
             if req.status_code != statusCode:
                 print_err("Expected %s, received %s" % (statusCode, req.status_code))
-                return False
+                if 'message' in req.json():
+                    print_err("[Server] " + req.json()['message'])
+                return req
             if req.headers['content-type'] != contentType:
                 print_err("Expected %s, received %s" % (contentType, req.headers['content-type']))
                 return False
         elif reqType == "POST" and postData:
             req = requests.post(config.server+endpoint, json=postData, timeout=config.request_timeout, headers=headers, verify=(not config.ignore_ssl_warn))
+            if req.status_code == 200:
+                if 'message' in req.json():
+                    print_info("[Server] " + req.json()['message'])
+                return req
+            if req.status_code == 403:
+                if 'message' in req.json():
+                    print_err("[Server] " + req.json()['message'])
+                if 'retry' in req.json() and not req.json()['retry']:
+                    os._exit(403)
+            if req.status_code == 400:
+                if 'message' in req.json():
+                    print_info("[Server] " + req.json()['message'])
+                return req
             if req.status_code != statusCode:
                 print_err("Expected %s, received %s" % (statusCode, req.status_code))
-                return False
+                if 'message' in req.json():
+                    print_err("[Server] " + req.json()['message'])
+                return req
     except requests.ConnectionError as e:
         print_err("Connection Error connecting to %s" % config.server)
         return False
@@ -83,7 +110,16 @@ def backoff_request(giveup=False, *args, **kwargs):
     result = None
     while not result:
         result = make_request(*args, **kwargs)
+        RETRY=False
+
         if not result:
+            RETRY=True
+        if 'retry' in result.json() and result.json()['retry']:
+            RETRY=True
+        elif not 'retry' in result.json() or not result.json()['retry']:
+            return result
+
+        if RETRY:
             attempt += 1
             if giveup and attempt == config.max_retries:
                 print_err("Request to %s failed %s times. Giving up" % (config.server, config.max_retries))
@@ -108,7 +144,7 @@ def get_services_file():
         with open("natlas-services", "w") as f:
             f.write(serviceData["services"])
         with open("natlas-services", "r") as f:
-            if not hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() == serviceData["sha256"]:            
+            if not hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() == serviceData["sha256"]:
                 print_err("hash of local file doesn't match hash provided by server")
                 return False
     else:
@@ -145,21 +181,21 @@ def cleanup_files(scan_id):
         os.remove(file)
 
 def scan(target_data=None):
-    
+
     if not validate_target(target_data["target"]):
         return ERR["INVALIDTARGET"]
-    print_info("Target: %s" % target_data["target"])
-    
+
     result = {}
 
     # If agent authentication is required, this agent id has to match a server side agent id
     # If it's not required and an agent_id is set, we'll use that in scan data
     # If it's not required and an agent_id is not set, we'll consider it an anonymous scan.
-    if config.agent_id: 
+    if config.agent_id:
         result['agent'] = config.agent_id
     else:
         result['agent'] = "anonymous"
-    
+    result["agent_version"] = config.NATLAS_VERSION
+
     target = target_data["target"]
     result['ip'] = target
     result['scan_reason'] = target_data['scan_reason']
@@ -214,10 +250,10 @@ def scan(target_data=None):
         response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
         return
     else:
-        print_info("Scan  %s Complete" % scan_id)
+        print_info("Scan %s Complete" % scan_id)
 
     for ext in 'nmap', 'gnmap', 'xml':
-        try: 
+        try:
             result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
         except:
             print_err("Couldn't read natlas.%s.%s" % (scan_id, ext))
@@ -299,10 +335,6 @@ def scan(target_data=None):
     cleanup_files(scan_id)
     print_info("Submitting %s ports for %s" % (result['port_count'], result['ip']))
     response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
-    if not response:
-        print_err("Something went wrong submitting results for %s" % result['ip'])
-    else:
-        print_info("Response: %s" % (response.text))
 
 class ThreadScan(threading.Thread):
     def __init__(self, queue, auto=False, servicesSha=''):
@@ -314,19 +346,28 @@ class ThreadScan(threading.Thread):
     def run(self):
         # If we're in auto mode, the threads handle getting work from the server
         if self.auto:
-            while True: 
+            while True:
                 target_data = fetch_target()
-                if target_data["services_hash"] != self.servicesSha:
+                # We hit this if we hit an error that we shouldn't recover from.
+                # Primarily version mismatch, at this point.
+                if not target_data:
+                    os._exit(400)
+                if target_data and target_data["services_hash"] != self.servicesSha:
                     self.servicesSha = get_services_file()
                     if not self.servicesSha:
                         print_err("Failed to get updated services from %s" % config.server)
                 result = scan(target_data)
-        
+
         else:
             #If we're not in auto mode, then the queue is populated with work from local data
-            target_data = self.queue.get()
-            result = scan(target_data)
-            self.queue.task_done()
+            while True:
+                print_info("Fetching work from queue")
+                target_data = self.queue.get()
+                if target_data is None:
+                    break
+                print_info("Manual Target: %s" % target_data["target"])
+                result = scan(target_data)
+                self.queue.task_done()
 
 def main():
     PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
@@ -337,14 +378,14 @@ def main():
     mutually_exclusive.add_argument('--target', metavar='IPADDR', help="An IPv4 address or CIDR range to scan. e.g. 192.168.0.1, 192.168.0.1/24", dest='target')
     mutually_exclusive.add_argument('--target-file', metavar='FILENAME', help="A file of line separated target IPv4 addresses or CIDR ranges", dest='tfile')
     args = parser.parse_args()
-    
-    
+
+
     if not os.geteuid() == 0:
         raise SystemExit("Please run as a privileged user in order to use nmap's features.")
     if not os.path.isdir("data"):
         os.mkdir("data")
-    
-    
+
+
     autoScan = True
     if args.target or args.tfile:
         autoScan = False
@@ -368,20 +409,37 @@ def main():
         t.start()
 
     # Use a default agent config of all options enabled if we are in standalone mode
-    defaultAgentConfig = {"id": 0, "versionDetection": True, "osDetection": True, "defaultScripts": True, "onlyOpens": True, "scanTimeout": 300, "webScreenshots": True, "vncScreenshots": True}
+    defaultAgentConfig = {
+        "id": 0,
+        "versionDetection": True,
+        "osDetection": True,
+        "enableScripts": True,
+        "onlyOpens": True,
+        "scanTimeout": 660,
+        "webScreenshots": True,
+        "vncScreenshots": True,
+        "scriptTimeout": 60,
+        "hostTimeout": 600,
+        "osScanLimit": True,
+        "noPing": False,
+        "scripts": "default"
+    }
+    target_data_template = {"agent_config": defaultAgentConfig, "scan_reason":"manual", "tags":[]}
     if args.target:
         print_info("Scanning: %s" % args.target)
 
         targetNetwork = ipaddress.ip_interface(args.target)
         if targetNetwork.with_prefixlen.endswith('/32'):
-            scan_id = generate_scan_id()
-            target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id, "agent_config":defaultAgentConfig}
+            target_data = target_data_template.copy()
+            target_data["target"] = str(targetNetwork.ip)
+            target_data["scan_id"] = generate_scan_id()
             q.put(target_data)
-        else:    
+        else:
             # Iterate over usable hosts in target, queue.put will block until a queue slot is available
-            for t in targetNetwork.network.hosts(): 
-                scan_id = generate_scan_id()
-                target_data = {"target": str(t), "scan_id": scan_id, "agent_config":defaultAgentConfig}
+            for t in targetNetwork.network.hosts():
+                target_data = target_data_template.copy()
+                target_data["target"] = str(t)
+                target_data["scan_id"] = generate_scan_id()
                 q.put(target_data)
 
         q.join()
@@ -394,13 +452,15 @@ def main():
         for target in open(args.tfile, "r"):
             targetNetwork = ipaddress.ip_interface(target.strip())
             if targetNetwork.with_prefixlen.endswith('/32'):
-                scan_id = generate_scan_id()
-                target_data = {"target": str(targetNetwork.ip), "scan_id": scan_id, "agent_config":defaultAgentConfig}
+                target_data = target_data_template.copy()
+                target_data["target"] = str(targetNetwork.ip)
+                target_data["scan_id"] = generate_scan_id()
                 q.put(target_data)
             else:
                 for t in targetNetwork.network.hosts():
-                    scan_id = generate_scan_id()
-                    target_data = {"target": str(t), "scan_id": scan_id, "agent_config":defaultAgentConfig}
+                    target_data = target_data_template.copy()
+                    target_data["target"] = str(t)
+                    target_data["scan_id"] = generate_scan_id()
                     q.put(target_data)
         q.join()
         print_info("Finished scanning the target file %s" % args.tfile)

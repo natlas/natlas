@@ -26,17 +26,17 @@ def isAgentAuthenticated(f):
     def decorated_function(*args, **kwargs): 
         if current_app.config['AGENT_AUTHENTICATION']:
             if not request.headers.has_key("Authorization"):
-                return json.dumps({ 'errorcode': 403, 'message': 'Authorization is required to access this endpoint' }), \
+                return json.dumps({ 'status': 403, 'message': 'Authorization is required to access this endpoint', 'retry': False }), \
                         403, {'content-type':'application/json'}
             authz = request.headers["Authorization"].split()
             if authz[0].lower() != "bearer":
-                return json.dumps({ 'errorcode': 403, 'message': 'Authorization is required to access this endpoint' }), \
+                return json.dumps({ 'status': 403, 'message': 'Authorization is required to access this endpoint', 'retry': False }), \
                         403, {'content-type':'application/json'}
             agent_id = authz[1].split(':', 1)[0]
             agent_token = authz[1].split(":", 1)[1]
             agent = Agent.load_agent(agent_id)
             if not agent or not agent.verify_token(agent_token):
-                return json.dumps({ 'errorcode': 403, 'message': 'Authorization is required to access this endpoint' }), \
+                return json.dumps({ 'status': 403, 'message': 'Authorization is required to access this endpoint', 'retry': False }), \
                         403, {'content-type':'application/json'}
         return f(*args, **kwargs)
     return decorated_function
