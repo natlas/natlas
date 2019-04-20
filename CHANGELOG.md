@@ -2,9 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project (roughly) adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project strives to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+
+## [v0.6.2]
+More information can be found at [natlas/v0.6.2](https://github.com/natlas/natlas/releases/tag/v0.6.2)
 
 ### Added
 * Branding improvements
@@ -102,3 +106,14 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 * Headless VNC screenshots with vncsnapshot
 * Configuration via .env file
 * Ability to run in standalone mode
+
+
+[Unreleased]: https://github.com/natlas/natlas/compare/v1.6.2...HEAD
+[0.6.2]: https://github.com/natlas/natlas/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/natlas/natlas/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/natlas/natlas/compare/v0.5.4...v0.6.0
+[0.5.4]: https://github.com/natlas/natlas/compare/v0.5.3...v0.5.4
+[0.5.3]: https://github.com/natlas/natlas/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/natlas/natlas/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/natlas/natlas/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/natlas/natlas/compare/v0.5.0
