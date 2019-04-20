@@ -97,6 +97,7 @@ git checkout master
 git pull origin master
 git merge $CURRENT_BRANCH
 git commit -m "Releasing v$NEW_VERSION"
+git push
 
 # Create a tag for the release and push it to github
 git tag -a v$NEW_VERSION -m "Release v$NEW_VERSION"

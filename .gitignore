@@ -8,3 +8,4 @@ metadata.db
 .env
 *.bak
 natlas-agent/natlas-services
+natlas-agent/data
