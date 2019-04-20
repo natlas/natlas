@@ -148,7 +148,18 @@ div.expand-img {
 .imagetitle {
   display:inline;
 }
-
+.date-submitted {
+  font-size: .75rem;
+}
+.port-str {
+  font-size: .85rem;
+}
+.host-hostname {
+  font-size: .85rem;
+}
+.host-export>button {
+  font-size: .85rem;
+}
 @media only screen and (min-width:1000px) {
   .modal-dialog {
     width: 1000px;
@@ -187,7 +198,7 @@ form.config-form>div, form.pwchange-form>div {
   border-top: 1px solid #f0f0f0;
 }
 .host-row:nth-child(even) {
-  background-color: #dfdfdf;
+  background-color: #ececec;
   border-top: 1px solid #f0f0f0;
 }
 

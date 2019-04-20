@@ -3,26 +3,28 @@
     {% if pagetype == 'search' %}
       <h3 class="mt-2"><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
     {% endif %}
+    {% if host.ctime %}
+      <div class="date-submitted">
+        <span class="submitted-text text-muted pr-1">Submitted:</span>
+        <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
+          <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
+        </a>
+      </div>
+    {% endif %}
     {% if host.ports|length > 0 %}
-      <h4 class="mt-2">Open Ports</h4>
-      {{ host.port_str }}
+      <h5 class="mt-2">Open Ports</h5>
+      <span class="port-str">{{ host.port_str }}</span>
     {% elif host.port_count == 0 and host.is_up %}
-      <h4 class="mt-2">No open ports</h4>
+      <h5 class="mt-2">No open ports</h5>
     {% elif not host.is_up %}
-      <h4 class="mt-2">Host down</h4>
+      <h5 class="mt-2">Host down</h5>
     {% endif %}
     {% if host.hostname %}
-    <h4 class="mt-2">Hostname</h4>
-    {{ host.hostname }}
-    {% endif %}
-    {% if host.ctime %}
-    <h4 class="mt-2">Date Added</h4>
-    <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
-      <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
-    </a>
+    <h5 class="mt-2">Hostname</h5>
+    <span class="host-hostname">{{ host.hostname }}</span>
     {% endif %}
     {% if host.tags %}
-    <h4 class="mt-2">Tags</h4>
+    <h5 class="mt-2">Tags</h5>
       {% for tag in host.tags %}
         <a href="{{ url_for('main.search', q="tags:" + tag)}}"><span class="badge badge-secondary badge-tag">{{ tag }}</span></a>
       {% endfor %}
