@@ -2,30 +2,34 @@
 {% set title = "Register" %}
 
 {% block content %}
-    <h1>Register</h1>
-    <form action="{{url_for('auth.register')}}" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=64) }}<br>
-            {% for error in form.email.errors %}
-            <span style="color: red;">{{ error }}</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-            <span style="color: red;">{{ error }}</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password2.label }}<br>
-            {{ form.password2(size=32) }}<br>
-            {% for error in form.password2.errors %}
-            <span style="color: red;">{{ error }}</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    <h2>Register</h2>
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <form action="{{url_for('auth.register')}}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.email.label(class="control-label") }}
+                    {{ form.email(class="form-control") }}
+                    {% for error in form.email.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.password.label(class="control-label") }}
+                    {{ form.password(class="form-control") }}
+                    {% for error in form.password.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.password2.label(class="control-label") }}
+                    {{ form.password2(class="form-control") }}
+                    {% for error in form.password2.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        </div>
+    </div>
 {% endblock %}

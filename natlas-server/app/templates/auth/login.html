@@ -2,32 +2,35 @@
 {% set title = "Login" %}
 
 {% block content %}
-    <div class="col-md-4">
-        <h1>Sign In</h1>
-        <form action="{{url_for('auth.login')}}" method="post">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.email.label(class="control-label") }}
-                {{ form.email(size=32, placeholder="user@example.com", class="form-control") }}
-                {% for error in form.email.errors %}
-                <span style="color: red;">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="form-group">
-                {{ form.password.label(class="control-label") }}
-                {{ form.password(size=32, class="form-control") }}
-                {% for error in form.password.errors %}
-                <span style="color: red;">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="checkbox">
-                <label>{{ form.remember_me() }} Remember Me</label>
-            </div>
-            {{ form.submit(class="btn btn-primary") }}
-        </form>
-        {% if config["REGISTER_ALLOWED"] %}
-        <p class="register-link"><a href="{{ url_for('auth.register') }}">New User?</a></p>
-        {% endif %}
-        <p><a href="{{ url_for('auth.reset_password_request') }}">Forgot Your Password?</a></p>
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h2>Sign In</h2>
+            <form action="{{url_for('auth.login')}}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.email.label(class="control-label") }}
+                    {{ form.email(size=32, placeholder="user@example.com", class="form-control") }}
+                    {% for error in form.email.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.password.label(class="control-label") }}
+                    {{ form.password(size=32, class="form-control") }}
+                    {% for error in form.password.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group form-check">
+                    {{ form.remember_me(class="form-check-input") }} 
+                    {{ form.remember_me.label(class="form-check-label") }}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+            {% if config["REGISTER_ALLOWED"] %}
+            <p class="register-link"><a href="{{ url_for('auth.register') }}">New User?</a></p>
+            {% endif %}
+            <p><a href="{{ url_for('auth.reset_password_request') }}">Forgot Your Password?</a></p>
+        </div>
     </div>
 {% endblock %}
