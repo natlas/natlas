@@ -19,7 +19,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    is_admin = db.Column(db.Boolean)
+    is_admin = db.Column(db.Boolean, default=False)
     results_per_page = db.Column(db.Integer, default=100)
     preview_length = db.Column(db.Integer, default=100)
     rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
