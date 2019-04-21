@@ -59,8 +59,8 @@ server {
 
         # Log calls to the api separately, we have to include the proxy settings here too, since it's still getting passed to natlas
         location /api/ {
-            access_log /var/log/nginx/natlas.io/api.access.log;
-            error_log /var/log/nginx/natlas.io/api.error.log;
+            access_log /var/log/nginx/natlas/api.access.log;
+            error_log /var/log/nginx/natlas/api.error.log;
             proxy_set_header Host $host;
             proxy_set_header REMOTE_ADDR $remote_addr;
             proxy_set_header X-Real-IP $remote_addr;
