@@ -19,24 +19,31 @@ def main():
     parser.add_argument("email", metavar="example@example.com", help="Email address of user to create or modify")
     parser.add_argument("--admin", action="store_true", default=False, help="Use this flag to make the user admin")
     args = parser.parse_args()
-    user = User.query.filter_by(email=args.email.lower()).first()
+
+    validemail = User.validate_email(args.email)
+
+    if not validemail:
+        print("%s does not appear to be a valid, deliverable email" % args.email)
+        return
+
+    user = User.query.filter_by(email=validemail).first()
     if user is not None:
         if args.admin:
             if user.is_admin:
-                print("User %s is already an admin" % args.email.lower())
+                print("User %s is already an admin" % validemail)
                 return
             else:
                 user.is_admin = True
                 db.session.add(user)
                 db.session.commit()
-                print("User %s is now an admin" % args.email.lower())
+                print("User %s is now an admin" % validemail)
                 return
         else:
-            print("User %s already exists" % args.email.lower())
+            print("User %s already exists" % validemail)
             return
     else:
-        password=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(PASS_LENGTH))
-        user = User(email=args.email.lower(), is_admin=args.admin)
+        password=User.generate_password(PASS_LENGTH)
+        user = User(email=validemail, is_admin=args.admin)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -44,7 +51,7 @@ def main():
             admintext = " as an admin "
         else:
             admintext = " "
-        print("User %s has been created%swith password %s" % (args.email.lower(), admintext, password))
+        print("User %s has been created%swith password %s" % (validemail, admintext, password))
         return
 
 if __name__ == "__main__":

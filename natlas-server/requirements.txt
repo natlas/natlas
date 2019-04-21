@@ -1,7 +1,9 @@
 alembic==1.0.8
 blinker==1.4
 Click==7.0
-elasticsearch>=6.0.0,<7.0.0
+dnspython==1.16.0
+elasticsearch==6.3.1
+email-validator==1.0.3
 Flask==1.0.2
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
@@ -9,6 +11,7 @@ Flask-Migrate==2.4.0
 Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
 gunicorn==19.9.0
+idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10.1
 Mako==1.0.8

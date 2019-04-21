@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
 from datetime import datetime, timezone
+from email_validator import validate_email, EmailNotValidError
 import jwt, string, random
 from .util import utcnow_tz
 
@@ -27,6 +28,22 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
+
+    # https://github.com/JoshData/python-email-validator
+    @staticmethod
+    def validate_email(email):
+        try:
+            valid = validate_email(email)
+            email = valid["email"]
+            return email
+        except EmailNotValidError as e:
+            return False
+
+    # This is really only used by the add-user bootstrap script, but useful to contain it here.
+    @staticmethod
+    def generate_password(length):
+        passcharset = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        return ''.join(random.SystemRandom().choice(passcharset) for _ in range(length))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

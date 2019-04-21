@@ -14,7 +14,7 @@ def login():
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data.lower()).first()
+        user = User.query.filter_by(email=User.validate_email(form.email.data)).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid email or password', 'danger')
             return redirect(url_for('auth.login'))
@@ -41,7 +41,11 @@ def register():
         return redirect(url_for('auth.login'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data.lower())
+        validemail = User.validate_email(form.email.data)
+        if not validemail:
+            flash("%s does not appear to be a valid, deliverable email address." % form.email.data, "danger")
+            return redirect(url_for('auth.register'))
+        user = User(email=validemail)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -56,7 +60,11 @@ def reset_password_request():
         return redirect(url_for('main.index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data.lower()).first()
+        validemail = User.validate_email(form.email.data)
+        if not validemail:
+            flash("%s does not appear to be a valid, deliverable email address." % form.email.data, "danger")
+            return redirect(url_for('auth.reset_password_request'))
+        user = User.query.filter_by(email=validemail).first()
         if user:
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password', "info")

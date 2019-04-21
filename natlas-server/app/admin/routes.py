@@ -38,7 +38,11 @@ def users():
     editForm = UserEditForm()
     inviteForm = InviteUserForm()
     if inviteForm.validate_on_submit():
-        newUser = User(email=inviteForm.email.data.lower())
+        validemail = User.validate_email(inviteForm.email.data)
+        if not validemail:
+            flash("%s does not appear to be a valid, deliverable email address." % inviteForm.email.data, "danger")
+            return redirect(request.referrer)
+        newUser = User(email=validemail)
         db.session.add(newUser)
         db.session.commit()
         send_user_invite_email(newUser)
