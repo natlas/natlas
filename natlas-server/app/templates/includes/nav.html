@@ -77,22 +77,22 @@
               <li><code>!ssh !apache</code> to filter out results containing both strings "ssh" and "apache"</li>
             </ul>
           </li>
-          <li>Search for specific ports using "ports:" 
+          <li>Search for specific ports using "port_str:" 
             <ul>
-              <li><code>ports:22</code> shows hosts with port 22 identified as open</li>
-              <li><code>ports:22 OR ports:2222</code> shows hosts with port 22 or port 2222 identified as open</li>
+              <li><code>port_str:22</code> shows hosts with port 22 identified as open</li>
+              <li><code>port_str:22 OR port_str:2222</code> shows hosts with port 22 or port 2222 identified as open</li>
             </ul>
           </li>
           <li>Search time ranges by using the "ctime:" keyword 
             <ul>
-              <li><code>ctime:&lt;2018</code> to search for results before January 1st, 2018</li>
-              <li><code>ctime:2018-01-01</code> to search for results from January 1st, 2018</li>
-              <li><code>ctime:>2018-01</code> to search for results newer than January 1st, 2018</li>
+              <li><code>ctime:&lt;2019</code> to search for results before January 1st, 2019</li>
+              <li><code>ctime:2019-01-01</code> to search for results from January 1st, 2019</li>
+              <li><code>ctime:>2019-01</code> to search for results newer than January 1st, 2019</li>
             </ul>
           </li>
           <li>Put it all together now:
             <ul>
-              <li><code>ctime:>2018-01 ports:22 !OpenSSH</code> shows us results newer than January 1st, 2018 that are listening on port 22 but do not contain the string "OpenSSH" in them</li></ul>
+              <li><code>ctime:>2019-01 port_str:22 !OpenSSH</code> shows us results newer than January 1st, 2019 that are listening on port 22 but do not contain the string "OpenSSH" in them</li></ul>
         </ul>
       </div>
     </div>
