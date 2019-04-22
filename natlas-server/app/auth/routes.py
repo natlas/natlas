@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, current_user
 from app import db
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, \
     ResetPasswordForm, InviteConfirmForm
-from app.models import User
+from app.models import User, EmailToken
 from app.auth.email import send_password_reset_email
 from app.auth import bp
 from werkzeug.urls import url_parse
@@ -79,11 +79,14 @@ def reset_password(token):
         return redirect(url_for('main.index'))
     user = User.verify_reset_password_token(token)
     if not user:
-        return redirect(url_for('main.index'))
+        flash("Password reset token is invalid or has expired.", "danger")
+        return redirect(url_for('auth.login'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
-        db.session.commit()
+        EmailToken.expire_token(token)
+        # No need to session.commit() because expire_token commits the session for us
+        
         flash('Your password has been reset.', "success")
         return redirect(url_for('auth.login'))
     return render_template('auth/password_reset.html', title="Reset Password", form=form)
@@ -95,13 +98,14 @@ def invite_user(token):
         return redirect(url_for('main.index'))
     user = User.verify_invite_token(token)
     if not user:
-        flash("Failed to verify invite token!", "danger")
-        flash(User.verify_invite_token(token))
-        return redirect(url_for('main.index'))
+        flash("Invite token is invalid or has expired", "danger")
+        return redirect(url_for('auth.login'))
     form = InviteConfirmForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
-        db.session.commit()
+        EmailToken.expire_token(token)
+        # No need to session.commit() because expire_token commits the session for us
+
         flash('Your password has been set.', "success")
         return redirect(url_for('auth.login'))
     return render_template('auth/accept_invite.html', title="Accept Invitation", form=form)

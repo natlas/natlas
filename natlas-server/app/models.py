@@ -4,10 +4,10 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from email_validator import validate_email, EmailNotValidError
 import jwt, string, random
-from .util import utcnow_tz
+from .util import utcnow_tz, generate_hex_16, generate_hex_32
 
 # Many:Many table mapping scope items to tags and vice versa.
 scopetags = db.Table('scopetags',
@@ -56,32 +56,29 @@ class User(UserMixin, db.Model):
         return User.query.get(int(id))
 
     def get_reset_password_token(self, expires_in=600):
-        return jwt.encode(
-            {'reset_password': self.id, 'exp': time() + expires_in},
-            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+        newToken = EmailToken.new_token(user_id=self.id, token_type='reset', expires_in=expires_in)
+        return newToken.token
 
     @staticmethod
     def verify_reset_password_token(token):
-        try:
-            id = jwt.decode(token, current_app.config['SECRET_KEY'],
-                            algorithms=['HS256'])['reset_password']
-        except:
-            return
-        return User.query.get(id)
+        myToken = EmailToken.get_token(token)
+        if myToken and myToken.verify_token('reset'):
+            return User.query.get(myToken.user_id)
+        else:
+            return False
 
+    # 172800 seconds == 48 hours
     def get_invite_token(self, expires_in=172800):
-        return jwt.encode(
-            {'invite_user': self.id, 'exp': time() + expires_in},
-            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+        newToken = EmailToken.new_token(user_id=self.id, token_type='invite', expires_in=expires_in)
+        return newToken.token
 
     @staticmethod
     def verify_invite_token(token):
-        try:
-            id = jwt.decode(token, current_app.config['SECRET_KEY'],
-                            algorithms=['HS256'])['invite_user']
-        except:
-            return
-        return User.query.get(id)
+        myToken = EmailToken.get_token(token)
+        if myToken and myToken.verify_token('invite'):
+            return User.query.get(myToken.user_id)
+        else:
+            return False
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -271,8 +268,65 @@ class Agent(db.Model):
 
     @staticmethod
     def generate_token():
-        return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(32))
+        tokencharset = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        return ''.join(random.choice(tokencharset) for _ in range(32))
 
     @staticmethod
     def generate_agentid():
-        return "%x" % random.randrange(16**16)
+        return generate_hex_16()
+
+
+class EmailToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(32), index=False, unique=True, nullable=False)
+    date_generated = db.Column(db.DateTime, nullable=False, default=utcnow_tz)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Valid Token Types are: "register", "invite", and "reset"
+    token_type = db.Column(db.String(8), index=True, nullable=False)
+    token_expiration = db.Column(db.DateTime, nullable=False)
+
+    # Build a new token
+    @staticmethod
+    def new_token(user_id, token_type, expires_in):
+        expiration = utcnow_tz() + timedelta(seconds=expires_in)
+        if token_type not in ['register', 'invite', 'reset']:
+            return False
+        newToken = EmailToken(user_id=user_id, token=generate_hex_32(), token_type=token_type, token_expiration=expiration)
+        db.session.add(newToken)
+        db.session.commit()
+        return newToken
+
+    # Get token from database
+    @staticmethod
+    def get_token(token):
+        mytoken = EmailToken.query.filter_by(token=token).first()
+        if mytoken:
+            return mytoken
+        else:
+            return False
+
+    # If a token is expired, I don't want to bother keeping it.
+    # Keep as little information about users as necessary, old tokens aren't necessary
+    @staticmethod
+    def expire_token(token):
+        mytoken = EmailToken.get_token(token)
+        if not mytoken:
+            return True #token already doesn't exist
+        db.session.delete(mytoken)
+        db.session.commit()
+        return True
+
+    # verify that the token is not expired and is of the correct token type
+    def verify_token(self, ttype):
+        if self.token_expiration > datetime.utcnow():
+            if self.token_type == ttype:
+                # Expiration date is in the future and token type matches expected
+                return True
+            else:
+                # The token type didn't match, which would only happen if someone tries to use a token for the wrong reason
+                return False 
+        else:
+            # The token has expired, delete it
+            EmailToken.expire_token(self.token)
+            return False
