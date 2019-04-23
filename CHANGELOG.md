@@ -7,6 +7,26 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 ## Unreleased
 
 
+## [v0.6.3]
+More information can be found at [natlas/v0.6.3](https://github.com/natlas/natlas/releases/tag/v0.6.3)
+
+### Added
+* Normal users can now be added with the add-admin.py bootstrap script
+
+### Changed
+* SECURITY - Invite and Password Reset tokens have moved from using JWT to database-backed stateful tokens. These tokens expire after a defined period of time, as well as if the token is successfully used.
+* Various styling improvements for authentication pages
+
+### Fixed
+* SECURITY - Invite and Password Reset flows have been updated to include an intermediary step that prevents the secret tokens from leaking to 3rd parties via the Referer header.
+* SECURITY - Email validation is much stricter now, through the use of python-email-validator. This fixes problems where emails like `test@test.com@test.com` or `test @test.com` could have been treated as valid emails, causing unexpected behaviors.
+* New users are explicitly created with "is_admin" set to false, instead of the previous "None" that they would get in certain flows.
+* The nginx deployment script now correctly recommends placing all logs in the same folder, instead of `/var/log/nginx/natlas` and `/var/log/nginx/natlas.io`.
+* Fixed erroneous help string in search help modal that was a holdover from v0.5.x.
+
+### Removed
+* Removed an unused css load from adobe for the NATLAS logo font. We previously settled on using the image, but had forgotten to remove the font stylesheet include.
+
 ## [v0.6.2]
 More information can be found at [natlas/v0.6.2](https://github.com/natlas/natlas/releases/tag/v0.6.2)
 
@@ -108,7 +128,8 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 * Ability to run in standalone mode
 
 
-[Unreleased]: https://github.com/natlas/natlas/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/natlas/natlas/compare/v1.6.3...HEAD
+[v0.6.3]: https://github.com/natlas/natlas/compare/v0.6.2...v0.6.3
 [v0.6.2]: https://github.com/natlas/natlas/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/natlas/natlas/compare/v0.6.0...v0.6.1
 [v0.6.0]: https://github.com/natlas/natlas/compare/v0.5.4...v0.6.0
