@@ -2,7 +2,7 @@
 
 The Setup
 ------------
-To get started using the natlas-agent, you should be able to simply run `setup-agent.sh`. This script requires elevated privileges in order to install the necessary packages to run an agent. This script has been tested on Ubuntu 18.10.
+To get started using the natlas-agent, you should be able to simply run `setup-agent.sh`. This script requires elevated privileges in order to install the necessary packages to run an agent. This script has been tested on Ubuntu 18.04 and Ubuntu 18.10.
 
 ```
 $ sudo ./setup-agent.sh
@@ -21,6 +21,8 @@ To make modifications to your agent, you can modify environment variables to mat
 - `NATLAS_BACKOFF_MAX` defaults to `300` (seconds) - Maximum time for exponential backoff after failed requests
 - `NATLAS_BACKOFF_BASE` defaults to `1` (second) - Incremental time for exponential backoff after failed requests
 - `NATLAS_MAX_RETRIES` defaults to `10` - Number of times to retry a request to the server before giving up
+- `NATLAS_AGENT_ID` defaults to `None` - ID string that identifies scans made by this host, required for agent authentication, optional if agent authentication is not required. Get this from your `/user/` page on the Natlas server if agent authentication is enabled.
+- `NATLAS_AGENT_TOKEN` defaults to `None` - Secret token only needed when agent authentication is required. Generate this with the ID on the `/user/` page on the Natlas server.
 
 Starting the Agent
 ------------
