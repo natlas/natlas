@@ -25,6 +25,7 @@ class User(UserMixin, db.Model):
     preview_length = db.Column(db.Integer, default=100)
     rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
     agents = db.relationship('Agent', backref='user', lazy=True)
+    tokens = db.relationship('EmailToken', backref='user', lazy=True)
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -292,6 +293,10 @@ class EmailToken(db.Model):
         expiration = utcnow_tz() + timedelta(seconds=expires_in)
         if token_type not in ['register', 'invite', 'reset']:
             return False
+        hasToken = EmailToken.query.filter_by(user_id=user_id, token_type=token_type).first()
+        if hasToken:
+            EmailToken.expire_token(hasToken)
+
         newToken = EmailToken(user_id=user_id, token=generate_hex_32(), token_type=token_type, token_expiration=expiration)
         db.session.add(newToken)
         db.session.commit()
@@ -309,13 +314,20 @@ class EmailToken(db.Model):
     # If a token is expired, I don't want to bother keeping it.
     # Keep as little information about users as necessary, old tokens aren't necessary
     @staticmethod
-    def expire_token(token):
-        mytoken = EmailToken.get_token(token)
-        if not mytoken:
-            return True #token already doesn't exist
-        db.session.delete(mytoken)
-        db.session.commit()
-        return True
+    def expire_token(token=None, tokenstr=None):
+        if token:
+            db.session.delete(token)
+            db.session.commit()
+            return True
+        elif tokenstr:
+            mytoken = EmailToken.get_token(tokenstr)
+            if not mytoken:
+                return True #token already doesn't exist
+            db.session.delete(mytoken)
+            db.session.commit()
+            return True
+        else:
+            return False
 
     # verify that the token is not expired and is of the correct token type
     def verify_token(self, ttype):
@@ -328,5 +340,5 @@ class EmailToken(db.Model):
                 return False 
         else:
             # The token has expired, delete it
-            EmailToken.expire_token(self.token)
+            EmailToken.expire_token(token=self)
             return False

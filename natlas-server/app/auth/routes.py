@@ -84,9 +84,9 @@ def reset_password(token):
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
-        EmailToken.expire_token(token)
+        EmailToken.expire_token(tokenstr=token)
         # No need to session.commit() because expire_token commits the session for us
-        
+
         flash('Your password has been reset.', "success")
         return redirect(url_for('auth.login'))
     return render_template('auth/password_reset.html', title="Reset Password", form=form)
@@ -103,7 +103,7 @@ def invite_user(token):
     form = InviteConfirmForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
-        EmailToken.expire_token(token)
+        EmailToken.expire_token(tokenstr=token)
         # No need to session.commit() because expire_token commits the session for us
 
         flash('Your password has been set.', "success")
