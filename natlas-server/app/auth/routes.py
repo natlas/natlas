@@ -1,4 +1,4 @@
-from flask import redirect, url_for, flash, render_template, request, current_app
+from flask import redirect, url_for, flash, render_template, request, current_app, session
 from flask_login import login_user, logout_user, current_user
 from app import db
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, \
@@ -54,7 +54,7 @@ def register():
     return render_template('auth/register.html', title='Register', form=form)
 
 
-@bp.route('/reset_password_request', methods=['GET', 'POST'])
+@bp.route('/reset_password', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -73,39 +73,66 @@ def reset_password_request():
                            title='Request Password Reset', form=form, pwrequest=True)
 
 
-@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
+@bp.route('/reset_password/<token>', methods=['GET'])
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
+    session['reset_token'] = token
+    return redirect(url_for('auth.do_password_reset'))
+
+@bp.route('/reset_password/reset', methods=['GET', 'POST'])
+def do_password_reset():
+    token = session['reset_token']
+    if not token:
+        flash("Token not found!", "danger")
+        return redirect(url_for('auth.login'))
+
     user = User.verify_reset_password_token(token)
     if not user:
         flash("Password reset token is invalid or has expired.", "danger")
+        session.pop('reset_token', None) # remove the invalid token from the session
         return redirect(url_for('auth.login'))
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
         EmailToken.expire_token(tokenstr=token)
-        # No need to session.commit() because expire_token commits the session for us
+        session.pop('reset_token', None) # remove the reset token from the session
+        # No need to db.session.commit() because expire_token commits the session for us
 
         flash('Your password has been reset.', "success")
         return redirect(url_for('auth.login'))
     return render_template('auth/password_reset.html', title="Reset Password", form=form)
 
 
-@bp.route('/invite/<token>', methods=['GET', 'POST'])
+@bp.route('/invite/<token>', methods=['GET'])
 def invite_user(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
+    session['invite_token'] = token
+    return redirect(url_for('auth.accept_invite'))
+
+@bp.route('/invite/accept', methods=['GET', 'POST'])
+def accept_invite():
+    token = session['invite_token']
+    if not token:
+        flash("Token not found!", "danger")
+        return redirect(url_for('auth.login'))
+    
     user = User.verify_invite_token(token)
     if not user:
         flash("Invite token is invalid or has expired", "danger")
+        session.pop('invite_token', None) # remove the invalid token from the session
         return redirect(url_for('auth.login'))
+
     form = InviteConfirmForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
         EmailToken.expire_token(tokenstr=token)
-        # No need to session.commit() because expire_token commits the session for us
+        session.pop('invite_token', None) # remove the invite token from the session
+        # No need to db.session.commit() because expire_token commits the session for us
 
         flash('Your password has been set.', "success")
         return redirect(url_for('auth.login'))
     return render_template('auth/accept_invite.html', title="Accept Invitation", form=form)
+
