@@ -21,7 +21,7 @@ There are a number of config options that you can specify in a file called `.env
 
 Can't be changed via the web interface (only `.env`):
 
-- `SECRET_KEY` defaults to `you-should-set-a-secret-key` and you should **absolutely** set this to a secret value
+- `SECRET_KEY` defaults to `you-should-set-a-secret-key`, however the `setup-server.sh` script will generate a random value for you if you don't have an existing `SECRET_KEY` set.
 - `SQLALCHEMY_DATABASE_URI` defaults to a sqlite database in the natlas-server directory `sqlite:///metadata.db`
 - `FLASK_ENV` defaults to `production` and should not be changed unless you are developing for natlas.
 - `FLASK_APP` defaults to `natlas-server.py` and should not be changed. It's what allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.
@@ -75,11 +75,11 @@ In order to get started interacting with Natlas, you'll need an administrator ac
 - the blacklist
 - services that agents scan for
 
-To create a new admin account, simply run `./add-admin.py` from within the natlas `venv` with an email as the only argument. If this email doesn't already exist in the User table, it will be created with admin privileges and a random password will be generated and spit out to the command line. If the email *does* already exist in the User table, it will be toggled to be an admin. This can be helpful if you accidentally remove yourself as an admin and can't get back into the admin interface.
+To create a new admin account, ensure that you're in the natlas server `venv` and then run `./add-user.py --admin <email>`. If this email doesn't already exist in the User table, it will be created with admin privileges and a random password will be generated and spit out to the command line. If the email *does* already exist in the User table, it will be toggled to be an admin. This can be helpful if you accidentally remove yourself as an admin and can't get back into the admin interface.
 
 ```
 $ source venv/bin/activate
-$ python3 add-admin.py user@example.com
+$ python3 add-user.py --admin user@example.com
 ```
 
 
