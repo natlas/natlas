@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project strives to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-
+* Fixed bug in scan manager ([#150](https://github.com/natlas/natlas/issues/150)) where updating the networks in range to scan caused unexpected scan targets.
 
 ## [v0.6.3]
 More information can be found at [natlas/v0.6.3](https://github.com/natlas/natlas/releases/tag/v0.6.3)

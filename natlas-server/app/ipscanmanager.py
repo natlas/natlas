@@ -7,17 +7,21 @@ class IPScanManager:
 	rng = None
 
 	def __init__(self, whitelist, blacklist):
-		set = IPSet([])
+		ipset = IPSet([])
+		self.networks = []
+		self.total = 0
+		self.rng = None
+
 		for block in whitelist:
-			set.add(IPNetwork(block))
+			ipset.add(IPNetwork(block))
 			# Remove invalid broadcast and network addresses
 			if block.broadcast != None:
-				set.remove(IPNetwork(block.broadcast))
+				ipset.remove(IPNetwork(block.broadcast))
 			if block.size > 2:
-				set.remove(IPNetwork(block.network))
+				ipset.remove(IPNetwork(block.network))
 		for block in blacklist:
-			set.remove(IPNetwork(block))
-		for block in set.iter_cidrs():
+			ipset.remove(IPNetwork(block))
+		for block in ipset.iter_cidrs():
 			self.total += block.size
 			self.networks.append( { "network": block, "size": block.size, "start": block[0], "index": 0 } )
 

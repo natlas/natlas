@@ -73,7 +73,9 @@ class ScopeManager():
         from app.models import ScopeItem
         self.scanmanager = None
         try:
-            self.scanmanager = IPScanManager([IPNetwork(n.target) for n in ScopeItem.getScope()], [IPNetwork(n.target) for n in ScopeItem.getBlacklist()])
+            scanrange = [IPNetwork(n.target) for n in ScopeItem.getScope()]
+            blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
+            self.scanmanager = IPScanManager(scanrange, blacklistrange)
         except Exception as e:
             print("Scan manager could not be instantiated because there was no scope configured.")
 
