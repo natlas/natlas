@@ -1,15 +1,18 @@
 import json
 import elasticsearch
 import random
-
+from config import Config
 
 class Elastic:
     es = None
     status = False
     errrorinfo = ''
     natlasIndices = ["nmap", "nmap_history"]
+    mapping = {}
 
     def __init__(self, elasticURL):
+        with open(Config().BASEDIR + '/defaults/elastic/mapping.json') as mapfile:
+            self.mapping = json.loads(mapfile.read())
         try:
             self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
             if "cluster_name" in self.es.nodes.info():
@@ -17,56 +20,7 @@ class Elastic:
             if self.status:
                 for index in self.natlasIndices: # initialize nmap and nmap_history and give them mappings for known necessary types
                     if not self.es.indices.exists(index):
-                        myIndexInit = {"mappings":{"_doc":{"properties":{
-                            "ctime": {"type":"date"},
-                            "agent": {"type":"keyword"},
-                            "agent_version": {"type":"keyword"},
-                            "scan_reason": {"type":"keyword"},
-                            "scan_start": {"type":"date"},
-                            "scan_stop": {"type":"date"},
-                            "elapsed": {"type":"integer"},
-                            "tags": {"type":"keyword"},
-                            "port_count": {"type":"integer"},
-                            "port_str": {"type":"text"},
-                            "is_up": {"type":"boolean"},
-                            "ip": {"type":"ip"},
-                            "scan_id": {"type":"keyword"},
-                            "nmap_data": {"type": "text"},
-                            "xml_data": {"type": "text", "index":"false"},
-                            "gnmap_data": {"type": "text", "index": "false"},
-                            "httpsheadshot": {"type": "binary"},
-                            "httpsheadshot": {"type": "binary"},
-                            "vncheadshot": {"type":"binary"},
-                            "ports": {"type": "nested", "properties": {
-                                "id" : {"type": "keyword"},
-                                "number" : {"type": "integer"},
-                                "protocol": {"type": "keyword"},
-                                "state": {"type": "keyword"},
-                                "reason": {"type": "text"},
-                                "banner": {"type": "text"},
-                                "service": {
-                                   "properties": {
-                                       "name": {"type": "keyword"},
-                                       "product": {"type": "keyword"},
-                                       "version": {"type": "keyword"},
-                                       "ostype": {"type": "keyword"},
-                                       "conf": {"type": "integer"},
-                                       "cpelist": {"type": "text"},
-                                       "method": {"type": "text"},
-                                       "extrainfo": {"type": "text"},
-                                       "tunnel": {"type": "keyword"}
-                                     }
-                                   },
-                                   "scripts": {
-                                        "properties": {
-                                            "id": {"type": "text"},
-                                            "output": {"type": "text"}
-                                        }
-                                   }
-
-                            }}
-                            }}}}
-                        self.es.indices.create(index, body=myIndexInit)
+                        self.es.indices.create(index, body=self.mapping)
         except elasticsearch.exceptions.NotFoundError:
             self.errorinfo = 'Cluster Not Found'
         except:
