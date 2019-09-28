@@ -5,16 +5,16 @@ import sympy
 mutex = Lock()
 
 def modexp(b, e, m):
-        bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
-        s = b
-        v = 1
-        for bit in bits:
-                if bit == 1:
-                        v *= s
-                        v %= m
-                s *= s
-                s %= m
-        return v
+		bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
+		s = b
+		v = 1
+		for bit in bits:
+				if bit == 1:
+						v *= s
+						v %= m
+				s *= s
+				s %= m
+		return v
 
 class CyclicPRNG:
 	N = 0
