@@ -114,7 +114,7 @@ def backoff_request(giveup=False, *args, **kwargs):
 
         if not result:
             RETRY=True
-        if 'retry' in result.json() and result.json()['retry']:
+        elif 'retry' in result.json() and result.json()['retry']:
             RETRY=True
         elif not 'retry' in result.json() or not result.json()['retry']:
             return result
