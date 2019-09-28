@@ -1,7 +1,9 @@
 import json
 import elasticsearch
 import random
+from datetime import datetime
 from config import Config
+from urllib3.exceptions import NewConnectionError
 
 class Elastic:
     es = None
@@ -9,6 +11,7 @@ class Elastic:
     errrorinfo = ''
     natlasIndices = ["nmap", "nmap_history"]
     mapping = {}
+    lastReconnectAttempt = None
 
     def __init__(self, elasticURL):
         with open(Config().BASEDIR + '/defaults/elastic/mapping.json') as mapfile:
@@ -21,15 +24,41 @@ class Elastic:
                 for index in self.natlasIndices: # initialize nmap and nmap_history and give them mappings for known necessary types
                     if not self.es.indices.exists(index):
                         self.es.indices.create(index, body=self.mapping)
+        except NewConnectionError:
+            self.errorinfo = 'urllib3.exceptions.NewConnectionError'
+            return
+        except ConnectionRefusedError:
+            self.errorinfo = 'ConnectionRefusedError'
+            return
         except elasticsearch.exceptions.NotFoundError:
             self.errorinfo = 'Cluster Not Found'
+            return
         except:
+            self.lastReconnectAttempt = datetime.now()
             self.errorinfo = 'Could not establish connection'
+            return
 
+    def attemptReconnect(self):
+        now = datetime.now()
+        delta = now - self.lastReconnectAttempt
+        if delta.seconds < 60:
+            return False
+        else:
+            try:
+                if "cluster_name" in self.es.nodes.info():
+                    self.status = True
+                    return True
+                else:
+                    self.lastReconnectAttempt = now
+                    return False
+            except:
+                self.lastReconnectAttempt = now
+                return False
 
     def search(self, query, limit, offset):
         if not self.status:
-            return 0,[]
+            if not self.attemptReconnect():
+                return 0,[]
         if query == '':
             query = 'nmap'
         try:
@@ -68,6 +97,8 @@ class Elastic:
                             }
                         }
                 })
+        except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+            self.status = False
         except:
             return 0, []  # search borked, return nothing
 
@@ -78,31 +109,53 @@ class Elastic:
         return result['hits']['total'], results
 
     def totalHosts(self):
-        result = self.es.count(index="nmap", doc_type="_doc")
-        return result["count"]
+        if not self.status:
+            if not self.attemptReconnect():
+                return 0
+        try:
+            result = self.es.count(index="nmap", doc_type="_doc")
+            return result["count"]
+        except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+            self.status = False
+            return 0
 
     def newhost(self, host):
         if not self.status:
-            return
+            if not self.attemptReconnect():
+                return
         ip = str(host['ip'])
-        # broken in ES6
-        self.es.index(index='nmap_history', doc_type='_doc', body=host)
-        self.es.index(index='nmap', doc_type='_doc', id=ip, body=host)
+
+        try:
+            self.es.index(index='nmap_history', doc_type='_doc', body=host)
+            self.es.index(index='nmap', doc_type='_doc', id=ip, body=host)
+        except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+            self.status = False
+            return
 
     def gethost(self, ip):
         if not self.status:
-            return 0,[]
-        result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {"query_string": {
-                                'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+            if not self.attemptReconnect():
+                return 0,[]
+        try:
+            result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {"query_string": {
+                                    'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+        except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+            self.status = False
+            return 0, None
         if result['hits']['total'] == 0:
             return 0, None
         return result['hits']['total'], result['hits']['hits'][0]['_source']
 
     def gethost_history(self, ip, limit, offset):
         if not self.status:
-            return 0,[]
-        result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": limit, "from": offset, "query": {
-                                "query_string": {'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+            if not self.attemptReconnect():
+                return 0,[]
+        try:
+            result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": limit, "from": offset, "query": {
+                                    "query_string": {'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+        except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+            self.status = False
+            return 0, None
 
         results = []  # collate results
         for thing in result['hits']['hits']:
@@ -112,10 +165,15 @@ class Elastic:
 
     def gethost_scan_id(self, scan_id):
         if not self.status:
-            return 0,[]
-        result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {
-                                "query_string": {'query': scan_id, "fields": ["scan_id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
-
+            if not self.attemptReconnect():
+                return 0,[]
+        
+        try:
+            result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {
+                                    "query_string": {'query': scan_id, "fields": ["scan_id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+        except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+            self.status = False
+            return 0, None
         if result['hits']['total'] == 0:
             return 0, None
         return result['hits']['total'], result['hits']['hits'][0]['_source']
@@ -123,7 +181,8 @@ class Elastic:
 
     def delete_scan(self, scan_id):
         if not self.status:
-            return -1
+            if not self.attemptReconnect():
+                return -1
 
         migrate = False
         hostResult = self.es.search(index='nmap', doc_type='_doc', body={"size": 1, "query": {
@@ -148,7 +207,8 @@ class Elastic:
 
     def delete_host(self, ip):
         if not self.status:
-            return -1
+            if not self.attemptReconnect():
+                return -1
 
         deleted = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body={"query": {
                                 "query_string": {'query': ip, "fields": ["ip", "id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
