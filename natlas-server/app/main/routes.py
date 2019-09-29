@@ -9,6 +9,7 @@ from app.models import RescanTask
 from app import db
 import json
 from datetime import datetime, timedelta
+import random
 
 @bp.route('/')
 @isAuthenticated
@@ -164,3 +165,17 @@ def rescan_host(ip):
 		current_app.ScopeManager.updatePendingRescans()
 		current_app.ScopeManager.updateDispatchedRescans()
 		return redirect(request.referrer)
+
+@bp.route("/random")
+@bp.route("/random/")
+def randomHost():
+	randomHost = current_app.elastic.random_host()
+	if not randomHost:
+		abort(404)
+	ip = randomHost['hits']['hits'][0]['_source']['ip']
+	info, context = hostinfo(ip)
+	delForm = DeleteForm()
+	delHostForm = DeleteForm()
+	rescanForm = RescanForm()
+	return render_template("host/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
+		rescanForm=rescanForm)

@@ -3,12 +3,15 @@
         <a class="navbar-brand natlas-brand" href="{{ url_for('main.index') }}"><img src="/static/img/natlas-logo.png" class="img-fluid natlas-logo" alt="Natlas Globe"/><span class="sr-only">Natlas</span></a>
           <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
           </button>
-          
+
         <div id="navbar" class="collapse navbar-collapse">
-          
+
           <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('main.search') }}">Browse</a>
+            </li>
+            <li>
+              <a class="nav-link" href="{{ url_for('main.randomHost') }}">Random</a>
             </li>
           </ul>
 
@@ -38,7 +41,7 @@
               </div>
             </div>
 
-            <a href="#" class="ml-1" data-toggle="modal" data-target="#searchHelp"><i class="fas fa-question-circle natlas-pink"></i></a> 
+            <a href="#" class="ml-1" data-toggle="modal" data-target="#searchHelp"><i class="fas fa-question-circle natlas-pink"></i></a>
           </form>
          <!--http://tholman.com/github-corners/ -->
          <span class="d-none d-md-block">

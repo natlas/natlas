@@ -1,6 +1,6 @@
 import json
 import elasticsearch
-import random
+import random, time
 from datetime import datetime
 from config import Config
 from urllib3.exceptions import NewConnectionError
@@ -143,7 +143,7 @@ class Elastic:
 			if result['hits']['total'] == 0:
 				return 0, None
 			return result['hits']['total'], result['hits']['hits'][0]['_source']
-		
+
 		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
 			self.status = False
 			return 0, None
@@ -161,7 +161,7 @@ class Elastic:
 				results.append(thing['_source'])
 
 			return result['hits']['total'], results
-		
+
 		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
 			self.status = False
 			return 0, None
@@ -224,4 +224,47 @@ class Elastic:
 			return deleted["deleted"]
 		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
 			self.status = False
+			return False
+
+	def random_host(self):
+		if not self.status:
+			if not self.attemptReconnect():
+				return False
+
+		seed = time.time()
+		searchQuery = {
+				"from": 0,
+				"size": 1,
+				"query": {
+					"function_score": {
+						"query": {
+							"bool": {
+									   "must": [
+											{
+												"term": {
+													"is_up": True
+												}
+											},
+											{
+												"range": {
+													"port_count": {
+														"gt": 0
+														}
+												}
+											}
+										]
+									}
+						},
+						"random_score": {
+							"seed": int(seed),
+							"field": "_id"
+						}
+					}
+				}
+			}
+		try:
+
+			random = self.es.search(index="nmap", doc_type="_doc", body=searchQuery)
+			return random
+		except Exception as e:
 			return False
