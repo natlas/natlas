@@ -223,6 +223,8 @@ def deleteScopeItem(id):
 			redirectLoc = 'admin.blacklist'
 		else:
 			redirectLoc = 'admin.scope'
+		for tag in item.tags:
+			item.tags.remove(tag)
 		ScopeItem.query.filter_by(id=id).delete()
 		db.session.commit()
 		current_app.ScopeManager.update()
@@ -383,7 +385,7 @@ def deleteScript(name):
 			db.session.delete(delScript)
 			db.session.commit()
 			current_app.agentScripts = AgentScript.query.all()
-			current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)            
+			current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)
 			flash("%s successfully deleted." % name, "success")
 		else:
 			flash("%s doesn't exist" % name, "danger")
