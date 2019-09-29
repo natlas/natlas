@@ -22,6 +22,7 @@ class ChangePasswordForm(FlaskForm):
 class DisplaySettingsForm(FlaskForm):
 	results_per_page = SelectField('Results Per Page', coerce=int)
 	preview_length = SelectField('Preview Length', coerce=int)
+	result_format = SelectField('Result Format', coerce=int)
 	updateDisplaySettings = SubmitField("Submit Changes")
 
 

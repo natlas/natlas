@@ -23,6 +23,7 @@ class User(UserMixin, db.Model):
 	is_admin = db.Column(db.Boolean, default=False)
 	results_per_page = db.Column(db.Integer, default=100)
 	preview_length = db.Column(db.Integer, default=100)
+	result_format = db.Column(db.Integer, default=0)
 	rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
 	agents = db.relationship('Agent', backref='user', lazy=True)
 	tokens = db.relationship('EmailToken', backref='user', lazy=True)
@@ -251,7 +252,7 @@ class Agent(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	# agent identification string for storing in reports
-	agentid = db.Column(db.String(16), index=True, unique=True, nullable=False) 
+	agentid = db.Column(db.String(16), index=True, unique=True, nullable=False)
 	date_created = db.Column(db.DateTime, nullable=False, default=utcnow_tz)
 	# auth token
 	token = db.Column(db.String(32), index=True, unique=True)
@@ -337,7 +338,7 @@ class EmailToken(db.Model):
 				return True
 			else:
 				# The token type didn't match, which would only happen if someone tries to use a token for the wrong reason
-				return False 
+				return False
 		else:
 			# The token has expired, delete it
 			EmailToken.expire_token(token=self)

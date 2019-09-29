@@ -20,6 +20,7 @@ def profile():
 		preview_length=current_user.preview_length)
 	displaySettingsForm.results_per_page.choices = [(25,25), (50,50), (75,75), (100,100)]
 	displaySettingsForm.preview_length.choices = [(25,25), (50,50), (75,75), (100,100)]
+	displaySettingsForm.result_format.choices = [(0, 'Pretty'), (1, 'Raw')]
 
 	generateTokenForm = GenerateTokenForm()
 	agentNameForm = AgentNameForm()
@@ -34,6 +35,7 @@ def profile():
 			user = User.query.get(current_user.id)
 			user.results_per_page = displaySettingsForm.results_per_page.data
 			user.preview_length = displaySettingsForm.preview_length.data
+			user.result_format = displaySettingsForm.result_format.data
 			db.session.commit()
 			flash("Display settings updated.", "success")
 			return redirect(url_for('user.profile'))

@@ -45,10 +45,16 @@
       <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div>
     {% endif %}
   </div><!--meta column-->
+  {% if current_user.result_format == 0 or not current_user.result_format %}
   <div class="col-xs-12 col-sm-8 col-md-9">
       {% for port in host.ports %}
           {% set portloop = loop %}
           {% include  'host/_port-info.html' %}
       {% endfor %}
     </div><!--data column-->
+  {% elif current_user.result_format == 1 %}
+  <div class="col-xs-12 col-sm-8 col-md-9">
+    <pre class="nmap_data px-2 py-2 mt-2">{{ host.nmap_data }}</pre>
+  </div>
+  {% endif %}
 </div><!-- end host row -->

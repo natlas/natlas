@@ -44,6 +44,10 @@
                         {{ displaySettingsForm.preview_length.label(class="control-label") }}
                         {{ displaySettingsForm.preview_length(class="form-control") }}
                     </div>
+                    <div class="form-group">
+                        {{ displaySettingsForm.result_format.label(class="control-label") }}
+                        {{ displaySettingsForm.result_format(class="form-control") }}
+                    </div>
                     <div>{{ displaySettingsForm.updateDisplaySettings(class="btn btn-primary") }}</div>
                 </form>
             </div>
@@ -76,7 +80,7 @@
                         <td id="agenttoken-{{loop.index}}" class="text-monospace">
                             <div id="showtokenwrapper-{{loop.index}}"><a id="showtoken-{{loop.index}}" class="showtoken" style="cursor:pointer;">Show API Key</a>{% if loop.index == 1%}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}</div>
                             <div class="tokenval" id="tokenval-{{loop.index}}" style="display:none;">{{ agent.token }}</div>
-                        </td> 
+                        </td>
                         <td style="text-align:center;">
                           {% include 'user/_agent_menu.html' %}
                         </td>
@@ -101,7 +105,7 @@
       <div class="modal-body">
           {{ agentNameForm.hidden_tag() }}
           {{ agentNameForm.agent_name(size=32, class="form-control", placeholder="Agent 1") }}
-        
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -129,7 +133,7 @@ $('#agentmodal').on('show.bs.modal', function (event) {
     modal.find('.modal-title').text('New Agent')
     modal.find('#agentNameForm').attr('action', '/user/agent/newAgent')
     modal.find('#change_name').text('New Agent')
-  } 
+  }
 })
 
 $('.showtoken').on('click', function() {
