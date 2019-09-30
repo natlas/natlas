@@ -38,15 +38,15 @@
                     {{ displaySettingsForm.hidden_tag() }}
                     <div class="form-group">
                         {{ displaySettingsForm.results_per_page.label(class="control-label") }}
-                        {{ displaySettingsForm.results_per_page(class="form-control") }}
+                        {{ displaySettingsForm.results_per_page(class="form-control", selected=current_user.results_per_page) }}
                     </div>
                     <div class="form-group">
                         {{ displaySettingsForm.preview_length.label(class="control-label") }}
-                        {{ displaySettingsForm.preview_length(class="form-control") }}
+                        {{ displaySettingsForm.preview_length(class="form-control", selected=current_user.preview_length) }}
                     </div>
                     <div class="form-group">
                         {{ displaySettingsForm.result_format.label(class="control-label") }}
-                        {{ displaySettingsForm.result_format(class="form-control") }}
+                        {{ displaySettingsForm.result_format(class="form-control", selected=current_user.result_format) }}
                     </div>
                     <div>{{ displaySettingsForm.updateDisplaySettings(class="btn btn-primary") }}</div>
                 </form>

@@ -17,10 +17,11 @@ def profile():
 	myagents = current_user.agents
 	changePasswordForm = ChangePasswordForm(prefix="change-password")
 	displaySettingsForm = DisplaySettingsForm(prefix="display-settings", results_per_page=current_user.results_per_page, \
-		preview_length=current_user.preview_length)
+		preview_length=current_user.preview_length, result_format=current_user.result_format)
 	displaySettingsForm.results_per_page.choices = [(25,25), (50,50), (75,75), (100,100)]
 	displaySettingsForm.preview_length.choices = [(25,25), (50,50), (75,75), (100,100)]
 	displaySettingsForm.result_format.choices = [(0, 'Pretty'), (1, 'Raw')]
+	result_formats = ["Pretty", "Raw"]
 
 	generateTokenForm = GenerateTokenForm()
 	agentNameForm = AgentNameForm()
