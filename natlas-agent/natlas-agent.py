@@ -173,7 +173,7 @@ def validate_target(target):
 	return True
 
 def generate_scan_id():
-	return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
+	return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
 
 def cleanup_files(scan_id):
 	print_info("Cleaning up files for %s" % scan_id)

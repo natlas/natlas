@@ -38,7 +38,7 @@ def getwork():
 
 		ip = scanmanager.getNextIP()
 		work['scan_reason'] = 'auto'
-	
+
 	else: # Get the ip from the rescan queue, mark the job as dispatched, update the PendingRescans for other requests
 		ip = rescans[0].target
 		work['scan_reason'] = 'requested'
@@ -65,7 +65,7 @@ def getwork():
 	scan_id = ''
 	while scan_id == '':
 		rand = ''.join(random.choice(string.ascii_lowercase + string.digits)
-			   for _ in range(10))
+			   for _ in range(16))
 		count, context = current_app.elastic.gethost_scan_id(rand)
 		if count == 0:
 			scan_id = rand
@@ -104,7 +104,7 @@ def submit():
 		return json.dumps({"status":200, "message": "Received: " + newhost['ip']}), 200, {'content-type':'application/json'}
 
 	nmap = NmapParser.parse(newhost['xml_data'])
-	
+
 	# Some quick checks to ensure there are hosts in the scan data
 	if nmap.hosts_total != 1:
 		return json.dumps({"status":400, "message":"XML had too many hosts in it", 'retry':False}), 400, {'content-type':'application/json'}
@@ -137,8 +137,8 @@ def submit():
 
 
 		newhost['ports'].append(portinfo)
-	
-	newhost['port_str'] = ', '.join(tmpports) 
+
+	newhost['port_str'] = ', '.join(tmpports)
 
 	if len(newhost['ports']) == 0:
 		return json.dumps({"status":200, "message":"Expected open ports but didn't find any for %s" % newhost['ip']}), 200, {"content-type":"application/json"}
