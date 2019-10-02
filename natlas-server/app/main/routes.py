@@ -115,14 +115,14 @@ def export_scan_json(ip, scan_id):
 	count, context = current_app.elastic.gethost_scan_id(scan_id)
 	return Response(json.dumps(context), mimetype="application/json")
 
-@bp.route('/host/<ip>/headshots')
-@bp.route('/host/<ip>/headshots/')
+@bp.route('/host/<ip>/screenshots')
+@bp.route('/host/<ip>/screenshots/')
 @isAuthenticated
-def host_headshots(ip):
+def host_screenshots(ip):
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
 	info, context = hostinfo(ip)
-	return render_template("host/headshots.html", **context, info=info, delHostForm=delHostForm, rescanForm=rescanForm)
+	return render_template("host/screenshots.html", **context, info=info, delHostForm=delHostForm, rescanForm=rescanForm)
 
 @bp.route('/host/<ip>/rescan', methods=['POST'])
 # login_required ensures that an actual user is logged in to make the request

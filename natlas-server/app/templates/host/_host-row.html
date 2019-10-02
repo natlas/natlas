@@ -32,6 +32,12 @@
     <div class="btn-group export-group mt-2" role="group">
         {% include 'host/_host-export.html' %}
       </div>
+
+    {% for screenshot in host.screenshots %}
+      <h5 class="mt-2">{{ screenshot.service }}</h5>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ screenshot.data }}" alt="{{ host.ip }} - {{ screenshot.service }} Screenshot"></div>
+    {% endfor %}
+
     {% if host.vncheadshot %}
       <h5 class="mt-2">VNC</h5>
       <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div>

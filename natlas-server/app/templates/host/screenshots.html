@@ -1,8 +1,14 @@
 {% extends "base.html" %}
-{% set title = ip ~ " | Headshots" %}
-{% set active_page = "headshots" %}
+{% set title = ip ~ " | Screenshots" %}
+{% set active_page = "screenshots" %}
 {% block content %}
     {% include 'host/_header.html' %}
+
+    {% for screenshot in screenshots %}
+      <h5 class="mt-2">{{ screenshot.service }}</h5>
+      <img src="data:image/jpeg;base64,{{ screenshot.data }}" alt="{{ screenshot.service }} Screenshot" class="host-headshot">
+    {% endfor %}
+
 	{% if headshot %}
 	  <h3 class="headshot-header">Unknown Headshot</h3>
 	  <img src="data:image/jpeg;base64,{{ headshot }}" alt="Unknown Screenshot" class="host-headshot">
@@ -21,4 +27,3 @@
 	{% endif %}
 {% endblock %}
 
-    

@@ -9,13 +9,13 @@ def hostinfo(ip):
 	if count == 0:
 		return abort(404)
 	hostinfo['history'] = count
-	headshots = 0
-	headshotTypes = ['headshot', 'vncheadshot',
+	screenshots = 0
+	screenshotTypes = ['screenshots', 'headshot', 'vncheadshot',
 					 'httpheadshot', 'httpsheadshot']
-	for hs in headshotTypes:
+	for hs in screenshotTypes:
 		if context.get(hs):
-			headshots += 1
-	hostinfo['headshots'] = headshots
+			screenshots += 1
+	hostinfo['screenshots'] = screenshots
 	if context.get('hostname'):
 		hostinfo['hostname'] = context.get('hostname')
 	return hostinfo, context
@@ -26,7 +26,7 @@ def isAcceptableTarget(target):
 	targetAddr = ipaddress.IPv4Address(target)
 	inScope = False
 	# if zero, update to make sure that the scopemanager has been populated
-	if current_app.ScopeManager.getScopeSize() == 0: 
+	if current_app.ScopeManager.getScopeSize() == 0:
 		current_app.ScopeManager.update()
 		scopeSize = current_app.ScopeManager.getScopeSize()
 		blacklistSize = current_app.ScopeManager.getBlacklistSize()

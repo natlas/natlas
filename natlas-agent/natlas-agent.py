@@ -22,8 +22,8 @@ import threading
 import queue
 
 
-# my script for headshotting servers
-from getheadshot import getheadshot
+# my wrapper for screenshotting servers
+import screenshotutils
 from config import Config
 
 ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
@@ -234,9 +234,9 @@ def scan(target_data=None):
 		out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
 	except:
 		try:
+			TIMEDOUT = True
 			print_err("Scan %s timed out" % scan_id)
 			process.kill()
-			TIMEDOUT = True
 		except:
 			pass
 
@@ -289,42 +289,48 @@ def scan(target_data=None):
 		# host is up and reportable ports were found
 		result['is_up'] = nmap_report.hosts[0].is_up()
 		result['port_count'] = len(nmap_report.hosts[0].get_ports())
+	result['screenshots'] = []
 
 	if target_data["agent_config"]["webScreenshots"] and shutil.which("aquatone") is not None:
+		targetServices=[]
 		if "80/tcp" in result['nmap_data']:
-			if getheadshot(target, scan_id, 'http') is True:
-				print_info("Attempting to take HTTP screenshot for %s" % result['ip'])
-				screenshotPath = "data/aquatone." + scan_id + ".http/screenshots/http__" +target.replace('.','_') + ".png"
-				if not os.path.isfile(screenshotPath):
-					shutil.rmtree("data/aquatone." + scan_id + ".http/")
-				else:
-					result['httpheadshot'] = str(base64.b64encode(
-						open(screenshotPath, 'rb').read()))[2:-1]
-					shutil.rmtree("data/aquatone." + scan_id + ".http/")
-					print_info("HTTP screenshot acquired for %s" % result['ip'])
-			else:
-				print_err("Failed to acquire HTTP screenshot for %s" % result['ip'])
-
+			targetServices.append("http")
 		if "443/tcp" in result['nmap_data']:
-			if getheadshot(target, scan_id, 'https') is True:
-				print_info("Attempting to take HTTPS screenshot for %s" % result['ip'])
-				screenshotPath = "data/aquatone." + scan_id + ".https/screenshots/https__" +target.replace('.','_') + ".png"
-				if not os.path.isfile(screenshotPath):
-					shutil.rmtree("data/aquatone." + scan_id + ".https/")
-				else:
-					result['httpsheadshot'] = str(base64.b64encode(
-						open(screenshotPath, 'rb').read()))[2:-1]
-					shutil.rmtree("data/aquatone." + scan_id + ".https/")
-					print_info("HTTPS screenshot acquired for %s" % result['ip'])
-			else:
-				print_err("Failed to acquire HTTPS screenshot for %s" % result['ip'])
+			targetServices.append("https")
+		if len(targetServices) > 0:
+			print_info("Attempting to take %s screenshot(s) for %s" % (', '.join(targetServices).upper(),result['ip']))
+			screenshotutils.runAquatone(target, scan_id, targetServices)
+
+		serviceMapping = {
+			"http": 80,
+			"https": 443
+		}
+		for service in targetServices:
+			screenshotPath = "data/aquatone." + scan_id + "/screenshots/" + service + "__" + target.replace('.', '_') + ".png"
+
+			if not os.path.isfile(screenshotPath):
+				continue
+
+			result['screenshots'].append({
+				"host": target,
+				"port": serviceMapping[service],
+				"service": service.upper(),
+				"data": str(base64.b64encode(open(screenshotPath, 'rb').read()))[2:-1]
+			})
+			print_info("%s screenshot acquired for %s" % (service.upper(), result['ip']))
+
+		shutil.rmtree("data/aquatone.%s" % scan_id)
 
 	if target_data["agent_config"]["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result['nmap_data']:
 			print_info("Attempting to take vnc screenshot for %s" % result['ip'])
-			if getheadshot(target, scan_id, 'vnc') is True:
-				result['vncsheadshot'] = str(base64.b64encode(
-					open("data/natlas."+scan_id+".vnc.headshot.jpg", 'rb').read()))[2:-1]
+			if screenshotutils.runVNCSnapshot(target, scan_id) is True:
+				result['screenshots'].append({
+					"host": target,
+					"port": 5900,
+					"service": "VNC",
+					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.headshot.jpg", 'rb').read()))[2:-1]
+				})
 				os.remove("data/natlas."+scan_id+".vnc.headshot.jpg")
 				print_info("VNC screenshot acquired for %s" % result['ip'])
 			else:
