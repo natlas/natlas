@@ -1,20 +1,27 @@
 from threading import Lock
 import random
 import sympy
+from datetime import datetime
 
 mutex = Lock()
 
+LOGFILE = 'prng.log'
+
 def modexp(b, e, m):
-		bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
-		s = b
-		v = 1
-		for bit in bits:
-				if bit == 1:
-						v *= s
-						v %= m
-				s *= s
-				s %= m
-		return v
+	bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
+	s = b
+	v = 1
+	for bit in bits:
+		if bit == 1:
+			v *= s
+			v %= m
+		s *= s
+		s %= m
+	return v
+
+def log(message):
+	with open(LOGFILE, 'a') as f:
+		f.write('%s - %s\n' % (str(datetime.now()), message))
 
 class CyclicPRNG:
 	N = 0
@@ -33,6 +40,8 @@ class CyclicPRNG:
 			self.initPermutation()
 		if N < 1:
 			raise Exception("Random Number Generator must be given a positive non-zero integer")
+
+		log('PRNG Starting Up')
 
 	def getN(self):
 		return self.N
@@ -83,6 +92,7 @@ class CyclicPRNG:
 		while self.current > self.N:
 			self.current = (self.current * self.G) % self.Modulus
 		if value == self.end:
+			log('Cycle Restarted')
 			self.initGenerator()
 			self.initPermutation()
 		mutex.release()
