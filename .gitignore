@@ -9,3 +9,8 @@ metadata.db
 *.bak
 natlas-agent/natlas-services
 natlas-agent/data
+natlas-agent/LICENSE
+natlas-agent/CHANGELOG.md
+natlas-server/LICENSE
+natlas-server/CHANGELOG.md
+dist/
