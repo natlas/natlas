@@ -177,8 +177,13 @@ def generate_scan_id():
 
 def cleanup_files(scan_id):
 	print_info("Cleaning up files for %s" % scan_id)
-	for file in glob.glob("data/*."+scan_id+".*"):
-		os.remove(file)
+	if os.path.isdir("data/aquatone.%s" % scan_id):
+		shutil.rmtree("data/aquatone.%s" % scan_id)
+	for file in glob.glob("data/natlas."+scan_id+".*"):
+		try:
+			os.remove(file)
+		except:
+			print_err("Could not remove file %s" % file)
 
 def scan(target_data=None):
 
@@ -319,8 +324,6 @@ def scan(target_data=None):
 			})
 			print_info("%s screenshot acquired for %s" % (service.upper(), result['ip']))
 
-		shutil.rmtree("data/aquatone.%s" % scan_id)
-
 	if target_data["agent_config"]["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result['nmap_data']:
 			print_info("Attempting to take VNC screenshot for %s" % result['ip'])
@@ -331,7 +334,6 @@ def scan(target_data=None):
 					"service": "VNC",
 					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.jpg", 'rb').read()))[2:-1]
 				})
-				os.remove("data/natlas."+scan_id+".vnc.jpg")
 				print_info("VNC screenshot acquired for %s" % result['ip'])
 			else:
 				print_err("Failed to acquire screenshot for %s" % result['ip'])
