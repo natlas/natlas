@@ -23,6 +23,9 @@ class Config(object):
 	# This isn't in the database because we'll never want to change it
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+	# This isn't in the database because it really shouldn't be changing on-the-fly
+	# Also make sure that you're using an absolute path if you're serving your app directly via flask
+	MEDIA_DIRECTORY = os.environ.get('MEDIA_DIRECTORY') or os.path.join(BASEDIR, 'media/')
 
 # run as standalone to populate the config items into the database using environment or default values
 def populate_defaults(verbose=False):

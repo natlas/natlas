@@ -1,5 +1,6 @@
 from flask import current_app, request, jsonify
-import random, os, json, ipaddress, string
+import random, os, json, ipaddress, string, base64, hashlib
+from PIL import Image
 
 from datetime import datetime as dt
 from datetime import timezone as tz
@@ -139,6 +140,42 @@ def submit():
 		newhost['ports'].append(portinfo)
 
 	newhost['port_str'] = ', '.join(tmpports)
+
+
+	if newhost['screenshots']:
+		datepath = newhost['ctime'].strftime("%Y/%m/%d/%H")
+		dirpath = os.path.join(current_app.config["MEDIA_DIRECTORY"], datepath)
+		thumbpath = os.path.join(dirpath, "t")
+
+		# makedirs attempts to make every directory necessary to get to the "thumbs" folder: YYYY/MM/DD/HH/thumbs
+		os.makedirs(thumbpath, exist_ok=True)
+
+	# Handle screenshots
+	thumb_size = (255, 160)
+	for item in newhost['screenshots']:
+		if item['service'] == 'VNC':
+			file_ext = '.jpg'
+		else: # Handles http, https files from aquatone/chromium-headless
+			file_ext = '.png'
+
+		image = base64.b64decode(item['data'])
+		image_hash = hashlib.sha256(image).hexdigest()
+
+		fname = os.path.join(dirpath, image_hash + file_ext)
+		with open(fname, 'wb') as f:
+			f.write(image)
+
+		# use datepath instead of dirpath so that we don't include the base media directory in elasticsearch data
+		item['path'] = os.path.join(datepath, image_hash + file_ext)
+		del item['data']
+		thumb = Image.open(fname)
+		thumb.thumbnail(thumb_size)
+		thumb_hash = hashlib.sha256(thumb.tobytes()).hexdigest()
+		fname = os.path.join(dirpath, thumb_hash + file_ext)
+		thumb.save(fname)
+		thumb.close()
+		item['thumb'] = os.path.join(datepath, "t", thumb_hash + file_ext)
+
 
 	if len(newhost['ports']) == 0:
 		return json.dumps({"status":200, "message":"Expected open ports but didn't find any for %s" % newhost['ip']}), 200, {"content-type":"application/json"}

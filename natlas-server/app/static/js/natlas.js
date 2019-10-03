@@ -1,9 +1,9 @@
 $(function() {
 		$('.expand-img').on('click', function() {
 			$('.imagetitle').text($(this).find('img').attr('alt'));
-			$('.imagepreview').attr('src', $(this).find('img').attr('src'));
-			$('#imagemodal').modal('show');   
-		});		
+			$('.imagepreview').attr('src', $(this).find('img').attr('data-path'));
+			$('#imagemodal').modal('show');
+		});
 });
 
 
@@ -17,7 +17,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  
+
   var btn = $('#backtotop');
   btn.tooltip();
   $(window).scroll(function() {

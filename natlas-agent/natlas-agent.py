@@ -323,15 +323,15 @@ def scan(target_data=None):
 
 	if target_data["agent_config"]["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result['nmap_data']:
-			print_info("Attempting to take vnc screenshot for %s" % result['ip'])
+			print_info("Attempting to take VNC screenshot for %s" % result['ip'])
 			if screenshotutils.runVNCSnapshot(target, scan_id) is True:
 				result['screenshots'].append({
 					"host": target,
 					"port": 5900,
 					"service": "VNC",
-					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.headshot.jpg", 'rb').read()))[2:-1]
+					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.jpg", 'rb').read()))[2:-1]
 				})
-				os.remove("data/natlas."+scan_id+".vnc.headshot.jpg")
+				os.remove("data/natlas."+scan_id+".vnc.jpg")
 				print_info("VNC screenshot acquired for %s" % result['ip'])
 			else:
 				print_err("Failed to acquire screenshot for %s" % result['ip'])

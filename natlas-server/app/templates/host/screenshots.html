@@ -5,8 +5,10 @@
     {% include 'host/_header.html' %}
 
     {% for screenshot in screenshots %}
+      {% if screenshot.path %}
       <h5 class="mt-2">{{ screenshot.service }}</h5>
-      <img src="data:image/jpeg;base64,{{ screenshot.data }}" alt="{{ screenshot.service }} Screenshot" class="host-headshot">
+      <img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ screenshot.service }} Screenshot">
+      {% endif %}
     {% endfor %}
 
 	{% if headshot %}

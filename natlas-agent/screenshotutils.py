@@ -31,7 +31,7 @@ def runVNCSnapshot(target, scan_id):
 	if "DISPLAY" not in os.environ:
 		return False
 	process = subprocess.Popen(["xvfb-run", "vncsnapshot", "-quality", "50", target, "data/natlas." +
-								scan_id + "." + service + ".headshot.jpg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+								scan_id + ".vnc.jpg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 	try:
 		out, err = process.communicate(timeout=60)
 		if process.returncode is 0:

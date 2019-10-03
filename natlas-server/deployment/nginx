@@ -1,9 +1,9 @@
 server {
         listen 80;
         listen [::]:80;
-        server_name <host>;
+        server_name <host>; #CHANGEME
         # The below location block is for Let's Encrypt, feel free to delete if you're not using LE.
-        location ~ /.well-known { 
+        location ~ /.well-known {
             allow all;
         }
         return 301 https://$host$request_uri;
@@ -12,10 +12,10 @@ server {
 server {
         listen 443 ssl;
         listen [::]:443 ssl;
-        server_name <host>;
+        server_name <host>; #CHANGEME
 
-        ssl_certificate /etc/ssl/certs/<cert>.cert;
-        ssl_certificate_key /etc/ssl/private/<key>.key;
+        ssl_certificate /etc/ssl/certs/<cert>.cert; #CHANGEME
+        ssl_certificate_key /etc/ssl/private/<key>.key; #CHANGEME
         ssl_session_timeout 10m;
         ssl_session_cache shared:SSL:10m;
         ssl_session_tickets off;
@@ -42,6 +42,16 @@ server {
             error_log /var/log/nginx/natlas/static.error.log;
             gzip_static on;
             expires modified +24h;
+            add_header Cache-Control public;
+        }
+
+        # Serve media files (screenshots of hosts)
+        location /media/ {
+            alias <PATH TO YOUR DATA DIRECTORY>; #CHANGEME
+            access_log /var/log/nginx/natlas/media.access.log;
+            error_log /var/log/nginx/natlas/media.error.log;
+            gzip_static on;
+            expires modified +72h;
             add_header Cache-Control public;
         }
 

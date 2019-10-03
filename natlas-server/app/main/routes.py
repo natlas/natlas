@@ -1,4 +1,6 @@
-from flask import redirect, url_for, flash, render_template, Response, current_app, g, request
+from flask import redirect, url_for, flash, render_template, \
+				Response, current_app, g, request, send_from_directory
+
 from flask_login import current_user, login_required
 from app.main import bp
 from app.util import hostinfo, isAcceptableTarget
@@ -15,6 +17,13 @@ import random
 @isAuthenticated
 def index():
 	return redirect(url_for('main.search'))
+
+# Serve media files in case the front-end proxy doesn't do it
+@bp.route('/media/<path:filename>')
+def send_media(filename):
+	# If you're looking at this function, wondering why your files aren't sending...
+	# It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
+	return send_from_directory(current_app.config['MEDIA_DIRECTORY'], filename)
 
 @bp.route('/search')
 @isAuthenticated
