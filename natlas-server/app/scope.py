@@ -1,6 +1,18 @@
 import ipaddress
 from netaddr import IPNetwork
 from app.ipscanmanager import IPScanManager
+from datetime import datetime
+import os
+
+LOGFILE = 'logs/scopemanager.log'
+
+def log(message, printm=False):
+	if not os.path.isdir('logs'):
+		os.makedirs('logs', exist_ok=True)
+	with open(LOGFILE, 'a') as f:
+		f.write('%s - %s\n' % (str(datetime.now()), message))
+	if printm:
+		print('%s - %s\n' % (str(datetime.now()), message))
 
 class ScopeManager():
 
@@ -77,7 +89,7 @@ class ScopeManager():
 			blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
 			self.scanmanager = IPScanManager(scanrange, blacklistrange)
 		except Exception as e:
-			print("Scan manager could not be instantiated because there was no scope configured.")
+			log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
 
 	def getScanManager(self):
 		return self.scanmanager
@@ -86,4 +98,4 @@ class ScopeManager():
 		self.updateScope()
 		self.updateBlacklist()
 		self.updateScanManager()
-		print("ScopeManager Updated")
+		log("ScopeManager Updated")

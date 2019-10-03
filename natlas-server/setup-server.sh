@@ -9,6 +9,10 @@ if [[ "$EUID" -ne 0 ]]; then
 	exit 2
 fi
 
+if [[ ! -d logs ]]; then
+	mkdir logs
+fi
+
 echo "[+] Updating apt repositories"
 apt-get update >/dev/null
 
