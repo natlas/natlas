@@ -171,7 +171,7 @@ def submit():
 		thumb = Image.open(fname)
 		thumb.thumbnail(thumb_size)
 		thumb_hash = hashlib.sha256(thumb.tobytes()).hexdigest()
-		fname = os.path.join(dirpath, thumb_hash + file_ext)
+		fname = os.path.join(dirpath, "t", thumb_hash + file_ext)
 		thumb.save(fname)
 		thumb.close()
 		item['thumb'] = os.path.join(datepath, "t", thumb_hash + file_ext)
