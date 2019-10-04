@@ -64,22 +64,24 @@ class ScopeManager():
 	def updateScope(self):
 		from app.models import ScopeItem
 		newScopeSize = 0
+		newScope = []
 		for item in ScopeItem.getScope():
 			newItem = ipaddress.ip_network(item.target, False)
-			self.scope.append(newItem)
+			newScope.append(newItem)
 			newScopeSize += newItem.num_addresses
+		self.scope = newScope
 		self.scopeSize = newScopeSize
-		#print("Scope Size: %s" % self.scopeSize)
 
 	def updateBlacklist(self):
 		from app.models import ScopeItem
 		newBlacklistSize = 0
+		newBlacklist = []
 		for item in ScopeItem.getBlacklist():
 			newItem = ipaddress.ip_network(item.target, False)
-			self.blacklist.append(newItem)
+			newBlacklist.append(newItem)
 			newBlacklistSize += newItem.num_addresses
+		self.blacklist = newBlacklist
 		self.blacklistSize = newBlacklistSize
-		#print("Blacklist Size: %s" % self.blacklistSize)
 
 	def updateScanManager(self):
 		from app.models import ScopeItem

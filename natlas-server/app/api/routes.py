@@ -56,7 +56,7 @@ def getwork():
 			scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags.all()
 			for tag in scopetags:
 				tags.append(tag.name)
-	work['tags'] = tags
+	work['tags'] = list(set(tags)) # make it a set for only uniques, then make it a list to serialize to JSON
 
 
 	work['type'] = 'nmap'
