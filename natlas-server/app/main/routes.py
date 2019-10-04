@@ -133,10 +133,21 @@ def export_scan_json(ip, scan_id):
 @bp.route('/host/<ip>/screenshots/')
 @isAuthenticated
 def host_screenshots(ip):
+	page = int(request.args.get('p', 1))
+	searchOffset = current_user.results_per_page * (page-1)
+
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
 	info, context = hostinfo(ip)
-	return render_template("host/screenshots.html", **context, info=info, delHostForm=delHostForm, rescanForm=rescanForm)
+	total_entries, screenshots = current_app.elastic.get_host_screenshots(ip, current_user.results_per_page, searchOffset)
+
+	next_url = url_for('main.host_screenshots', ip=ip, p=page + 1) \
+		if total_entries > page * current_user.results_per_page else None
+	prev_url = url_for('main.host_screenshots', ip=ip, p=page - 1) \
+		if page > 1 else None
+
+	return render_template("host/screenshots.html", **context, historical_screenshots=screenshots, numresults=total_entries, \
+		info=info, delHostForm=delHostForm, rescanForm=rescanForm, next_url=next_url, prev_url=prev_url)
 
 @bp.route('/host/<ip>/rescan', methods=['POST'])
 # login_required ensures that an actual user is logged in to make the request

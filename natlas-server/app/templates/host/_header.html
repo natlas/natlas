@@ -30,7 +30,7 @@
     	<a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('main.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
     </li>
     <li role="presentation" class="nav-item">
-    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'screenshots' }}" href="{{ url_for('main.host_screenshots', ip=ip) }}">Screenshots <span class="badge badge-dark">{{ info.screenshots }}</span></a>
+    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'screenshots' }}" href="{{ url_for('main.host_screenshots', ip=ip) }}">Screenshots <span class="badge badge-dark">{{ info.screenshot_count }}</span></a>
     </li>
   </ul>
 </div>

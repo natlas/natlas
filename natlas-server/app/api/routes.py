@@ -152,6 +152,7 @@ def submit():
 
 	# Handle screenshots
 	thumb_size = (255, 160)
+	num_screenshots = 0
 	for item in newhost['screenshots']:
 		if item['service'] == 'VNC':
 			file_ext = '.jpg'
@@ -175,7 +176,9 @@ def submit():
 		thumb.save(fname)
 		thumb.close()
 		item['thumb'] = os.path.join(datepath, "t", thumb_hash + file_ext)
+		num_screenshots +=1
 
+	newhost['num_screenshots'] = num_screenshots
 
 	if len(newhost['ports']) == 0:
 		return json.dumps({"status":200, "message":"Expected open ports but didn't find any for %s" % newhost['ip']}), 200, {"content-type":"application/json"}
