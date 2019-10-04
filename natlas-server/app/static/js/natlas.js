@@ -6,6 +6,19 @@ $(function() {
 		});
 });
 
+var modal_content_loaded = false;
+function loadModalContent() {
+  if (modal_content_loaded){
+    return
+  }
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", "/searchmodal")
+  xhr.send();
+  xhr.onload = function() {
+    $('#searchHelpContent').html(xhr.response);
+    modal_content_loaded = true;
+  }
+}
 
 $(document).ready(function() {
     $('.dataTable').DataTable( {

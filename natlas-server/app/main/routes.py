@@ -55,6 +55,11 @@ def search():
 	else:
 		return render_template("search.html", query=query, numresults=count, totalHosts=totalHosts, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
+@bp.route('/searchmodal')
+@isAuthenticated
+def search_modal():
+	return render_template("includes/search_modal_content.html")
+
 @bp.route('/host/<ip>')
 @bp.route('/host/<ip>/')
 @isAuthenticated
