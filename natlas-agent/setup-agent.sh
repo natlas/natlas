@@ -18,10 +18,10 @@ if ! which python3 >/dev/null; then
 	if ! which python3 >/dev/null; then
 		echo "[!] Failed to install python3" && exit 1
 	else
-		echo "[+] Successfully installed python3: `which python3`"
+		echo "[+] Successfully installed python3: $(which python3)"
 	fi
 else
-	echo "[+] Found python3: `which python3`"
+	echo "[+] Found python3: $(which python3)"
 fi
 
 if ! which pip3 >/dev/null; then
@@ -30,10 +30,10 @@ if ! which pip3 >/dev/null; then
 	if ! which pip3 >/dev/null; then
 		echo "[!] Failed to install pip3" && exit 2
 	else
-		echo "[+] Successfully installed python3: `which pip3`"
+		echo "[+] Successfully installed python3: $(which pip3)"
 	fi
 else
-	echo "[+] Found pip3: `which pip3`"
+	echo "[+] Found pip3: $(which pip3)"
 fi
 
 if ! which virtualenv >/dev/null; then
@@ -42,10 +42,10 @@ if ! which virtualenv >/dev/null; then
 	if ! which virtualenv >/dev/null; then
 		echo "[!] Failed to install virtualenv" && exit 3
 	else
-		echo "[+] Successfully installed virtualenv: `which virtualenv`"
+		echo "[+] Successfully installed virtualenv: $(which virtualenv)"
 	fi
 else
-	echo "[+] Found virtualenv: `which virtualenv`"
+	echo "[+] Found virtualenv: $(which virtualenv)"
 fi
 
 if [ ! -d venv ]; then
@@ -77,10 +77,10 @@ if ! which nmap >/dev/null; then
 	if ! which nmap >/dev/null; then
 		echo "[!] Failed to install nmap" && exit 6
 	else
-		echo "[+] Successfully installed nmap: `which nmap`"
+		echo "[+] Successfully installed nmap: $(which nmap)"
 	fi
 else
-	echo "[+] Found nmap: `which nmap`"
+	echo "[+] Found nmap: $(which nmap)"
 fi
 
 if ! which chromium-browser >/dev/null; then
@@ -89,10 +89,10 @@ if ! which chromium-browser >/dev/null; then
 	if ! which chromium-browser >/dev/null; then
 		echo "[!] Failed to install chromium-browser" && exit 7
 	else
-		echo "[+] Successfully installed chromium-browser: `which chromium-browser`"
+		echo "[+] Successfully installed chromium-browser: $(which chromium-browser)"
 	fi
 else
-	echo "[+] Found chromium-browser: `which chromium-browser`"
+	echo "[+] Found chromium-browser: $(which chromium-browser)"
 fi
 
 if ! which unzip >/dev/null; then
@@ -101,10 +101,10 @@ if ! which unzip >/dev/null; then
 	if ! which unzip >/dev/null; then
 		echo "[!] Failed to install unzip" && exit 8
 	else
-		echo "[+] Successfully installed unzip: `which unzip`"
+		echo "[+] Successfully installed unzip: $(which unzip)"
 	fi
 else
-	echo "[+] Found unzip: `which unzip`"
+	echo "[+] Found unzip: $(which unzip)"
 fi
 
 if ! which xvfb-run >/dev/null; then
@@ -113,10 +113,10 @@ if ! which xvfb-run >/dev/null; then
 	if ! which xvfb-run >/dev/null; then
 		echo "[!] Failed to install xvfb-run" && exit 9
 	else
-		echo "[+] Successfully installed xvfb-run: `which xvfb-run`"
+		echo "[+] Successfully installed xvfb-run: $(which xvfb-run)"
 	fi
 else
-	echo "[+] Found xvfb-run: `which xvfb-run`"
+	echo "[+] Found xvfb-run: $(which xvfb-run)"
 fi
 
 if ! which vncsnapshot >/dev/null; then
@@ -125,10 +125,10 @@ if ! which vncsnapshot >/dev/null; then
 	if ! which vncsnapshot >/dev/null; then
 		echo "[!] Failed to install vncsnapshot" && exit 10
 	else
-		echo "[+] Successfully installed vncsnapshot: `which vncsnapshot`"
+		echo "[+] Successfully installed vncsnapshot: $(which vncsnapshot)"
 	fi
 else
-	echo "[+] Found vncsnapshot: `which vncsnapshot`"
+	echo "[+] Found vncsnapshot: $(which vncsnapshot)"
 fi
 
 if ! which aquatone >/dev/null; then
@@ -138,8 +138,8 @@ if ! which aquatone >/dev/null; then
 	if ! which aquatone >/dev/null; then
 		echo "[!] Failed to install Aquatone" && exit 11
 	else
-		echo "[+] Successfully installed Aquatone: `which aquatone`"
+		echo "[+] Successfully installed Aquatone: $(which aquatone)"
 	fi
 else
-	echo "[+] Found Aquatone: `which aquatone`"
+	echo "[+] Found Aquatone: $(which aquatone)"
 fi
