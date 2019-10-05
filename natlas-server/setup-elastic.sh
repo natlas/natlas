@@ -14,10 +14,10 @@ if ! which java >/dev/null; then
 	if ! which java >/dev/null; then
 		echo "[!] Failed to install java"
 	else
-		echo "[+] Successfully installed java: `which java`"
+		echo "[+] Successfully installed java: $(which java)"
 	fi
 else
-	echo "[+] Found java: `which java`"
+	echo "[+] Found java: $(which java)"
 fi
 
 ELASTIC=$(dpkg -s elasticsearch)
@@ -27,7 +27,7 @@ VERSTR="Version: "
 if ! echo "$ELASTIC" | grep "$STATUSSTR" >/dev/null; then
 	echo "[+] Downloading Elasticsearch"
 	DOWNLOAD=1
-elif ! echo "$ELASTIC" | grep "$VERTSTR" | grep "$TARGETVER" >/dev/null; then
+elif ! echo "$ELASTIC" | grep "$VERSTR" | grep "$TARGETVER" >/dev/null; then
 	echo "[+] Updating Elasticsearch to $TARGETVER"
 	DOWNLOAD=1
 else

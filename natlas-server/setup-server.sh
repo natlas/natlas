@@ -21,7 +21,7 @@ if ! id -u "natlas" >/dev/null 2>&1; then
 	groupadd -r natlas
 	echo "[+] Creating natlas user: useradd -M -N -r -s /bin/false -d /opt/natlas natlas"
 	useradd -M -N -r -s /bin/false -g natlas -d /opt/natlas natlas
-	if [ ! id natlas >/dev/null 2>&1 ]; then
+	if ! id natlas >/dev/null 2>&1; then
 		echo "[!] Failed to create natlas user"
 	else
 		echo "[+] Successfully created natlas user"
@@ -31,10 +31,10 @@ else
 fi
 
 ELASTIC=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9200/_nodes)
-if [ $ELASTIC != "200" ]
+if [ "$ELASTIC" != "200" ]
 then
 	ELASTICMSG="[!] Elasticsearch not found on localhost:9200: Make sure you connect natlas to an elasticsearch instance."
-	echo $ELASTICMSG
+	echo "$ELASTICMSG"
 else
 	echo "[+] Elasticsearch found: http://localhost:9200/_nodes"
 fi
@@ -45,10 +45,10 @@ if ! which python3 >/dev/null; then
 	if ! which python3 >/dev/null; then
 		echo "[!] Failed to install python3" && exit 1
 	else
-		echo "[+] Successfully installed python3: `which python3`"
+		echo "[+] Successfully installed python3: $(which python3)"
 	fi
 else
-	echo "[+] Found python3: `which python3`"
+	echo "[+] Found python3: $(which python3)"
 fi
 
 if ! which pip3 >/dev/null; then
@@ -57,10 +57,10 @@ if ! which pip3 >/dev/null; then
 	if ! which pip3 >/dev/null; then
 		echo "[!] Failed to install pip3" && exit 2
 	else
-		echo "[+] Successfully installed python3: `which pip3`"
+		echo "[+] Successfully installed python3: $(which pip3)"
 	fi
 else
-	echo "[+] Found pip3: `which pip3`"
+	echo "[+] Found pip3: $(which pip3)"
 fi
 
 if ! which virtualenv >/dev/null; then
@@ -69,10 +69,10 @@ if ! which virtualenv >/dev/null; then
 	if ! which virtualenv >/dev/null; then
 		echo "[!] Failed to install virtualenv" && exit 3
 	else
-		echo "[+] Successfully installed virtualenv: `which virtualenv`"
+		echo "[+] Successfully installed virtualenv: $(which virtualenv)"
 	fi
 else
-	echo "[+] Found virtualenv: `which virtualenv`"
+	echo "[+] Found virtualenv: $(which virtualenv)"
 fi
 
 if [ ! -d venv ]; then
@@ -95,16 +95,16 @@ else
 	echo "[+] Installing/updating natlas-server python dependencies"
 	pip3 --disable-pip-version-check install -r requirements.txt --log pip.log -q
 	echo "[+] Initializing/upgrading metadata database"
-	if ! cat .env 2>/dev/null | grep "FLASK_APP" >/dev/null; then
+	if ! grep "FLASK_APP" .env >/dev/null 2>&1; then
 		echo "FLASK_APP=natlas-server.py" >> .env
 	fi
 
-	if ! cat .env 2>/dev/null | grep "SECRET_KEY" >/dev/null; then
+	if ! grep "SECRET_KEY" .env >/dev/null 2>&1; then
 		if [ ! -z "$SECRET_KEY" ]; then
 			echo "SECRET_KEY=$SECRET_KEY" >> .env
 			echo "[+] Copying \$SECRET_KEY to .env"
 		else
-			echo "SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)" >> .env
+			echo "SECRET_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 32 | head -n 1)" >> .env
 			echo "[+] Generating random SECRET_KEY"
 		fi
 	fi
@@ -115,12 +115,12 @@ else
 fi
 
 echo "[+] Giving natlas user ownership of all project files"
-chown -R natlas:natlas $BASEDIR
+chown -R natlas:natlas "$BASEDIR"
 
 echo "[+] Setup Complete"
 echo "------------------"
-if [ ! -z ${ELASTICMSG+x} ]; then
-	echo $ELASTICMSG
+if [ ! -z "${ELASTICMSG+x}" ]; then
+	echo "$ELASTICMSG"
 fi
 echo "[+] An example systemd script can be found in deployment/natlas-server.service"
 echo "[+] An example nginx config can be found in deployment/nginx"

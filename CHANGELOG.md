@@ -5,7 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project strives to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-* Fixed bug in scan manager ([#150](https://github.com/natlas/natlas/issues/150)) where updating the networks in range to scan caused unexpected scan targets.
+
+## [v0.6.4]
+More information can be found at [natlas/v0.6.4](https://github.com/natlas/natlas/releases/tag/v0.6.4)
+
+### Added
+* Server - Random button gives us a random host
+* Server - User profiles can now select between different view formats (Currently supported: Pretty and Raw)
+* Server - Added `tags` example to search help modal
+
+### Changed
+* Server - Automatically attempt to reconnect to elasticsearch on the next request if our last attempt failed and it's been more than 60 seconds.
+* Server/Agent - `scan_id` field increased from 10 characters in length to 16 characters.
+
+### Fixed
+* Server - Fixed bug in scan manager ([#150](https://github.com/natlas/natlas/issues/150)) where updating the networks in range to scan caused unexpected scan targets.
+* Server - Fixed view issue not populating user's settings in profile page
+* Server - Cleanup relationship between a scope item and tags when a scope item is deleted
+* Agent - Fixed retry failures when server is down so agents should now automatically try to reconnect as intended
 
 ## [v0.6.3]
 More information can be found at [natlas/v0.6.3](https://github.com/natlas/natlas/releases/tag/v0.6.3)
@@ -95,7 +112,7 @@ More information can be found at [natlas/v0.5.2](https://github.com/natlas/natla
 * Setup-server handles user creation correctly now
 
 ### Changed
-* Setup-server changes ownership of the files to not be owned by root once finished setting up. 
+* Setup-server changes ownership of the files to not be owned by root once finished setting up.
 
 ## [v0.5.1] - Agent bugfix, Responsive Views
 More information can be found at [natlas/v0.5.1](https://github.com/natlas/natlas/releases/tag/v0.5.1)

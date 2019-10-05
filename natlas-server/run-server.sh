@@ -8,17 +8,18 @@ source .env
 source venv/bin/activate
 DEPLOY_ENV=${FLASK_ENV:-production}
 
-if [[ ! -d logs ]]; then
+if [[ ! d logs ]]; then
 	mkdir logs
 fi
 
-if [ $DEPLOY_ENV == "development" ]
+if [ "$DEPLOY_ENV" == "development" ]
 then
-	echo "`date` : Development" >> logs/start.log
-	echo "`date` : Development"
+	echo "$(date) : Development" >> logs/start.log
+	echo "$(date) : Development"
 	flask run --with-threads # --host=0.0.0.0
 else
-	echo "`date` : Production" >> logs/start.log
-	echo "`date` : Production"
+	echo "$(date) : Production" >> logs/start.log
+	echo "$(date) : Production"
+
 	gunicorn -b 127.0.0.1:5000 natlas-server:app
 fi
