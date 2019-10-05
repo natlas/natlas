@@ -166,6 +166,74 @@ class Elastic:
 			self.status = False
 			return 0, None
 
+	def count_host_screenshots(self, ip):
+		if not self.status:
+			if not self.attemptReconnect():
+				return 0
+		searchBody = {
+			"query": {
+				"term": {
+					"ip": ip
+				}},
+			"aggs": {
+				"screenshot_count": {
+					"sum": {
+						"field": "num_screenshots"
+					}
+				}
+			}
+		}
+		try:
+			result = self.es.search(index="nmap_history", doc_type='_doc', body=searchBody, size=0, _source=False, track_scores=False,)
+			num_screenshots = int(result['aggregations']["screenshot_count"]["value"])
+			return num_screenshots
+		except:
+			return 0
+
+	def get_host_screenshots(self, ip, limit, offset):
+		if not self.status:
+			if not self.attemptReconnect():
+				return 0, []
+		searchBody = {
+			"size": limit,
+			"from": offset,
+			"query": {
+				"bool": {
+					"must": [
+						{
+							"term": {
+								"ip": ip
+							}
+						},
+						{
+							"range": {
+								"num_screenshots": {
+									"gt": 0
+									}
+							}
+						}
+					]
+				}
+			},
+			"sort": {
+				"ctime": {
+					"order": "desc"
+				}
+			}
+		}
+
+		try:
+			result = self.es.search(index="nmap_history", doc_type='_doc', body=searchBody, _source=["screenshots", "ctime", "scan_id"], track_scores=False,)
+
+			results = []  # collate results
+			for thing in result['hits']['hits']:
+				results.append(thing['_source'])
+
+			return result['hits']['total'], results
+		except:
+			return 0, []
+
+
 	def gethost_scan_id(self, scan_id):
 		if not self.status:
 			if not self.attemptReconnect():

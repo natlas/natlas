@@ -2,7 +2,7 @@
 
 Installing Elasticsearch
 ------------------------
-Natlas uses Elasticsearch 6.6 to store all of the scan results. If you want to run Elasticsearch locally on your natlas-server, simply run the `./setup-elastic.sh` script. 
+Natlas uses Elasticsearch 6.6 to store all of the scan results. If you want to run Elasticsearch locally on your natlas-server, simply run the `./setup-elastic.sh` script.
 
 Alternatively, if you already have an elastic cluster that you'd like to use, you can add it to the `.env` file with the name `ELASTICSEARCH_URL`.
 
@@ -25,6 +25,7 @@ Can't be changed via the web interface (only `.env`):
 - `SQLALCHEMY_DATABASE_URI` defaults to a sqlite database in the natlas-server directory `sqlite:///metadata.db`
 - `FLASK_ENV` defaults to `production` and should not be changed unless you are developing for natlas.
 - `FLASK_APP` defaults to `natlas-server.py` and should not be changed. It's what allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.
+- `MEDIA_DIRECTORY` defaults to `$BASEDIR/media/`. If you want to store media in a larger mounted storage, set this value to an absolute path. If you change the path after you already have data, make sure to copy the contents of the previous folder into the new media directory.
 
 Can be changed via the web interface:
 
@@ -38,7 +39,7 @@ Can be changed via the web interface:
 - `MAIL_PASSWORD` defaults to `""`
 - `MAIL_FROM` defaults to `""`
 
-For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`, which you should **absolutely** set), however user invitations won't work without a valid mail server. 
+For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`, which you should **absolutely** set), however user invitations won't work without a valid mail server.
 
 
 Initializing the Database
@@ -67,7 +68,7 @@ $ python3 add-scope.py --blacklist myblacklist.txt
 
 Giving a User Admin Privilege
 ------------------
-In order to get started interacting with Natlas, you'll need an administrator account. Admins are allowed to make changes to the following via the web interface: 
+In order to get started interacting with Natlas, you'll need an administrator account. Admins are allowed to make changes to the following via the web interface:
 
 - application config
 - the user list
@@ -100,7 +101,7 @@ To install nginx, you can simply `sudo apt-get install nginx`. Once it's install
 $ sudo cp natlas/natlas-server/deployment/nginx /etc/nginx/sites-available/natlas
 ```
 
-This nginx config expects that you'll be using TLS for your connections to the server. If you're hosting on the internet, letsencrypt makes this really easy. If you're not, you'll want to remove the TLS redirects. You should really be using a TLS certificate, though, even if it's only self-signed. All communications between both the users and the server, and the agents and the server will happen over this connection.  Go ahead and modify the lines that say `server_name <host>` and change `<host>` to whatever hostname your server will be listening on. Then, in the second server block, you'll want to set the `ssl_certificate` and `ssl_certificate_key` values to point to the correct SSL certificate and key. The final `location /` block is where the reverse proxying actually happens, specifically line `proxy_pass http://127.0.0.1:5000;`. 
+This nginx config expects that you'll be using TLS for your connections to the server. If you're hosting on the internet, letsencrypt makes this really easy. If you're not, you'll want to remove the TLS redirects. You should really be using a TLS certificate, though, even if it's only self-signed. All communications between both the users and the server, and the agents and the server will happen over this connection.  Go ahead and modify the lines that say `server_name <host>` and change `<host>` to whatever hostname your server will be listening on. Then, in the second server block, you'll want to set the `ssl_certificate` and `ssl_certificate_key` values to point to the correct SSL certificate and key. The final `location /` block is where the reverse proxying actually happens, specifically line `proxy_pass http://127.0.0.1:5000;`.
 
 
 Example Systemd Unit

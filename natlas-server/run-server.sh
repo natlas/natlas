@@ -7,6 +7,11 @@ export FLASK_APP=./natlas-server.py
 source .env
 source venv/bin/activate
 DEPLOY_ENV=${FLASK_ENV:-production}
+
+if [[ ! d logs ]]; then
+	mkdir logs
+fi
+
 if [ "$DEPLOY_ENV" == "development" ]
 then
 	echo "$(date) : Development" >> start.log
@@ -15,5 +20,6 @@ then
 else
 	echo "$(date) : Production" >> start.log
 	echo "$(date) : Production"
+
 	gunicorn -b 127.0.0.1:5000 natlas-server:app
 fi

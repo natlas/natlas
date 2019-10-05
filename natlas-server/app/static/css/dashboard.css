@@ -86,6 +86,9 @@ body {
 .footer-links a {
   color: #fff;
 }
+.version-string a {
+  color: #99979c;
+}
 /*
  * Main content
  */
@@ -207,7 +210,7 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .nmap_history {
-  max-height: 10rem; 
+  max-height: 10rem;
   overflow: scroll;
 }
 
@@ -243,7 +246,7 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .port-number {
-  background-color: #36978D; 
+  background-color: #36978D;
   color: white;
   border-top-left-radius: 10px;
   width: 50%;
@@ -251,7 +254,7 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .port-protocol {
-  background-color: #62A9E3; 
+  background-color: #62A9E3;
   color: white;
   border-top-right-radius: 10px;
   width: 50%;
@@ -259,7 +262,7 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .port-service {
-  background-color: #2B2D33; 
+  background-color: #2B2D33;
   color: white;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -343,7 +346,7 @@ a > .badge-tag {
   bottom: 5px;
   right: 5px;
   z-index: 1000;
-  transition: color .3s 
+  transition: color .3s
     opacity .5s, visibility .5s;
   opacity: 0;
   visibility: hidden;
@@ -359,4 +362,9 @@ a > .badge-tag {
 #backtotop.show {
   opacity: 1;
   visibility: visible;
+}
+
+button.check-update {
+  font-size:.9rem;
+  font-weight:bold;
 }

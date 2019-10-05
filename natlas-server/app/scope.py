@@ -1,6 +1,18 @@
 import ipaddress
 from netaddr import IPNetwork
 from app.ipscanmanager import IPScanManager
+from datetime import datetime
+import os
+
+LOGFILE = 'logs/scopemanager.log'
+
+def log(message, printm=False):
+	if not os.path.isdir('logs'):
+		os.makedirs('logs', exist_ok=True)
+	with open(LOGFILE, 'a') as f:
+		f.write('%s - %s\n' % (str(datetime.now()), message))
+	if printm:
+		print('%s - %s\n' % (str(datetime.now()), message))
 
 class ScopeManager():
 
@@ -52,22 +64,24 @@ class ScopeManager():
 	def updateScope(self):
 		from app.models import ScopeItem
 		newScopeSize = 0
+		newScope = []
 		for item in ScopeItem.getScope():
 			newItem = ipaddress.ip_network(item.target, False)
-			self.scope.append(newItem)
+			newScope.append(newItem)
 			newScopeSize += newItem.num_addresses
+		self.scope = newScope
 		self.scopeSize = newScopeSize
-		#print("Scope Size: %s" % self.scopeSize)
 
 	def updateBlacklist(self):
 		from app.models import ScopeItem
 		newBlacklistSize = 0
+		newBlacklist = []
 		for item in ScopeItem.getBlacklist():
 			newItem = ipaddress.ip_network(item.target, False)
-			self.blacklist.append(newItem)
+			newBlacklist.append(newItem)
 			newBlacklistSize += newItem.num_addresses
+		self.blacklist = newBlacklist
 		self.blacklistSize = newBlacklistSize
-		#print("Blacklist Size: %s" % self.blacklistSize)
 
 	def updateScanManager(self):
 		from app.models import ScopeItem
@@ -77,7 +91,7 @@ class ScopeManager():
 			blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
 			self.scanmanager = IPScanManager(scanrange, blacklistrange)
 		except Exception as e:
-			print("Scan manager could not be instantiated because there was no scope configured.")
+			log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
 
 	def getScanManager(self):
 		return self.scanmanager
@@ -86,4 +100,4 @@ class ScopeManager():
 		self.updateScope()
 		self.updateBlacklist()
 		self.updateScanManager()
-		print("ScopeManager Updated")
+		log("ScopeManager Updated")

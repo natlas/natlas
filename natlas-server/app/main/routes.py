@@ -1,4 +1,6 @@
-from flask import redirect, url_for, flash, render_template, Response, current_app, g, request
+from flask import redirect, url_for, flash, render_template, \
+				Response, current_app, g, request, send_from_directory
+
 from flask_login import current_user, login_required
 from app.main import bp
 from app.util import hostinfo, isAcceptableTarget
@@ -15,6 +17,13 @@ import random
 @isAuthenticated
 def index():
 	return redirect(url_for('main.search'))
+
+# Serve media files in case the front-end proxy doesn't do it
+@bp.route('/media/<path:filename>')
+def send_media(filename):
+	# If you're looking at this function, wondering why your files aren't sending...
+	# It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
+	return send_from_directory(current_app.config['MEDIA_DIRECTORY'], filename)
 
 @bp.route('/search')
 @isAuthenticated
@@ -45,6 +54,11 @@ def search():
 		return Response('\n'.join(hostlist), mimetype='text/plain')
 	else:
 		return render_template("search.html", query=query, numresults=count, totalHosts=totalHosts, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
+
+@bp.route('/searchmodal')
+@isAuthenticated
+def search_modal():
+	return render_template("includes/search_modal_content.html")
 
 @bp.route('/host/<ip>')
 @bp.route('/host/<ip>/')
@@ -115,14 +129,25 @@ def export_scan_json(ip, scan_id):
 	count, context = current_app.elastic.gethost_scan_id(scan_id)
 	return Response(json.dumps(context), mimetype="application/json")
 
-@bp.route('/host/<ip>/headshots')
-@bp.route('/host/<ip>/headshots/')
+@bp.route('/host/<ip>/screenshots')
+@bp.route('/host/<ip>/screenshots/')
 @isAuthenticated
-def host_headshots(ip):
+def host_screenshots(ip):
+	page = int(request.args.get('p', 1))
+	searchOffset = current_user.results_per_page * (page-1)
+
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
 	info, context = hostinfo(ip)
-	return render_template("host/headshots.html", **context, info=info, delHostForm=delHostForm, rescanForm=rescanForm)
+	total_entries, screenshots = current_app.elastic.get_host_screenshots(ip, current_user.results_per_page, searchOffset)
+
+	next_url = url_for('main.host_screenshots', ip=ip, p=page + 1) \
+		if total_entries > page * current_user.results_per_page else None
+	prev_url = url_for('main.host_screenshots', ip=ip, p=page - 1) \
+		if page > 1 else None
+
+	return render_template("host/screenshots.html", **context, historical_screenshots=screenshots, numresults=total_entries, \
+		info=info, delHostForm=delHostForm, rescanForm=rescanForm, next_url=next_url, prev_url=prev_url)
 
 @bp.route('/host/<ip>/rescan', methods=['POST'])
 # login_required ensures that an actual user is logged in to make the request

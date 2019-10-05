@@ -9,7 +9,7 @@
             </ul>
         </div>
         <div class="px-2 my-flex">
-          <span>v{{ config.NATLAS_VERSION }}</span>
+          <span class="version-string"><a id="natlasVersion" target="_blank" href="https://github.com/natlas/natlas/releases/tag/v{{ config.NATLAS_VERSION }}">v{{ config.NATLAS_VERSION }}</a></span>
         </div>
         <div class="px-2 my-flex">
             <a href="{{ url_for('main.index') }}"><img class="img-fluid natlas-name" src="/static/img/natlas-name.png" title="Natlas {{ config.NATLAS_VERSION }}" alt="Natlas"></a>

@@ -18,6 +18,7 @@ Mako==1.0.8
 MarkupSafe==1.1.1
 mpmath==1.1.0
 netaddr==0.7.19
+Pillow==6.2.0
 PyJWT==1.7.1
 python-dateutil==2.8.0
 python-dotenv==0.10.1
