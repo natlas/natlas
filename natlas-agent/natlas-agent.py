@@ -393,8 +393,7 @@ def main():
 	needed_caps = ["cap_net_raw", "cap_net_admin", "cap_net_bind_service"]
 	missing_caps = [cap for cap in needed_caps if cap not in nmap_caps]
 	if missing_caps:
-		raise SystemExit("[!] Missing Nmap capabilities: %s" % "
-".join(missing_caps))
+		raise SystemExit("[!] Missing Nmap capabilities: %s" % " ".join(missing_caps))
 
 	if not os.path.isdir("data"):
 		os.mkdir("data")
