@@ -83,6 +83,14 @@ else
 	echo "[+] Found nmap: $(which nmap)"
 fi
 
+echo "[+] Setting capabilities for nmap"
+if ! setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap >/dev/null 2>&1; then
+	echo "[!] Failed to set capabilities for nmap"
+	exit 12
+else
+	echo "[+] Successfully set capabilities for nmap"
+fi
+
 if ! which chromium-browser >/dev/null; then
 	echo '[+] Installing chromium-browser: apt-get install -y chromium-browser'
 	apt-get install -y chromium-browser
