@@ -6,6 +6,14 @@ $(function() {
 		});
 });
 
+$(function() {
+		$('.expand-imgold').on('click', function() {
+			$('.imagetitle').text($(this).find('img').attr('alt'));
+			$('.imagepreview').attr('src', $(this).find('img').attr('src'));
+			$('#imagemodal').modal('show');
+		});
+});
+
 var modal_content_loaded = false;
 function loadModalContent() {
 	if (modal_content_loaded){
