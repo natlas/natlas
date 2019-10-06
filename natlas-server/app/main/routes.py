@@ -60,6 +60,22 @@ def search():
 def search_modal():
 	return render_template("includes/search_modal_content.html")
 
+def determine_data_version(hostdata):
+	if 'agent_version' in hostdata:
+		# Do math on version here to determine if we need to fall "up" to 0.6.4
+		version = hostdata['agent_version']
+		verlist = version.split('.')
+		for idx,item in enumerate(verlist):
+			verlist[idx] = int(item)
+
+		if verlist[1] < 6 or (verlist[1] == 6 and verlist[2] < 4):
+			version = '0.6.4'
+	else:
+		# Fall "up" to 0.6.4 which is the last release before we introduced versioned host templates
+		version = '0.6.4'
+
+	return version
+
 @bp.route('/host/<ip>')
 @bp.route('/host/<ip>/')
 @isAuthenticated
@@ -68,7 +84,10 @@ def host(ip):
 	delForm = DeleteForm()
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
-	return render_template("host/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
+
+	version = determine_data_version(context)
+
+	return render_template("host/versions/"+version+"/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
 		rescanForm=rescanForm)
 
 
@@ -92,7 +111,7 @@ def host_history(ip):
 	prev_url = url_for('main.host_history', ip=ip, p=page - 1) \
 		if page > 1 else None
 
-	return render_template("host/history.html", ip=ip, info=info, page=page, numresults=count, hosts=context, next_url=next_url, prev_url=prev_url, \
+	return render_template("host/versions/0.6.5/history.html", ip=ip, info=info, page=page, numresults=count, hosts=context, next_url=next_url, prev_url=prev_url, \
 		delHostForm=delHostForm, rescanForm=rescanForm)
 
 @bp.route('/host/<ip>/<scan_id>')
@@ -103,7 +122,10 @@ def host_historical_result(ip, scan_id):
 	rescanForm = RescanForm()
 	info, context = hostinfo(ip)
 	count, context = current_app.elastic.gethost_scan_id(scan_id)
-	return render_template("host/summary.html", host=context, info=info, **context, delForm=delForm, delHostForm=delHostForm, rescanForm=rescanForm)
+
+	version = determine_data_version(context)
+
+	return render_template("host/versions/"+version+"/summary.html", host=context, info=info, **context, delForm=delForm, delHostForm=delHostForm, rescanForm=rescanForm)
 
 @bp.route('/host/<ip>/<scan_id>.xml')
 @isAuthenticated
@@ -146,7 +168,9 @@ def host_screenshots(ip):
 	prev_url = url_for('main.host_screenshots', ip=ip, p=page - 1) \
 		if page > 1 else None
 
-	return render_template("host/screenshots.html", **context, historical_screenshots=screenshots, numresults=total_entries, \
+	version = determine_data_version(context)
+
+	return render_template("host/versions/"+version+"/screenshots.html", **context, historical_screenshots=screenshots, numresults=total_entries, \
 		info=info, delHostForm=delHostForm, rescanForm=rescanForm, next_url=next_url, prev_url=prev_url)
 
 @bp.route('/host/<ip>/rescan', methods=['POST'])
@@ -202,5 +226,8 @@ def randomHost():
 	delForm = DeleteForm()
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
-	return render_template("host/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
+
+	version = determine_data_version(context)
+
+	return render_template("host/versions/"+version+"/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
 		rescanForm=rescanForm)

@@ -27,6 +27,13 @@ class Config(object):
 	# Also make sure that you're using an absolute path if you're serving your app directly via flask
 	MEDIA_DIRECTORY = os.environ.get('MEDIA_DIRECTORY') or os.path.join(BASEDIR, 'media/')
 
+	# Allow version overrides for local development
+	# Necessary to test versioned host data templates before release
+	version_override = os.environ.get("NATLAS_VERSION_OVERRIDE") or None
+
+	if version_override:
+		NATLAS_VERSION = version_override
+
 # run as standalone to populate the config items into the database using environment or default values
 def populate_defaults(verbose=False):
 					# NAME,             TYPE, DEFAULT

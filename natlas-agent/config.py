@@ -25,24 +25,24 @@ class Config:
 
 	def __init__(self):
 		# url of server to get/submit work from/to
-		self.server = os.environ.get('NATLAS_SERVER_ADDRESS') or 'http://127.0.0.1:5000' 
+		self.server = os.environ.get('NATLAS_SERVER_ADDRESS') or 'http://127.0.0.1:5000'
 
 		# ignore warnings about SSL connections
 		# you shouldn't ignore ssl warnings, but I'll give you the option
 		# Instead, you should put the trusted CA certificate bundle on the agent and use the REQUESTS_CA_BUNDLE env variable
-		self.ignore_ssl_warn = self.getBool('NATLAS_IGNORE_SSL_WARN') or False 
+		self.ignore_ssl_warn = self.getBool('NATLAS_IGNORE_SSL_WARN') or False
 
 		# maximum number of threads to utilize
-		self.max_threads = self.getInt('NATLAS_MAX_THREADS') or 3 
+		self.max_threads = self.getInt('NATLAS_MAX_THREADS') or 3
 
 		# Are we allowed to scan local addresses?
 		# By default, agents protect themselves from scanning their local network
-		self.scan_local = self.getBool('NATLAS_SCAN_LOCAL') or False 
+		self.scan_local = self.getBool('NATLAS_SCAN_LOCAL') or False
 
 		# default time to wait for the server to respond
 		self.request_timeout = self.getInt('NATLAS_REQUEST_TIMEOUT') or 15 # seconds
 
-		# Maximum value for exponential backoff of requests, 5 minutes default 
+		# Maximum value for exponential backoff of requests, 5 minutes default
 		self.backoff_max = self.getInt('NATLAS_BACKOFF_MAX') or 300 # seconds
 
 		# Base value to begin the exponential backoff
@@ -59,3 +59,10 @@ class Config:
 		# Authentication token that agents can use to talk to the server API
 		# Only needed if the server is configured to require agent authentication
 		self.auth_token = os.environ.get("NATLAS_AGENT_TOKEN") or None
+
+		# Allow version overrides for local development
+		# Necessary to test versioned host data templates before release
+		self.version_override = os.environ.get("NATLAS_VERSION_OVERRIDE") or None
+
+		if self.version_override:
+			self.NATLAS_VERSION = self.version_override

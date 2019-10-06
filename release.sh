@@ -29,8 +29,9 @@ else
 fi
 
 # Grab current version strings
-CURRENT_SERVER_VERSION=$(grep NATLAS_VERSION natlas-server/config.py | cut -d'"' -f2)
-CURRENT_AGENT_VERSION=$(grep NATLAS_VERSION natlas-agent/config.py | cut -d'"' -f2)
+# Only grab first line in event of NATLAS_VERSION appearing multiple times
+CURRENT_SERVER_VERSION=$(grep NATLAS_VERSION natlas-server/config.py | head -n1 | cut -d'"' -f2)
+CURRENT_AGENT_VERSION=$(grep NATLAS_VERSION natlas-agent/config.py | head -n1 | cut -d'"' -f2)
 
 # If agent and server versions are different, something is probably wrong
 if [ "$CURRENT_SERVER_VERSION" != "$CURRENT_AGENT_VERSION" ]; then
