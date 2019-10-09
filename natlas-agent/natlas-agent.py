@@ -230,6 +230,8 @@ def scan(target_data=None):
 		command.append("-Pn")
 	if agentConfig["onlyOpens"]:
 		command.append("--open")
+	if agentConfig["udpScan"]:
+		command.append("-sUS")
 
 	command.append(target_data["target"])
 
@@ -430,6 +432,7 @@ def main():
 		"hostTimeout": 600,
 		"osScanLimit": True,
 		"noPing": False,
+		"udpScan": False,
 		"scripts": "default"
 	}
 	target_data_template = {"agent_config": defaultAgentConfig, "scan_reason":"manual", "tags":[]}
