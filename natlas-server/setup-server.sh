@@ -15,6 +15,7 @@ fi
 
 echo "[+] Updating apt repositories"
 apt-get update >/dev/null
+apt-get install -y curl
 
 if ! id -u "natlas" >/dev/null 2>&1; then
 	echo "[+] Creating natlas group: groupadd -r natlas"
@@ -40,20 +41,20 @@ else
 fi
 
 if ! which python3 >/dev/null; then
-	echo "[+] Installing python3: apt-get -y install python3.6"
-	apt-get -y install python3.6
-	if ! which python3 >/dev/null; then
+	echo "[+] Installing python3: apt-get -qq install python3.6"
+	apt-get -qq install python3.6
+	if ! which python3 > /dev/null && ! which python3.6 >/dev/null; then
 		echo "[!] Failed to install python3" && exit 1
 	else
-		echo "[+] Successfully installed python3: $(which python3)"
+		echo "[+] Successfully installed python3: $(which python3 || which python3.6)"
 	fi
 else
-	echo "[+] Found python3: $(which python3)"
+	echo "[+] Found python3: $(which python3 || which python3.6)"
 fi
 
 if ! which pip3 >/dev/null; then
-	echo "[+] Installing pip3: apt-get -y install python3-pip"
-	apt-get -y install python3-pip
+	echo "[+] Installing pip3: apt-get -qq install python3-pip"
+	apt-get -qq install python3-pip
 	if ! which pip3 >/dev/null; then
 		echo "[!] Failed to install pip3" && exit 2
 	else
@@ -64,8 +65,8 @@ else
 fi
 
 if ! which virtualenv >/dev/null; then
-	echo "[!] Installing virtualenv: apt-get -y install virtualenv"
-	apt-get -y install virtualenv
+	echo "[!] Installing virtualenv: apt-get -qq install virtualenv"
+	apt-get -qq install virtualenv
 	if ! which virtualenv >/dev/null; then
 		echo "[!] Failed to install virtualenv" && exit 3
 	else

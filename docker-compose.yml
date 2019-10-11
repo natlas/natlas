@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3
+    container_name: elastic
+    environment:
+      - node.name=elastic
+      - discovery.seed_hosts=es02
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - backend
+    restart: on-failure
+
+  natlas-server:
+    build: natlas-server
+    ports:
+      - 5000:5000
+    networks:
+      - backend
+    environment:
+      - ELASTICSEARCH_URL="http://elastic:9200"
+    restart: on-failure
+
+  natlas-agent:
+    image: dockersamples/examplevotingapp_worker
+    networks:
+      - backend
+    restart: on-failure
+        
+networks:
+  frontend:
+  backend:
+
+volumes:
+  db-data:
+  elastic:
