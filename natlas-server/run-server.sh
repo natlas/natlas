@@ -21,5 +21,5 @@ else
 	echo "$(date) : Production" >> logs/start.log
 	echo "$(date) : Production"
 
-	gunicorn -b 0.0.0.0:5000 natlas-server:app
+	gunicorn -b "${BIND_ADDRESS:-127.0.0.1}":5000 natlas-server:app
 fi

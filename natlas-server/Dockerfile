@@ -5,6 +5,9 @@ WORKDIR /opt/natlas/natlas-server/
 RUN mkdir -p /opt/natlas/natlas-server/
 COPY . /opt/natlas/natlas-server
 
+EXPOSE 5000
+VOLUME ["/data"]
+
 RUN env && bash ./setup-server.sh
 
 CMD [ "/bin/bash", "/opt/natlas/natlas-server/run-server.sh" ]
