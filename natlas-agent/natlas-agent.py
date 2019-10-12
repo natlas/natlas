@@ -13,6 +13,8 @@ import argparse
 import shutil
 import hashlib
 import glob
+import logging
+from logging.handlers import RotatingFileHandler
 from datetime import datetime,timezone
 from libnmap.parser import NmapParser, NmapParserException
 import ipaddress
@@ -32,15 +34,28 @@ config = Config()
 MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
 
 RTTVAR_MSG = "RTTVAR has grown to over"
+FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
+logging.Formatter.converter = time.gmtime # Always log in GMT
 
+def get_console_handler():
+	console_handler = logging.StreamHandler(sys.stdout)
+	console_handler.setFormatter(FORMATTER)
+	return console_handler
 
-def print_err(message):
-	threadname = threading.current_thread().name
-	print("[!] %s: %s" % (threadname, message))
+def get_file_handler():
+	file_handler = RotatingFileHandler("logs/agent.log", maxBytes=1024*1024, backupCount=5)
+	file_handler.setFormatter(FORMATTER)
+	return file_handler
 
-def print_info(message):
-	threadname = threading.current_thread().name
-	print("[+] %s: %s" % (threadname, message))
+def getLogger(name):
+	logger = logging.getLogger(name)
+	logger.setLevel(logging.DEBUG)
+	logger.addHandler(get_console_handler())
+	logger.addHandler(get_file_handler())
+	logger.propagate = False
+	return logger
+
+global_logger = getLogger("natlas-agent")
 
 if config.ignore_ssl_warn:
 	requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -54,53 +69,53 @@ def make_request(endpoint, reqType="GET", postData=None, contentType="applicatio
 			req = requests.get(config.server+endpoint, timeout=config.request_timeout, headers=headers, verify=(not config.ignore_ssl_warn))
 			if req.status_code == 200:
 				if 'message' in req.json():
-					print_info("[Server] " + req.json()['message'])
+					global_logger.info("[Server] " + req.json()['message'])
 				return req
 			if req.status_code == 403:
 				if 'message' in req.json():
-					print_err("[Server] " + req.json()['message'])
+					global_logger.error("[Server] " + req.json()['message'])
 				if 'retry' in req.json() and not req.json()['retry']:
 					os._exit(403)
 			if req.status_code == 400:
 				if 'message' in req.json():
-					print_info("[Server] " + req.json()['message'])
+					global_logger.info("[Server] " + req.json()['message'])
 				return req
 			if req.status_code != statusCode:
-				print_err("Expected %s, received %s" % (statusCode, req.status_code))
+				global_logger.error("Expected %s, received %s" % (statusCode, req.status_code))
 				if 'message' in req.json():
-					print_err("[Server] " + req.json()['message'])
+					global_logger.error("[Server] " + req.json()['message'])
 				return req
 			if req.headers['content-type'] != contentType:
-				print_err("Expected %s, received %s" % (contentType, req.headers['content-type']))
+				global_logger.error("Expected %s, received %s" % (contentType, req.headers['content-type']))
 				return False
 		elif reqType == "POST" and postData:
 			req = requests.post(config.server+endpoint, json=postData, timeout=config.request_timeout, headers=headers, verify=(not config.ignore_ssl_warn))
 			if req.status_code == 200:
 				if 'message' in req.json():
-					print_info("[Server] " + req.json()['message'])
+					global_logger.info("[Server] " + req.json()['message'])
 				return req
 			if req.status_code == 403:
 				if 'message' in req.json():
-					print_err("[Server] " + req.json()['message'])
+					global_logger.error("[Server] " + req.json()['message'])
 				if 'retry' in req.json() and not req.json()['retry']:
 					os._exit(403)
 			if req.status_code == 400:
 				if 'message' in req.json():
-					print_info("[Server] " + req.json()['message'])
+					global_logger.info("[Server] " + req.json()['message'])
 				return req
 			if req.status_code != statusCode:
-				print_err("Expected %s, received %s" % (statusCode, req.status_code))
+				global_logger.error("Expected %s, received %s" % (statusCode, req.status_code))
 				if 'message' in req.json():
-					print_err("[Server] " + req.json()['message'])
+					global_logger.error("[Server] " + req.json()['message'])
 				return req
 	except requests.ConnectionError as e:
-		print_err("Connection Error connecting to %s" % config.server)
+		global_logger.error("Connection Error connecting to %s" % config.server)
 		return False
 	except requests.Timeout as e:
-		print_err("Request timed out after %s seconds." % config.request_timeout)
+		global_logger.error("Request timed out after %s seconds." % config.request_timeout)
 		return False
 	except ValueError as e:
-		print_err("Error: %s" % e)
+		global_logger.error("Error: %s" % e)
 		return False
 
 	return req
@@ -122,30 +137,30 @@ def backoff_request(giveup=False, *args, **kwargs):
 		if RETRY:
 			attempt += 1
 			if giveup and attempt == config.max_retries:
-				print_err("Request to %s failed %s times. Giving up" % (config.server, config.max_retries))
+				global_logger.error("Request to %s failed %s times. Giving up" % (config.server, config.max_retries))
 				return None
 			jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
 			current_sleep = min(config.backoff_max, config.backoff_base * 2 ** attempt) + jitter
-			print_err("Request to %s failed. Waiting %s seconds before retrying." % (config.server, current_sleep))
+			global_logger.error("Request to %s failed. Waiting %s seconds before retrying." % (config.server, current_sleep))
 			time.sleep(current_sleep)
 	return result
 
 def get_services_file():
-	print_info("Fetching natlas-services file from %s" % config.server)
+	global_logger.info("Fetching natlas-services file from %s" % config.server)
 	response = backoff_request(endpoint="/api/natlas-services")
 	if response:
 		serviceData = response.json()
 		if serviceData["id"] == "None":
-			print_err("%s doesn't have a service file for us" % config.server)
+			global_logger.error("%s doesn't have a service file for us" % config.server)
 			return False
 		if not hashlib.sha256(serviceData["services"].encode()).hexdigest() == serviceData["sha256"]:
-			print_err("hash provided by %s doesn't match locally computed hash of services" % config.server)
+			global_logger.error("hash provided by %s doesn't match locally computed hash of services" % config.server)
 			return False
 		with open("natlas-services", "w") as f:
 			f.write(serviceData["services"])
 		with open("natlas-services", "r") as f:
 			if not hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() == serviceData["sha256"]:
-				print_err("hash of local file doesn't match hash provided by server")
+				global_logger.error("hash of local file doesn't match hash provided by server")
 				return False
 	else:
 		return False # return false if we were unable to get a response from the server
@@ -153,7 +168,7 @@ def get_services_file():
 
 
 def fetch_target():
-	print_info("Fetching Target from %s" % config.server)
+	global_logger.info("Fetching Target from %s" % config.server)
 	response = backoff_request(endpoint="/api/getwork")
 	if response:
 		target_data = response.json()
@@ -165,10 +180,10 @@ def validate_target(target):
 	try:
 		iptarget = ipaddress.ip_address(target)
 		if iptarget.is_private and not config.scan_local:
-			print_err("We're not configured to scan local addresses!")
+			global_logger.error("We're not configured to scan local addresses!")
 			return False
 	except ipaddress.AddressValueError:
-		print_err("%s is not a valid IP Address" % target)
+		global_logger.error("%s is not a valid IP Address" % target)
 		return False
 	return True
 
@@ -176,14 +191,14 @@ def generate_scan_id():
 	return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
 
 def cleanup_files(scan_id):
-	print_info("Cleaning up files for %s" % scan_id)
+	global_logger.info("Cleaning up files for %s" % scan_id)
 	if os.path.isdir("data/aquatone.%s" % scan_id):
 		shutil.rmtree("data/aquatone.%s" % scan_id)
 	for file in glob.glob("data/natlas."+scan_id+".*"):
 		try:
 			os.remove(file)
 		except:
-			print_err("Could not remove file %s" % file)
+			global_logger.error("Could not remove file %s" % file)
 
 def scan(target_data=None):
 
@@ -242,7 +257,7 @@ def scan(target_data=None):
 	except:
 		try:
 			TIMEDOUT = True
-			print_err("Scan %s timed out" % scan_id)
+			global_logger.error("Scan %s timed out" % scan_id)
 			process.kill()
 		except:
 			pass
@@ -253,30 +268,30 @@ def scan(target_data=None):
 		result['scan_stop'] = datetime.now(timezone.utc).isoformat()
 		result['timed_out'] = True
 		cleanup_files(scan_id)
-		print_info("Submitting scan timeout notice for %s" % result['ip'])
+		global_logger.info("Submitting scan timeout notice for %s" % result['ip'])
 		response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
 		return
 	else:
-		print_info("Scan %s Complete" % scan_id)
+		global_logger.info("Scan %s Complete" % scan_id)
 
 	for ext in 'nmap', 'gnmap', 'xml':
 		try:
 			result[ext+"_data"] = open("data/natlas."+scan_id+"."+ext).read()
 		except:
-			print_err("Couldn't read natlas.%s.%s" % (scan_id, ext))
+			global_logger.error("Couldn't read natlas.%s.%s" % (scan_id, ext))
 			return ERR["DATANOTFOUND"]
 
 	try:
 		nmap_report = NmapParser.parse(result['xml_data'])
 	except NmapParserException:
-		print_err("Couldn't parse natlas.%s.xml" % (scan_id))
+		global_logger.error("Couldn't parse natlas.%s.xml" % (scan_id))
 		return ERR["DATANOTFOUND"]
 
 	if nmap_report.hosts_total < 1:
-		print_err("No hosts found in scan data")
+		global_logger.error("No hosts found in scan data")
 		return "[!] No hosts found in scan data"
 	elif nmap_report.hosts_total > 1:
-		print_err("Too many hosts found in scan data")
+		global_logger.error("Too many hosts found in scan data")
 		return "[!] Too many hosts found in scan data"
 	elif nmap_report.hosts_down == 1:
 		# host is down
@@ -284,7 +299,7 @@ def scan(target_data=None):
 		result['port_count'] = 0
 		result['scan_stop'] = datetime.now(timezone.utc).isoformat()
 		cleanup_files(scan_id)
-		print_info("Submitting host down notice for %s" % (result['ip']))
+		global_logger.info("Submitting host down notice for %s" % (result['ip']))
 		response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
 		return
 	elif nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
@@ -293,7 +308,7 @@ def scan(target_data=None):
 		result['port_count'] = 0
 		result['scan_stop'] = datetime.now(timezone.utc).isoformat()
 		cleanup_files(scan_id)
-		print_info("Submitting %s ports for %s" % (result['port_count'], result['ip']))
+		global_logger.info("Submitting %s ports for %s" % (result['port_count'], result['ip']))
 		response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
 		return
 	else:
@@ -309,7 +324,7 @@ def scan(target_data=None):
 		if "443/tcp" in result['nmap_data']:
 			targetServices.append("https")
 		if len(targetServices) > 0:
-			print_info("Attempting to take %s screenshot(s) for %s" % (', '.join(targetServices).upper(),result['ip']))
+			global_logger.info("Attempting to take %s screenshot(s) for %s" % (', '.join(targetServices).upper(),result['ip']))
 			screenshotutils.runAquatone(target, scan_id, targetServices)
 
 		serviceMapping = {
@@ -328,11 +343,11 @@ def scan(target_data=None):
 				"service": service.upper(),
 				"data": str(base64.b64encode(open(screenshotPath, 'rb').read()))[2:-1]
 			})
-			print_info("%s screenshot acquired for %s" % (service.upper(), result['ip']))
+			global_logger.info("%s screenshot acquired for %s" % (service.upper(), result['ip']))
 
 	if target_data["agent_config"]["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result['nmap_data']:
-			print_info("Attempting to take VNC screenshot for %s" % result['ip'])
+			global_logger.info("Attempting to take VNC screenshot for %s" % result['ip'])
 			if screenshotutils.runVNCSnapshot(target, scan_id) is True:
 				result['screenshots'].append({
 					"host": target,
@@ -340,14 +355,14 @@ def scan(target_data=None):
 					"service": "VNC",
 					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.jpg", 'rb').read()))[2:-1]
 				})
-				print_info("VNC screenshot acquired for %s" % result['ip'])
+				global_logger.info("VNC screenshot acquired for %s" % result['ip'])
 			else:
-				print_err("Failed to acquire screenshot for %s" % result['ip'])
+				global_logger.error("Failed to acquire screenshot for %s" % result['ip'])
 
 	# submit result
 	result['scan_stop'] = datetime.now(timezone.utc).isoformat()
 	cleanup_files(scan_id)
-	print_info("Submitting %s ports for %s" % (result['port_count'], result['ip']))
+	global_logger.info("Submitting %s ports for %s" % (result['port_count'], result['ip']))
 	response = backoff_request(giveup=True, endpoint="/api/submit", reqType="POST", postData=json.dumps(result))
 
 class ThreadScan(threading.Thread):
@@ -369,21 +384,22 @@ class ThreadScan(threading.Thread):
 				if target_data and target_data["services_hash"] != self.servicesSha:
 					self.servicesSha = get_services_file()
 					if not self.servicesSha:
-						print_err("Failed to get updated services from %s" % config.server)
+						global_logger.error("Failed to get updated services from %s" % config.server)
 				result = scan(target_data)
 
 		else:
 			#If we're not in auto mode, then the queue is populated with work from local data
 			while True:
-				print_info("Fetching work from queue")
+				global_logger.info("Fetching work from queue")
 				target_data = self.queue.get()
 				if target_data is None:
 					break
-				print_info("Manual Target: %s" % target_data["target"])
+				global_logger.info("Manual Target: %s" % target_data["target"])
 				result = scan(target_data)
 				self.queue.task_done()
 
 def main():
+
 	PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
 	PARSER_EPILOG = "Report problems to https://github.com/natlas/natlas"
 	parser = argparse.ArgumentParser(description=PARSER_DESC, epilog=PARSER_EPILOG, prog='natlas-agent')
@@ -398,7 +414,8 @@ def main():
 		raise SystemExit("Please run as a privileged user in order to use nmap's features.")
 	if not os.path.isdir("data"):
 		os.mkdir("data")
-
+	if not os.path.isdir("logs"):
+		os.mkdir("logs")
 
 	autoScan = True
 	if args.target or args.tfile:
@@ -441,7 +458,7 @@ def main():
 	}
 	target_data_template = {"agent_config": defaultAgentConfig, "scan_reason":"manual", "tags":[]}
 	if args.target:
-		print_info("Scanning: %s" % args.target)
+		global_logger.info("Scanning: %s" % args.target)
 
 		targetNetwork = ipaddress.ip_interface(args.target)
 		if targetNetwork.with_prefixlen.endswith('/32'):
@@ -458,11 +475,11 @@ def main():
 				q.put(target_data)
 
 		q.join()
-		print_info("Finished scanning: %s" % args.target)
+		global_logger.info("Finished scanning: %s" % args.target)
 		return
 
 	elif args.tfile:
-		print_info("Reading scope from file: %s" % args.tfile)
+		global_logger.info("Reading scope from file: %s" % args.tfile)
 
 		for target in open(args.tfile, "r"):
 			targetNetwork = ipaddress.ip_interface(target.strip())
@@ -478,7 +495,7 @@ def main():
 					target_data["scan_id"] = generate_scan_id()
 					q.put(target_data)
 		q.join()
-		print_info("Finished scanning the target file %s" % args.tfile)
+		global_logger.info("Finished scanning the target file %s" % args.tfile)
 		return
 
 	# This is the default behavior of fetching work from the server
