@@ -266,7 +266,11 @@ def scan(target_data=None):
 			print_err("Couldn't read natlas.%s.%s" % (scan_id, ext))
 			return ERR["DATANOTFOUND"]
 
-	nmap_report = NmapParser.parse(result['xml_data'])
+	try:
+		nmap_report = NmapParser.parse(result['xml_data'])
+	except NmapParserException:
+		print_err("Couldn't parse natlas.%s.xml" % (scan_id))
+		return ERR["DATANOTFOUND"]
 
 	if nmap_report.hosts_total < 1:
 		print_err("No hosts found in scan data")
