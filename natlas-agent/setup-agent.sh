@@ -9,24 +9,24 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 echo "[+] Updating apt repositories"
-apt-get update
+apt-get update && apt-get -qq install curl
 
 
 if ! which python3 >/dev/null; then
-	echo "[+] Installing python3: apt-get -y install python3.6"
-	apt-get -y install python3.6
-	if ! which python3 >/dev/null; then
+	echo "[+] Installing python3: apt-get -qq install python3.6"
+	apt-get -qq install python3.6
+	if ! which python3 > /dev/null && ! which python3.6 >/dev/null; then
 		echo "[!] Failed to install python3" && exit 1
 	else
-		echo "[+] Successfully installed python3: $(which python3)"
+		echo "[+] Successfully installed python3: $(which python3 || which python3.6)"
 	fi
 else
-	echo "[+] Found python3: $(which python3)"
+	echo "[+] Found python3: $(which python3 || which python3.6)"
 fi
 
 if ! which pip3 >/dev/null; then
-	echo "[+] Installing pip3: apt-get -y install python3-pip"
-	apt-get -y install python3-pip
+	echo "[+] Installing pip3: apt-get -qq install python3-pip"
+	apt-get -qq install python3-pip
 	if ! which pip3 >/dev/null; then
 		echo "[!] Failed to install pip3" && exit 2
 	else
@@ -133,7 +133,7 @@ fi
 
 if ! which aquatone >/dev/null; then
 	echo '[+] Downloading Aquatone'
-	wget $AQUATONEURL -O /tmp/aquatone.zip -q && unzip /tmp/aquatone.zip -d /tmp/aquatone && cp /tmp/aquatone/aquatone /usr/local/bin/aquatone
+	curl -sL $AQUATONEURL -o /tmp/aquatone.zip -q && unzip /tmp/aquatone.zip -d /tmp/aquatone && cp /tmp/aquatone/aquatone /usr/local/bin/aquatone
 	rm -rf /tmp/aquatone.zip /tmp/aquatone
 	if ! which aquatone >/dev/null; then
 		echo "[!] Failed to install Aquatone" && exit 11

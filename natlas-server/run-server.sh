@@ -12,6 +12,15 @@ if [ ! -d logs ]; then
 	mkdir logs
 fi
 
+DATABASE_FILE=${SQLALCHEMY_DATABASE_URI//sqlite:\/\/\//}
+if [ ! -f "${DATABASE_FILE}" ]; then 
+  echo "Creating database"
+	touch ${DATABASE_FILE}
+  export FLASK_APP=./natlas-server.py
+  flask db upgrade
+fi
+
+
 if [ "$DEPLOY_ENV" == "development" ]
 then
 	echo "$(date) : Development" >> logs/start.log
