@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% set title = "Screenshot Browser" %}
 {% block content %}
-	<h2 class="sub-header">{{numresults}} screenshots</h2>
-    {% include 'host/_imagemodal.html' %}
-	{% if numresults > current_user.results_per_page %}
-	    <div class="row">
-	      <div class="col text-center my-2">
-	      {% include 'includes/pagination.html' %}
-	      </div>
-	    </div>
+	<div class="row search-header">
+		<div class="col">
+			<h2 class="sub-header">{{numresults}} screenshots</h2>
+		</div>
+		{% if numresults > current_user.results_per_page %}
+		<div class="col-xs-12 col-sm-1 text-center">
+		{% include 'includes/pagination.html' %}
+		</div>
 	  {% endif %}
+	</div>
+    {% include 'host/_imagemodal.html' %}
 		<div class="row image-row">
 			{% for host in hosts %}
 				{% for screenshot in host.screenshots %}
