@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set title = "Screenshot Browser" %}
+{% block content %}
+	<h2 class="sub-header">{{numresults}} screenshots</h2>
+    {% include 'host/_imagemodal.html' %}
+	{% if numresults > current_user.results_per_page %}
+	    <div class="row">
+	      <div class="col text-center my-2">
+	      {% include 'includes/pagination.html' %}
+	      </div>
+	    </div>
+	  {% endif %}
+		<div class="row image-row">
+			{% for host in hosts %}
+				{% for screenshot in host.screenshots %}
+					{% if screenshot.path %}
+				    <div class="col-xs-12 col-sm-3 my-3">
+						<div class="image-browser"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/{{screenshot.thumb}}' alt="{{ host.ip }} - {{ screenshot.service }}"></div>
+					</div>
+					{% endif %}
+				{% endfor %}
+			{% endfor %}
+		</div>
+
+	{% if numresults > current_user.results_per_page %}
+    <div class="row">
+      <div class="col text-center my-2">
+      {% include 'includes/pagination.html' %}
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
