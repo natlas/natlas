@@ -244,6 +244,6 @@ def browseScreenshots():
 	next_url = url_for('main.browseScreenshots', p=page + 1) \
 		if total_hosts > page * current_user.results_per_page else None
 	prev_url = url_for('main.browseScreenshots', p=page - 1) \
-		if total_hosts > 1 else None
+		if page > 1 else None
 
 	return render_template("screenshots.html", numresults=total_screenshots, hosts=hosts, next_url=next_url, prev_url=prev_url)
