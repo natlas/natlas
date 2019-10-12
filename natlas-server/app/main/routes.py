@@ -239,11 +239,11 @@ def browseScreenshots():
 	page = int(request.args.get('p', 1))
 	searchOffset = current_user.results_per_page * (page-1)
 
-	total_entries, hosts = current_app.elastic.get_current_screenshots(current_user.results_per_page, searchOffset)
+	total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(current_user.results_per_page, searchOffset)
 
 	next_url = url_for('main.browseScreenshots', p=page + 1) \
-		if total_entries > page * current_user.results_per_page else None
+		if total_hosts > page * current_user.results_per_page else None
 	prev_url = url_for('main.browseScreenshots', p=page - 1) \
-		if page > 1 else None
+		if total_hosts > 1 else None
 
-	return render_template("screenshots.html", numresults=total_entries, hosts=hosts, next_url=next_url, prev_url=prev_url)
+	return render_template("screenshots.html", numresults=total_screenshots, hosts=hosts, next_url=next_url, prev_url=prev_url)

@@ -373,6 +373,6 @@ class Elastic:
 			for thing in result['hits']['hits']:
 				results.append(thing['_source'])
 
-			return num_screenshots, results
+			return result['hits']['total'], num_screenshots, results
 		except:
 			return 0, []
