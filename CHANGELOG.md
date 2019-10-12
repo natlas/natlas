@@ -6,6 +6,16 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ## Unreleased
 
+### Added
+- Screenshot Browser ([#173](https://github.com/natlas/natlas/issues/173))
+
+### Changed
+- Agent logging is done via an app logger now with timestamps and to a file. ([#170](https://github.com/natlas/natlas/issues/170))
+
+### Fixed
+- Handle NmapParserException when malformed xml files are encountered ([#169](https://github.com/natlas/natlas/issues/169))
+- Improve randomness of `/random/` route by selecting a rand int each time instead of seeding with timestamp. ([#178]https://github.com/natlas/natlas/issues/178)
+
 ## [v0.6.5]
 More information can be found at [natlas/v0.6.5](https://github.com/natlas/natlas/releases/tag/v0.6.5)
 
