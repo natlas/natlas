@@ -84,7 +84,7 @@ else
 fi
 
 echo "[+] Setting capabilities for nmap"
-if ! setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap >/dev/null 2>&1; then
+if ! setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip $(which nmap) >/dev/null 2>&1; then
 	echo "[!] Failed to set capabilities for nmap"
 	exit 12
 else
