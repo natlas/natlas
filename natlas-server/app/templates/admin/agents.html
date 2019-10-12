@@ -26,12 +26,16 @@
             {{ agentForm.onlyOpens.label(class="form-check-label") }}
         </div>
         <div class="form-check">
-            {{ agentForm.osScanLimit(class="form-check-input") }} 
+            {{ agentForm.osScanLimit(class="form-check-input") }}
             {{ agentForm.osScanLimit.label(class="form-check-label") }}
         </div>
         <div class="form-check">
-            {{ agentForm.noPing(class="form-check-input") }} 
+            {{ agentForm.noPing(class="form-check-input") }}
             {{ agentForm.noPing.label(class="form-check-label") }}
+        </div>
+        <div class="form-check">
+            {{ agentForm.udpScan(class="form-check-input") }}
+            {{ agentForm.udpScan.label(class="form-check-label") }}
         </div>
         <div class="form-group">
           {{ agentForm.scanTimeout.label }}

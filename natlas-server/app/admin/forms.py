@@ -105,6 +105,7 @@ class AgentConfigForm(FlaskForm):
 	hostTimeout = IntegerField("Host Timeout (--host-timeout)")
 	osScanLimit = BooleanField("Limit OS Scan (--osscan-limit)")
 	noPing = BooleanField("No Ping (-Pn)")
+	udpScan = BooleanField("Also scan UDP (-sUS)")
 
 	updateAgents = SubmitField("Update Agent Config")
 

@@ -172,6 +172,7 @@ class AgentConfig(db.Model):
 	hostTimeout = db.Column(db.Integer, default=600) # --host-timeout (s)
 	osScanLimit = db.Column(db.Boolean, default=True) # --osscan-limit
 	noPing = db.Column(db.Boolean, default=False) # -Pn
+	udpScan = db.Column(db.Boolean, default=False) # -sSU
 
 	def as_dict(self):
 		return {c.name: getattr(self, c.name) for c in self.__table__.columns}
