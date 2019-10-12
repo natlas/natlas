@@ -1,6 +1,6 @@
 import json
 import elasticsearch
-import random, time
+import random, time, sys
 from datetime import datetime
 from config import Config
 from urllib3.exceptions import NewConnectionError
@@ -298,8 +298,8 @@ class Elastic:
 		if not self.status:
 			if not self.attemptReconnect():
 				return False
-
-		seed = time.time()
+		import random
+		seed = random.randrange(sys.maxsize)
 		searchQuery = {
 				"from": 0,
 				"size": 1,
@@ -324,7 +324,7 @@ class Elastic:
 									}
 						},
 						"random_score": {
-							"seed": int(seed),
+							"seed": seed,
 							"field": "_id"
 						}
 					}
