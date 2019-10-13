@@ -3,7 +3,7 @@ venv
 __pycache__
 *.pyc
 *.log
-data/
+data
 metadata.db
 .env
 *.bak
@@ -13,6 +13,7 @@ natlas-agent/LICENSE
 natlas-agent/CHANGELOG.md
 natlas-server/LICENSE
 natlas-server/CHANGELOG.md
-dist/
-natlas-server/media/
-natlas-server/logs/
+dist
+natlas-server/media
+natlas-server/logs
+natlas-agent/logs

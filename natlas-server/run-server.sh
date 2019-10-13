@@ -8,7 +8,7 @@ source .env
 source venv/bin/activate
 DEPLOY_ENV=${FLASK_ENV:-production}
 
-if [[ ! d logs ]]; then
+if [ ! -d logs ]; then
 	mkdir logs
 fi
 

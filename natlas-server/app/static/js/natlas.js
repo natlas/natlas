@@ -6,6 +6,22 @@ $(function() {
 		});
 });
 
+$(function() {
+		$('.image-browser').on('click', function() {
+			$('.imagetitle').html("<a href=/host/"+$(this).find('img').attr('data-ip')+"/" + $(this).find('img').attr('data-scan_id') + ">"+$(this).find('img').attr('alt')+"</a>");
+			$('.imagepreview').attr('src', $(this).find('img').attr('data-path'));
+			$('#imagemodal').modal('show');
+		});
+});
+
+$(function() {
+		$('.expand-imgold').on('click', function() {
+			$('.imagetitle').text($(this).find('img').attr('alt'));
+			$('.imagepreview').attr('src', $(this).find('img').attr('src'));
+			$('#imagemodal').modal('show');
+		});
+});
+
 var modal_content_loaded = false;
 function loadModalContent() {
 	if (modal_content_loaded){

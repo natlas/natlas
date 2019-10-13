@@ -30,34 +30,26 @@
       {% endfor %}
     {% endif %}
     <div class="btn-group export-group mt-2" role="group">
-        {% include 'host/_host-export.html' %}
+        {% include 'host/versions/0.6.4/_host-export.html' %}
       </div>
-
-    {% for screenshot in host.screenshots %}
-      {% if screenshot.path %}
-      <h5 class="mt-2">{{ screenshot.service }}</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ host.ip }} - {{ screenshot.service }} Screenshot"></div>
-      {% endif %}
-    {% endfor %}
-
     {% if host.vncheadshot %}
       <h5 class="mt-2">VNC</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div>
+      <div class="expand-imgold"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div>
     {% endif %}
     {% if host.httpheadshot %}
       <h5 class="mt-2">HTTP</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div>
+      <div class="expand-imgold"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div>
     {% endif %}
     {% if host.httpsheadshot %}
       <h5 class="mt-2">HTTPS</h5>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div>
+      <div class="expand-imgold"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div>
     {% endif %}
   </div><!--meta column-->
   {% if current_user.result_format == 0 or not current_user.result_format %}
   <div class="col-xs-12 col-sm-8 col-md-9">
       {% for port in host.ports %}
           {% set portloop = loop %}
-          {% include  'host/_port-info.html' %}
+          {% include 'host/versions/0.6.4/_port-info.html' %}
       {% endfor %}
     </div><!--data column-->
   {% elif current_user.result_format == 1 %}

@@ -6,6 +6,40 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ## Unreleased
 
+### Added
+- Screenshot Browser ([#173](https://github.com/natlas/natlas/issues/173))
+
+### Changed
+- Agent logging is done via an app logger now with timestamps and to a file. ([#170](https://github.com/natlas/natlas/issues/170))
+
+### Fixed
+- Handle NmapParserException when malformed xml files are encountered ([#169](https://github.com/natlas/natlas/issues/169))
+- Improve randomness of `/random/` route by selecting a rand int each time instead of seeding with timestamp. ([#178]https://github.com/natlas/natlas/issues/178)
+
+## [v0.6.5]
+More information can be found at [natlas/v0.6.5](https://github.com/natlas/natlas/releases/tag/v0.6.5)
+
+### Added
+- Consolidate server logs into logs/ folder ([#163](https://github.com/natlas/natlas/issues/163))
+- Logging scope manager and cyclical prng starts and restarts ([#118](https://github.com/natlas/natlas/issues/118))
+- Screenshot filter ([#78](https://github.com/natlas/natlas/issues/78))
+- Versioned Template Files ([#164](https://github.com/natlas/natlas/issues/164))
+- Check For Update Feature ([#48](https://github.com/natlas/natlas/issues/48))
+- Optional natlas version override for developing changes to the way host data is stored and presented. (No ticket)
+
+### Changed
+- Screenshot overhaul ([#72](https://github.com/natlas/natlas/issues/72))
+	- Thumbnails of images
+	- Save images on disk and serve as files (cacheable, less overhead than base64)
+	- Serve thumbnail and only serve full image when clicked
+	- nginx example location block included
+	- serves from `$DOMAIN/media/`
+- Load Search Modal Only When Clicked ([#141](https://github.com/natlas/natlas/issues/141))
+
+### Fixed
+- Failure to cleanup Aquatone files ([#157](https://github.com/natlas/natlas/issues/157))
+- Screenshots Page Only Shows Most Recent Screenshots ([#98](https://github.com/natlas/natlas/issues/98))
+
 ## [v0.6.4]
 More information can be found at [natlas/v0.6.4](https://github.com/natlas/natlas/releases/tag/v0.6.4)
 

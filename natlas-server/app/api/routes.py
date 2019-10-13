@@ -126,9 +126,9 @@ def submit():
 	tmpports = []
 	newhost['ports'] = []
 
-	for port in nmap.hosts[0].get_ports():
+	for port in nmap.hosts[0].get_open_ports():
 		tmpports.append(str(port[0]))
-		srv = nmap.hosts[0].get_service(port[0])
+		srv = nmap.hosts[0].get_service(port[0],port[1])
 		portinfo = srv.get_dict()
 		portinfo['service'] = srv.service_dict
 		portinfo['scripts'] = []

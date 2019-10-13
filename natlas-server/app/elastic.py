@@ -1,6 +1,6 @@
 import json
 import elasticsearch
-import random, time
+import random, time, sys
 from datetime import datetime
 from config import Config
 from urllib3.exceptions import NewConnectionError
@@ -298,8 +298,8 @@ class Elastic:
 		if not self.status:
 			if not self.attemptReconnect():
 				return False
-
-		seed = time.time()
+		import random
+		seed = random.randrange(sys.maxsize)
 		searchQuery = {
 				"from": 0,
 				"size": 1,
@@ -324,7 +324,7 @@ class Elastic:
 									}
 						},
 						"random_score": {
-							"seed": int(seed),
+							"seed": seed,
 							"field": "_id"
 						}
 					}
@@ -336,3 +336,43 @@ class Elastic:
 			return random
 		except Exception as e:
 			return False
+
+
+	def get_current_screenshots(self, limit, offset):
+		if not self.status:
+			if not self.attemptReconnect():
+				return 0, []
+		searchBody = {
+			"size": limit,
+			"from": offset,
+			"query": {
+				"range": {
+					"num_screenshots": {
+						"gt": 0
+						}
+				}
+			},
+			"aggs": {
+				"screenshot_count": {
+					"sum": {
+						"field": "num_screenshots"
+					}
+				}
+			},
+			"sort": {
+				"ctime": {
+					"order": "desc"
+				}
+			}
+		}
+
+		try:
+			result = self.es.search(index="nmap", doc_type='_doc', body=searchBody, _source=["screenshots", "ctime", "scan_id", "ip"], track_scores=False,)
+			num_screenshots = int(result['aggregations']["screenshot_count"]["value"])
+			results = []  # collate results
+			for thing in result['hits']['hits']:
+				results.append(thing['_source'])
+
+			return result['hits']['total'], num_screenshots, results
+		except:
+			return 0, []

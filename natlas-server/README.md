@@ -26,6 +26,7 @@ Can't be changed via the web interface (only `.env`):
 - `FLASK_ENV` defaults to `production` and should not be changed unless you are developing for natlas.
 - `FLASK_APP` defaults to `natlas-server.py` and should not be changed. It's what allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.
 - `MEDIA_DIRECTORY` defaults to `$BASEDIR/media/`. If you want to store media in a larger mounted storage, set this value to an absolute path. If you change the path after you already have data, make sure to copy the contents of the previous folder into the new media directory.
+- `NATLAS_VERSION_OVERRIDE` can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented.
 
 Can be changed via the web interface:
 
