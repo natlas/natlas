@@ -24,6 +24,10 @@
             {{ configForm.local_subresources(checked=configItems["LOCAL_SUBRESOURCES"], class="form-check-input", id="localSubresources") }}
             {{ configForm.local_subresources.label(class="form-check-label", for="localSubresources") }}
         </div>
+        <div class="form-group">
+            {{ configForm.custom_brand.label(class="control-label") }}
+            {{ configForm.custom_brand(value=configItems["CUSTOM_BRAND"], class="form-control", placeholder="Natlas Internal") }}
+        </div>
     	<div class="form-group">
     		{{ configForm.elasticsearch_url.label(class="control-label") }}
     		{{ configForm.elasticsearch_url(value=configItems["ELASTICSEARCH_URL"], class="form-control", placeholder="http://localhost:9200") }}
