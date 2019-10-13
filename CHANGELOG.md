@@ -11,6 +11,8 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ### Changed
 - Agent logging is done via an app logger now with timestamps and to a file. ([#170](https://github.com/natlas/natlas/issues/170))
+- Agent relies on nmap capabilities being set instead of running as root. ([#123](https://github.com/natlas/natlas/issues/123)) (Thanks droberson!)
+- Agent refactoring to improve maintainability
 
 ### Fixed
 - Handle NmapParserException when malformed xml files are encountered ([#169](https://github.com/natlas/natlas/issues/169))
