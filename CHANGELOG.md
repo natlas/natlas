@@ -184,7 +184,9 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 * Ability to run in standalone mode
 
 
-[Unreleased]: https://github.com/natlas/natlas/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.5...HEAD
+[v0.6.5]: https://github.com/natlas/natlas/compare/v0.6.4...v0.6.5
+[v0.6.4]: https://github.com/natlas/natlas/compare/v0.6.3...v0.6.4
 [v0.6.3]: https://github.com/natlas/natlas/compare/v0.6.2...v0.6.3
 [v0.6.2]: https://github.com/natlas/natlas/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/natlas/natlas/compare/v0.6.0...v0.6.1
