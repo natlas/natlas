@@ -9,16 +9,20 @@
     	<h3>General Settings</h3>
     	{{ configForm.hidden_tag() }}
     	<div class="form-check">
-            {{ configForm.login_required(checked=configItems["LOGIN_REQUIRED"], class="form-check-input", id="loginRequired") }} 
+            {{ configForm.login_required(checked=configItems["LOGIN_REQUIRED"], class="form-check-input", id="loginRequired") }}
             {{ configForm.login_required.label(class="form-check-label", for="loginRequired") }}
         </div>
         <div class="form-check">
-            {{ configForm.register_allowed(checked=configItems["REGISTER_ALLOWED"], class="form-check-input", id="registerAllowed") }} 
+            {{ configForm.register_allowed(checked=configItems["REGISTER_ALLOWED"], class="form-check-input", id="registerAllowed") }}
             {{ configForm.register_allowed.label(class="form-check-label", for="registerAllowed") }}
         </div>
         <div class="form-check">
-            {{ configForm.agent_authentication(checked=configItems["AGENT_AUTHENTICATION"], class="form-check-input", id="agentAuthentication") }} 
+            {{ configForm.agent_authentication(checked=configItems["AGENT_AUTHENTICATION"], class="form-check-input", id="agentAuthentication") }}
             {{ configForm.agent_authentication.label(class="form-check-label", for="agentAuthentication") }}
+        </div>
+        <div class="form-check">
+            {{ configForm.local_subresources(checked=configItems["LOCAL_SUBRESOURCES"], class="form-check-input", id="localSubresources") }}
+            {{ configForm.local_subresources.label(class="form-check-label", for="localSubresources") }}
         </div>
     	<div class="form-group">
     		{{ configForm.elasticsearch_url.label(class="control-label") }}
@@ -42,7 +46,7 @@
     		{{ configForm.mail_port(value=configItems["MAIL_PORT"], class="form-control") }}
     	</div>
     	<div class="form-check">
-            {{ configForm.mail_use_tls(checked=configItems["MAIL_USE_TLS"], class="form-check-input") }} 
+            {{ configForm.mail_use_tls(checked=configItems["MAIL_USE_TLS"], class="form-check-input") }}
             {{ configForm.mail_use_tls.label(class="form-check-label") }}
         </div>
     	<div class="form-group">

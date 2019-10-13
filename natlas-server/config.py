@@ -34,20 +34,35 @@ class Config(object):
 	if version_override:
 		NATLAS_VERSION = version_override
 
+
+				# NAME,             TYPE, DEFAULT
+defaultConfig = [
+			("LOGIN_REQUIRED","bool","False"),
+			("REGISTER_ALLOWED","bool","False"),
+			("AGENT_AUTHENTICATION", "bool", "False"),
+			("ELASTICSEARCH_URL","string","http://localhost:9200"),
+			("MAIL_SERVER","string","localhost"),
+			("MAIL_PORT","int","25"),
+			("MAIL_USE_TLS","bool","False"),
+			("MAIL_USERNAME","string",""),
+			("MAIL_PASSWORD","string",""),
+			("MAIL_FROM","string",""),
+			("LOCAL_SUBRESOURCES", "bool", "False")
+			]
+
+def get_defaults():
+	return defaultConfig
+
+def get_current_config():
+	from app import create_app, db
+	from app.models import ConfigItem
+	app = create_app(load_config=False)
+	with app.app_context():
+		for item in ConfigItem.query.all():
+			print("%s, %s, %s" % (item.name, item.type, item.value))
+
 # run as standalone to populate the config items into the database using environment or default values
 def populate_defaults(verbose=False):
-					# NAME,             TYPE, DEFAULT
-	defaultConfig = [("LOGIN_REQUIRED","bool","False"),
-				 ("REGISTER_ALLOWED","bool","False"),
-				 ("AGENT_AUTHENTICATION", "bool", "False"),
-				 ("ELASTICSEARCH_URL","string","http://localhost:9200"),
-				 ("MAIL_SERVER","string","localhost"),
-				 ("MAIL_PORT","int","25"),
-				 ("MAIL_USE_TLS","bool","False"),
-				 ("MAIL_USERNAME","string",""),
-				 ("MAIL_PASSWORD","string",""),
-				 ("MAIL_FROM","string","")
-				]
 
 	from app import create_app, db
 	from app.models import ConfigItem
@@ -75,9 +90,14 @@ def main():
 	'''
 	parser_epil = "Be sure that you're running this from within the virtual environment for the server."
 	parser = argparse.ArgumentParser(description=parser_desc, epilog=parser_epil)
+	parser.add_argument("--populate", action="store_true", default=False)
 	parser.add_argument("-v", "--verbose", action="store_true", default=False)
 	args = parser.parse_args()
-	populate_defaults(args.verbose)
+	if args.populate:
+		populate_defaults(args.verbose)
+	else:
+		print("[+] Getting current config from database\nNAME, TYPE, VALUE")
+		get_current_config()
 
 if __name__ == "__main__":
 	main()

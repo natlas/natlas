@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
-from config import Config, populate_defaults
+from config import Config, populate_defaults, get_defaults
 from app.elastic import Elastic
 from app.scope import ScopeManager
 import sqlalchemy
@@ -53,13 +53,21 @@ def create_app(config_class=Config, load_config=False):
 		with app.app_context():
 			from app.models import ConfigItem
 			try: # This is gross but we need it because otherwise flask db operations won't work to create the ConfigItem table in the first place.
+
+				# Look to see if any new config items were added that aren't currently in db
+				for item in get_defaults():
+					if not ConfigItem.query.filter_by(name=item[0]).first():
+						newConfItem = ConfigItem(name=item[0], type=item[1], value=item[2])
+						db.session.add(newConfItem)
+						db.session.commit()
+
 				conf = ConfigItem.query.all()
 				if not conf: # We'll hit this if the table exists but there's no data
 					populate_defaults(verbose=False)
 					conf = ConfigItem.query.all() # populate_defaults should populate data that we can query now
 					if not conf: # if it didn't, then we don't have config items that we need in order to run, so exit.
 						raise(SystemExit())
-				
+
 				for item in conf:
 					if item.type == "int":
 						app.config[item.name] = int(item.value)
@@ -74,7 +82,7 @@ def create_app(config_class=Config, load_config=False):
 						print("Unsupported config type %s:%s:%s" % (item.name, item.type, item.value))
 			except Exception as e:
 				print("ConfigItem table doesn't exist yet. Ignore if flask db upgrade.")
-			
+
 			from app.models import NatlasServices
 			try:
 				current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
@@ -90,7 +98,7 @@ def create_app(config_class=Config, load_config=False):
 					app.current_services = current_services.as_dict()
 			except Exception as e:
 				print("NatlasServices table doesn't exist yet. Ignore if flask db upgrade.")
-			
+
 			# Load the current agent config, otherwise create it.
 			from app.models import AgentConfig
 			try:
@@ -122,7 +130,7 @@ def create_app(config_class=Config, load_config=False):
 				print("AgentScript table doesn't exist yet. Ignore if flask db upgrade.")
 
 		# Grungy thing so we can use flask db and flask shell before the config items are initially populated
-		if "ELASTICSEARCH_URL" in app.config: 
+		if "ELASTICSEARCH_URL" in app.config:
 			app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])
 
 	app.ScopeManager = ScopeManager()
