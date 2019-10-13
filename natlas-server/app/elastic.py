@@ -55,10 +55,15 @@ class Elastic:
 				self.lastReconnectAttempt = now
 				return False
 
-	def search(self, query, limit, offset):
+	def checkStatus(self):
 		if not self.status:
 			if not self.attemptReconnect():
-				return 0,[]
+				return False
+		return True
+
+	def search(self, query, limit, offset):
+		if not self.checkStatus():
+			return 0,[]
 		if query == '':
 			query = 'nmap'
 		try:
@@ -110,9 +115,8 @@ class Elastic:
 
 
 	def totalHosts(self):
-		if not self.status:
-			if not self.attemptReconnect():
-				return 0
+		if not self.checkStatus():
+			return 0
 		try:
 			result = self.es.count(index="nmap", doc_type="_doc")
 			return result["count"]
@@ -121,22 +125,21 @@ class Elastic:
 			return 0
 
 	def newhost(self, host):
-		if not self.status:
-			if not self.attemptReconnect():
-				return
+		if not self.checkStatus():
+			return False
 		ip = str(host['ip'])
 
 		try:
 			self.es.index(index='nmap_history', doc_type='_doc', body=host)
 			self.es.index(index='nmap', doc_type='_doc', id=ip, body=host)
+			return True
 		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
 			self.status = False
-			return
+			return False
 
 	def gethost(self, ip):
-		if not self.status:
-			if not self.attemptReconnect():
-				return 0,[]
+		if not self.checkStatus():
+			return 0,None
 		try:
 			result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {"query_string": {
 									'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
@@ -150,9 +153,8 @@ class Elastic:
 
 
 	def gethost_history(self, ip, limit, offset):
-		if not self.status:
-			if not self.attemptReconnect():
-				return 0,[]
+		if not self.checkStatus():
+			return 0,[]
 		try:
 			result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": limit, "from": offset, "query": {
 									"query_string": {'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
@@ -164,12 +166,11 @@ class Elastic:
 
 		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
 			self.status = False
-			return 0, None
+			return 0, []
 
 	def count_host_screenshots(self, ip):
-		if not self.status:
-			if not self.attemptReconnect():
-				return 0
+		if not self.checkStatus():
+			return 0
 		searchBody = {
 			"query": {
 				"term": {
@@ -191,9 +192,8 @@ class Elastic:
 			return 0
 
 	def get_host_screenshots(self, ip, limit, offset):
-		if not self.status:
-			if not self.attemptReconnect():
-				return 0, []
+		if not self.checkStatus():
+			return 0, []
 		searchBody = {
 			"size": limit,
 			"from": offset,
@@ -235,9 +235,8 @@ class Elastic:
 
 
 	def gethost_scan_id(self, scan_id):
-		if not self.status:
-			if not self.attemptReconnect():
-				return 0,[]
+		if not self.checkStatus():
+			return 0,None
 
 		try:
 			result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {
@@ -253,9 +252,8 @@ class Elastic:
 
 
 	def delete_scan(self, scan_id):
-		if not self.status:
-			if not self.attemptReconnect():
-				return -1
+		if not self.checkStatus():
+			return False
 
 		migrate = False
 		try:
@@ -283,9 +281,8 @@ class Elastic:
 			return False
 
 	def delete_host(self, ip):
-		if not self.status:
-			if not self.attemptReconnect():
-				return -1
+		if not self.checkStatus():
+			return False
 		try:
 			deleted = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body={"query": {
 									"query_string": {'query': ip, "fields": ["ip", "id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
@@ -295,9 +292,8 @@ class Elastic:
 			return False
 
 	def random_host(self):
-		if not self.status:
-			if not self.attemptReconnect():
-				return False
+		if not self.checkStatus():
+			return False
 		import random
 		seed = random.randrange(sys.maxsize)
 		searchQuery = {
@@ -339,9 +335,8 @@ class Elastic:
 
 
 	def get_current_screenshots(self, limit, offset):
-		if not self.status:
-			if not self.attemptReconnect():
-				return 0, []
+		if not self.checkStatus():
+			return 0, 0, []
 		searchBody = {
 			"size": limit,
 			"from": offset,
@@ -375,4 +370,4 @@ class Elastic:
 
 			return result['hits']['total'], num_screenshots, results
 		except Exception:
-			return 0, []
+			return 0, 0, []
