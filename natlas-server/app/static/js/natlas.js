@@ -1,7 +1,11 @@
 $(function() {
 		$('.expand-img').on('click', function() {
+			var selectAttr = 'src';
+			if ($(this).find('img')[0].hasAttribute('data-path')) {
+				selectAttr = 'data-path'
+			}
 			$('.imagetitle').text($(this).find('img').attr('alt'));
-			$('.imagepreview').attr('src', $(this).find('img').attr('data-path'));
+			$('.imagepreview').attr('src', $(this).find('img').attr(selectAttr));
 			$('#imagemodal').modal('show');
 		});
 });
@@ -10,14 +14,6 @@ $(function() {
 		$('.image-browser').on('click', function() {
 			$('.imagetitle').html("<a href=/host/"+$(this).find('img').attr('data-ip')+"/" + $(this).find('img').attr('data-scan_id') + ">"+$(this).find('img').attr('alt')+"</a>");
 			$('.imagepreview').attr('src', $(this).find('img').attr('data-path'));
-			$('#imagemodal').modal('show');
-		});
-});
-
-$(function() {
-		$('.expand-imgold').on('click', function() {
-			$('.imagetitle').text($(this).find('img').attr('alt'));
-			$('.imagepreview').attr('src', $(this).find('img').attr('src'));
 			$('#imagemodal').modal('show');
 		});
 });

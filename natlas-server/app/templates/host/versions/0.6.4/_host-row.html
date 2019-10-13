@@ -34,15 +34,15 @@
       </div>
     {% if host.vncheadshot %}
       <h5 class="mt-2">VNC</h5>
-      <div class="expand-imgold"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.vncheadshot }}" alt="{{ host.ip }} - VNC Screenshot"></div>
     {% endif %}
     {% if host.httpheadshot %}
       <h5 class="mt-2">HTTP</h5>
-      <div class="expand-imgold"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpheadshot }}" alt="{{ host.ip }} - HTTP Screenshot"></div>
     {% endif %}
     {% if host.httpsheadshot %}
       <h5 class="mt-2">HTTPS</h5>
-      <div class="expand-imgold"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div>
+      <div class="expand-img"><img class="img-responsive img-thumbnail" src="data:image/jpeg;base64,{{ host.httpsheadshot }}" alt="{{ host.ip }} - HTTPS Screenshot"></div>
     {% endif %}
   </div><!--meta column-->
   {% if current_user.result_format == 0 or not current_user.result_format %}
