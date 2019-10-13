@@ -44,7 +44,7 @@ netsrv = NatlasNetworkServices(config)
 
 
 def commandBuilder(scan_id, agentConfig, target):
-	command = ["nmap", "-oA", "data/natlas."+scan_id, "--servicedb", "./natlas-services"]
+	command = ["nmap", "--privileged", "-oA", "data/natlas."+scan_id, "--servicedb", "./natlas-services"]
 
 	commandDict = {
 		"versionDetection": "-sV",
@@ -233,9 +233,14 @@ def main():
 	mutually_exclusive.add_argument('--target-file', metavar='FILENAME', help="A file of line separated target IPv4 addresses or CIDR ranges", dest='tfile')
 	args = parser.parse_args()
 
+	# Check if Nmap has required capabilities to run as a non-root user
+	nmap_caps = subprocess.check_output(["getcap", "/usr/bin/nmap"]).decode("utf-8")
 
-	if not os.geteuid() == 0:
-		raise SystemExit("Please run as a privileged user in order to use nmap's features.")
+	needed_caps = ["cap_net_raw", "cap_net_admin", "cap_net_bind_service"]
+	missing_caps = [cap for cap in needed_caps if cap not in nmap_caps]
+	if missing_caps:
+		raise SystemExit("[!] Missing Nmap capabilities: %s" % " ".join(missing_caps))
+
 	if not os.path.isdir("data"):
 		os.mkdir("data")
 	if not os.path.isdir("logs"):
