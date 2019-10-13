@@ -52,17 +52,26 @@
                     "type":"text",
                     "index":"false"
                 },
-                "httpheadshot":{
-                    "type":"binary"
-                },
-                "httpsheadshot":{
-                    "type":"binary"
-                },
-                "vncheadshot":{
-                    "type":"binary"
+                "screenshots": {
+                    "properties": {
+                        "host": {
+                            "type": "keyword"
+                        },
+                        "port": {
+                            "type": "integer"
+                        },
+                        "service": {
+                            "type": "keyword"
+                        },
+                        "path": {
+                            "type": "text"
+                        },
+                        "thumb": {
+                            "type": "text"
+                        }
+                    }
                 },
                 "ports":{
-                    "type":"nested",
                     "properties":{
                         "id":{
                             "type":"keyword"
