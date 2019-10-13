@@ -8,6 +8,9 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ### Added
 - Screenshot Browser ([#173](https://github.com/natlas/natlas/issues/173))
+- Administrative settings:
+    - Optionally use local subresources instead of CDN subresources (#[105](https://github.com/natlas/natlas/issues/105))
+    - Optionally add a custom brand field to navigation to more easily identify the natlas instance you're viewing ([#106](https://github.com/natlas/natlas/issues/106))
 
 ### Changed
 - Agent logging is done via an app logger now with timestamps and to a file. ([#170](https://github.com/natlas/natlas/issues/170))
