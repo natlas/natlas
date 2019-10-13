@@ -88,47 +88,44 @@ def scan(target_data=None):
 	except Exception:
 		try:
 			TIMEDOUT = True
-			global_logger.error("Scan %s timed out" % scan_id)
+			global_logger.warn("TIMEOUT: Nmap against %s (%s)" % (target, scan_id))
 			process.kill()
 		except Exception:
 			pass
 
 	if TIMEDOUT:
 		result.addItem('timed_out', True)
-		global_logger.info("Submitting scan timeout notice for %s" % result.result['ip'])
 		return result
 	else:
-		global_logger.info("Scan %s Complete" % scan_id)
+		global_logger.info("Nmap against %s (%s) complete" % (target, scan_id))
 
 	for ext in 'nmap', 'gnmap', 'xml':
 		try:
 			result.addItem(ext+"_data", open("data/natlas."+scan_id+"."+ext).read())
 		except Exception:
-			global_logger.error("Couldn't read natlas.%s.%s" % (scan_id, ext))
+			global_logger.warn("Couldn't read natlas.%s.%s" % (scan_id, ext))
 			return False
 
 	try:
 		nmap_report = NmapParser.parse(result.result['xml_data'])
 	except NmapParserException:
-		global_logger.error("Couldn't parse natlas.%s.xml" % (scan_id))
+		global_logger.warn("Couldn't parse natlas.%s.xml" % (scan_id))
 		return False
 
 	if nmap_report.hosts_total < 1:
-		global_logger.error("No hosts found in scan data")
+		global_logger.warn("No hosts found in natlas.%s.xml" % (scan_id))
 		return False
 	elif nmap_report.hosts_total > 1:
-		global_logger.error("Too many hosts found in scan data")
+		global_logger.warn("Too many hosts found in natlas.%s.xml" % (scan_id))
 		return False
 	elif nmap_report.hosts_down == 1:
 		# host is down
 		result.isUp(False)
-		global_logger.info("Submitting host down notice for %s" % (result.result['ip']))
 		return result
 	elif nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
 		# host is up but no reportable ports were found
 		result.isUp(True)
 		result.addItem('port_count', 0)
-		global_logger.info("Submitting %s ports for %s" % (result.result['port_count'], result.result['ip']))
 		return result
 	else:
 		# host is up and reportable ports were found
@@ -143,7 +140,6 @@ def scan(target_data=None):
 		if "443/tcp" in result.result['nmap_data']:
 			targetServices.append("https")
 		if len(targetServices) > 0:
-			global_logger.info("Attempting to take %s screenshot(s) for %s" % (', '.join(targetServices).upper(),result.result['ip']))
 			screenshotutils.runAquatone(target, scan_id, targetServices)
 
 		serviceMapping = {
@@ -166,7 +162,6 @@ def scan(target_data=None):
 
 	if agentConfig["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result.result['nmap_data']:
-			global_logger.info("Attempting to take VNC screenshot for %s" % result.result['ip'])
 			if screenshotutils.runVNCSnapshot(target, scan_id) is True:
 				result.addScreenshot({
 					"host": target,
@@ -175,11 +170,9 @@ def scan(target_data=None):
 					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.jpg", 'rb').read()))[2:-1]
 				})
 				global_logger.info("VNC screenshot acquired for %s" % result.result['ip'])
-			else:
-				global_logger.error("Failed to acquire screenshot for %s" % result.result['ip'])
 
 	# submit result
-	global_logger.info("Submitting %s ports for %s" % (result.result['port_count'], result.result['ip']))
+
 	return result
 
 class ThreadScan(threading.Thread):
@@ -201,7 +194,7 @@ class ThreadScan(threading.Thread):
 				if target_data and target_data["services_hash"] != self.servicesSha:
 					self.servicesSha = netsrv.get_services_file()
 					if not self.servicesSha:
-						global_logger.error("Failed to get updated services from %s" % config.server)
+						global_logger.warn("Failed to get updated services from %s" % config.server)
 				result = scan(target_data)
 				result.scanStop()
 				response = netsrv.submit_results(result)

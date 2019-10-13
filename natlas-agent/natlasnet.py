@@ -141,6 +141,14 @@ class NatlasNetworkServices:
 
 	# Results is a ScanResult object
 	def submit_results(self, results):
-		self.netlogger.info("Submitting results for %s" % results.result["ip"])
+		if results.result['is_up'] and 'port_count' in results.result and results.result['port_count'] >= 0:
+			self.netlogger.info("Submitting %s ports for %s" % (results.result['port_count'], results.result['ip']))
+		elif 'timed_out' in results.result and results.result['timed_out']:
+			self.netlogger.info("Submitting scan timeout notice for %s" % results.result['ip'])
+		elif not results.result['is_up']:
+			self.netlogger.info("Submitting host down notice for %s" % (results.result['ip']))
+		else:
+			self.netlogger.info("Submitting results for %s" % results.result["ip"])
+
 		response = self.backoff_request(giveup=True, endpoint=self.api_endpoints["SUBMIT"], reqType="POST", postData=json.dumps(results.result))
 		return response
