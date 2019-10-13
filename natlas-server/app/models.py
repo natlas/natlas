@@ -1,12 +1,10 @@
-from time import time
 from app import db
-from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
-import jwt, string, random
+import string, random
 from .util import utcnow_tz, generate_hex_16, generate_hex_32
 
 # Many:Many table mapping scope items to tags and vice versa.

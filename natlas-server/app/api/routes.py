@@ -1,5 +1,5 @@
-from flask import current_app, request, jsonify
-import random, os, json, ipaddress, string, base64, hashlib
+from flask import current_app, request
+import random, os, json, string, base64, hashlib
 from PIL import Image
 
 from datetime import datetime as dt
@@ -8,7 +8,7 @@ import dateutil.parser
 from ipaddress import ip_network
 
 from app import db
-from app.models import NatlasServices, ScopeItem, Tag
+from app.models import ScopeItem
 from app.api import bp
 from app.util import isAcceptableTarget
 from libnmap.parser import NmapParser
@@ -30,11 +30,11 @@ def getwork():
 
 	if len(rescans) == 0: # if we don't have rescans, use the ScanManager
 		scanmanager = current_app.ScopeManager.getScanManager()
-		if scanmanager == None:
+		if not scanmanager:
 			current_app.ScopeManager.update()
 			scanmanager = current_app.ScopeManager.getScanManager()
 
-			if scanmanager == None:
+			if not scanmanager:
 				return json.dumps({ 'status': 404, 'message': 'No scope is currently configured.', "retry": True }), 404, {'content-type':'application/json'}
 
 		ip = scanmanager.getNextIP()

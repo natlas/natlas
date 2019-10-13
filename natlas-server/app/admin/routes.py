@@ -219,20 +219,16 @@ def deleteScopeItem(id):
 	delForm = ScopeDeleteForm()
 	if delForm.validate_on_submit():
 		item = ScopeItem.query.filter_by(id=id).first()
-		if item.blacklist:
-			redirectLoc = 'admin.blacklist'
-		else:
-			redirectLoc = 'admin.scope'
 		for tag in item.tags:
 			item.tags.remove(tag)
 		ScopeItem.query.filter_by(id=id).delete()
 		db.session.commit()
 		current_app.ScopeManager.update()
 		flash('%s deleted!' % item.target, 'success')
-		return redirect(url_for(redirectLoc))
+		return redirect(request.referrer)
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(url_for(redirectLoc))
+		return redirect(request.referrer)
 
 
 @bp.route('/scope/<int:id>/toggle', methods=['POST'])
@@ -244,11 +240,9 @@ def toggleScopeItem(id):
 		item = ScopeItem.query.filter_by(id=id).first()
 		if item.blacklist:
 			item.blacklist = False
-			redirectLoc = 'admin.blacklist'
 			flash('%s removed from blacklist!' % item.target, 'success')
 		else:
 			item.blacklist = True
-			redirectLoc = 'admin.scope'
 			flash('%s blacklisted!' % item.target, 'success')
 		db.session.commit()
 		current_app.ScopeManager.update()

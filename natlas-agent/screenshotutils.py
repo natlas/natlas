@@ -36,12 +36,12 @@ def runVNCSnapshot(target, scan_id):
 		out, err = process.communicate(timeout=60)
 		if process.returncode is 0:
 			return True
-	except:
+	except Exception:
 		try:
 			print("[!] (%s) Killing slacker process" % scan_id)
 			process.kill()
 			return False
-		except:
+		except Exception:
 			pass
 
 	return False

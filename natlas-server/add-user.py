@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import random
-import string
 from app import create_app, db
 from app.models import User
 

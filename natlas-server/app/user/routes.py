@@ -1,11 +1,10 @@
-from flask import render_template, redirect, url_for, current_app, flash, Response, abort, request
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user
 from app import db
 from app.user import bp
 from app.user.forms import ChangePasswordForm, DisplaySettingsForm, GenerateTokenForm, AgentNameForm
 from app.models import User, Agent
-from app.auth.wrappers import isAuthenticated, isAdmin
-import ipaddress
+from app.auth.wrappers import isAuthenticated
 
 @bp.route('/', methods=['GET', 'POST'])
 @isAuthenticated
@@ -21,7 +20,6 @@ def profile():
 	displaySettingsForm.results_per_page.choices = [(25,25), (50,50), (75,75), (100,100)]
 	displaySettingsForm.preview_length.choices = [(25,25), (50,50), (75,75), (100,100)]
 	displaySettingsForm.result_format.choices = [(0, 'Pretty'), (1, 'Raw')]
-	result_formats = ["Pretty", "Raw"]
 
 	generateTokenForm = GenerateTokenForm()
 	agentNameForm = AgentNameForm()

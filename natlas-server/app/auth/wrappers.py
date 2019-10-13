@@ -1,4 +1,4 @@
-from flask import current_app, request, jsonify
+from flask import current_app, request
 from flask_login import current_user
 from app import login as lm
 from app.models import Agent
@@ -23,7 +23,7 @@ def isAdmin(f):
 
 def isAgentAuthenticated(f):
 	@wraps(f)
-	def decorated_function(*args, **kwargs): 
+	def decorated_function(*args, **kwargs):
 		if current_app.config['AGENT_AUTHENTICATION']:
 			if not request.headers.has_key("Authorization"):
 				return json.dumps({ 'status': 403, 'message': 'Authorization is required to access this endpoint', 'retry': False }), \

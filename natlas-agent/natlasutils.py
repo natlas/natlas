@@ -35,5 +35,5 @@ def cleanup_files(scan_id):
 	for file in glob.glob("data/natlas."+scan_id+".*"):
 		try:
 			os.remove(file)
-		except:
+		except Exception:
 			utillogger.error("Could not remove file %s" % file)

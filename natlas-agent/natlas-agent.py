@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import requests
 import subprocess
 import time
@@ -86,12 +85,12 @@ def scan(target_data=None):
 	process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 	try:
 		out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
-	except:
+	except Exception:
 		try:
 			TIMEDOUT = True
 			global_logger.error("Scan %s timed out" % scan_id)
 			process.kill()
-		except:
+		except Exception:
 			pass
 
 	if TIMEDOUT:
@@ -104,7 +103,7 @@ def scan(target_data=None):
 	for ext in 'nmap', 'gnmap', 'xml':
 		try:
 			result.addItem(ext+"_data", open("data/natlas."+scan_id+"."+ext).read())
-		except:
+		except Exception:
 			global_logger.error("Couldn't read natlas.%s.%s" % (scan_id, ext))
 			return False
 
@@ -334,4 +333,7 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+	try:
+		main()
+	except KeyboardInterrupt:
+		global_logger.info("Shutting down due to keyboard interrupt")

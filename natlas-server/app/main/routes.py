@@ -1,17 +1,16 @@
 from flask import redirect, url_for, flash, render_template, \
-				Response, current_app, g, request, send_from_directory, abort
+				Response, current_app, request, send_from_directory, abort
 
 from flask_login import current_user, login_required
 from app.main import bp
 from app.util import hostinfo, isAcceptableTarget
-from app.auth.wrappers import isAuthenticated, isAdmin
+from app.auth.wrappers import isAuthenticated
 from app.admin.forms import DeleteForm
 from app.main.forms import RescanForm
 from app.models import RescanTask
 from app import db
 import json
-from datetime import datetime, timedelta
-import random
+from datetime import datetime
 
 @bp.route('/')
 @isAuthenticated

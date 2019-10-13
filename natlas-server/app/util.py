@@ -35,8 +35,6 @@ def isAcceptableTarget(target):
 	# if zero, update to make sure that the scopemanager has been populated
 	if current_app.ScopeManager.getScopeSize() == 0:
 		current_app.ScopeManager.update()
-		scopeSize = current_app.ScopeManager.getScopeSize()
-		blacklistSize = current_app.ScopeManager.getBlacklistSize()
 	for network in current_app.ScopeManager.getScope():
 		if str(network).endswith('/32'):
 			if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):

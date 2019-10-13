@@ -1,6 +1,6 @@
 import json
 import elasticsearch
-import random, time, sys
+import time, sys
 from datetime import datetime
 from config import Config
 from urllib3.exceptions import NewConnectionError
@@ -33,7 +33,7 @@ class Elastic:
 		except elasticsearch.exceptions.NotFoundError:
 			self.errorinfo = 'Cluster Not Found'
 			return
-		except:
+		except Exception:
 			self.lastReconnectAttempt = datetime.now()
 			self.errorinfo = 'Could not establish connection'
 			return
@@ -51,7 +51,7 @@ class Elastic:
 				else:
 					self.lastReconnectAttempt = now
 					return False
-			except:
+			except Exception:
 				self.lastReconnectAttempt = now
 				return False
 
@@ -104,7 +104,7 @@ class Elastic:
 			return result['hits']['total'], results
 		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
 			self.status = False
-		except:
+		except Exception:
 			return 0, []  # search borked, return nothing
 
 
@@ -187,7 +187,7 @@ class Elastic:
 			result = self.es.search(index="nmap_history", doc_type='_doc', body=searchBody, size=0, _source=False, track_scores=False,)
 			num_screenshots = int(result['aggregations']["screenshot_count"]["value"])
 			return num_screenshots
-		except:
+		except Exception:
 			return 0
 
 	def get_host_screenshots(self, ip, limit, offset):
@@ -230,7 +230,7 @@ class Elastic:
 				results.append(thing['_source'])
 
 			return result['hits']['total'], results
-		except:
+		except Exception:
 			return 0, []
 
 
@@ -334,7 +334,7 @@ class Elastic:
 
 			random = self.es.search(index="nmap", doc_type="_doc", body=searchQuery)
 			return random
-		except Exception as e:
+		except Exception:
 			return False
 
 
@@ -374,5 +374,5 @@ class Elastic:
 				results.append(thing['_source'])
 
 			return result['hits']['total'], num_screenshots, results
-		except:
+		except Exception:
 			return 0, []
