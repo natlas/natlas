@@ -10,7 +10,7 @@ from ipaddress import ip_network
 from app import db
 from app.models import ScopeItem
 from app.api import bp
-from app.util import isAcceptableTarget
+from app.util import isAcceptableTarget, parse_ssl_data
 from libnmap.parser import NmapParser
 from app.auth.wrappers import isAgentAuthenticated
 
@@ -135,6 +135,8 @@ def submit():
 		for script in srv.scripts_results:
 			scriptsave = {"id": script['id'], "output": script["output"]}
 			portinfo['scripts'].append(scriptsave)
+			if script['id'] == "ssl-cert":
+				portinfo['ssl'] = parse_ssl_data(script)
 
 
 		newhost['ports'].append(portinfo)

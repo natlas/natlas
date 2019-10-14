@@ -1,140 +1,261 @@
 {
-    "mappings":{
-        "_doc":{
-            "properties":{
-                "ctime":{
-                    "type":"date"
-                },
-                "agent":{
-                    "type":"keyword"
-                },
-                "agent_version":{
-                    "type":"keyword"
-                },
-                "scan_reason":{
-                    "type":"keyword"
-                },
-                "scan_start":{
-                    "type":"date"
-                },
-                "scan_stop":{
-                    "type":"date"
-                },
-                "elapsed":{
-                    "type":"integer"
-                },
-                "tags":{
-                    "type":"keyword"
-                },
-                "port_count":{
-                    "type":"integer"
-                },
-                "port_str":{
-                    "type":"text"
-                },
-                "is_up":{
-                    "type":"boolean"
-                },
-                "ip":{
-                    "type":"ip"
-                },
-                "scan_id":{
-                    "type":"keyword"
-                },
-                "nmap_data":{
-                    "type":"text"
-                },
-                "xml_data":{
-                    "type":"text",
-                    "index":"false"
-                },
-                "gnmap_data":{
-                    "type":"text",
-                    "index":"false"
-                },
-                "screenshots": {
-                    "properties": {
-                        "host": {
-                            "type": "keyword"
-                        },
-                        "port": {
-                            "type": "integer"
-                        },
-                        "service": {
-                            "type": "keyword"
-                        },
-                        "path": {
-                            "type": "text"
-                        },
-                        "thumb": {
-                            "type": "text"
-                        }
-                    }
-                },
-                "ports":{
-                    "properties":{
-                        "id":{
-                            "type":"keyword"
-                        },
-                        "number":{
-                            "type":"integer"
-                        },
-                        "protocol":{
-                            "type":"keyword"
-                        },
-                        "state":{
-                            "type":"keyword"
-                        },
-                        "reason":{
-                            "type":"text"
-                        },
-                        "banner":{
-                            "type":"text"
-                        },
-                        "service":{
-                            "properties":{
-                                "name":{
-                                    "type":"keyword"
-                                },
-                                "product":{
-                                    "type":"keyword"
-                                },
-                                "version":{
-                                    "type":"keyword"
-                                },
-                                "ostype":{
-                                    "type":"keyword"
-                                },
-                                "conf":{
-                                    "type":"integer"
-                                },
-                                "cpelist":{
-                                    "type":"text"
-                                },
-                                "method":{
-                                    "type":"text"
-                                },
-                                "extrainfo":{
-                                    "type":"text"
-                                },
-                                "tunnel":{
-                                    "type":"keyword"
-                                }
-                            }
-                        },
-                        "scripts":{
-                            "properties":{
-                                "id":{
-                                    "type":"text"
-                                },
-                                "output":{
-                                    "type":"text"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+  "mappings": {
+	"_doc": {
+	  "properties": {
+		"ctime": {
+		  "type": "date"
+		},
+		"agent": {
+		  "type": "keyword"
+		},
+		"agent_version": {
+		  "type": "keyword"
+		},
+		"scan_reason": {
+		  "type": "keyword"
+		},
+		"scan_start": {
+		  "type": "date"
+		},
+		"scan_stop": {
+		  "type": "date"
+		},
+		"elapsed": {
+		  "type": "integer"
+		},
+		"tags": {
+		  "type": "keyword"
+		},
+		"port_count": {
+		  "type": "integer"
+		},
+		"port_str": {
+		  "type": "text"
+		},
+		"is_up": {
+		  "type": "boolean"
+		},
+		"ip": {
+		  "type": "ip"
+		},
+		"scan_id": {
+		  "type": "keyword"
+		},
+		"nmap_data": {
+		  "type": "text"
+		},
+		"xml_data": {
+		  "type": "text",
+		  "index": "false"
+		},
+		"gnmap_data": {
+		  "type": "text",
+		  "index": "false"
+		},
+		"screenshots": {
+		  "properties": {
+			"host": {
+			  "type": "keyword"
+			},
+			"port": {
+			  "type": "integer"
+			},
+			"service": {
+			  "type": "keyword"
+			},
+			"path": {
+			  "type": "text"
+			},
+			"thumb": {
+			  "type": "text"
+			}
+		  }
+		},
+		"ports": {
+		  "properties": {
+			"id": {
+			  "type": "keyword"
+			},
+			"number": {
+			  "type": "integer"
+			},
+			"protocol": {
+			  "type": "keyword"
+			},
+			"state": {
+			  "type": "keyword"
+			},
+			"reason": {
+			  "type": "text"
+			},
+			"banner": {
+			  "type": "text"
+			},
+			"service": {
+			  "properties": {
+				"name": {
+				  "type": "keyword"
+				},
+				"product": {
+				  "type": "keyword"
+				},
+				"version": {
+				  "type": "keyword"
+				},
+				"ostype": {
+				  "type": "keyword"
+				},
+				"conf": {
+				  "type": "integer"
+				},
+				"cpelist": {
+				  "type": "text"
+				},
+				"method": {
+				  "type": "text"
+				},
+				"extrainfo": {
+				  "type": "text"
+				},
+				"tunnel": {
+				  "type": "keyword"
+				}
+			  }
+			},
+			"scripts": {
+			  "properties": {
+				"id": {
+				  "type": "text"
+				},
+				"output": {
+				  "type": "text"
+				}
+			  }
+			},
+			"ssl": {
+			  "properties": {
+				"issuer": {
+				  "properties": {
+					"commonName": {
+					  "type": "text",
+					  "fields": {
+						"keyword": {
+						  "type": "keyword",
+						  "ignore_above": 256
+						}
+					  }
+					},
+					"countryName": {
+					  "type": "text",
+					  "fields": {
+						"keyword": {
+						  "type": "keyword",
+						  "ignore_above": 256
+						}
+					  }
+					},
+					"organizationName": {
+					  "type": "text",
+					  "fields": {
+						"keyword": {
+						  "type": "keyword",
+						  "ignore_above": 256
+						}
+					  }
+					}
+				  }
+				},
+				"md5": {
+				  "type": "text",
+				  "fields": {
+					"keyword": {
+					  "type": "keyword",
+					  "ignore_above": 256
+					}
+				  }
+				},
+				"notAfter": {
+				  "type": "date"
+				},
+				"notBefore": {
+				  "type": "date"
+				},
+				"pem": {
+				  "type": "text",
+				  "fields": {
+					"keyword": {
+					  "type": "keyword",
+					  "ignore_above": 256
+					}
+				  }
+				},
+				"pubkey": {
+				  "properties": {
+					"bits": {
+					  "type": "integer",
+					  "fields": {
+						"keyword": {
+						  "type": "keyword",
+						  "ignore_above": 256
+						}
+					  }
+					},
+					"type": {
+					  "type": "text",
+					  "fields": {
+						"keyword": {
+						  "type": "keyword",
+						  "ignore_above": 256
+						}
+					  }
+					}
+				  }
+				},
+				"sha1": {
+				  "type": "text",
+				  "fields": {
+					"keyword": {
+					  "type": "keyword",
+					  "ignore_above": 256
+					}
+				  }
+				},
+				"sig_alg": {
+				  "type": "text",
+				  "fields": {
+					"keyword": {
+					  "type": "keyword",
+					  "ignore_above": 256
+					}
+				  }
+				},
+				"subject": {
+				  "properties": {
+					"altNames": {
+					  "type": "text",
+					  "fields": {
+						"keyword": {
+						  "type": "keyword",
+						  "ignore_above": 256
+						}
+					  }
+					},
+					"commonName": {
+					  "type": "text",
+					  "fields": {
+						"keyword": {
+						  "type": "keyword",
+						  "ignore_above": 256
+						}
+					  }
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
 }
