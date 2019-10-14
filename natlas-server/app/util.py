@@ -70,22 +70,50 @@ def parse_ssl_data(sslcert):
 				altnames.append(item.strip(',').split('DNS:')[1])
 
 	elements = sslcert['elements']
+	subject = elements.get('subject')
+	issuer = elements.get('issuer')
+	pubkey = elements.get('pubkey')
+	sig_alg = elements.get('sig_algo')
+	validity = elements.get('validity')
+	md5 = elements.get('md5')
+	sha1 = elements.get('sha1')
+	pem = elements.get('pem')
 
-	result = {
-		"subject": {
-			"commonName": elements['subject']['commonName'],
-			"altNames": altnames
-		},
-		"issuer": elements['issuer'],
-		"pubkey": {
-			"type": elements['pubkey']["type"],
-			"bits": int(elements['pubkey']["bits"])
-		},
-		"sig_alg": elements['sig_algo'],
-		"notAfter": elements['validity']['notAfter'],
-		"notBefore": elements['validity']['notBefore'],
-		"md5": elements["md5"],
-		"sha1": elements['sha1'],
-		"pem": elements['pem']
-	}
+	result = {}
+	if subject:
+		subDict = {}
+		if subject.get('commonName'):
+			subDict['commonName'] = subject.get('commonName')
+		if altnames:
+			subDict['altNames'] = altnames
+		if subDict:
+			result['subject'] = subDict
+
+	if issuer:
+		result['issuer'] = issuer
+
+	if pubkey:
+		pubkeyDict = {}
+		if pubkey.get('type'):
+			pubkeyDict['type'] = pubkey.get('type')
+		if pubkey.get('bits'):
+			pubkeyDict['bits'] = int(pubkey.get('bits'))
+		if pubkeyDict:
+			result['pubkey'] = pubkeyDict
+
+	if sig_alg:
+		result['sig_alg'] = sig_alg
+
+	if validity:
+		if validity.get('notAfter'):
+			result['notAfter'] = validity.get('notAfter')
+		if validity.get('notBefore'):
+			result['notBefore'] = validity.get('notBefore')
+	if md5:
+		result['md5'] = md5
+	if sha1:
+		result['sha1'] = sha1
+	if pem:
+		result['pem'] = pem
+
 	return result
