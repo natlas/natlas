@@ -151,3 +151,27 @@ if ! which aquatone >/dev/null; then
 else
 	echo "[+] Found Aquatone: $(which aquatone)"
 fi
+
+if [ ! -d data ]; then
+	echo '[+] Creating data directory'
+	mkdir data
+	if [ ! -d data ]; then
+		echo "[!] Failed to make data directory" && exit 12
+	else
+		echo "[+] Successfully created data directory"
+	fi
+else
+	echo "[+] Found data directory"
+fi
+
+if [ ! -d logs ]; then
+	echo '[+] Creating logs directory'
+	mkdir logs
+	if [ ! -d logs ]; then
+		echo "[!] Failed to make logs directory" && exit 12
+	else
+		echo "[+] Successfully created logs directory"
+	fi
+else
+	echo "[+] Found logs directory"
+fi

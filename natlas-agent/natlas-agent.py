@@ -233,8 +233,10 @@ def main():
 	if missing_caps:
 		raise SystemExit("[!] Missing Nmap capabilities: %s" % " ".join(missing_caps))
 
+	print("isdir data: %s" % os.path.isdir("data"))
 	if not os.path.isdir("data"):
 		os.mkdir("data")
+
 	if not os.path.isdir("logs"):
 		os.mkdir("logs")
 
