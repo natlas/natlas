@@ -67,7 +67,9 @@ def parse_ssl_data(sslcert):
 	for line in sslcert['output'].split('\n'):
 		if line.startswith("Subject Alternative Name:"):
 			for item in line.split(' ')[3:]:
-				altnames.append(item.strip(',').split('DNS:')[1])
+				altname = item.strip(',').split('DNS:')
+				if len(altname) > 1: # Prevent an indexerror in edge case
+					altnames.append(altname[1])
 
 	elements = sslcert['elements']
 	subject = elements.get('subject')
