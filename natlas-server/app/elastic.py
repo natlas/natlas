@@ -1,6 +1,6 @@
 import json
 import elasticsearch
-import time, sys
+import sys
 from datetime import datetime
 from config import Config
 from urllib3.exceptions import NewConnectionError
