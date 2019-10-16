@@ -6,11 +6,14 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ## Unreleased
 
+## [v0.6.6]
+
 ### Added
 - Screenshot Browser ([#173](https://github.com/natlas/natlas/issues/173))
 - Administrative settings:
     - Optionally use local subresources instead of CDN subresources (#[105](https://github.com/natlas/natlas/issues/105))
     - Optionally add a custom brand field to navigation to more easily identify the natlas instance you're viewing ([#106](https://github.com/natlas/natlas/issues/106))
+- Store structured SSL certificate data for any port that we've identified an ssl-cert for ([#146](https://github.com/natlas/natlas/issues/146))
 
 ### Changed
 - Agent logging is done via an app logger now with timestamps and to a file. ([#170](https://github.com/natlas/natlas/issues/170))
@@ -184,7 +187,8 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 * Ability to run in standalone mode
 
 
-[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.5...HEAD
+[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.6...HEAD
+[v0.6.6]: https://github.com/natlas/natlas/compare/v0.6.5...v0.6.6
 [v0.6.5]: https://github.com/natlas/natlas/compare/v0.6.4...v0.6.5
 [v0.6.4]: https://github.com/natlas/natlas/compare/v0.6.3...v0.6.4
 [v0.6.3]: https://github.com/natlas/natlas/compare/v0.6.2...v0.6.3
