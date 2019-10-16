@@ -17,3 +17,4 @@ dist
 natlas-server/media
 natlas-server/logs
 natlas-agent/logs
+tmp
