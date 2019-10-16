@@ -75,7 +75,7 @@ def scan(target_data=None):
 	result = ScanResult(target_data, config)
 
 	TIMEDOUT = False
-	process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+	process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) # nosec
 	try:
 		out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
 	except Exception:
