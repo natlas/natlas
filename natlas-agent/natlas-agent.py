@@ -1,21 +1,14 @@
 #!/usr/bin/env python3
 
-import requests
 import subprocess
 import time
 import os
-import random
-import string
-import json
 import base64
 import argparse
 import shutil
 import hashlib
-import glob
-from datetime import datetime,timezone
 from libnmap.parser import NmapParser, NmapParserException
 import ipaddress
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 import threading
 import queue
