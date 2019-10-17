@@ -111,9 +111,11 @@ cp LICENSE natlas-agent/
 cp CHANGELOG.md natlas-agent/
 
 # Create tarballs for components
-tar cvzf "natlas-server-${NEW_VERSION}.tgz" --exclude-from=.gitignore natlas-server/
-tar cvzf "natlas-agent-${NEW_VERSION}.tgz" --exclude-from=.gitignore natlas-agent/
+tar cvzf "dist/natlas-server-${NEW_VERSION}.tgz" --exclude-from=.gitignore natlas-server/
+tar cvzf "dist/natlas-agent-${NEW_VERSION}.tgz" --exclude-from=.gitignore natlas-agent/
 
+# Cleanup the copied files that are only included for distribution
+rm natlas-server/LICENSE natlas-server/CHANGELOG.md natlas-agent/LICENSE natlas-agent/CHANGELOG.md
 
 echo "[+] Version v${NEW_VERSION} released."
-echo "[+] Don't forget to upload natlas-server-${NEW_VERSION}.tgz and natlas-agent-${NEW_VERSION}.tgz to the Github release page."
+echo "[+] Don't forget to upload dist/natlas-server-${NEW_VERSION}.tgz and dist/natlas-agent-${NEW_VERSION}.tgz to the Github release page."
