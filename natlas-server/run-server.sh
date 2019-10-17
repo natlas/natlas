@@ -4,8 +4,20 @@ export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
 export FLASK_APP=./natlas-server.py
 
-source .env
-source venv/bin/activate
+if [ ! -e .env ]; then
+	echo "[-] No .env found, running with defaults"
+else
+	# shellcheck disable=SC1091
+	source .env
+fi
+
+if [ ! -e venv/bin/activate ]; then
+	echo "[!] No venv activate script found: venv/bin/activate" && exit 1
+else
+	# shellcheck disable=SC1091
+	source venv/bin/activate
+fi
+
 DEPLOY_ENV=${FLASK_ENV:-production}
 
 if [ ! -d logs ]; then
