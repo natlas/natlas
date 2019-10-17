@@ -6,9 +6,9 @@ import time
 
 import natlaslogging
 
-logger = natlaslogging.getLogger("ScreenshotUtils")
+logger = natlaslogging.get_logger("ScreenshotUtils")
 
-def runAquatone(target, scan_id, services):
+def get_web_screenshots(target, scan_id, services):
 	inputstring = ""
 	for service in services:
 		inputstring += service + "://" + target + "\n"
@@ -33,7 +33,7 @@ def runAquatone(target, scan_id, services):
 
 	return False
 
-def runVNCSnapshot(target, scan_id):
+def get_vnc_screenshots(target, scan_id):
 	if "DISPLAY" not in os.environ:
 		return False
 

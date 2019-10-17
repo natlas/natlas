@@ -11,7 +11,7 @@ import natlaslogging
 
 SCAN_ID_LENGTH = 16
 
-utillogger = natlaslogging.getLogger("Utilities")
+utillogger = natlaslogging.get_logger("Utilities")
 
 
 def validate_target(target, config):

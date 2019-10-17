@@ -9,13 +9,13 @@ class Config:
 	BASEDIR = os.path.abspath(os.path.dirname(__file__))
 	load_dotenv(os.path.join(BASEDIR, '.env'))
 
-	def getInt(self, varname):
+	def get_int(self, varname):
 		tmp = os.environ.get(varname)
 		if tmp:
 			return int(tmp)
 		return None
 
-	def getBool(self, varname):
+	def get_bool(self, varname):
 		tmp = os.environ.get(varname)
 		if tmp and tmp.upper() == "TRUE":
 			return True
@@ -30,27 +30,27 @@ class Config:
 		# ignore warnings about SSL connections
 		# you shouldn't ignore ssl warnings, but I'll give you the option
 		# Instead, you should put the trusted CA certificate bundle on the agent and use the REQUESTS_CA_BUNDLE env variable
-		self.ignore_ssl_warn = self.getBool('NATLAS_IGNORE_SSL_WARN') or False
+		self.ignore_ssl_warn = self.get_bool('NATLAS_IGNORE_SSL_WARN') or False
 
 		# maximum number of threads to utilize
-		self.max_threads = self.getInt('NATLAS_MAX_THREADS') or 3
+		self.max_threads = self.get_int('NATLAS_MAX_THREADS') or 3
 
 		# Are we allowed to scan local addresses?
 		# By default, agents protect themselves from scanning their local network
-		self.scan_local = self.getBool('NATLAS_SCAN_LOCAL') or False
+		self.scan_local = self.get_bool('NATLAS_SCAN_LOCAL') or False
 
 		# default time to wait for the server to respond
-		self.request_timeout = self.getInt('NATLAS_REQUEST_TIMEOUT') or 15 # seconds
+		self.request_timeout = self.get_int('NATLAS_REQUEST_TIMEOUT') or 15 # seconds
 
 		# Maximum value for exponential backoff of requests, 5 minutes default
-		self.backoff_max = self.getInt('NATLAS_BACKOFF_MAX') or 300 # seconds
+		self.backoff_max = self.get_int('NATLAS_BACKOFF_MAX') or 300 # seconds
 
 		# Base value to begin the exponential backoff
-		self.backoff_base = self.getInt('NATLAS_BACKOFF_BASE') or 1 # seconds
+		self.backoff_base = self.get_int('NATLAS_BACKOFF_BASE') or 1 # seconds
 
 		# Maximum number of times to retry submitting data before giving up
 		# This is useful if a thread is submitting data that the server doesn't understand for some reason
-		self.max_retries = self.getInt('NATLAS_MAX_RETRIES') or 10
+		self.max_retries = self.get_int('NATLAS_MAX_RETRIES') or 10
 
 		# Identification string that identifies the agent that performed any given scan
 		# Used for database lookup and stored in scan output

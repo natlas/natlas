@@ -13,16 +13,16 @@ class ScanResult:
 			"scan_start": datetime.now(timezone.utc).isoformat()
 		}
 
-	def addItem(self, name, value):
+	def add_item(self, name, value):
 		self.result[name] = value
 
-	def scanStop(self):
+	def scan_stop(self):
 		self.result["scan_stop"] = datetime.now(timezone.utc).isoformat()
 
-	def isUp(self, status):
+	def is_up(self, status):
 		self.result['is_up'] = status
 
-	def addScreenshot(self, screenshot):
+	def add_screenshot(self, screenshot):
 		if 'screenshots' not in self.result:
 			self.result['screenshots'] = []
 		self.result['screenshots'].append(screenshot)

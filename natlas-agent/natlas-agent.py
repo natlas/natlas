@@ -30,12 +30,12 @@ MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of ou
 RTTVAR_MSG = "RTTVAR has grown to over"
 
 
-global_logger = natlaslogging.getLogger("natlas-agent")
+global_logger = natlaslogging.get_logger("natlas-agent")
 
 netsrv = NatlasNetworkServices(config)
 
 
-def commandBuilder(scan_id, agentConfig, target):
+def command_builder(scan_id, agentConfig, target):
 	command = ["nmap", "--privileged", "-oA", "data/natlas."+scan_id, "--servicedb", "./natlas-services"]
 
 	commandDict = {
@@ -70,31 +70,22 @@ def scan(target_data=None):
 
 	agentConfig = target_data["agent_config"]
 
-	command = commandBuilder(scan_id, agentConfig, target)
+	command = command_builder(scan_id, agentConfig, target)
 
 	result = ScanResult(target_data, config)
 
-	TIMEDOUT = False
-	process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) # nosec
 	try:
-		out, err = process.communicate(timeout=int(agentConfig["scanTimeout"]))
-	except Exception:
-		try:
-			TIMEDOUT = True
-			global_logger.warn("TIMEOUT: Nmap against %s (%s)" % (target, scan_id))
-			process.kill()
-		except Exception:
-			pass
-
-	if TIMEDOUT:
-		result.addItem('timed_out', True)
+		process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=int(agentConfig["scanTimeout"])) # nosec
+	except subprocess.TimeoutExpired:
+		result.add_item('timed_out', True)
+		global_logger.warn("TIMEOUT: Nmap against %s (%s)" % (target, scan_id))
 		return result
-	else:
-		global_logger.info("Nmap against %s (%s) complete" % (target, scan_id))
+
+	global_logger.info("Nmap %s (%s) complete" % (target, scan_id))
 
 	for ext in 'nmap', 'gnmap', 'xml':
 		try:
-			result.addItem(ext+"_data", open("data/natlas."+scan_id+"."+ext).read())
+			result.add_item(ext+"_data", open("data/natlas."+scan_id+"."+ext).read())
 		except Exception:
 			global_logger.warn("Couldn't read natlas.%s.%s" % (scan_id, ext))
 			return False
@@ -113,17 +104,17 @@ def scan(target_data=None):
 		return False
 	elif nmap_report.hosts_down == 1:
 		# host is down
-		result.isUp(False)
+		result.is_up(False)
 		return result
 	elif nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
 		# host is up but no reportable ports were found
-		result.isUp(True)
-		result.addItem('port_count', 0)
+		result.is_up(True)
+		result.add_item('port_count', 0)
 		return result
 	else:
 		# host is up and reportable ports were found
-		result.isUp(nmap_report.hosts[0].is_up())
-		result.addItem('port_count', len(nmap_report.hosts[0].get_ports()))
+		result.is_up(nmap_report.hosts[0].is_up())
+		result.add_item('port_count', len(nmap_report.hosts[0].get_ports()))
 
 
 	if agentConfig["webScreenshots"] and shutil.which("aquatone") is not None:
@@ -133,7 +124,7 @@ def scan(target_data=None):
 		if "443/tcp" in result.result['nmap_data']:
 			targetServices.append("https")
 		if len(targetServices) > 0:
-			screenshotutils.runAquatone(target, scan_id, targetServices)
+			screenshotutils.get_web_screenshots(target, scan_id, targetServices)
 
 		serviceMapping = {
 			"http": 80,
@@ -145,7 +136,7 @@ def scan(target_data=None):
 			if not os.path.isfile(screenshotPath):
 				continue
 
-			result.addScreenshot({
+			result.add_screenshot({
 				"host": target,
 				"port": serviceMapping[service],
 				"service": service.upper(),
@@ -155,8 +146,8 @@ def scan(target_data=None):
 
 	if agentConfig["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result.result['nmap_data']:
-			if screenshotutils.runVNCSnapshot(target, scan_id) is True:
-				result.addScreenshot({
+			if screenshotutils.get_vnc_screenshots(target, scan_id) is True:
+				result.add_screenshot({
 					"host": target,
 					"port": 5900,
 					"service": "VNC",
@@ -189,7 +180,10 @@ class ThreadScan(threading.Thread):
 					if not self.servicesSha:
 						global_logger.warn("Failed to get updated services from %s" % config.server)
 				result = scan(target_data)
-				result.scanStop()
+				if not result:
+					global_logger.warn("Not submitting data for %s" % target_data['target'])
+					continue
+				result.scan_stop()
 				response = netsrv.submit_results(result)
 				natlasutils.cleanup_files(target_data['scan_id'])
 
@@ -202,7 +196,10 @@ class ThreadScan(threading.Thread):
 					break
 				global_logger.info("Manual Target: %s" % target_data["target"])
 				result = scan(target_data)
-				result.scanStop()
+				if not result:
+					global_logger.warn("Not submitting data for %s" % target_data['target'])
+					continue
+				result.scan_stop()
 				response = netsrv.submit_results(result)
 				natlasutils.cleanup_files(target_data['scan_id'])
 				self.queue.task_done()
@@ -249,11 +246,10 @@ def main():
 		global_logger.critical(msg)
 		raise SystemExit("[!] %s" % msg)
 
-	if not os.path.isdir("data"):
-		os.mkdir("data")
-
-	if not os.path.isdir("logs"):
-		os.mkdir("logs")
+	required_dirs = ['data', 'logs']
+	for directory in required_dirs:
+		if not os.path.isdir(directory):
+			os.mkdir(directory)
 
 	autoScan = True
 	if args.target or args.tfile:
