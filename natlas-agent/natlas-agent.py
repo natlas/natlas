@@ -207,6 +207,21 @@ class ThreadScan(threading.Thread):
 				natlasutils.cleanup_files(target_data['scan_id'])
 				self.queue.task_done()
 
+def add_targets_to_queue(target, template, q):
+	targetNetwork = ipaddress.ip_interface(target.strip())
+	if targetNetwork.with_prefixlen.endswith('/32'):
+		target_data = template.copy()
+		target_data["target"] = str(targetNetwork.ip)
+		target_data["scan_id"] = natlasutils.generate_scan_id()
+		q.put(target_data)
+	else:
+		# Iterate over usable hosts in target, queue.put will block until a queue slot is available
+		for t in targetNetwork.network.hosts():
+			target_data = target_data_template.copy()
+			target_data["target"] = str(t)
+			target_data["scan_id"] = natlasutils.generate_scan_id()
+			q.put(target_data)
+
 def main():
 
 	PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
@@ -219,14 +234,21 @@ def main():
 	args = parser.parse_args()
 
 	# Check if Nmap has required capabilities to run as a non-root user
-	nmap_caps = subprocess.check_output(["getcap", "/usr/bin/nmap"]).decode("utf-8")
+	try:
+		nmap_path = subprocess.check_output(["which", "nmap"]).decode("utf-8").strip() # nosec
+		nmap_caps = subprocess.check_output(["getcap", nmap_path]).decode("utf-8") # nosec
+	except subprocess.CalledProcessError:
+		msg = "Couldn't find nmap"
+		global_logger.critical(msg)
+		raise SystemExit("[!] %s" % msg)
 
 	needed_caps = ["cap_net_raw", "cap_net_admin", "cap_net_bind_service"]
 	missing_caps = [cap for cap in needed_caps if cap not in nmap_caps]
 	if missing_caps:
-		raise SystemExit("[!] Missing Nmap capabilities: %s" % " ".join(missing_caps))
+		msg = "Missing Nmap capabilities: %s" % " ".join(missing_caps)
+		global_logger.critical(msg)
+		raise SystemExit("[!] %s" % msg)
 
-	print("isdir data: %s" % os.path.isdir("data"))
 	if not os.path.isdir("data"):
 		os.mkdir("data")
 
@@ -276,19 +298,7 @@ def main():
 	if args.target:
 		global_logger.info("Scanning: %s" % args.target)
 
-		targetNetwork = ipaddress.ip_interface(args.target)
-		if targetNetwork.with_prefixlen.endswith('/32'):
-			target_data = target_data_template.copy()
-			target_data["target"] = str(targetNetwork.ip)
-			target_data["scan_id"] = natlasutils.generate_scan_id()
-			q.put(target_data)
-		else:
-			# Iterate over usable hosts in target, queue.put will block until a queue slot is available
-			for t in targetNetwork.network.hosts():
-				target_data = target_data_template.copy()
-				target_data["target"] = str(t)
-				target_data["scan_id"] = natlasutils.generate_scan_id()
-				q.put(target_data)
+		add_targets_to_queue(args.target, target_data_template, q)
 
 		q.join()
 		global_logger.info("Finished scanning: %s" % args.target)
@@ -298,18 +308,8 @@ def main():
 		global_logger.info("Reading scope from file: %s" % args.tfile)
 
 		for target in open(args.tfile, "r"):
-			targetNetwork = ipaddress.ip_interface(target.strip())
-			if targetNetwork.with_prefixlen.endswith('/32'):
-				target_data = target_data_template.copy()
-				target_data["target"] = str(targetNetwork.ip)
-				target_data["scan_id"] = natlasutils.generate_scan_id()
-				q.put(target_data)
-			else:
-				for t in targetNetwork.network.hosts():
-					target_data = target_data_template.copy()
-					target_data["target"] = str(t)
-					target_data["scan_id"] = natlasutils.generate_scan_id()
-					q.put(target_data)
+			add_targets_to_queue(target, target_data_template, q)
+
 		q.join()
 		global_logger.info("Finished scanning the target file %s" % args.tfile)
 		return
