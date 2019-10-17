@@ -57,7 +57,7 @@ Information about this project's security reporting guidelines as well as securi
 * [Dean Pierce](https://github.com/pierce403) - Created the initial project, nweb, that Natlas was built out of.
 * [Topher Timzen](https://github.com/tophertimzen) - Testing, feedback, automation support.
 * [Adam Jacques](https://github.com/ajacques) - Helping with Elasticsearch theory and just generally helping improve code quality
-
+* [Ross Snider](https://github.com/rosswsnider) - Writing Cyclic PRNG for target selection
 
 # Disclaimer
 
@@ -68,7 +68,7 @@ For further inquiry about licensing, please see the respective projects' license
 
 # License
 
-Copyright 2018 The Natlas Authors
+Copyright 2019 The Natlas Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
