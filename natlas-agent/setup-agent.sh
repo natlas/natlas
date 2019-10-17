@@ -64,6 +64,7 @@ if [ ! -e venv/bin/activate ]; then
 	echo "[!] No venv activate script found: venv/bin/activate" && exit 5
 else
 	echo "[+] Entering virtual environment"
+	# shellcheck disable=SC1091
 	source venv/bin/activate
 	echo "[+] Installing/upgrading natlas-agent python dependencies"
 	pip3 install -r requirements.txt --log pip.log -q
