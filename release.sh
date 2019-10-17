@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Updates version strings and commits to version branch
-# Merges version branch to master
-# Switches to master, creates and pushes tag
+# Merges version branch to main
+# Switches to main, creates and pushes tag
 # Prepares agent and server tarballs for release
 #
 # Inspiration taken from Michael Henriksen's Aquatone release script
@@ -12,8 +12,8 @@ SLEEP_TIME=60
 CURRENT_BRANCH=$(git status | grep "On branch" | cut -d" " -f3)
 
 
-if [[ $CURRENT_BRANCH == "master" ]]; then
-	echo "[!] Attempting to create a release from the master branch is not currently supported."
+if [[ $CURRENT_BRANCH == "main" ]]; then
+	echo "[!] Attempting to create a release from the main branch is not currently supported."
 	exit
 else
 	echo "[+] Building release from branch $CURRENT_BRANCH"
@@ -93,9 +93,9 @@ done
 git commit -m "Preparing configs for v${NEW_VERSION}"
 git push
 
-# Switch to master, make sure there's no upstream changes, and merge version branch to master
-git checkout master
-git pull origin master
+# Switch to main, make sure there's no upstream changes, and merge version branch to main
+git checkout main
+git pull origin main
 git merge "$CURRENT_BRANCH"
 git commit -m "Releasing v${NEW_VERSION}"
 git push
