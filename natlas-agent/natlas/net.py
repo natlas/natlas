@@ -6,12 +6,12 @@ import json
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-import natlaslogging
+from natlas import logging
 
 class NatlasNetworkServices:
 
 	config = None
-	netlogger = natlaslogging.get_logger("NetworkServices")
+	netlogger = logging.get_logger("NetworkServices")
 
 	api_endpoints = {"GETSERVICES": "/api/natlas-services", "GETWORK": "/api/getwork", "SUBMIT": "/api/submit"}
 
@@ -134,7 +134,6 @@ class NatlasNetworkServices:
 		response = self.backoff_request(endpoint=self.api_endpoints["GETWORK"])
 		if response:
 			work = response.json()
-			self.netlogger.info("Work Target: %s" % (work["target"]))
 		else:
 			return False # failed to get work from server
 		return work

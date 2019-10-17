@@ -3,221 +3,38 @@
 import subprocess
 import time
 import os
-import base64
 import argparse
-import shutil
 import hashlib
-from libnmap.parser import NmapParser, NmapParserException
 import ipaddress
-
-import threading
 import queue
 
+from natlas import logging
 
-# my wrapper for screenshotting servers
-import screenshotutils
-import natlaslogging
-from natlasnet import NatlasNetworkServices
-import natlasutils
-from scanresult import ScanResult
 from config import Config
+from natlas.threadscan import ThreadScan
 
 ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
 
 config = Config()
 MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
 
-RTTVAR_MSG = "RTTVAR has grown to over"
-
-
-global_logger = natlaslogging.get_logger("natlas-agent")
-
-netsrv = NatlasNetworkServices(config)
-
-
-def command_builder(scan_id, agentConfig, target):
-	command = ["nmap", "--privileged", "-oA", "data/natlas."+scan_id, "--servicedb", "./natlas-services"]
-
-	commandDict = {
-		"versionDetection": "-sV",
-		"osDetection": "-O",
-		"osScanLimit": "--osscan-limit",
-		"noPing": "-Pn",
-		"onlyOpens": "--open",
-		"udpScan": "-sUS",
-		"enableScripts": "--script={scripts}",
-		"scriptTimeout": "--script-timeout={scriptTimeout}",
-		"hostTimeout": "--host-timeout={hostTimeout}"
-	}
-
-	for k,v in agentConfig.items():
-		if agentConfig[k] and k in commandDict:
-			command.append(commandDict[k].format(**agentConfig))
-
-	command.append(target)
-
-	return command
-
-
-
-def scan(target_data=None):
-
-	if not natlasutils.validate_target(target_data["target"], config):
-		return False
-
-	target = target_data["target"]
-	scan_id = target_data["scan_id"]
-
-	agentConfig = target_data["agent_config"]
-
-	command = command_builder(scan_id, agentConfig, target)
-
-	result = ScanResult(target_data, config)
-
-	try:
-		process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=int(agentConfig["scanTimeout"])) # nosec
-	except subprocess.TimeoutExpired:
-		result.add_item('timed_out', True)
-		global_logger.warn("TIMEOUT: Nmap against %s (%s)" % (target, scan_id))
-		return result
-
-	global_logger.info("Nmap %s (%s) complete" % (target, scan_id))
-
-	for ext in 'nmap', 'gnmap', 'xml':
-		try:
-			result.add_item(ext+"_data", open("data/natlas."+scan_id+"."+ext).read())
-		except Exception:
-			global_logger.warn("Couldn't read natlas.%s.%s" % (scan_id, ext))
-			return False
-
-	try:
-		nmap_report = NmapParser.parse(result.result['xml_data'])
-	except NmapParserException:
-		global_logger.warn("Couldn't parse natlas.%s.xml" % (scan_id))
-		return False
-
-	if nmap_report.hosts_total < 1:
-		global_logger.warn("No hosts found in natlas.%s.xml" % (scan_id))
-		return False
-	elif nmap_report.hosts_total > 1:
-		global_logger.warn("Too many hosts found in natlas.%s.xml" % (scan_id))
-		return False
-	elif nmap_report.hosts_down == 1:
-		# host is down
-		result.is_up(False)
-		return result
-	elif nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
-		# host is up but no reportable ports were found
-		result.is_up(True)
-		result.add_item('port_count', 0)
-		return result
-	else:
-		# host is up and reportable ports were found
-		result.is_up(nmap_report.hosts[0].is_up())
-		result.add_item('port_count', len(nmap_report.hosts[0].get_ports()))
-
-
-	if agentConfig["webScreenshots"] and shutil.which("aquatone") is not None:
-		targetServices=[]
-		if "80/tcp" in result.result['nmap_data']:
-			targetServices.append("http")
-		if "443/tcp" in result.result['nmap_data']:
-			targetServices.append("https")
-		if len(targetServices) > 0:
-			screenshotutils.get_web_screenshots(target, scan_id, targetServices)
-
-		serviceMapping = {
-			"http": 80,
-			"https": 443
-		}
-		for service in targetServices:
-			screenshotPath = "data/aquatone." + scan_id + "/screenshots/" + service + "__" + target.replace('.', '_') + ".png"
-
-			if not os.path.isfile(screenshotPath):
-				continue
-
-			result.add_screenshot({
-				"host": target,
-				"port": serviceMapping[service],
-				"service": service.upper(),
-				"data": str(base64.b64encode(open(screenshotPath, 'rb').read()))[2:-1]
-			})
-			global_logger.info("%s screenshot acquired for %s" % (service.upper(), target))
-
-	if agentConfig["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
-		if "5900/tcp" in result.result['nmap_data']:
-			if screenshotutils.get_vnc_screenshots(target, scan_id) is True:
-				result.add_screenshot({
-					"host": target,
-					"port": 5900,
-					"service": "VNC",
-					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.jpg", 'rb').read()))[2:-1]
-				})
-				global_logger.info("VNC screenshot acquired for %s" % result.result['ip'])
-
-	# submit result
-
-	return result
-
-class ThreadScan(threading.Thread):
-	def __init__(self, queue, auto=False, servicesSha=''):
-		threading.Thread.__init__(self)
-		self.queue = queue
-		self.auto = auto
-		self.servicesSha = servicesSha
-
-	def run(self):
-		# If we're in auto mode, the threads handle getting work from the server
-		if self.auto:
-			while True:
-				target_data = netsrv.get_work()
-				# We hit this if we hit an error that we shouldn't recover from.
-				# Primarily version mismatch, at this point.
-				if not target_data:
-					os._exit(400)
-				if target_data and target_data["services_hash"] != self.servicesSha:
-					self.servicesSha = netsrv.get_services_file()
-					if not self.servicesSha:
-						global_logger.warn("Failed to get updated services from %s" % config.server)
-				result = scan(target_data)
-				if not result:
-					global_logger.warn("Not submitting data for %s" % target_data['target'])
-					continue
-				result.scan_stop()
-				response = netsrv.submit_results(result)
-				natlasutils.cleanup_files(target_data['scan_id'])
-
-		else:
-			#If we're not in auto mode, then the queue is populated with work from local data
-			while True:
-				global_logger.info("Fetching work from queue")
-				target_data = self.queue.get()
-				if target_data is None:
-					break
-				global_logger.info("Manual Target: %s" % target_data["target"])
-				result = scan(target_data)
-				if not result:
-					global_logger.warn("Not submitting data for %s" % target_data['target'])
-					continue
-				result.scan_stop()
-				response = netsrv.submit_results(result)
-				natlasutils.cleanup_files(target_data['scan_id'])
-				self.queue.task_done()
+global_logger = logging.get_logger("MainThread")
 
 def add_targets_to_queue(target, template, q):
 	targetNetwork = ipaddress.ip_interface(target.strip())
 	if targetNetwork.with_prefixlen.endswith('/32'):
 		target_data = template.copy()
 		target_data["target"] = str(targetNetwork.ip)
-		target_data["scan_id"] = natlasutils.generate_scan_id()
+		target_data["scan_id"] = utils.generate_scan_id()
 		q.put(target_data)
 	else:
 		# Iterate over usable hosts in target, queue.put will block until a queue slot is available
 		for t in targetNetwork.network.hosts():
 			target_data = target_data_template.copy()
 			target_data["target"] = str(t)
-			target_data["scan_id"] = natlasutils.generate_scan_id()
+			target_data["scan_id"] = utils.generate_scan_id()
 			q.put(target_data)
+
 
 def main():
 
@@ -269,7 +86,7 @@ def main():
 
 	# Start threads that will wait for items in queue and then scan them
 	for i in range(int(config.max_threads)):
-		t = ThreadScan(q, autoScan, servicesSha)
+		t = ThreadScan(q, config, autoScan, servicesSha)
 		t.setDaemon(True)
 		t.start()
 
@@ -291,21 +108,18 @@ def main():
 		"scripts": "default"
 	}
 	target_data_template = {"agent_config": defaultAgentConfig, "scan_reason":"manual", "tags":[]}
+
 	if args.target:
 		global_logger.info("Scanning: %s" % args.target)
-
 		add_targets_to_queue(args.target, target_data_template, q)
-
 		q.join()
 		global_logger.info("Finished scanning: %s" % args.target)
 		return
 
 	elif args.tfile:
 		global_logger.info("Reading scope from file: %s" % args.tfile)
-
 		for target in open(args.tfile, "r"):
 			add_targets_to_queue(target, target_data_template, q)
-
 		q.join()
 		global_logger.info("Finished scanning the target file %s" % args.tfile)
 		return

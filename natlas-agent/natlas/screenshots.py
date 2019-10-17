@@ -4,9 +4,9 @@ import subprocess
 import os
 import time
 
-import natlaslogging
+from natlas import logging
 
-logger = natlaslogging.get_logger("ScreenshotUtils")
+logger = logging.get_logger("ScreenshotUtils")
 
 def get_web_screenshots(target, scan_id, services):
 	inputstring = ""
