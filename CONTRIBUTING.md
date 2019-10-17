@@ -79,7 +79,7 @@ Note: The team is unlikely to be able to accept every single feature request tha
 
 ## Submitting a Pull Request
 
-This project refrains from, or attempts to refrain from, making any commits to master unless as part of a version release cycle. Therefore, any pull requests that are submitted should be targeted against the latest development branch. That is currently the `v0.6.x` branch, which supports natlas versions beginning with `0.6`. Any pull request submitted against master will almost certainly be asked to retarget to the development branch.
+This project refrains from, or attempts to refrain from, making any commits to main unless as part of a version release cycle. Therefore, any pull requests that are submitted should be targeted against the latest development branch. That is currently the `v0.6.x` branch, which supports natlas versions beginning with `0.6`. Any pull request submitted against main will almost certainly be asked to retarget to the development branch.
 
 ## Project Setup
 
@@ -213,7 +213,7 @@ To clean up issues and PRs:
   * not marked as `starter` or `help wanted` (these might stick around for a while, in general, as they're intended to be available)
   * no explicit messages in the comments asking for it to be left open
   * does not belong to a milestone
-* Leave a message when closing saying "Cleaning up stale issue. Please reopen or ping us if and when you're ready to resume this. See https://github.com/natlas/natlas/blob/master/CONTRIBUTING.md#clean-up-issues-and-prs for more details."
+* Leave a message when closing saying "Cleaning up stale issue. Please reopen or ping us if and when you're ready to resume this. See https://github.com/natlas/natlas/blob/main/CONTRIBUTING.md#clean-up-issues-and-prs for more details."
 
 ## Review Pull Requests
 

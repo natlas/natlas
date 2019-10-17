@@ -1,5 +1,5 @@
 # Natlas Security
-Natlas is a project born out of a desire for improving security, and as such, the team behind Natlas strives to take into account security considerations during the design and development of the platform. Built by hackers, Natlas is extremely receptive to constructive criticisms and research into trying to break our project. 
+Natlas is a project born out of a desire for improving security, and as such, the team behind Natlas strives to take into account security considerations during the design and development of the platform. Built by hackers, Natlas is extremely receptive to constructive criticisms and research into trying to break our project.
 
 
 ## Reporting Vulnerabilities
@@ -12,4 +12,4 @@ Natlas uses werkzeug's `generate_password_hash` function in order to generate sa
 All of Natlas' routes are protected with Flask WTF's CSRF protection and a randomly generated server-side `SECRET_KEY`. The only routes that are not protected by CSRF protection are the `/api/` routes, as they are only used by the agents. The API agent authentication is separate from user authentication, so when Natlas has `Agent Authentication` turned on, those routes aren't accessible without the relevant API keys.
 
 ## Nginx Security Options
-While Natlas itself doesn't set any security headers, the provided nginx configuration `natlas-server/deployment/nginx` provides a number of security related settings, including `X-Frame-Options DENY`, `X-Content-Type-Options nosniff;` and `X-XSS-Protection "1; mode=block";`. It also contains a number of TLS related security settings that provide some of the best TLS configurations available. More information can be found by reviewing the [config file](https://github.com/natlas/natlas/blob/master/natlas-server/deployment/nginx#L17-L34) yourself.
+While Natlas itself doesn't set any security headers, the provided nginx configuration `natlas-server/deployment/nginx` provides a number of security related settings, including `X-Frame-Options DENY`, `X-Content-Type-Options nosniff;` and `X-XSS-Protection "1; mode=block";`. It also contains a number of TLS related security settings that provide some of the best TLS configurations available. More information can be found by reviewing the [config file](https://github.com/natlas/natlas/blob/main/natlas-server/deployment/nginx#L17-L34) yourself.
