@@ -11,7 +11,7 @@ import natlaslogging
 class NatlasNetworkServices:
 
 	config = None
-	netlogger = natlaslogging.getLogger("NetworkServices")
+	netlogger = natlaslogging.get_logger("NetworkServices")
 
 	api_endpoints = {"GETSERVICES": "/api/natlas-services", "GETWORK": "/api/getwork", "SUBMIT": "/api/submit"}
 

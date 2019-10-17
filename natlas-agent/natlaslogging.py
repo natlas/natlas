@@ -22,7 +22,7 @@ def get_file_handler():
 	file_handler.setFormatter(FORMATTER)
 	return file_handler
 
-def getLogger(name):
+def get_logger(name):
 	setup_logging_dir()
 	logger = logging.getLogger(name)
 	logger.setLevel(logging.DEBUG)
