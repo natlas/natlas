@@ -58,6 +58,7 @@ Information about this project's security reporting guidelines as well as securi
 * [Topher Timzen](https://github.com/tophertimzen) - Testing, feedback, automation support.
 * [Adam Jacques](https://github.com/ajacques) - Helping with Elasticsearch theory and just generally helping improve code quality
 * [Ross Snider](https://github.com/rosswsnider) - Writing Cyclic PRNG for target selection
+* [Everyone who has contributed.](https://github.com/natlas/natlas/graphs/contributors)
 
 # Disclaimer
 
