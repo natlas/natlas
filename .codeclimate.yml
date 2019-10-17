@@ -1,3 +1,13 @@
 plugins:
 	pep8:
 		enabled: true
+  radon:
+    enabled: true
+    config:
+      python_version: 3
+  shellcheck:
+    enabled: true
+  sonar-python:
+    enabled: true
+  stylelint:
+    enabled: true
