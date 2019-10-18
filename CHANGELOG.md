@@ -11,6 +11,7 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ### Changed
 - Screenshots are stored in deterministic location based purely on their file hash, instead of `timestamp/<hash>.ext`. ([#182](https://github.com/natlas/natlas/issues/182))
+- Agents will now get work definitions from the server even when scanning targets from a file or the command line. ([#179](https://github.com/natlas/natlas/issues/179))
 
 ### Fixed
 - Agent now correctly makes sure that it's logs folder exists before trying to use it. ([#181](https://github.com/natlas/natlas/issues/181))

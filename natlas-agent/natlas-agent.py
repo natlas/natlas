@@ -9,9 +9,9 @@ import ipaddress
 import queue
 
 from natlas import logging
-
 from config import Config
 from natlas.threadscan import ThreadScan
+from natlas.net import NatlasNetworkServices
 
 ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
 
@@ -19,20 +19,21 @@ config = Config()
 MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
 
 global_logger = logging.get_logger("MainThread")
+netsrv = NatlasNetworkServices(config)
 
-def add_targets_to_queue(target, template, q):
+def add_targets_to_queue(target, q):
 	targetNetwork = ipaddress.ip_interface(target.strip())
 	if targetNetwork.with_prefixlen.endswith('/32'):
-		target_data = template.copy()
-		target_data["target"] = str(targetNetwork.ip)
-		target_data["scan_id"] = utils.generate_scan_id()
+		target_data = netsrv.get_work(target=str(targetNetwork.ip))
+		if not target_data:
+			return
 		q.put(target_data)
 	else:
 		# Iterate over usable hosts in target, queue.put will block until a queue slot is available
 		for t in targetNetwork.network.hosts():
-			target_data = target_data_template.copy()
-			target_data["target"] = str(t)
-			target_data["scan_id"] = utils.generate_scan_id()
+			target_data = netsrv.get_work(target=str(t))
+			if not target_data:
+				continue
 			q.put(target_data)
 
 
@@ -90,28 +91,9 @@ def main():
 		t.setDaemon(True)
 		t.start()
 
-	# Use a default agent config of all options enabled if we are in standalone mode
-	defaultAgentConfig = {
-		"id": 0,
-		"versionDetection": True,
-		"osDetection": True,
-		"enableScripts": True,
-		"onlyOpens": True,
-		"scanTimeout": 660,
-		"webScreenshots": True,
-		"vncScreenshots": True,
-		"scriptTimeout": 60,
-		"hostTimeout": 600,
-		"osScanLimit": True,
-		"noPing": False,
-		"udpScan": False,
-		"scripts": "default"
-	}
-	target_data_template = {"agent_config": defaultAgentConfig, "scan_reason":"manual", "tags":[]}
-
 	if args.target:
 		global_logger.info("Scanning: %s" % args.target)
-		add_targets_to_queue(args.target, target_data_template, q)
+		add_targets_to_queue(args.target, q)
 		q.join()
 		global_logger.info("Finished scanning: %s" % args.target)
 		return
@@ -119,7 +101,7 @@ def main():
 	elif args.tfile:
 		global_logger.info("Reading scope from file: %s" % args.tfile)
 		for target in open(args.tfile, "r"):
-			add_targets_to_queue(target, target_data_template, q)
+			add_targets_to_queue(target, q)
 		q.join()
 		global_logger.info("Finished scanning the target file %s" % args.tfile)
 		return

@@ -28,7 +28,7 @@ def get_web_screenshots(target, scan_id, services, proctimeout):
 			time.sleep(0.5) # a small sleep to make sure all file handles are closed so that the agent can read them
 			return True
 	except subprocess.TimeoutExpired:
-		logger.warn("TIMEOUT: Killing aquatone against %s" % target)
+		logger.warning("TIMEOUT: Killing aquatone against %s" % target)
 		process.kill()
 
 	return False
@@ -47,7 +47,7 @@ def get_vnc_screenshots(target, scan_id, proctimeout):
 			return True
 	except Exception:
 		try:
-			logger.warn("TIMEOUT: Killing vncsnapshot against %s" % target)
+			logger.warning("TIMEOUT: Killing vncsnapshot against %s" % target)
 			process.kill()
 			return False
 		except Exception:

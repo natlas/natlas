@@ -14,15 +14,59 @@ from app.util import isAcceptableTarget, parse_ssl_data
 from libnmap.parser import NmapParser
 from app.auth.wrappers import isAgentAuthenticated
 
+def get_target_tags(target):
+	targetnet = ip_network(target)
+	tags = []
+	for scope in current_app.ScopeManager.getScope():
+		if scope.overlaps(targetnet):
+			scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags.all()
+			for tag in scopetags:
+				tags.append(tag.name)
+	return list(set(tags)) # make it a set for only uniques, then make it a list to serialize to JSON
+
+def get_unique_scan_id():
+	scan_id = ''
+	while scan_id == '':
+		rand = ''.join(random.choice(string.ascii_lowercase + string.digits)
+			   for _ in range(16))
+		count, context = current_app.elastic.gethost_scan_id(rand)
+		if count == 0:
+			scan_id = rand
+	return scan_id
+
+def prepare_work(work):
+	work['tags'] = get_target_tags(work['target'])
+	work['type'] = 'nmap'
+	work['agent_config'] = current_app.agentConfig
+	work['agent_config']['scripts'] = current_app.agentScriptStr
+	work["services_hash"] = current_app.current_services["sha256"]
+	work['scan_id'] = get_unique_scan_id()
+	work['status'] = 200
+	work['message'] = "Target: " + str(work['target'])
+	return work
+
 @bp.route('/getwork', methods=['GET'])
 @isAgentAuthenticated
 def getwork():
+	manual = request.args.get('target', '')
 	if "natlas-agent" in request.headers["user-agent"]:
 		verstr = request.headers["user-agent"].split('/')[1]
 		if verstr != current_app.config["NATLAS_VERSION"]:
 			errmsg = "The server detected you were running version {} but the server is running {}".format(verstr, current_app.config["NATLAS_VERSION"])
 			return json.dumps({'status': 400, 'message': errmsg, 'retry':False}), 400, {'content-type':'application/json'}
 	work = {}
+
+	if manual:
+		canTarget = isAcceptableTarget(manual)
+		if canTarget:
+			work['scan_reason'] = 'manual'
+			work['target'] = manual
+			work = prepare_work(work)
+			return json.dumps(work), 200, {'content-type':'application/json'}
+		else:
+			errmsg = "{} is not a valid target for this server.".format(manual)
+			return json.dumps({'status': 400, 'message': errmsg, 'retry':False}), 400, {'content-type':'application/json'}
+
 	rescans = current_app.ScopeManager.getPendingRescans()
 	if len(rescans) == 0: # If there aren't any rescans, update the Rescan Queue and get it again, because of lazy loading
 		current_app.ScopeManager.updatePendingRescans()
@@ -37,11 +81,11 @@ def getwork():
 			if not scanmanager:
 				return json.dumps({ 'status': 404, 'message': 'No scope is currently configured.', "retry": True }), 404, {'content-type':'application/json'}
 
-		ip = scanmanager.getNextIP()
+		work['target'] = str(scanmanager.getNextIP())
 		work['scan_reason'] = 'auto'
 
 	else: # Get the ip from the rescan queue, mark the job as dispatched, update the PendingRescans for other requests
-		ip = rescans[0].target
+		work['target'] = rescans[0].target
 		work['scan_reason'] = 'requested'
 		rescans[0].dispatchTask()
 		db.session.add(rescans[0])
@@ -49,31 +93,7 @@ def getwork():
 		current_app.ScopeManager.updatePendingRescans()
 		current_app.ScopeManager.updateDispatchedRescans()
 
-	targetnet = ip_network(ip)
-	tags = []
-	for scope in current_app.ScopeManager.getScope():
-		if scope.overlaps(targetnet):
-			scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags.all()
-			for tag in scopetags:
-				tags.append(tag.name)
-	work['tags'] = list(set(tags)) # make it a set for only uniques, then make it a list to serialize to JSON
-
-
-	work['type'] = 'nmap'
-	work['agent_config'] = current_app.agentConfig
-	work['agent_config']['scripts'] = current_app.agentScriptStr
-	work["services_hash"] = current_app.current_services["sha256"]
-	scan_id = ''
-	while scan_id == '':
-		rand = ''.join(random.choice(string.ascii_lowercase + string.digits)
-			   for _ in range(16))
-		count, context = current_app.elastic.gethost_scan_id(rand)
-		if count == 0:
-			scan_id = rand
-	work['scan_id'] = scan_id
-	work['target'] = str(ip)
-	work['status'] = 200
-	work['message'] = "Target: " + str(ip)
+	work = prepare_work(work)
 
 	return json.dumps(work), 200, {'content-type':'application/json'}
 

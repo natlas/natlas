@@ -28,7 +28,11 @@ def hostinfo(ip):
 
 def isAcceptableTarget(target):
 	from flask import current_app, abort
-	targetAddr = ipaddress.IPv4Address(target)
+	try:
+		targetAddr = ipaddress.IPv4Address(target)
+	except ipaddress.AddressValueError:
+		return False
+
 	inScope = False
 	# if zero, update to make sure that the scopemanager has been populated
 	if current_app.ScopeManager.getScopeSize() == 0:

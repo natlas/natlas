@@ -57,7 +57,7 @@ def scan(target_data, config):
 		process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=int(agentConfig["scanTimeout"])) # nosec
 	except subprocess.TimeoutExpired:
 		result.add_item('timed_out', True)
-		logger.warn("TIMEOUT: Nmap against %s (%s)" % (target, scan_id))
+		logger.warning("TIMEOUT: Nmap against %s (%s)" % (target, scan_id))
 		return result
 
 	logger.info("Nmap %s (%s) complete" % (target, scan_id))
@@ -66,20 +66,20 @@ def scan(target_data, config):
 		try:
 			result.add_item(ext+"_data", open("data/natlas."+scan_id+"."+ext).read())
 		except Exception:
-			logger.warn("Couldn't read natlas.%s.%s" % (scan_id, ext))
+			logger.warning("Couldn't read natlas.%s.%s" % (scan_id, ext))
 			return False
 
 	try:
 		nmap_report = NmapParser.parse(result.result['xml_data'])
 	except NmapParserException:
-		logger.warn("Couldn't parse natlas.%s.xml" % (scan_id))
+		logger.warning("Couldn't parse natlas.%s.xml" % (scan_id))
 		return False
 
 	if nmap_report.hosts_total < 1:
-		logger.warn("No hosts found in natlas.%s.xml" % (scan_id))
+		logger.warning("No hosts found in natlas.%s.xml" % (scan_id))
 		return False
 	elif nmap_report.hosts_total > 1:
-		logger.warn("Too many hosts found in natlas.%s.xml" % (scan_id))
+		logger.warning("Too many hosts found in natlas.%s.xml" % (scan_id))
 		return False
 	elif nmap_report.hosts_down == 1:
 		# host is down
@@ -160,10 +160,10 @@ class ThreadScan(threading.Thread):
 				if target_data and target_data["services_hash"] != self.servicesSha:
 					self.servicesSha = self.netsrv.get_services_file()
 					if not self.servicesSha:
-						logger.warn("Failed to get updated services from %s" % config.server)
+						logger.warning("Failed to get updated services from %s" % config.server)
 				result = scan(target_data, self.config)
 				if not result:
-					logger.warn("Not submitting data for %s" % target_data['target'])
+					logger.warning("Not submitting data for %s" % target_data['target'])
 					continue
 				result.scan_stop()
 				response = self.netsrv.submit_results(result)
@@ -179,7 +179,7 @@ class ThreadScan(threading.Thread):
 				logger.info("Manual Target: %s" % target_data["target"])
 				result = scan(target_data, self.config)
 				if not result:
-					logger.warn("Not submitting data for %s" % target_data['target'])
+					logger.warning("Not submitting data for %s" % target_data['target'])
 					continue
 				result.scan_stop()
 				response = self.netsrv.submit_results(result)

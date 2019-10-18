@@ -89,11 +89,13 @@ class NatlasNetworkServices:
 			result = self.make_request(*args, **kwargs)
 			RETRY=False
 
-			if not result:
+			if result is False: # Retry if there are connection errors
 				RETRY=True
-			elif 'retry' in result.json() and result.json()['retry']:
+			elif 'retry' in result.json() and result.json()['retry']: # Retry if the server tells us to
 				RETRY=True
-			elif not 'retry' in result.json() or not result.json()['retry']:
+			elif 'retry' in result.json() and not result.json()['retry']: # Don't retry if the server tells us not to
+				return result
+			elif not 'retry' in result.json(): # No instructions on whether to retry or not, so don't
 				return result
 
 			if RETRY:
@@ -129,9 +131,15 @@ class NatlasNetworkServices:
 		return serviceData["sha256"] # return True if we got a response and everything checks out
 
 
-	def get_work(self):
-		self.netlogger.info("Getting work from %s" % self.config.server)
-		response = self.backoff_request(endpoint=self.api_endpoints["GETWORK"])
+	def get_work(self, target=None):
+		if target:
+			self.netlogger.info("Getting work config for %s from %s" % (target, self.config.server))
+			get_work_endpoint=self.api_endpoints["GETWORK"]+"?target="+target
+		else:
+			self.netlogger.info("Getting work from %s" % (self.config.server))
+			get_work_endpoint=self.api_endpoints["GETWORK"]
+
+		response = self.backoff_request(endpoint=get_work_endpoint)
 		if response:
 			work = response.json()
 		else:
