@@ -13,6 +13,8 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 - Screenshots are stored in deterministic location based purely on their file hash, instead of `timestamp/<hash>.ext`. ([#182](https://github.com/natlas/natlas/issues/182))
 
 ### Fixed
+- Agent now correctly makes sure that it's logs folder exists before trying to use it. ([#181](https://github.com/natlas/natlas/issues/181))
+- Agent checks for `timed_out` before it checks for `is_up` ([#184](https://github.com/natlas/natlas/issues/184))
 
 ## [v0.6.6]
 
