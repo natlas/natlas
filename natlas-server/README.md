@@ -21,26 +21,33 @@ There are a number of config options that you can specify in a file called `.env
 
 Can't be changed via the web interface (only `.env`):
 
-- `SECRET_KEY` defaults to `you-should-set-a-secret-key`, however the `setup-server.sh` script will generate a random value for you if you don't have an existing `SECRET_KEY` set.
-- `SQLALCHEMY_DATABASE_URI` defaults to a sqlite database in the natlas-server directory `sqlite:///metadata.db`
-- `FLASK_ENV` defaults to `production` and should not be changed unless you are developing for natlas.
-- `FLASK_APP` defaults to `natlas-server.py` and should not be changed. It's what allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.
-- `MEDIA_DIRECTORY` defaults to `$BASEDIR/media/`. If you want to store media in a larger mounted storage, set this value to an absolute path. If you change the path after you already have data, make sure to copy the contents of the previous folder into the new media directory.
-- `NATLAS_VERSION_OVERRIDE` can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented.
+| Variable | Default | Explanation |
+|---|---|---|
+| `SECRET_KEY` | `you-should-set-a-secret-key` | Used for CSRF tokens and sessions. The `setup-server.sh` script will generate a random value for you if you don't have an existing `SECRET_KEY` set. |
+| `SQLALCHEMY_DATABASE_URI` | `sqlite:///metadata.db` | A SQLALCHEMY URI that points to the database to store natlas metadata in |
+| `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
+| `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
+| `MEDIA_DIRECTORY` | `$BASEDIR/media/` | If you want to store media (screenshots) in a larger mounted storage volume, set this value to an absolute path. If you change this value, be sure to copy the contents of the previous media directory to the new location, otherwise old media will not render.|
+| `NATLAS_VERSION_OVERRIDE` | `None` | **Danger**: This can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented. |
+
 
 Can be changed via the web interface:
 
-- `LOGIN_REQUIRED` defaults to `False`
-- `REGISTER_ALLOWED` defaults to `False`
-- `ELASTICSEARCH_URL` defaults to `http://localhost:9200`
-- `MAIL_SERVER` defaults to `localhost`
-- `MAIL_PORT` defaults to `25`
-- `MAIL_USE_TLS` defaults to `False`
-- `MAIL_USERNAME` defaults to `""`
-- `MAIL_PASSWORD` defaults to `""`
-- `MAIL_FROM` defaults to `""`
+| Variable | Default | Explanation |
+|---|---|---|
+| `LOGIN_REQUIRED` | `False` | Require login to browse results |
+| `REGISTER_ALLOWED` | `False` | Permit open registration (requires defined `MAIL_*` settings below) for new users |
+| `ELASTICSEARCH_URL` | `http://localhost:9200` | Location of an elasticsearch node that we can store and fetch scan data from |
+| `MAIL_SERVER` | `localhost` | Mail server to use for invitations, registrations, and password resets |
+| `MAIL_PORT` | `25` | Port that `MAIL_SERVER` is listening on |
+| `MAIL_USE_TLS` | `False` | Whether or not to connect to `MAIL_SERVER` with TLS|
+| `MAIL_USERNAME` | `""` | Username (if required) to connect to `MAIL_SERVER` |
+| `MAIL_PASSWORD` | `""` | Password (if required) to connect to `MAIL_SERVER` |
+| `MAIL_FROM` | `""` | Address to be used as the "From" address for outgoing mail |
+| `LOCAL_SUBRESOURCES` | `False` | Use local subresources (js,css,fonts) instead of CDN resources |
+| `CUSTOM_BRAND` | `""` | Custom branding for the navigation bar to help distinguish different natlas installations from one another |
 
-For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`, which you should **absolutely** set), however user invitations won't work without a valid mail server.
+For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`, but this should get generated automatically by `setup-server.sh`), however user invitations won't work without a valid mail server.
 
 
 Initializing the Database
