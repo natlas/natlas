@@ -8,7 +8,7 @@ from natlas import logging
 
 logger = logging.get_logger("ScreenshotUtils")
 
-def get_web_screenshots(target, scan_id, services):
+def get_web_screenshots(target, scan_id, services, proctimeout):
 	inputstring = ""
 	for service in services:
 		inputstring += service + "://" + target + "\n"
@@ -19,11 +19,11 @@ def get_web_screenshots(target, scan_id, services):
 	logger.info("Attempting to take %s screenshot(s) for %s" % (', '.join(services).upper(),target))
 
 	p1 = subprocess.Popen(["echo", inputstring], stdout=subprocess.PIPE) # nosec
-	process = subprocess.Popen(["aquatone", "-scan-timeout", "1000", "-out", "data/aquatone."+scan_id], stdin=p1.stdout, stdout=subprocess.DEVNULL) # nosec
+	process = subprocess.Popen(["aquatone", "-scan-timeout", "2500", "-out", "data/aquatone."+scan_id], stdin=p1.stdout, stdout=subprocess.DEVNULL) # nosec
 	p1.stdout.close()
 
 	try:
-		out,err = process.communicate(timeout=60)
+		out,err = process.communicate(timeout=proctimeout)
 		if process.returncode is 0:
 			time.sleep(0.5) # a small sleep to make sure all file handles are closed so that the agent can read them
 			return True
@@ -33,7 +33,7 @@ def get_web_screenshots(target, scan_id, services):
 
 	return False
 
-def get_vnc_screenshots(target, scan_id):
+def get_vnc_screenshots(target, scan_id, proctimeout):
 	if "DISPLAY" not in os.environ:
 		return False
 
@@ -42,7 +42,7 @@ def get_vnc_screenshots(target, scan_id):
 	process = subprocess.Popen(["xvfb-run", "vncsnapshot", "-quality", "50", target, "data/natlas." +
 								scan_id + ".vnc.jpg"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # nosec
 	try:
-		out, err = process.communicate(timeout=60)
+		out, err = process.communicate(timeout=proctimeout)
 		if process.returncode is 0:
 			return True
 	except Exception:

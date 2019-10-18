@@ -103,7 +103,7 @@ def scan(target_data, config):
 		if "443/tcp" in result.result['nmap_data']:
 			targetServices.append("https")
 		if len(targetServices) > 0:
-			screenshots.get_web_screenshots(target, scan_id, targetServices)
+			screenshots.get_web_screenshots(target, scan_id, targetServices, agentConfig["webScreenshotTimeout"])
 
 		serviceMapping = {
 			"http": 80,
@@ -125,7 +125,7 @@ def scan(target_data, config):
 
 	if agentConfig["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result.result['nmap_data']:
-			if screenshots.get_vnc_screenshots(target, scan_id) is True:
+			if screenshots.get_vnc_screenshots(target, scan_id, agentConfig["vncScreenshotTimeout"]) is True:
 				result.add_screenshot({
 					"host": target,
 					"port": 5900,
