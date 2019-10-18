@@ -27,19 +27,19 @@ def send_media(filename):
 @bp.route('/search')
 @isAuthenticated
 def search():
-	query = request.args.get('q', '')
-	page = int(request.args.get('p', 1))
-	format = request.args.get('f', '')
-	scan_ids = request.args.get('s', '')
+	query = request.args.get('query', '')
+	page = int(request.args.get('page', 1))
+	format = request.args.get('format', '')
+	scan_ids = request.args.get('includeScanIDs', '')
 
 
 	searchOffset = current_user.results_per_page * (page-1)
 	count, context = current_app.elastic.search(query, current_user.results_per_page, searchOffset)
 	totalHosts = current_app.elastic.totalHosts()
 
-	next_url = url_for('main.search', q=query, p=page+1) \
+	next_url = url_for('main.search', query=query, page=page+1) \
 		 if count > page * current_user.results_per_page else None
-	prev_url = url_for('main.search', q=query, p=page - 1) \
+	prev_url = url_for('main.search', query=query, page=page - 1) \
 		if page > 1 else None
 
 	# what kind of output are we looking for?
