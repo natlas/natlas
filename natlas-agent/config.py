@@ -60,6 +60,9 @@ class Config:
 		# Only needed if the server is configured to require agent authentication
 		self.auth_token = os.environ.get("NATLAS_AGENT_TOKEN") or None
 
+		# Optionally save files that failed to upload
+		self.save_fails = self.get_bool("NATLAS_SAVE_FAILS") or False
+
 		# Allow version overrides for local development
 		# Necessary to test versioned host data templates before release
 		self.version_override = os.environ.get("NATLAS_VERSION_OVERRIDE") or None

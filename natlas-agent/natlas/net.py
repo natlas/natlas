@@ -102,7 +102,7 @@ class NatlasNetworkServices:
 				attempt += 1
 				if giveup and attempt == self.config.max_retries:
 					self.netlogger.warn("Request to %s failed %s times. Giving up" % (self.config.server, self.config.max_retries))
-					return None
+					return False
 				jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
 				current_sleep = min(self.config.backoff_max, self.config.backoff_base * 2 ** attempt) + jitter
 				self.netlogger.warn("Request to %s failed. Waiting %s seconds before retrying." % (self.config.server, current_sleep))
