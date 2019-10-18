@@ -8,9 +8,6 @@ import glob
 from natlas import logging
 
 
-
-SCAN_ID_LENGTH = 16
-
 utillogger = logging.get_logger("Utilities")
 
 
@@ -25,15 +22,36 @@ def validate_target(target, config):
 		return False
 	return True
 
-def generate_scan_id():
-	return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(SCAN_ID_LENGTH))
 
-def cleanup_files(scan_id):
+def create_data_dir(scan_id):
+	data_folder = f"data/natlas.{scan_id}"
+	os.makedirs(data_folder, exist_ok=True)
+
+
+def get_data_dir(scan_id):
+	data_folder = f"data/natlas.{scan_id}"
+	return data_folder
+
+
+def delete_files(scan_id):
+	data_folder = f"data/natlas.{scan_id}"
+	if os.path.isdir(data_folder):
+		shutil.rmtree(data_folder)
+
+
+def save_files(scan_id):
+	failroot = "data/failures"
+	if not os.path.isdir(failroot):
+		os.mkdir(failroot)
+	if os.path.isdir(f"data/natlas.{scan_id}"):
+		src = f"data/natlas.{scan_id}"
+		dst = f"data/failures/"
+		shutil.move(src, dst)
+
+
+def cleanup_files(scan_id, failed=False, saveFails=False):
 	utillogger.info("Cleaning up files for %s" % scan_id)
-	if os.path.isdir("data/aquatone.%s" % scan_id):
-		shutil.rmtree("data/aquatone.%s" % scan_id)
-	for file in glob.glob("data/natlas."+scan_id+".*"):
-		try:
-			os.remove(file)
-		except Exception:
-			utillogger.error("Could not remove file %s" % file)
+	if saveFails and failed:
+		save_files(scan_id)
+	else:
+		delete_files(scan_id)

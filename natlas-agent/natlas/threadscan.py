@@ -16,7 +16,8 @@ from natlas import utils
 logger = logging.get_logger("AgentThread")
 
 def command_builder(scan_id, agentConfig, target):
-	command = ["nmap", "--privileged", "-oA", "data/natlas."+scan_id, "--servicedb", "./natlas-services"]
+	outFiles = utils.get_data_dir(scan_id) + f"/nmap.{scan_id}"
+	command = ["nmap", "--privileged", "-oA", outFiles, "--servicedb", "./natlas-services"]
 
 	commandDict = {
 		"versionDetection": "-sV",
@@ -50,6 +51,7 @@ def scan(target_data, config):
 	agentConfig = target_data["agent_config"]
 
 	command = command_builder(scan_id, agentConfig, target)
+	data_dir = utils.get_data_dir(scan_id)
 
 	result = ScanResult(target_data, config)
 
@@ -63,23 +65,24 @@ def scan(target_data, config):
 	logger.info("Nmap %s (%s) complete" % (target, scan_id))
 
 	for ext in 'nmap', 'gnmap', 'xml':
+		path = f"{data_dir}/nmap.{scan_id}.{ext}"
 		try:
-			result.add_item(ext+"_data", open("data/natlas."+scan_id+"."+ext).read())
+			result.add_item(ext+"_data", open(path).read())
 		except Exception:
-			logger.warning("Couldn't read natlas.%s.%s" % (scan_id, ext))
+			logger.warning(f"Couldn't read {path}")
 			return False
 
 	try:
 		nmap_report = NmapParser.parse(result.result['xml_data'])
 	except NmapParserException:
-		logger.warning("Couldn't parse natlas.%s.xml" % (scan_id))
+		logger.warning(f"Couldn't parse nmap.{scan_id}.xml")
 		return False
 
 	if nmap_report.hosts_total < 1:
-		logger.warning("No hosts found in natlas.%s.xml" % (scan_id))
+		logger.warning(f"No hosts found in nmap.{scan_id}.xml")
 		return False
 	elif nmap_report.hosts_total > 1:
-		logger.warning("Too many hosts found in natlas.%s.xml" % (scan_id))
+		logger.warning(f"Too many hosts found in nmap.{scan_id}.xml")
 		return False
 	elif nmap_report.hosts_down == 1:
 		# host is down
@@ -110,7 +113,8 @@ def scan(target_data, config):
 			"https": 443
 		}
 		for service in targetServices:
-			screenshotPath = "data/aquatone." + scan_id + "/screenshots/" + service + "__" + target.replace('.', '_') + ".png"
+			screenshotPath = f"{data_dir}/aquatone.{scan_id}/screenshots/{service}__{target.replace('.','_')}.png"
+			# "data/aquatone." + scan_id + "/screenshots/" + service + "__" + target.replace('.', '_') + ".png"
 
 			if not os.path.isfile(screenshotPath):
 				continue
@@ -126,13 +130,16 @@ def scan(target_data, config):
 	if agentConfig["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result.result['nmap_data']:
 			if screenshots.get_vnc_screenshots(target, scan_id, agentConfig["vncScreenshotTimeout"]) is True:
-				result.add_screenshot({
-					"host": target,
-					"port": 5900,
-					"service": "VNC",
-					"data": str(base64.b64encode(open("data/natlas."+scan_id+".vnc.jpg", 'rb').read()))[2:-1]
-				})
-				logger.info("VNC screenshot acquired for %s" % result.result['ip'])
+
+				screenshotPath = f"{data_dir}/vncsnapshot.{scan_id}.jpg"
+				if os.path.isfile(screenshotPath):
+					result.add_screenshot({
+						"host": target,
+						"port": 5900,
+						"service": "VNC",
+						"data": str(base64.b64encode(open(screenshotPath, 'rb').read()))[2:-1]
+					})
+					logger.info("VNC screenshot acquired for %s" % result.result['ip'])
 
 	# submit result
 
@@ -161,13 +168,19 @@ class ThreadScan(threading.Thread):
 					self.servicesSha = self.netsrv.get_services_file()
 					if not self.servicesSha:
 						logger.warning("Failed to get updated services from %s" % config.server)
+
+				utils.create_data_dir(target_data['scan_id'])
 				result = scan(target_data, self.config)
+
 				if not result:
 					logger.warning("Not submitting data for %s" % target_data['target'])
 					continue
 				result.scan_stop()
 				response = self.netsrv.submit_results(result)
-				utils.cleanup_files(target_data['scan_id'])
+				if response is False:
+					utils.cleanup_files(target_data['scan_id'], failed=True, saveFails=self.config.save_fails)
+				else:
+					utils.cleanup_files(target_data['scan_id'])
 
 		else:
 			#If we're not in auto mode, then the queue is populated with work from local data
@@ -177,11 +190,15 @@ class ThreadScan(threading.Thread):
 				if target_data is None:
 					break
 				logger.info("Manual Target: %s" % target_data["target"])
+				utils.create_data_dir(target_data['scan_id'])
 				result = scan(target_data, self.config)
 				if not result:
 					logger.warning("Not submitting data for %s" % target_data['target'])
 					continue
 				result.scan_stop()
 				response = self.netsrv.submit_results(result)
-				utils.cleanup_files(target_data['scan_id'])
+				if response is False:
+					utils.cleanup_files(target_data['scan_id'], failed=True, saveFails=self.config.save_fails)
+				else:
+					utils.cleanup_files(target_data['scan_id'])
 				self.queue.task_done()
