@@ -8,6 +8,7 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ### Added
 - Administrators can now configure process timeout values for web and vnc screenshot agent capabilities. ([#186](https://github.com/natlas/natlas/issues/186))
+- Users may now choose to search historical results by including `includeHistory=1` in the query parameters. ([#110](https://github.com/natlas/natlas/issues/110))
 
 ### Changed
 - Screenshots are stored in deterministic location based purely on their file hash, instead of `timestamp/<hash>.ext`. ([#182](https://github.com/natlas/natlas/issues/182))

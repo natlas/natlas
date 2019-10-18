@@ -10,10 +10,14 @@
   <div class="row search-header mb-3">
     <div class="col">
     {% if query != '' %}
-      <h2 class="sub-header">{{numresults}} search results for '{{query}}'
+      <h2 class="sub-header">{{numresults}} search results for '{{query}}'{%if request.args.get('includeHistory')%} <small>(including history)</small>{% endif %}</h2>
       {% include 'includes/hostlist_button.html' %}
     {% else %}
-      <h2 class="sub-header">{{ totalHosts }} hosts scanned, {{ numresults }} hosts up</h2>
+      {% if request.args.get('includeHistory') %}
+      <h2 class="sub-header">Showing {{ numresults }} results across {{ totalHosts }} hosts <small>(including history)</small></h2>
+      {% else %}
+      <h2 class="sub-header">Showing {{ numresults }} results across {{ totalHosts }} hosts</h2>
+      {% endif %}
     {% endif %}
     </div>
     {% if numresults > current_user.results_per_page %}
