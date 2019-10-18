@@ -2,7 +2,7 @@
 
 [![Release](https://img.shields.io/github/release/natlas/natlas.svg)](https://github.com/natlas/natlas/releases/latest)
 ![Last Commit](https://img.shields.io/github/last-commit/natlas/natlas.svg)
-[![Maintainability](https://api.codeclimate.com/v1/badges/b2bd7a586e80282d3ea1/maintainability)](https://codeclimate.com/github/natlas/natlas/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/321141e5cf7426874cd7/maintainability)](https://codeclimate.com/github/natlas/natlas/maintainability)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/natlas/natlas.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/natlas/natlas/alerts/)
 ![Total Downloads](https://img.shields.io/github/downloads/natlas/natlas/total.svg)
 ![Code Size](https://img.shields.io/github/languages/code-size/natlas/natlas.svg)
