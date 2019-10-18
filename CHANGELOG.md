@@ -6,6 +6,14 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ## Unreleased
 
+### Added
+- Administrators can now configure process timeout values for web and vnc screenshot agent capabilities. ([#186](https://github.com/natlas/natlas/issues/186))
+
+### Changed
+- Screenshots are stored in deterministic location based purely on their file hash, instead of `timestamp/<hash>.ext`. ([#182](https://github.com/natlas/natlas/issues/182))
+
+### Fixed
+
 ## [v0.6.6]
 
 ### Added
