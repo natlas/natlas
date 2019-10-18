@@ -63,11 +63,11 @@
 			"service": {
 			  "type": "keyword"
 			},
-			"path": {
-			  "type": "text"
+			"hash": {
+			  "type": "keyword"
 			},
-			"thumb": {
-			  "type": "text"
+			"thumb_hash": {
+			  "type": "keyword"
 			}
 		  }
 		},

@@ -145,12 +145,6 @@ def submit():
 
 
 	if 'screenshots' in newhost and newhost['screenshots']:
-		datepath = newhost['ctime'].strftime("%Y/%m/%d/%H")
-		dirpath = os.path.join(current_app.config["MEDIA_DIRECTORY"], datepath)
-		thumbpath = os.path.join(dirpath, "t")
-
-		# makedirs attempts to make every directory necessary to get to the "thumbs" folder: YYYY/MM/DD/HH/thumbs
-		os.makedirs(thumbpath, exist_ok=True)
 
 		# Handle screenshots
 		thumb_size = (255, 160)
@@ -164,20 +158,29 @@ def submit():
 			image = base64.b64decode(item['data'])
 			image_hash = hashlib.sha256(image).hexdigest()
 
+			hashpath = "{}/{}".format(image_hash[0:2], image_hash[2:4])
+			dirpath = os.path.join(current_app.config["MEDIA_DIRECTORY"], "original", hashpath)
+
+
+			# makedirs attempts to make every directory necessary to get to the "thumbs" folder: YYYY/MM/DD/HH/thumbs
+			os.makedirs(dirpath, exist_ok=True)
+
 			fname = os.path.join(dirpath, image_hash + file_ext)
 			with open(fname, 'wb') as f:
 				f.write(image)
-
-			# use datepath instead of dirpath so that we don't include the base media directory in elasticsearch data
-			item['path'] = os.path.join(datepath, image_hash + file_ext)
+			item['hash'] = image_hash
 			del item['data']
+
 			thumb = Image.open(fname)
 			thumb.thumbnail(thumb_size)
 			thumb_hash = hashlib.sha256(thumb.tobytes()).hexdigest()
-			fname = os.path.join(dirpath, "t", thumb_hash + file_ext)
+			thumbhashpath = "{}/{}".format(thumb_hash[0:2], thumb_hash[2:4])
+			thumbpath = os.path.join(current_app.config["MEDIA_DIRECTORY"], "thumbs", thumbhashpath)
+			os.makedirs(thumbpath, exist_ok=True)
+			fname = os.path.join(thumbpath, thumb_hash + file_ext)
 			thumb.save(fname)
 			thumb.close()
-			item['thumb'] = os.path.join(datepath, "t", thumb_hash + file_ext)
+			item['thumb_hash'] = thumb_hash
 			num_screenshots +=1
 
 		newhost['num_screenshots'] = num_screenshots
