@@ -1,0 +1,9 @@
+<div class="btn-group host-list" role="group">
+  <button id="hostListButton" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fas fa-file-export mr-1"></i>Export
+  </button>
+  <div class="dropdown-menu" aria-labelledby="hostListButton">
+    <a class="dropdown-item" href="{{ url_for('main.search', query=request.args.get('query'), page=request.args.get('page', 1), format='hostlist') }}">IP addresses</a>
+  	<a class="dropdown-item" href="{{ url_for('main.search', query=request.args.get('query'), page=request.args.get('page', 1), format='hostlist', includeScanIDs=True) }}">IP addresses, scan_id</a>
+  </div>
+</div>

@@ -26,7 +26,7 @@
     {% if host.tags %}
     <h5 class="mt-2">Tags</h5>
       {% for tag in host.tags %}
-        <a href="{{ url_for('main.search', q="tags:" + tag)}}"><span class="badge badge-secondary badge-tag">{{ tag }}</span></a>
+        <a href="{{ url_for('main.search', query="tags:" + tag)}}"><span class="badge badge-secondary badge-tag">{{ tag }}</span></a>
       {% endfor %}
     {% endif %}
     <div class="btn-group export-group mt-2" role="group">

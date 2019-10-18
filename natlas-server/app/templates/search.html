@@ -11,7 +11,7 @@
     <div class="col">
     {% if query != '' %}
       <h2 class="sub-header">{{numresults}} search results for '{{query}}'
-      <small><a href="?q={{query}}&p={{page}}&f=hostlist"> [hostlist]</a></small></h2>
+      {% include 'includes/hostlist_button.html' %}
     {% else %}
       <h2 class="sub-header">{{ totalHosts }} hosts scanned, {{ numresults }} hosts up</h2>
     {% endif %}
