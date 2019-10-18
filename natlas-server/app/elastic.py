@@ -61,13 +61,13 @@ class Elastic:
 				return False
 		return True
 
-	def search(self, query, limit, offset):
+	def search(self, query, limit, offset, searchIndex="nmap"):
 		if not self.checkStatus():
 			return 0,[]
 		if query == '':
 			query = 'nmap'
 		try:
-			result = self.es.search(index="nmap", doc_type="_doc", body=\
+			result = self.es.search(index=searchIndex, doc_type="_doc", body=\
 				{
 					"size": limit,
 					"from": offset,
