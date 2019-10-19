@@ -10,6 +10,7 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 - Administrators can now configure process timeout values for web and vnc screenshot agent capabilities. ([#186](https://github.com/natlas/natlas/issues/186))
 - Users may now choose to search historical results by including `includeHistory=1` in the query parameters. ([#110](https://github.com/natlas/natlas/issues/110))
 - Agents can now optionally save data that failed to upload to the server via the `NATLAS_SAVE_FAILS` environment variable. ([#129](https://github.com/natlas/natlas/issues/129))
+- Importing scope, either via the web interface or via the `./add-scope.py` script, now supports importing scope items with tags. Each imported line can have a comma separated list of tags. Tags will be created if they don't already exist. ([#142](https://github.com/natlas/natlas/issues/142))
 
 ### Changed
 - Screenshots are stored in deterministic location based purely on their file hash, instead of `timestamp/<hash>.ext`. ([#182](https://github.com/natlas/natlas/issues/182))
