@@ -162,34 +162,24 @@ def importScope(scopetype=''):
 	else:
 		abort(404)
 	if importForm.validate_on_submit():
-		successImport = []
+		successImports = []
 		alreadyExists = []
-		failedImport = []
+		failedImports = []
 		newScopeItems = importForm.scope.data.split('\n')
 		for item in newScopeItems:
 			item = item.strip()
-			if '/' not in item:
-				item = item + '/32'
-			try:
-				target = ipaddress.ip_network(item, False)
-			except ValueError as e:
-				failedImport.append(item) # this item couldn't be validated as an ip network
-				continue
-			exists = ScopeItem.query.filter_by(target=target.with_prefixlen).first()
-			if exists:
-				alreadyExists.append(target.with_prefixlen) # this range is already a scope item
-				continue
-			newTarget = ScopeItem(target=target.with_prefixlen, blacklist=importBlacklist)
-			db.session.add(newTarget)
-			successImport.append(newTarget.target)
+			fail, exist, success = ScopeItem.importScope(item, importBlacklist)
+			failedImports = failedImports + fail
+			alreadyExists = alreadyExists + exist
+			successImports = successImports + success
 		db.session.commit()
 		current_app.ScopeManager.update()
-		if len(successImport) > 0:
-			flash('%s targets added to %s!' % (len(successImport), scopetype), 'success')
+		if len(successImports) > 0:
+			flash('%s targets added to %s!' % (len(successImports), scopetype), 'success')
 		if len(alreadyExists) > 0:
 			flash('%s targets already existed!' % len(alreadyExists), 'info')
-		if len(failedImport) > 0:
-			flash('%s targets failed to import!' % len(failedImport), 'danger')
+		if len(failedImports) > 0:
+			flash('%s targets failed to import!' % len(failedImports), 'danger')
 			for item in failedImport:
 				flash('%s' % item, 'danger')
 		return redirect(url_for('admin.%s' % scopetype))
