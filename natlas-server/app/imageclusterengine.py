@@ -39,7 +39,7 @@ class imageclusterengine:
 		if kwargs['hashtype'] == 'phash':
 			i = 0
 			phash = [0] * 64
-			for v in imagehash.phash(img).__dict__['hash']:
+			for v in imagehash.average_hash(img).__dict__['hash']:
 				for u in v:
 					phash[i] = 1.0 if u else 0.0
 					i = i + 1
@@ -54,17 +54,17 @@ class imageclusterengine:
 			b = [(d[2], d[2], d[2]) for d in data]
 
 			img.putdata(r)
-			for v in imagehash.phash(img).__dict__['hash']:
+			for v in imagehash.average_hash(img).__dict__['hash']:
 				for u in v:
 					phash[i] = 1.0 if u else 0.0
 					i = i + 1
 			img.putdata(b)
-			for v in imagehash.phash(img).__dict__['hash']:
+			for v in imagehash.average_hash(img).__dict__['hash']:
 				for u in v:
 					phash[i] = 1.0 if u else 0.0
 					i = i + 1
 			img.putdata(g)
-			for v in imagehash.phash(img).__dict__['hash']:
+			for v in imagehash.average_hash(img).__dict__['hash']:
 				for u in v:
 					phash[i] = 1.0 if u else 0.0
 					i = i + 1
