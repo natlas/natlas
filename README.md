@@ -8,7 +8,7 @@
 ![Code Size](https://img.shields.io/github/languages/code-size/natlas/natlas.svg)
 [![Contributors](https://img.shields.io/github/contributors/natlas/natlas.svg)](https://github.com/natlas/natlas/graphs/contributors)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat)](LICENSE)
-
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/natlasio)
 
 # Summary
 
