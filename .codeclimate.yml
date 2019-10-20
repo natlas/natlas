@@ -1,6 +1,7 @@
+version: "2"
 plugins:
-	pep8:
-		enabled: true
+  pep8:
+    enabled: true
   radon:
     enabled: true
     config:
