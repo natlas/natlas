@@ -138,29 +138,26 @@ def host_historical_result(ip, scan_id):
 
 	return render_template("host/versions/"+version+"/summary.html", host=context, info=info, **context, delForm=delForm, delHostForm=delHostForm, rescanForm=rescanForm)
 
-@bp.route('/host/<ip>/<scan_id>.xml')
+@bp.route('/host/<ip>/<scan_id>.<ext>')
 @isAuthenticated
-def export_scan_xml(ip, scan_id):
-	count, context = current_app.elastic.gethost_scan_id(scan_id)
-	return Response(context['xml_data'], mimetype="text/plain")
+def export_scan(ip, scan_id, ext):
+	if ext not in ['xml', 'nmap', 'gnmap', 'json']:
+		abort(404)
 
-@bp.route('/host/<ip>/<scan_id>.nmap')
-@isAuthenticated
-def export_scan_nmap(ip, scan_id):
-	count, context = current_app.elastic.gethost_scan_id(scan_id)
-	return Response(context['nmap_data'], mimetype="text/plain")
+	export_field = f"{ext}_data"
 
-@bp.route('/host/<ip>/<scan_id>.gnmap')
-@isAuthenticated
-def export_scan_gnmap(ip, scan_id):
-	count, context = current_app.elastic.gethost_scan_id(scan_id)
-	return Response(context['gnmap_data'], mimetype="text/plain")
+	if ext == 'json':
+		mime = "application/json"
+	else:
+		mime = "text/plain"
 
-@bp.route('/host/<ip>/<scan_id>.json')
-@isAuthenticated
-def export_scan_json(ip, scan_id):
 	count, context = current_app.elastic.gethost_scan_id(scan_id)
-	return Response(json.dumps(context), mimetype="application/json")
+	if ext == 'json' and count > 0:
+		return Response(json.dumps(context), mimetype=mime)
+	elif count > 0 and export_field in context:
+		return Response(context[export_field], mimetype=mime)
+	else:
+		abort(404)
 
 @bp.route('/host/<ip>/screenshots')
 @bp.route('/host/<ip>/screenshots/')
