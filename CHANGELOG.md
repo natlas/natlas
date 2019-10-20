@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project strives to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [v0.6.7]
 
 ### Added
 - Administrators can now configure process timeout values for web and vnc screenshot agent capabilities. ([#186](https://github.com/natlas/natlas/issues/186))
@@ -19,6 +19,8 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 ### Fixed
 - Agent now correctly makes sure that it's logs folder exists before trying to use it. ([#181](https://github.com/natlas/natlas/issues/181))
 - Agent checks for `timed_out` before it checks for `is_up` ([#184](https://github.com/natlas/natlas/issues/184))
+- Handle exceptions when export requests are made for non-existing data ([#191](https://github.com/natlas/natlas/issues/191)
+- Removed unexpected search export button when no search results [#193](https://github.com/natlas/natlas/issues/193)
 
 ## [v0.6.6]
 
@@ -201,7 +203,8 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 * Ability to run in standalone mode
 
 
-[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.6...HEAD
+[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.7...HEAD
+[v0.6.7]: https://github.com/natlas/natlas/compare/v0.6.6...v0.6.7
 [v0.6.6]: https://github.com/natlas/natlas/compare/v0.6.5...v0.6.6
 [v0.6.5]: https://github.com/natlas/natlas/compare/v0.6.4...v0.6.5
 [v0.6.4]: https://github.com/natlas/natlas/compare/v0.6.3...v0.6.4
