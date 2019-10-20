@@ -1,4 +1,4 @@
 extraction:
-	python:
-		python_setup:
-			version: "3"
+  python:
+    python_setup:
+      version: "3"
