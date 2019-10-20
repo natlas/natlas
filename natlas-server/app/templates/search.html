@@ -11,12 +11,14 @@
     <div class="col">
     {% if query != '' %}
       <h2 class="sub-header">{{numresults}} search results for '{{query}}'{%if request.args.get('includeHistory')%} <small>(including history)</small>{% endif %}</h2>
-      {% include 'includes/hostlist_button.html' %}
+      {% if numresults > 0 %}
+        {% include 'includes/hostlist_button.html' %}
+      {% endif %}
     {% else %}
       {% if request.args.get('includeHistory') %}
-      <h2 class="sub-header">Showing {{ numresults }} results across {{ totalHosts }} hosts <small>(including history)</small></h2>
+      <h2 class="sub-header">{{ numresults }} results across {{ totalHosts }} hosts <small>(including history)</small></h2>
       {% else %}
-      <h2 class="sub-header">Showing {{ numresults }} results across {{ totalHosts }} hosts</h2>
+      <h2 class="sub-header">{{ numresults }} results across {{ totalHosts }} hosts</h2>
       {% endif %}
     {% endif %}
     </div>
