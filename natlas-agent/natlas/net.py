@@ -120,9 +120,9 @@ class NatlasNetworkServices:
 			if not hashlib.sha256(serviceData["services"].encode()).hexdigest() == serviceData["sha256"]:
 				self.netlogger.error("hash provided by %s doesn't match locally computed hash of services" % self.config.server)
 				return False
-			with open("natlas-services", "w") as f:
+			with open("tmp/natlas-services", "w") as f:
 				f.write(serviceData["services"])
-			with open("natlas-services", "r") as f:
+			with open("tmp/natlas-services", "r") as f:
 				if not hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() == serviceData["sha256"]:
 					self.netlogger.error("hash of local file doesn't match hash provided by server")
 					return False

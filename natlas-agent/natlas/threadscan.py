@@ -17,7 +17,7 @@ logger = logging.get_logger("AgentThread")
 
 def command_builder(scan_id, agentConfig, target):
 	outFiles = utils.get_data_dir(scan_id) + f"/nmap.{scan_id}"
-	command = ["nmap", "--privileged", "-oA", outFiles, "--servicedb", "./natlas-services"]
+	command = ["nmap", "--privileged", "-oA", outFiles, "--servicedb", "./tmp/natlas-services"]
 
 	commandDict = {
 		"versionDetection": "-sV",
