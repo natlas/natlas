@@ -11,4 +11,4 @@ Dockerfile
 venv/
 tmp/
 logs/
-tmp/
+data/
