@@ -11,6 +11,9 @@ SLEEP_TIME=60
 #BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CURRENT_BRANCH=$(git status | grep "On branch" | cut -d" " -f3)
 
+echo "PLEASE DONT USE ME YET. TEST A RELEASE MANUALLY BEFORE ATTEMPTING TO AUTOMATE IT."
+exit
+
 
 if [[ $CURRENT_BRANCH == "main" ]]; then
 	echo "[!] Attempting to create a release from the main branch is not currently supported."
