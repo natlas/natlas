@@ -64,7 +64,7 @@ def main():
 		global_logger.critical(msg)
 		raise SystemExit("[!] %s" % msg)
 
-	required_dirs = ['data', 'logs']
+	required_dirs = ['data', 'logs', 'tmp']
 	for directory in required_dirs:
 		if not os.path.isdir(directory):
 			os.mkdir(directory)
@@ -77,7 +77,7 @@ def main():
 
 	servicesSha = ""
 	BASEDIR = os.path.abspath(os.path.dirname(__file__))
-	SERVICESPATH = os.path.join(BASEDIR, "natlas-services")
+	SERVICESPATH = os.path.join(BASEDIR, "tmp", "natlas-services")
 	if os.path.isfile(SERVICESPATH):
 		servicesSha = hashlib.sha256(open(SERVICESPATH, "r").read().rstrip('\r\n').encode()).hexdigest()
 	else:

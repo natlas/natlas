@@ -1,0 +1,14 @@
+# Ships with source
+Dockerfile
+*.md
+deployment/
+setup-agent.sh
+.dockerignore
+Dockerfile
+
+# Dev Environment
+.env
+venv/
+tmp/
+logs/
+tmp/

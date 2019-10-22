@@ -1,0 +1,15 @@
+# Ships with source
+deployment/
+setup-elastic.sh
+setup-server.sh
+elastic-snapshot.py
+*.md
+.dockerignore
+Dockerfile
+
+# Dev Environment
+.env
+venv/
+tmp/
+logs/
+tmp/
