@@ -1,0 +1,73 @@
+version: "3.7"
+services:
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3
+    container_name: elastic
+    environment:
+      - node.name=elastic
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - backend
+    restart: on-failure
+
+  natlas-server:
+    image: natlas-server
+    ports:
+      - 5000:5000
+    networks:
+      - backend
+    environment:
+      - ELASTICSEARCH_URL=http://elastic:9200
+      - BIND_ADDRESS=0.0.0.0
+      - SQLALCHEMY_DATABASE_URI=sqlite:////data/metadata.db
+    volumes:
+      - ns-data:/data/
+    restart: on-failure
+    links: 
+      - elastic
+
+  natlas-agent:
+    image: natlas-agent
+    networks:
+      - backend
+    restart: on-failure
+    environment:
+      - NATLAS_SERVER_ADDRESS=http://natlas-server:5000
+    links:
+      - natlas-server
+  
+  natlas-create-account:
+    image: natlas-server
+    networks:
+      - backend
+    environment:
+      - ELASTICSEARCH_URL=http://elastic:9200
+      - BIND_ADDRESS=0.0.0.0
+      - SQLALCHEMY_DATABASE_URI=sqlite:////data/metadata.db
+    volumes:
+      - ns-data:/data/
+    restart: "no"
+    command: |
+      bash -c "echo [+] This takes a minute ; source venv/bin/activate ; ./add-user.py --admin admin@admin.local ; exit"
+    links: 
+      - elastic
+      - natlas-server
+        
+networks:
+  frontend:
+  backend:
+
+volumes:
+  ns-data:
+  elastic:
