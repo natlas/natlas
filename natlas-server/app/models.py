@@ -135,6 +135,7 @@ class ScopeItem(db.Model):
 			tags = line.split(',')[1:]
 		else:
 			ip = line
+			tags = []
 
 		if '/' not in ip:
 			ip = ip + '/32'
