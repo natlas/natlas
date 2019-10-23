@@ -1,0 +1,21 @@
+version: 2.1
+orbs:
+  flake8: arrai/flake8@5.0.0
+jobs:
+  general-analysis:
+    docker:
+      - image: circleci/python:3.6.1
+    working_directory: ~/repo
+    steps:
+      - checkout:
+          path: ~/repo
+
+      - flake8/setup_flake8:
+          wd: ~/repo/natlas-agent
+      - flake8/flake8_errors:
+          wd: ~/repo/natlas-agent
+workflows:
+  version: 2
+  normal-build:
+    jobs:
+      - general-analysis

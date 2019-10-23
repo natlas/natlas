@@ -1,0 +1,7 @@
+[flake8]
+# W191 - Tabs over spaces
+# E261 - Two spaces before comments
+# E117 - Indention levels
+
+ignore = W191, E261, E117
+max-line-length = 160

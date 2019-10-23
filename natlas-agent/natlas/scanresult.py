@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+
 class ScanResult:
 
 	def __init__(self, target_data, config):
