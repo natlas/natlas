@@ -79,7 +79,7 @@ Note: The team is unlikely to be able to accept every single feature request tha
 
 ## Submitting a Pull Request
 
-This project refrains from, or attempts to refrain from, making any commits to main unless as part of a version release cycle. Therefore, any pull requests that are submitted should be targeted against the latest development branch. That is currently the `v0.6.x` branch, which supports natlas versions beginning with `0.6`. Any pull request submitted against main will almost certainly be asked to retarget to the development branch.
+Pull requests should be submitted against the `main` branch. Branch protection rules should enforce that your pull request is up to date before being merged. All development, including that of the maintainers, *SHOULD* be done through the fork + pull-request pattern.
 
 ## Project Setup
 
@@ -122,7 +122,7 @@ Once you've filed the PR:
 * One or more maintainers will use GitHub's review feature to review your PR.
 * If the maintainer asks for any changes, edit your changes, push, and ask for another review.
 * If the maintainer decides to pass on your PR, they will thank you for the contribution and explain why they won't be accepting the changes. That's ok! We still really appreciate you taking the time to do it, and we don't take that lightly.
-* If your PR gets accepted, it will be marked as such, and merged into the latest development branch soon after. Your contribution will be distributed to the masses next time the maintainers [tag a release](#tag-a-release)
+* If your PR gets accepted, it will be marked as such, and merged into the `main` branch soon after. Your contribution will be distributed to the masses next time the maintainers [tag a release](#tag-a-release)
 
 ## Contribute Code
 
@@ -145,7 +145,7 @@ Once you've filed the PR:
 * One or more maintainers will use GitHub's review feature to review your PR.
 * If the maintainer asks for any changes, edit your changes, push, and ask for another review. Additional tags will be added depending on the review.
 * If the maintainer decides to pass on your PR, they will thank you for the contribution and explain why they won't be accepting the changes. That's ok! We still really appreciate you taking the time to do it, and we don't take that lightly.
-* If your PR gets accepted, it will be marked as such, and merged into the latest development branch soon after. Your contribution will be distributed to the masses next time the maintainers [tag a release](#tag-a-release).
+* If your PR gets accepted, it will be marked as such, and merged into the `main` branch soon after. Your contribution will be distributed to the masses next time the maintainers [tag a release](#tag-a-release).
 
 ## Provide Support on Issues
 
@@ -233,22 +233,18 @@ Some notes:
 
 [Needs Collaborator](#join-the-project-team): Committer
 
-Team members who can commit to the project are able to merge pull requests that have been reviewed and marked as approved. Please ensure that the pull request is targeting the latest version branch as defined in the instructions on [submitting a pull request](#submitting-a-pull-request). At this point, you should attempt to merge the pull request in the following order:
+Team members who can commit to the project are able to merge pull requests that have been reviewed and marked as approved. Please ensure that the pull request is targeting the latest `main` branch as defined in the instructions on [submitting a pull request](#submitting-a-pull-request). At this point, you should attempt to merge the pull request in the following order:
 
-1. If you can rebase the commits to the version branch, do so.
-1. If you cannot rebase the commits, please create a merge commit to the version branch.
+1. Please create a merge commit to the `main` branch.
 1. Under certain circumstances you may wish to squash and merge, but this should always be discussed with another maintainer if possible.
 
 ## Tag A Release
 
 [Needs Collaborator](#join-the-project-team): Committer
 
-Tagging a natlas release has been mostly automated using the `release.sh` script in the base of the repository. This script should be run from the version branch that you're currently developing on. It will walk you through the release process. It is important to note that the `CHANGELOG.md` file must be updated, accurate, and committed to the branch prior to running the release script. It will prompt you to double check that you've done this. Make sure to update the `Unreleased` section to your new target version and then add a new `Unreleased` header above your target version.
+All releases to the natlas project should begin with a fork from the `main` branch. When a release is ready, ensure the `CHANGELOG.md` file is updat to date and the configs have been updated to reflect the new version. At this point, a new branch should be created. Once the new branch has been created, a tag for that commit should be created for v0.x.0. All new releases should increment the minor version field. The reason for branching is so that when we eventually need to patch a version to fix bugs, security or otherwise, we can increment the patch version off of the minor version branch.
 
-Once the `CHANGELOG.md` has been updated and committed, the release script will identify the current version as defined in `natlas-agent/config.py` and `natlas-server/config.py`. If these versions do not match for whatever reason, the script will error out. You should correct this manually. After the current version is detected, it will prompt you to provide the next version. You should follow [semver](https://semver.org/) as much as possible when doing this. Furthermore, releases from a given version branch should only be tagged with matching versions.
-
-Once the version is selected, the script will ask you to confirm that you're ready to release. If everything is good, go ahead and hit `y`. It will give you a minute to cancel before it commits the version changes to the respective config files and then tags and pushes the release. After it has tagged and pushed the release, it will automatically copy the `LICENSE` and `CHANGELOG.md` files into the `natlas-server/` and `natlas-agent/` folders and then proceed to create a tarball of the respective components. Double check that these tarballs do not include any unwanted files (such as the contents of data directories, log directories, development files, etc) and then upload them to the releases page on github. Copy the relevant section of the `CHANGELOG.md` file into the releases page description for the given version, give it a title that briefly summarizes the release, and then save the release.
-
+This section will be filled out further after the next release is finished and it can be further automated and documented. The documentation for tagging a release is difficult to ensure accuracy until after we've tagged a release using the new workflow.
 
 ## Join the Project Team
 

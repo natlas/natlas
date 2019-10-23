@@ -26,6 +26,8 @@ $ git clone https://github.com/natlas/natlas.git
 $ cd natlas
 ```
 
+Alternatively, please download the respective tarballs from [natlas/releases](https://github.com/natlas/natlas/releases). 
+
 Once you've got the code in /opt/natlas, please continue to setup either the server, the agent, or both, depending on your use case.
 
 
