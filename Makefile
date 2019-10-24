@@ -9,12 +9,15 @@ clean: ## Delete all images and clean up running containers related to natlas
 	docker rmi ${NA_IMAGE_NAME} || true
 	docker rmi ${NS_IMAGE_NAME} || true
 
-clean-volumes: clean ## Delete all images and clean up running containers related to natlas
+clean-volumes: clean ## Delete all volumes, images and clean up running containers related to natlas
 	docker volume rm natlas_elastic
 	docker volume rm natlas_ns-data
 
 create-account: ## Creates admin account with email admin@admin.local password will be in output
-	docker-compose up natlas-create-account
+	docker-compose exec natlas-server python3 add-user.py --admin admin@admin.local
+
+add-scopes: ## Adds scopes from myscopefile.txt 
+	docker-compose exec natlas-server python3 add-scope.py --scope /myscopefile.txt --verbose
 
 build: ## Build containers
 	cd natlas-agent && docker build -t ${NA_IMAGE_NAME} . && cd -
@@ -24,7 +27,7 @@ gen-cert: ## Generate certs for the container
 	openssl ecparam -name secp384r1 -genkey -noout -out dev-key.key
 	openssl req -new -batch -x509 -days 3652 -key dev-key.key -out dev-cert.crt
 
-run: build gen-cert## Builds and runs containers
+run: build gen-cert ## Builds and runs containers
 	docker-compose up -d elastic
 	sleep 10
 	docker-compose up -d natlas-server

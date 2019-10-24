@@ -57,7 +57,7 @@ def main():
 		global_logger.critical(msg)
 		raise SystemExit("[!] %s" % msg)
 
-	needed_caps = ["cap_net_raw", "cap_net_admin", "cap_net_bind_service"]
+	needed_caps = ["cap_net_raw"]
 	missing_caps = [cap for cap in needed_caps if cap not in nmap_caps]
 	if missing_caps:
 		msg = "Missing Nmap capabilities: %s" % " ".join(missing_caps)

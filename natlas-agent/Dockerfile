@@ -28,7 +28,7 @@ FROM ubuntu:18.04
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install --no-install-recommends -qy python3 python3-pkg-resources chromium-browser nmap xvfb vncsnapshot libcap2-bin \
-	&& setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap \
+	&& setcap cap_net_raw+eip /usr/bin/nmap \
 	&& rm -rf /var/cache/* /root /var/lib/apt/info/* /var/lib/apt/lists/* /var/lib/ghc /var/lib/dpkg /var/lib/log/*
 
 COPY --from=build /tmp/aquatone/aquatone /usr/bin/aquatone
