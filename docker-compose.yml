@@ -30,6 +30,7 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
       - BIND_ADDRESS=0.0.0.0
+      - NATLAS_SCAN_LOCAL=False
     volumes:
       - ns-data:/data/
       - ${PWD}/myscopefile.txt:/myscopefile.txt

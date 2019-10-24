@@ -14,9 +14,9 @@ utillogger = logging.get_logger("Utilities")
 def validate_target(target, config):
 	try:
 		iptarget = ipaddress.ip_address(target)
-		# if iptarget.is_private and not config.scan_local:
-		# 	utillogger.error("We're not configured to scan local addresses!")
-		# 	return False
+		if iptarget.is_private and not config.scan_local:
+			utillogger.error("We're not configured to scan local addresses!")
+			return False
 	except ipaddress.AddressValueError:
 		utillogger.error("%s is not a valid IP Address" % target)
 		return False
