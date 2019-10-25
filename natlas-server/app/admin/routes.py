@@ -135,6 +135,8 @@ def blacklist():
 	delForm = ScopeDeleteForm()
 	editForm = ScopeToggleForm()
 	importForm = ImportBlacklistForm()
+	addTagForm = TagScopeForm()
+	addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
 	if newForm.validate_on_submit():
 		if '/' not in newForm.target.data:
 			newForm.target.data = newForm.target.data + '/32'

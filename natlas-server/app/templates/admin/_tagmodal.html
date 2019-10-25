@@ -1,0 +1,60 @@
+<div class="modal fade" tabindex="-1" role="dialog" id="tagmodal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Tag</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{{url_for('admin.scope')}}" id="tagScopeForm">
+        <div class="modal-body">
+            {{ addTagForm.hidden_tag() }}
+            {{ addTagForm.tagname(class="custom-select") }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="tagScopeSubmit" class="btn btn-primary">Add Tag</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+$('#tagmodal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var scopeid = button.data('scopeid') // Extract info from data-* attributes
+  var scopetarget = button.data('scopetarget') // Extract info from data-* attributes
+  var tagaction = button.data('action')
+  var tagstr = $('#scopeTags-'+scopeid).text().replace(/\s+/g,'')
+  var tags = tagstr.split(',')
+  var modal = $(this)
+  if (tagaction == 'add') {
+    modal.find('.modal-title').text('Add tag to ' + scopetarget)
+    modal.find('#tagScopeForm').attr('action', "/admin/scope/"+scopeid+"/tag")
+    modal.find('#tagScopeSubmit').text('Add Tag')
+    if (tagstr != ''){
+      tags.forEach(function(item) {
+        $("option[value="+item+"]").attr('hidden', '')
+        $("option[value="+item+"]").attr('disabled', '')
+      });
+    }
+
+
+  } else {
+    modal.find('.modal-title').text('Remove tag from ' + scopetarget)
+    modal.find('#tagScopeForm').attr('action', "/admin/scope/"+scopeid+"/untag")
+    modal.find('#tagScopeSubmit').text('Remove Tag')
+    $("select[name='tagname']")[0].options.length = 0;
+    
+    tags.forEach(function(item) {
+      $("#tagname").append(
+        $('<option>', {
+          value: item,
+          text: item
+        })
+      );
+    });
+  }
+})
+</script>
