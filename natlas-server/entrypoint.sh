@@ -11,4 +11,4 @@ fi
 
 chown -R www-data:www-data /data
 chown -R www-data:www-data logs
-exec runuser -m -p -u www-data -- "$@"
+exec runuser -u www-data -- "$@"
