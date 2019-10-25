@@ -1,6 +1,7 @@
 #!/bin/sh
 
-mkdir -p /data/{db,media} logs
+mkdir -p /data/{db,media,logs}
+ln -s /data/logs logs
 
 DATABASE_FILE=${SQLALCHEMY_DATABASE_URI//sqlite:\/\/\//}
 if [ ! -f "${DATABASE_FILE}" ]; then 
@@ -10,5 +11,4 @@ if [ ! -f "${DATABASE_FILE}" ]; then
 fi
 
 chown -R www-data:www-data /data
-chown -R www-data:www-data logs
 exec runuser -u www-data -- "$@"
