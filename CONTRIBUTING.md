@@ -101,6 +101,17 @@ Then in your terminal:
 
 This should setup the environment necessary to develop and test code for both the `natlas-server` and the `natlas-agent`.
 
+If you prefer to run this in a isolated local docker dev environment:
+* Download and install docker desktop. 
+  * [Windows](https://docs.docker.com/docker-for-windows/install/)
+  * [Mac](https://docs.docker.com/docker-for-mac/install/)
+  * [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* Install docker-compose 
+  * [All Operating Systems](https://docs.docker.com/compose/install/)
+* Read [Getting started with Docker](https://docs.docker.com/get-started/)
+* Modify the code
+* Run ` docker-compose up -d `
+
 ## Contribute Documentation
 
 Documentation is a super important, critical part of this project. Docs are how we keep track of what we're doing, how, and why. It's how we stay on the same page about our policies. And it's how we tell others everything they need in order to be able to use this project -- or contribute to it. So thank you in advance.
@@ -236,7 +247,7 @@ Some notes:
 Team members who can commit to the project are able to merge pull requests that have been reviewed and marked as approved. Please ensure that the pull request is targeting the latest `main` branch as defined in the instructions on [submitting a pull request](#submitting-a-pull-request). At this point, you should attempt to merge the pull request in the following order:
 
 1. Please create a merge commit to the `main` branch.
-1. Under certain circumstances you may wish to squash and merge, but this should always be discussed with another maintainer if possible.
+2. Under certain circumstances you may wish to squash and merge, but this should always be discussed with another maintainer if possible.
 
 ## Tag A Release
 

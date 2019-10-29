@@ -15,6 +15,8 @@ The setup script has been tested on Ubuntu 18.10:
 $ sudo ./setup-server.sh
 ```
 
+If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natla-server `. You can also run the complete stack by running ` docker-compose up -d `. Note: This method is only suggested for a Development Environment. Future updates will allow for this to be ran as a production stack. 
+
 The Config
 ------------------
 There are a number of config options that you can specify in a file called `.env` before initializing the database and launching the application. These options break down into two categories:

@@ -38,4 +38,4 @@ WORKDIR /opt/natlas/natlas-agent
 USER www-data
 ENV LC_ALL='C.UTF-8'
 
-CMD ["/usr/local/bin/python3", "/opt/natlas/natlas-agent/natlas-agent.py"]
+CMD ["/usr/bin/python3", "/opt/natlas/natlas-agent/natlas-agent.py"]
