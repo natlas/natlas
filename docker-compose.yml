@@ -22,7 +22,7 @@ services:
     restart: on-failure
 
   natlas-server:
-    image: natlas-server
+    build: natlas-server
     ports:
       - 5000:5000
     networks:
@@ -37,13 +37,15 @@ services:
       - elastic
 
   natlas-agent:
-    image: natlas-agent
+    build: natlas-agent
     networks:
       - backend
     restart: on-failure
     environment:
       - NATLAS_SERVER_ADDRESS=http://natlas-server:5000
-      - NATLAS_SCAN_LOCAL=False
+      - NATLAS_SCAN_LOCAL=true
+    cap_add:
+      - NET_ADMIN
     links:
       - natlas-server
         
