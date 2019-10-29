@@ -40,7 +40,7 @@ defaultConfig = [
 			("LOGIN_REQUIRED","bool","False"),
 			("REGISTER_ALLOWED","bool","False"),
 			("AGENT_AUTHENTICATION", "bool", "False"),
-			("ELASTICSEARCH_URL","string","http://localhost:9200"),
+			("ELASTICSEARCH_URL","string",os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")),
 			("MAIL_SERVER","string","localhost"),
 			("MAIL_PORT","int","25"),
 			("MAIL_USE_TLS","bool","False"),

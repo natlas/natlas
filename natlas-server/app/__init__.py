@@ -130,13 +130,9 @@ def create_app(config_class=Config, load_config=False):
 				print("AgentScript table doesn't exist yet. Ignore if flask db upgrade.")
 
 		# Grungy thing so we can use flask db and flask shell before the config items are initially populated
-		if "ELASTICSEARCH_URL" in os.environ:
-			esUrl = os.environ.get('ELASTICSEARCH_URL')
-		elif "ELASTICSEARCH_URL" in app.config:
-			esUrl = app.config['ELASTICSEARCH_URL']
+		if "ELASTICSEARCH_URL" in app.config:
+			app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])
 		
-		app.elastic = Elastic(esUrl)
-
 	app.ScopeManager = ScopeManager()
 
 	from app.errors import bp as errors_bp

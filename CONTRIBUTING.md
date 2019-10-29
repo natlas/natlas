@@ -2,26 +2,25 @@
 
 ## How do I... <a name="toc"></a>
 
-* [Use This Guide](#introduction)?
-* Ask or Say Something?
-  * [Request Support](#request-support)
-  * [Report an Error or Bug](#report-an-error-or-bug)
-  * [Report a security concern](#report-a-security-concern)
-  * [Request a Feature](#request-a-feature)
-* Make Something?
-  * [Submitting a Pull Request](#submitting-a-pull-request)
-  * [Project Setup](#project-setup)
-  * [Contribute Documentation](#contribute-documentation)
-  * [Contribute Code](#contribute-code)
-* Manage Something
-  * [Provide Support on Issues](#provide-support-on-issues)
-  * [Label Issues](#label-issues)
-  * [Clean Up Issues and PRs](#clean-up-issues-and-prs)
-  * [Review Pull Requests](#review-pull-requests)
-  * [Merge Pull Requests](#merge-pull-requests)
-  * [Tag a Release](#tag-a-release)
-  * [Join the Project Team](#join-the-project-team)
-* Add a Guide Like This One [To My Project](#attribution)?
+- [Contributing](#contributing)
+  - [How do I... <a name="toc"></a>](#how-do-i-a-name%22toc%22a)
+  - [Introduction](#introduction)
+  - [Request Support](#request-support)
+  - [Report an Error or Bug](#report-an-error-or-bug)
+  - [Request a Feature](#request-a-feature)
+  - [Submitting a Pull Request](#submitting-a-pull-request)
+  - [Project Setup](#project-setup)
+  - [Contribute Documentation](#contribute-documentation)
+  - [Contribute Code](#contribute-code)
+  - [Provide Support on Issues](#provide-support-on-issues)
+  - [Label Issues](#label-issues)
+  - [Clean Up Issues and PRs](#clean-up-issues-and-prs)
+  - [Review Pull Requests](#review-pull-requests)
+  - [Merge Pull Requests](#merge-pull-requests)
+  - [Tag A Release](#tag-a-release)
+  - [Join the Project Team](#join-the-project-team)
+    - [Ways to Join](#ways-to-join)
+  - [Attribution](#attribution)
 
 
 ## Introduction
@@ -100,6 +99,17 @@ Then in your terminal:
 * `sudo ./setup-agent.sh`
 
 This should setup the environment necessary to develop and test code for both the `natlas-server` and the `natlas-agent`.
+
+If you prefer to run this in a isolated local docker dev environment:
+* Download and install docker desktop. 
+  * [Windows](https://docs.docker.com/docker-for-windows/install/)
+  * [Mac](https://docs.docker.com/docker-for-mac/install/)
+  * [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* Install docker-compose 
+  * [All Operating Systems](https://docs.docker.com/compose/install/)
+* Read [Getting started with Docker](https://docs.docker.com/get-started/)
+* Modify the code
+* Run ` docker-compose up -d `
 
 ## Contribute Documentation
 
@@ -236,7 +246,7 @@ Some notes:
 Team members who can commit to the project are able to merge pull requests that have been reviewed and marked as approved. Please ensure that the pull request is targeting the latest `main` branch as defined in the instructions on [submitting a pull request](#submitting-a-pull-request). At this point, you should attempt to merge the pull request in the following order:
 
 1. Please create a merge commit to the `main` branch.
-1. Under certain circumstances you may wish to squash and merge, but this should always be discussed with another maintainer if possible.
+2. Under certain circumstances you may wish to squash and merge, but this should always be discussed with another maintainer if possible.
 
 ## Tag A Release
 

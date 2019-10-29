@@ -8,6 +8,8 @@ To get started using the natlas-agent, you should be able to simply run `setup-a
 $ sudo ./setup-agent.sh
 ```
 
+If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natla-agent `.  Be sure to set the 'NATLAS_SERVER_ADDRESS' variable to point at your Natlas server if you are not going to run the full stack in docker. Note: This method is only suggested for a Development Environment. Future updates will allow for this to be ran as a production stack. 
+
 
 The Config
 ------------
