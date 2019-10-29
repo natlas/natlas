@@ -132,7 +132,7 @@ def create_app(config_class=Config, load_config=False):
 		# Grungy thing so we can use flask db and flask shell before the config items are initially populated
 		if "ELASTICSEARCH_URL" in app.config:
 			app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])
-		
+
 	app.ScopeManager = ScopeManager()
 
 	from app.errors import bp as errors_bp
