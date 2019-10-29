@@ -2,25 +2,26 @@
 
 ## How do I... <a name="toc"></a>
 
-- [Contributing](#contributing)
-  - [How do I... <a name="toc"></a>](#how-do-i-a-name%22toc%22a)
-  - [Introduction](#introduction)
-  - [Request Support](#request-support)
-  - [Report an Error or Bug](#report-an-error-or-bug)
-  - [Request a Feature](#request-a-feature)
-  - [Submitting a Pull Request](#submitting-a-pull-request)
-  - [Project Setup](#project-setup)
-  - [Contribute Documentation](#contribute-documentation)
-  - [Contribute Code](#contribute-code)
-  - [Provide Support on Issues](#provide-support-on-issues)
-  - [Label Issues](#label-issues)
-  - [Clean Up Issues and PRs](#clean-up-issues-and-prs)
-  - [Review Pull Requests](#review-pull-requests)
-  - [Merge Pull Requests](#merge-pull-requests)
-  - [Tag A Release](#tag-a-release)
-  - [Join the Project Team](#join-the-project-team)
-    - [Ways to Join](#ways-to-join)
-  - [Attribution](#attribution)
+* [Use This Guide](#introduction)?
+* Ask or Say Something?
+  * [Request Support](#request-support)
+  * [Report an Error or Bug](#report-an-error-or-bug)
+  * [Report a security concern](#report-a-security-concern)
+  * [Request a Feature](#request-a-feature)
+* Make Something?
+  * [Submitting a Pull Request](#submitting-a-pull-request)
+  * [Project Setup](#project-setup)
+  * [Contribute Documentation](#contribute-documentation)
+  * [Contribute Code](#contribute-code)
+* Manage Something
+  * [Provide Support on Issues](#provide-support-on-issues)
+  * [Label Issues](#label-issues)
+  * [Clean Up Issues and PRs](#clean-up-issues-and-prs)
+  * [Review Pull Requests](#review-pull-requests)
+  * [Merge Pull Requests](#merge-pull-requests)
+  * [Tag a Release](#tag-a-release)
+  * [Join the Project Team](#join-the-project-team)
+* Add a Guide Like This One [To My Project](#attribution)?
 
 
 ## Introduction
