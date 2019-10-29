@@ -30,10 +30,9 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
     volumes:
-      - ns-data:/data/
-      - ${PWD}/myscopefile.txt:/myscopefile.txt
+      - ns-data:/data
     restart: on-failure
-    links: 
+    links:
       - elastic
 
   natlas-agent:
@@ -48,9 +47,8 @@ services:
       - NET_ADMIN
     links:
       - natlas-server
-        
+
 networks:
-  frontend:
   backend:
 
 volumes:
