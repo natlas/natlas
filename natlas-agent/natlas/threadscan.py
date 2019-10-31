@@ -15,6 +15,7 @@ from natlas import utils
 
 logger = logging.get_logger("AgentThread")
 
+
 def command_builder(scan_id, agentConfig, target):
 	outFiles = utils.get_data_dir(scan_id) + f"/nmap.{scan_id}"
 	command = ["nmap", "--privileged", "-oA", outFiles, "--servicedb", "./tmp/natlas-services"]
@@ -31,7 +32,7 @@ def command_builder(scan_id, agentConfig, target):
 		"hostTimeout": "--host-timeout={hostTimeout}"
 	}
 
-	for k,v in agentConfig.items():
+	for k, v in agentConfig.items():
 		if agentConfig[k] and k in commandDict:
 			command.append(commandDict[k].format(**agentConfig))
 
@@ -56,7 +57,7 @@ def scan(target_data, config):
 	result = ScanResult(target_data, config)
 
 	try:
-		process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=int(agentConfig["scanTimeout"])) # nosec
+		subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=int(agentConfig["scanTimeout"])) # nosec
 	except subprocess.TimeoutExpired:
 		result.add_item('timed_out', True)
 		logger.warning("TIMEOUT: Nmap against %s (%s)" % (target, scan_id))
@@ -67,7 +68,7 @@ def scan(target_data, config):
 	for ext in 'nmap', 'gnmap', 'xml':
 		path = f"{data_dir}/nmap.{scan_id}.{ext}"
 		try:
-			result.add_item(ext+"_data", open(path).read())
+			result.add_item(ext + "_data", open(path).read())
 		except Exception:
 			logger.warning(f"Couldn't read {path}")
 			return False
@@ -98,9 +99,8 @@ def scan(target_data, config):
 		result.is_up(nmap_report.hosts[0].is_up())
 		result.add_item('port_count', len(nmap_report.hosts[0].get_ports()))
 
-
 	if agentConfig["webScreenshots"] and shutil.which("aquatone") is not None:
-		targetServices=[]
+		targetServices = []
 		if "80/tcp" in result.result['nmap_data']:
 			targetServices.append("http")
 		if "443/tcp" in result.result['nmap_data']:
@@ -167,7 +167,7 @@ class ThreadScan(threading.Thread):
 				if target_data and target_data["services_hash"] != self.servicesSha:
 					self.servicesSha = self.netsrv.get_services_file()
 					if not self.servicesSha:
-						logger.warning("Failed to get updated services from %s" % config.server)
+						logger.warning("Failed to get updated services from %s" % self.config.server)
 
 				utils.create_data_dir(target_data['scan_id'])
 				result = scan(target_data, self.config)
@@ -183,7 +183,7 @@ class ThreadScan(threading.Thread):
 					utils.cleanup_files(target_data['scan_id'])
 
 		else:
-			#If we're not in auto mode, then the queue is populated with work from local data
+			# If we're not in auto mode, then the queue is populated with work from local data
 			while True:
 				logger.info("Fetching work from queue")
 				target_data = self.queue.get()

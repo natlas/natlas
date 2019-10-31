@@ -3,10 +3,12 @@ import random
 import hashlib
 import time
 import json
+import os
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from natlas import logging
+
 
 class NatlasNetworkServices:
 
@@ -26,9 +28,14 @@ class NatlasNetworkServices:
 		if self.config.agent_id and self.config.auth_token:
 			authheader = self.config.agent_id + ":" + self.config.auth_token
 			headers['Authorization'] = 'Bearer {}'.format(authheader)
+		args = {
+			"timeout": self.config.request_timeout,
+			"headers": headers,
+			"verify": not self.config.ignore_ssl_warn
+		}
 		try:
 			if reqType == "GET":
-				req = requests.get(self.config.server+endpoint, timeout=self.config.request_timeout, headers=headers, verify=(not self.config.ignore_ssl_warn))
+				req = requests.get(self.config.server + endpoint, **args)
 				if req.status_code == 200:
 					if 'message' in req.json():
 						self.netlogger.info("[Server] " + req.json()['message'])
@@ -51,7 +58,8 @@ class NatlasNetworkServices:
 					self.netlogger.warn("Expected %s, received %s" % (contentType, req.headers['content-type']))
 					return False
 			elif reqType == "POST" and postData:
-				req = requests.post(self.config.server+endpoint, json=postData, timeout=self.config.request_timeout, headers=headers, verify=(not self.config.ignore_ssl_warn))
+				args['json'] = postData
+				req = requests.post(self.config.server + endpoint, **args)
 				if req.status_code == 200:
 					if 'message' in req.json():
 						self.netlogger.info("[Server] " + req.json()['message'])
@@ -70,10 +78,10 @@ class NatlasNetworkServices:
 					if 'message' in req.json():
 						self.netlogger.warn("[Server] " + req.json()['message'])
 					return req
-		except requests.ConnectionError as e:
+		except requests.ConnectionError:
 			self.netlogger.warn("Connection Error connecting to %s" % self.config.server)
 			return False
-		except requests.Timeout as e:
+		except requests.Timeout:
 			self.netlogger.warn("Request timed out after %s seconds." % self.config.request_timeout)
 			return False
 		except ValueError as e:
@@ -87,15 +95,15 @@ class NatlasNetworkServices:
 		result = None
 		while not result:
 			result = self.make_request(*args, **kwargs)
-			RETRY=False
+			RETRY = False
 
 			if result is False: # Retry if there are connection errors
-				RETRY=True
+				RETRY = True
 			elif 'retry' in result.json() and result.json()['retry']: # Retry if the server tells us to
-				RETRY=True
+				RETRY = True
 			elif 'retry' in result.json() and not result.json()['retry']: # Don't retry if the server tells us not to
 				return result
-			elif not 'retry' in result.json(): # No instructions on whether to retry or not, so don't
+			elif 'retry' not in result.json(): # No instructions on whether to retry or not, so don't
 				return result
 
 			if RETRY:
@@ -103,7 +111,7 @@ class NatlasNetworkServices:
 				if giveup and attempt == self.config.max_retries:
 					self.netlogger.warn("Request to %s failed %s times. Giving up" % (self.config.server, self.config.max_retries))
 					return False
-				jitter = random.randint(0,1000) / 1000 # jitter to reduce chance of locking
+				jitter = random.randint(0, 1000) / 1000 # jitter to reduce chance of locking
 				current_sleep = min(self.config.backoff_max, self.config.backoff_base * 2 ** attempt) + jitter
 				self.netlogger.warn("Request to %s failed. Waiting %s seconds before retrying." % (self.config.server, current_sleep))
 				time.sleep(current_sleep)
@@ -130,14 +138,13 @@ class NatlasNetworkServices:
 			return False # return false if we were unable to get a response from the server
 		return serviceData["sha256"] # return True if we got a response and everything checks out
 
-
 	def get_work(self, target=None):
 		if target:
 			self.netlogger.info("Getting work config for %s from %s" % (target, self.config.server))
-			get_work_endpoint=self.api_endpoints["GETWORK"]+"?target="+target
+			get_work_endpoint = self.api_endpoints["GETWORK"] + "?target=" + target
 		else:
 			self.netlogger.info("Getting work from %s" % (self.config.server))
-			get_work_endpoint=self.api_endpoints["GETWORK"]
+			get_work_endpoint = self.api_endpoints["GETWORK"]
 
 		response = self.backoff_request(endpoint=get_work_endpoint)
 		if response:

@@ -13,13 +13,14 @@ from config import Config
 from natlas.threadscan import ThreadScan
 from natlas.net import NatlasNetworkServices
 
-ERR = {"INVALIDTARGET":1,"SCANTIMEOUT":2, "DATANOTFOUND":3, "INVALIDDATA": 4}
+ERR = {"INVALIDTARGET": 1, "SCANTIMEOUT": 2, "DATANOTFOUND": 3, "INVALIDDATA": 4}
 
 config = Config()
 MAX_QUEUE_SIZE = int(config.max_threads) # only queue enough work for each of our active threads
 
 global_logger = logging.get_logger("MainThread")
 netsrv = NatlasNetworkServices(config)
+
 
 def add_targets_to_queue(target, q):
 	targetNetwork = ipaddress.ip_interface(target.strip())

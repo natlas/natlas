@@ -1,9 +1,6 @@
 import ipaddress
-import string
-import random
 import os
 import shutil
-import glob
 
 from natlas import logging
 
