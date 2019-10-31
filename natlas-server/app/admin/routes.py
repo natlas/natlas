@@ -147,7 +147,8 @@ def blacklist():
 		current_app.ScopeManager.update()
 		flash('%s blacklisted!' % newTarget.target, 'success')
 		return redirect(url_for('admin.blacklist'))
-	return render_template("admin/blacklist.html", scope=scope, blacklistSize=blacklistSize, delForm=delForm, editForm=editForm, newForm=newForm, importForm=importForm)
+	return render_template("admin/blacklist.html", scope=scope, blacklistSize=blacklistSize, delForm=delForm, editForm=editForm, \
+		newForm=newForm, importForm=importForm, addTagForm=addTagForm)
 
 
 
@@ -427,7 +428,8 @@ def tags():
 
 	addForm = AddTagForm()
 	if addForm.validate_on_submit():
-		newTag = Tag(name=addForm.tagname.data.lower())
+		prepared_tag = addForm.tagname.data.strip()
+		newTag = Tag(name=prepared_tag)
 		db.session.add(newTag)
 		db.session.commit()
 		flash('Successfully added tag %s' % newTag.name, 'success')

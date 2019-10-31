@@ -35,11 +35,7 @@
           <tr>
             <th scope="row">{{ item.id }}</th>
             <td>{{ item.target }}</td>
-            <td id="scopeTags-{{item.id}}">
-              {% for tag in item.tags %}
-              {{ tag.name }}{% if not loop.last %}, {% endif %}
-              {% endfor %}
-            </td>
+            <td id="scopeTags-{{item.id}}">{% for tag in item.tags %}{{ tag.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
             <td style="text-align:center;">
               {% include 'admin/_scope_menu.html' %}
             </td>
