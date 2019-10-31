@@ -110,7 +110,7 @@ def scope():
 	if scopeSize == 0:
 		current_app.ScopeManager.update()
 		scopeSize = current_app.ScopeManager.getScopeSize()
-	# if it's zero again that's fine, we just had to check
+		# if it's zero again that's fine, we just had to check
 
 	newForm = NewScopeForm()
 	delForm = ScopeDeleteForm()
@@ -338,12 +338,14 @@ def exportServices():
 @isAdmin
 def agentConfig():
 	agentConfig = AgentConfig.query.get(1)
-	agentForm = AgentConfigForm(obj=agentConfig)  # pass the model to the form to populate
+	# pass the model to the form to populate
+	agentForm = AgentConfigForm(obj=agentConfig)
 	addScriptForm = AddScriptForm(prefix="add-script")
 	delScriptForm = DeleteForm(prefix="del-script")
 
 	if agentForm.validate_on_submit():
-		agentForm.populate_obj(agentConfig)  # populate the object from the form data
+		# populate the object from the form data
+		agentForm.populate_obj(agentConfig)
 		db.session.commit()
 		current_app.agentConfig = agentConfig.as_dict()
 
