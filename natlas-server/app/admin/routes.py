@@ -193,12 +193,11 @@ def importScope(scopetype=''):
 			flash('%s targets failed to import!' % len(failedImports), 'danger')
 			for item in failedImport:
 				flash('%s' % item, 'danger')
-		return redirect(url_for('admin.%s' % scopetype))
 	else:
 		for field, errors in importForm.errors.items():
 			for error in errors:
 				flash(error, 'danger')
-		return redirect(url_for('admin.%s' % scopetype))
+	return redirect(url_for('admin.%s' % scopetype))
 
 
 @bp.route('/export/<string:scopetype>', methods=['GET'])
@@ -228,10 +227,9 @@ def deleteScopeItem(id):
 		db.session.commit()
 		current_app.ScopeManager.update()
 		flash('%s deleted!' % item.target, 'success')
-		return redirect(request.referrer)
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(request.referrer)
+	return redirect(request.referrer)
 
 
 @bp.route('/scope/<int:id>/toggle', methods=['POST'])
@@ -249,10 +247,9 @@ def toggleScopeItem(id):
 			flash('%s blacklisted!' % item.target, 'success')
 		db.session.commit()
 		current_app.ScopeManager.update()
-		return redirect(request.referrer)
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(request.referrer)
+	return redirect(request.referrer)
 
 
 @bp.route('/scope/<int:id>/tag', methods=['POST'])
@@ -267,10 +264,9 @@ def tagScopeItem(id):
 		scope.addTag(mytag)
 		db.session.commit()
 		flash("Tag \"%s\" added to %s" % (mytag.name, scope.target), "success")
-		return redirect(request.referrer)
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(request.referrer)
+	return redirect(request.referrer)
 
 
 @bp.route('/scope/<int:id>/untag', methods=['POST'])
@@ -285,10 +281,9 @@ def untagScopeItem(id):
 		scope.delTag(mytag)
 		db.session.commit()
 		flash("Tag \"%s\" removed from %s" % (mytag.name, scope.target), "success")
-		return redirect(request.referrer)
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(request.referrer)
+	return redirect(request.referrer)
 
 
 @bp.route('/services', methods=['GET', 'POST'])
@@ -307,17 +302,15 @@ def services():
 			db.session.commit()
 			current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
 			flash("New services file with hash %s has been uploaded." % current_app.current_services["sha256"], "success")
-			return redirect(url_for('admin.services'))
 		else:
 			flash("That file is an exact match for our current services file!", "warning")
-			return redirect(url_for('admin.services'))
+		return redirect(url_for('admin.services'))
 
 	if addServiceForm.serviceName.data and addServiceForm.validate_on_submit():
 		newServiceName = addServiceForm.serviceName.data
 		newServicePort = str(addServiceForm.servicePort.data) + '/' + addServiceForm.serviceProtocol.data
 		if '\t' + newServicePort in str(current_app.current_services['services']):
 			flash("A service with port %s already exists!" % newServicePort, "danger")
-			return redirect(url_for('admin.services'))
 		else:
 			newServices = current_app.current_services["services"] + "\n" + newServiceName + "\t" + newServicePort
 			newSha = hashlib.sha256(newServices.encode()).hexdigest()
@@ -326,7 +319,7 @@ def services():
 			db.session.commit()
 			current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
 			flash("New service %s on port %s has been added." % (newServiceName, newServicePort), "success")
-			return redirect(url_for('admin.services'))
+		return redirect(url_for('admin.services'))
 
 	return render_template(
 		'admin/services.html', uploadForm=uploadForm, addServiceForm=addServiceForm,
