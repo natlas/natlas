@@ -34,8 +34,6 @@ $('#tagmodal').on('show.bs.modal', function (event) {
 })
 
 $('#tagmodal').on('hide.bs.modal', function (event) {
-  var modal = $(this)
-
   // Set all options to enabled and visible by default
   $("select[name='tagname'] > option").each(function() {
     $(this).removeAttr('hidden disabled')
