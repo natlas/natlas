@@ -33,7 +33,7 @@ csrf = CSRFProtect()
 def initialize_sentryio(config):
 	if config.sentry_dsn:
 		url = urlparse(config.sentry_dsn)
-		print("Sentry.io enabled and reporting errors to %s://%s." % (url.scheme, url.hostname))
+		print("Sentry.io enabled and reporting errors to %s://%s" % (url.scheme, url.hostname))
 		from sentry_sdk.integrations.flask import FlaskIntegration
 		sentry_sdk.init(dsn=config.sentry_dsn, release=config.NATLAS_VERSION, integrations=[FlaskIntegration()])
 
