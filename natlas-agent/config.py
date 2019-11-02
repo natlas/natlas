@@ -68,5 +68,7 @@ class Config:
 		# Necessary to test versioned host data templates before release
 		self.version_override = os.environ.get("NATLAS_VERSION_OVERRIDE") or None
 
+		self.sentry_dsn = os.environ.get("SENTRY_DSN") or None
+
 		if self.version_override:
 			self.NATLAS_VERSION = self.version_override

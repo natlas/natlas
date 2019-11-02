@@ -7,9 +7,11 @@ from flask_wtf.csrf import CSRFProtect
 from config import Config, populate_defaults, get_defaults
 from app.elastic import Elastic
 from app.scope import ScopeManager
+from urllib.parse import urlparse
 import sqlalchemy
 import os
 import hashlib
+import sentry_sdk
 
 class AnonUser(AnonymousUserMixin):
 
@@ -27,6 +29,15 @@ db = SQLAlchemy()
 migrate = Migrate()
 csrf = CSRFProtect()
 
+
+def initialize_sentryio(config):
+	if config.sentry_dsn:
+		url = urlparse(config.sentry_dsn)
+		print("Sentry.io enabled and reporting errors to %s://%s." % (url.scheme, url.hostname))
+		from sentry_sdk.integrations.flask import FlaskIntegration
+		sentry_sdk.init(dsn=config.sentry_dsn, release=config.NATLAS_VERSION, integrations=[FlaskIntegration()])
+
+
 @login.unauthorized_handler
 def unauthorized():
 	if current_user.is_anonymous:
@@ -38,6 +49,7 @@ def unauthorized():
 
 
 def create_app(config_class=Config, load_config=False):
+	initialize_sentryio(config_class)
 	app = Flask(__name__)
 	app.config.from_object(Config)
 	app.jinja_env.add_extension('jinja2.ext.do')

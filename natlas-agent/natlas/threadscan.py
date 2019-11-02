@@ -5,6 +5,7 @@ import shutil
 import os
 
 from libnmap.parser import NmapParser, NmapParserException
+from sentry_sdk import capture_exception
 
 from natlas import screenshots
 from natlas import logging
@@ -146,6 +147,24 @@ def scan(target_data, config):
 	return result
 
 
+class ScanWorkItem:
+	def __init__(self, target_data):
+		self.target_data = target_data
+
+	def complete(self):
+		pass
+
+
+class ManualScanWorkItem(ScanWorkItem):
+	def __init__(self, queue, target_data):
+		super(ManualScanWorkItem, self).__init__(target_data)
+		self.queue = queue
+
+	def complete(self):
+		super()
+		self.queue.mark_done()
+
+
 class ThreadScan(threading.Thread):
 	def __init__(self, queue, config, auto=False, servicesSha=''):
 		threading.Thread.__init__(self)
@@ -155,50 +174,53 @@ class ThreadScan(threading.Thread):
 		self.config = config
 		self.netsrv = NatlasNetworkServices(self.config)
 
+	def execute_scan(self, work_item):
+		target_data = work_item.target_data
+		utils.create_data_dir(target_data['scan_id'])
+		try:
+			result = scan(target_data, self.config)
+
+			if not result:
+				logger.warning("Not submitting data for %s" % target_data['target'])
+				return
+			result.scan_stop()
+			response = self.netsrv.submit_results(result)
+		finally:
+			didFail = response is False
+			utils.cleanup_files(target_data['scan_id'], failed=didFail, saveFails=self.config.save_fails)
+
 	def run(self):
+		try:
+			while True:
+				work_item = self.get_work()
+
+				if not work_item:
+					break
+
+				self.execute_scan(work_item)
+				work_item.complete()
+		except Exception as e:
+			logger.warning("Failed to process work item: %s" % e)
+			capture_exception(e)
+
+	def get_work(self):
 		# If we're in auto mode, the threads handle getting work from the server
 		if self.auto:
-			while True:
-				target_data = self.netsrv.get_work()
-				# We hit this if we hit an error that we shouldn't recover from.
-				# Primarily version mismatch, at this point.
-				if not target_data:
-					os._exit(400)
-				if target_data and target_data["services_hash"] != self.servicesSha:
-					self.servicesSha = self.netsrv.get_services_file()
-					if not self.servicesSha:
-						logger.warning("Failed to get updated services from %s" % self.config.server)
+			target_data = self.netsrv.get_work()
+			# We hit this if we hit an error that we shouldn't recover from.
+			# Primarily version mismatch, at this point.
+			if not target_data:
+				return None
+			if target_data["services_hash"] != self.servicesSha:
+				self.servicesSha = self.netsrv.get_services_file()
+				if not self.servicesSha:
+					logger.warning("Failed to get updated services from %s" % self.config.server)
 
-				utils.create_data_dir(target_data['scan_id'])
-				result = scan(target_data, self.config)
+			return ScanWorkItem(target_data)
+		else: # Manual
+			target_data = self.queue.get()
+			if not target_data:
+				return None
 
-				if not result:
-					logger.warning("Not submitting data for %s" % target_data['target'])
-					continue
-				result.scan_stop()
-				response = self.netsrv.submit_results(result)
-				if response is False:
-					utils.cleanup_files(target_data['scan_id'], failed=True, saveFails=self.config.save_fails)
-				else:
-					utils.cleanup_files(target_data['scan_id'])
-
-		else:
-			# If we're not in auto mode, then the queue is populated with work from local data
-			while True:
-				logger.info("Fetching work from queue")
-				target_data = self.queue.get()
-				if target_data is None:
-					break
-				logger.info("Manual Target: %s" % target_data["target"])
-				utils.create_data_dir(target_data['scan_id'])
-				result = scan(target_data, self.config)
-				if not result:
-					logger.warning("Not submitting data for %s" % target_data['target'])
-					continue
-				result.scan_stop()
-				response = self.netsrv.submit_results(result)
-				if response is False:
-					utils.cleanup_files(target_data['scan_id'], failed=True, saveFails=self.config.save_fails)
-				else:
-					utils.cleanup_files(target_data['scan_id'])
-				self.queue.task_done()
+			logger.info("Manual Target: %s" % target_data["target"])
+			return ManualScanWorkItem(self.queue, target_data)

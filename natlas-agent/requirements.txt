@@ -4,4 +4,5 @@ idna==2.8
 python-dotenv==0.10.1
 python-libnmap==0.7.0
 requests==2.21.0
+sentry-sdk[flask]==0.10.2
 urllib3==1.24.2
