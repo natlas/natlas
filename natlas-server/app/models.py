@@ -121,7 +121,7 @@ class ScopeItem(db.Model):
 			if existingTag:
 				scopeitem.addTag(existingTag)
 			else:
-				newTag = Tag(name=tag)
+				newTag = Tag(name=tag.strip())
 				db.session.add(newTag)
 				scopeitem.addTag(newTag)
 

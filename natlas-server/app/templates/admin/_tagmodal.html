@@ -1,0 +1,23 @@
+<div class="modal fade" tabindex="-1" role="dialog" id="tagmodal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Tag</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{{url_for('admin.scope')}}" id="tagScopeForm">
+        <div class="modal-body">
+            {{ addTagForm.hidden_tag() }}
+            {{ addTagForm.tagname(class="custom-select") }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="tagScopeSubmit" class="btn btn-primary">Add Tag</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="/static/js/natlas-tagging.js"></script>
