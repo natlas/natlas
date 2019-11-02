@@ -48,6 +48,7 @@ Can be changed via the web interface:
 | `MAIL_FROM` | `""` | Address to be used as the "From" address for outgoing mail |
 | `LOCAL_SUBRESOURCES` | `False` | Use local subresources (js,css,fonts) instead of CDN resources |
 | `CUSTOM_BRAND` | `""` | Custom branding for the navigation bar to help distinguish different natlas installations from one another |
+| `SENTRY_DSN` | `""` | Enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: http://mytoken@mysentry.example.com/1 |
 
 For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`, but this should get generated automatically by `setup-server.sh`), however user invitations won't work without a valid mail server.
 

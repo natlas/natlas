@@ -29,7 +29,7 @@ To make modifications to your agent, you can modify environment variables to mat
 | `NATLAS_AGENT_TOKEN` | `None` | Secret token only needed when agent authentication is required. Generate this with the ID on the `/user/` page on the Natlas server.
 | `NATLAS_SAVE_FAILS` | `False` | Optionally save scan data that fails to upload for whatever reason.
 | `NATLAS_VERSION_OVERRIDE` | `None` | **Danger**: This can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented.
-
+| `SENTRY_DSN` | `""` | If set, enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: http://mytoken@mysentry.example.com/1 |
 
 Starting the Agent
 ------------

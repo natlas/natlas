@@ -8,7 +8,7 @@ import hashlib
 import ipaddress
 import queue
 
-from natlas import logging
+from natlas import logging, error_reporting
 from config import Config
 from natlas.threadscan import ThreadScan
 from natlas.net import NatlasNetworkServices
@@ -74,6 +74,8 @@ def main():
 	if args.target or args.tfile:
 		autoScan = False
 
+	# Initialize SentryIo after basic environment checks complete
+	error_reporting.initialize_sentryio(config)
 	q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
 	servicesSha = ""
