@@ -3,7 +3,6 @@ import json
 from datetime import datetime as dt
 from datetime import timezone as tz
 import dateutil.parser
-from app import db
 from app.api import bp
 from app.util import isAcceptableTarget
 from app.api import utils

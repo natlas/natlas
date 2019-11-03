@@ -18,6 +18,7 @@ def mark_scan_dispatched(rescan):
 	current_app.ScopeManager.updateDispatchedRescans()
 	return
 
+
 def mark_scan_completed(ip, scan_id):
 	dispatched = current_app.ScopeManager.getDispatchedRescans()
 	for scan in dispatched:
