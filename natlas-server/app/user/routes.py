@@ -62,10 +62,9 @@ def generateNewToken(agent_id):
 		myAgent.token = Agent.generate_token()
 		db.session.commit()
 		flash(f"Agent {myAgent.agentid} has a new key of: {myAgent.token}", "success")
-		return redirect(request.referrer)
 	else:
 		flash("Couldn't generate new token", "danger")
-		return redirect(request.referrer)
+	return redirect(request.referrer)
 
 
 @bp.route('/agent/<string:agent_id>/newName', methods=['POST'])
@@ -79,10 +78,9 @@ def changeAgentName(agent_id):
 		myAgent.friendly_name = agentNameForm.agent_name.data
 		db.session.commit()
 		flash(f"Agent name changed from {oldname} to {myAgent.friendly_name}", "success")
-		return redirect(request.referrer)
 	else:
 		flash("Couldn't change agent name", "danger")
-		return redirect(request.referrer)
+	return redirect(request.referrer)
 
 
 @bp.route('/agent/newAgent', methods=['POST'])
@@ -100,7 +98,6 @@ def newAgent():
 		db.session.add(myAgent)
 		db.session.commit()
 		flash(f"New Agent named {myAgent.friendly_name} created. Agent ID: {myAgent.agentid} Agent Token: {myAgent.token}", "success")
-		return redirect(request.referrer)
 	else:
 		flash("Couldn't create new agent", "danger")
-		return redirect(request.referrer)
+	return redirect(request.referrer)
