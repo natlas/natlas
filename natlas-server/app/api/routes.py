@@ -62,11 +62,7 @@ def getwork():
 	else: # Get the ip from the rescan queue, mark the job as dispatched, update the PendingRescans for other requests
 		work['target'] = rescans[0].target
 		work['scan_reason'] = 'requested'
-		rescans[0].dispatchTask()
-		db.session.add(rescans[0])
-		db.session.commit()
-		current_app.ScopeManager.updatePendingRescans()
-		current_app.ScopeManager.updateDispatchedRescans()
+		utils.mark_scan_dispatched(rescans[0])
 
 	work = utils.prepare_work(work)
 	response_body = json.dumps(work)
@@ -83,15 +79,8 @@ def submit():
 	newhost = {}
 	newhost = json.loads(data)
 	newhost['ctime'] = dt.now(tz.utc)
-	if newhost['scan_reason'] != 'auto':
-		dispatched = current_app.ScopeManager.getDispatchedRescans()
-		for scan in dispatched:
-			if scan.target == newhost['ip']:
-				scan.completeTask(newhost['scan_id'])
-				db.session.add(scan)
-				db.session.commit()
-				current_app.ScopeManager.updateDispatchedRescans()
-				break
+	if newhost['scan_reason'] == 'requested':
+		utils.mark_scan_completed(newhost['ip'], newhost['scan_id'])
 
 	try:
 		nmap = NmapParser.parse(newhost['xml_data'])
