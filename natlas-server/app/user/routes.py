@@ -64,7 +64,7 @@ def generateNewToken(agent_id):
 		myAgent = Agent.load_agent(agent_id)
 		myAgent.token = Agent.generate_token()
 		db.session.commit()
-		flash("Agent {agentid} has a new key of: {token}".format(**myAgent), "success")
+		flash(f"Agent {myAgent.agentid} has a new key of: {myAgent.token}", "success")
 		return redirect(request.referrer)
 	else:
 		flash("Couldn't generate new token", "danger")
@@ -102,7 +102,7 @@ def newAgent():
 		)
 		db.session.add(myAgent)
 		db.session.commit()
-		flash("New Agent named {friendly_name} created. Agent ID: {agentid} Agent Token: {token}".format(**myAgent), "success")
+		flash(f"New Agent named {myAgent.friendly_name} created. Agent ID: {myAgent.agentid} Agent Token: {myAgent.token}", "success")
 		return redirect(request.referrer)
 	else:
 		flash("Couldn't create new agent", "danger")
