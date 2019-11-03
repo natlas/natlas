@@ -172,5 +172,4 @@ def create_app(config_class=Config, load_config=False):
 	return app
 
 
-# Ignore E402 and F401 errors about this line
-from app import models
+from app import models # noqa: F401

@@ -6,3 +6,10 @@
 
 ignore = W191, E261, E117, E402
 max-line-length = 160
+exclude =
+	# Ignore contents of pycache directories
+	__pycache__,
+	# Ignore dependencies in virtual environments
+	venv,
+	# Ignore migrations as they are mostly auto-generated
+	migrations
