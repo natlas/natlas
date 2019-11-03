@@ -34,17 +34,14 @@ def profile():
 			user.set_password(changePasswordForm.password.data)
 			db.session.commit()
 			flash('Your password has been changed.', "success")
-			return redirect(url_for('user.profile'))
-	if displaySettingsForm.updateDisplaySettings.data and displaySettingsForm.validate_on_submit():
+	elif displaySettingsForm.updateDisplaySettings.data and displaySettingsForm.validate_on_submit():
 			user = User.query.get(current_user.id)
 			user.results_per_page = displaySettingsForm.results_per_page.data
 			user.preview_length = displaySettingsForm.preview_length.data
 			user.result_format = displaySettingsForm.result_format.data
 			db.session.commit()
 			flash("Display settings updated.", "success")
-			return redirect(url_for('user.profile'))
-	if agentNameForm.change_name.data and agentNameForm.validate_on_submit():
-		return redirect(url_for('user.profile'))
+
 	return render_template(
 		"user/profile.html",
 		changePasswordForm=changePasswordForm,
