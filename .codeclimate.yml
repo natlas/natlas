@@ -2,6 +2,15 @@ version: "2"
 plugins:
   pep8:
     enabled: true
+    checks:
+      E261:
+        enabled: false
+      E402:
+        enabled: false
+      W191:
+        enabled: false
+      E117:
+        enabled: false
   radon:
     enabled: true
     config:
