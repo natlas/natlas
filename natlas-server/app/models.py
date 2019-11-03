@@ -100,9 +100,11 @@ class ScopeItem(db.Model):
 		backref=db.backref('scope', lazy='dynamic'),
 		lazy='dynamic')
 
+	@staticmethod
 	def getBlacklist():
 		return ScopeItem.query.filter_by(blacklist=True).all()
 
+	@staticmethod
 	def getScope():
 		return ScopeItem.query.filter_by(blacklist=False).all()
 
