@@ -42,16 +42,38 @@ def prepare_work(work):
 	return work
 
 
-def parse_ssl_data(sslcert):
+def parse_alt_names(cert_data):
 	altnames = []
 	# Parse out Subject Alternative Names because libnmap doesn't give them to us
-	for line in sslcert['output'].split('\n'):
+	for line in cert_data.split('\n'):
 		if line.startswith("Subject Alternative Name:"):
 			for item in line.split(' ')[3:]:
 				altname = item.strip(',').split('DNS:')
 				if len(altname) > 1: # Prevent an indexerror in edge case
 					altnames.append(altname[1])
+	return altnames
 
+
+def parse_subject(subject, altnames):
+	subDict = {}
+	if subject.get('commonName'):
+		subDict['commonName'] = subject.get('commonName')
+	if altnames:
+		subDict['altNames'] = altnames
+	return subDict
+
+
+def parse_pubkey(pubkey):
+	pubkeyDict = {}
+	if pubkey.get('type'):
+		pubkeyDict['type'] = pubkey.get('type')
+	if pubkey.get('bits'):
+		pubkeyDict['bits'] = int(pubkey.get('bits'))
+	return pubkeyDict
+
+
+def parse_ssl_data(sslcert):
+	altnames = parse_alt_names(sslcert['output'])
 	elements = sslcert['elements']
 	subject = elements.get('subject')
 	issuer = elements.get('issuer')
@@ -64,25 +86,13 @@ def parse_ssl_data(sslcert):
 
 	result = {}
 	if subject:
-		subDict = {}
-		if subject.get('commonName'):
-			subDict['commonName'] = subject.get('commonName')
-		if altnames:
-			subDict['altNames'] = altnames
-		if subDict:
-			result['subject'] = subDict
+		result['subject'] = parse_subject(subject, altnames)
 
 	if issuer:
 		result['issuer'] = issuer
 
 	if pubkey:
-		pubkeyDict = {}
-		if pubkey.get('type'):
-			pubkeyDict['type'] = pubkey.get('type')
-		if pubkey.get('bits'):
-			pubkeyDict['bits'] = int(pubkey.get('bits'))
-		if pubkeyDict:
-			result['pubkey'] = pubkeyDict
+		result['pubkey'] = parse_pubkey(pubkey)
 
 	if sig_alg:
 		result['sig_alg'] = sig_alg
@@ -102,9 +112,24 @@ def parse_ssl_data(sslcert):
 	return result
 
 
+def create_thumbnail(fname, file_ext):
+	thumb_size = (255, 160)
+	thumb = Image.open(fname)
+	thumb.thumbnail(thumb_size)
+	thumb_hash = hashlib.sha256(thumb.tobytes()).hexdigest()
+	thumbhashpath = "{}/{}".format(thumb_hash[0:2], thumb_hash[2:4])
+	thumbpath = os.path.join(current_app.config["MEDIA_DIRECTORY"], "thumbs", thumbhashpath)
+	# makedirs attempts to make every directory necessary to get to the "thumbs" folder
+	os.makedirs(thumbpath, exist_ok=True)
+	fname = os.path.join(thumbpath, thumb_hash + file_ext)
+	thumb.save(fname)
+	thumb.close()
+	return thumb_hash
+
+
 def process_screenshots(screenshots):
 	# Handle screenshots
-	thumb_size = (255, 160)
+
 	num_screenshots = 0
 	for item in screenshots:
 		if item['service'] == 'VNC':
@@ -127,17 +152,7 @@ def process_screenshots(screenshots):
 		item['hash'] = image_hash
 		del item['data']
 
-		thumb = Image.open(fname)
-		thumb.thumbnail(thumb_size)
-		thumb_hash = hashlib.sha256(thumb.tobytes()).hexdigest()
-		thumbhashpath = "{}/{}".format(thumb_hash[0:2], thumb_hash[2:4])
-		thumbpath = os.path.join(current_app.config["MEDIA_DIRECTORY"], "thumbs", thumbhashpath)
-		# makedirs attempts to make every directory necessary to get to the "thumbs" folder
-		os.makedirs(thumbpath, exist_ok=True)
-		fname = os.path.join(thumbpath, thumb_hash + file_ext)
-		thumb.save(fname)
-		thumb.close()
-		item['thumb_hash'] = thumb_hash
+		item['thumb_hash'] = create_thumbnail(fname, file_ext)
 		num_screenshots += 1
 
 	return screenshots, num_screenshots
