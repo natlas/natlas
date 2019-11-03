@@ -2,6 +2,7 @@ import ipaddress
 from datetime import datetime, timezone
 import random
 
+
 def hostinfo(ip):
 	from flask import current_app, abort
 	hostinfo = {}
@@ -12,11 +13,17 @@ def hostinfo(ip):
 	screenshot_count = current_app.elastic.count_host_screenshots(ip)
 	hostinfo['screenshot_count'] = screenshot_count
 	screenshots = 0
-	screenshotTypes = ['screenshots', 'headshot', 'vncheadshot',
-					 'httpheadshot', 'httpsheadshot']
+	screenshotTypes = [
+		'screenshots',
+		'headshot',
+		'vncheadshot',
+		'httpheadshot',
+		'httpsheadshot'
+	]
 	for hs in screenshotTypes:
 		if context.get(hs):
-			if hs == "screenshots": # 0.6.5 iterating screenshots instead of screenshot types
+			if hs == "screenshots":
+				# 0.6.5 iterating screenshots instead of screenshot types
 				for item in context.get(hs):
 					screenshots += 1
 			else:
@@ -26,8 +33,9 @@ def hostinfo(ip):
 		hostinfo['hostname'] = context.get('hostname')
 	return hostinfo, context
 
+
 def isAcceptableTarget(target):
-	from flask import current_app, abort
+	from flask import current_app
 	try:
 		targetAddr = ipaddress.IPv4Address(target)
 	except ipaddress.AddressValueError:
@@ -56,14 +64,18 @@ def isAcceptableTarget(target):
 
 	return True
 
+
 def utcnow_tz():
 	return datetime.now(timezone.utc)
+
 
 def generate_hex_16():
 	return "%x" % random.randrange(16**16)
 
+
 def generate_hex_32():
 	return "%x" % random.randrange(16**32)
+
 
 def parse_ssl_data(sslcert):
 	altnames = []

@@ -2,6 +2,7 @@
 # W191 - Tabs over spaces
 # E261 - Two spaces before comments
 # E117 - Indention levels
+# E402 - module level import not at top of file
 
-ignore = W191, E261, E117
+ignore = W191, E261, E117, E402
 max-line-length = 160

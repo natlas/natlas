@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, redirect, url_for, request
+from flask import Flask, flash, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
@@ -8,10 +8,10 @@ from config import Config, populate_defaults, get_defaults
 from app.elastic import Elastic
 from app.scope import ScopeManager
 from urllib.parse import urlparse
-import sqlalchemy
 import os
 import hashlib
 import sentry_sdk
+
 
 class AnonUser(AnonymousUserMixin):
 
@@ -55,7 +55,7 @@ def create_app(config_class=Config, load_config=False):
 	app.jinja_env.add_extension('jinja2.ext.do')
 
 	db.init_app(app)
-	migrate.init_app(app,db)
+	migrate.init_app(app, db)
 	login.init_app(app)
 	mail.init_app(app)
 	csrf.init_app(app)
@@ -64,8 +64,8 @@ def create_app(config_class=Config, load_config=False):
 		print("Loading Config from database")
 		with app.app_context():
 			from app.models import ConfigItem
-			try: # This is gross but we need it because otherwise flask db operations won't work to create the ConfigItem table in the first place.
-
+			# This is gross but we need it because otherwise flask db operations won't work to create the ConfigItem table in the first place.
+			try:
 				# Look to see if any new config items were added that aren't currently in db
 				for item in get_defaults():
 					if not ConfigItem.query.filter_by(name=item[0]).first():
@@ -92,7 +92,7 @@ def create_app(config_class=Config, load_config=False):
 						app.config[item.name] = item.value
 					else:
 						print("Unsupported config type %s:%s:%s" % (item.name, item.type, item.value))
-			except Exception as e:
+			except Exception:
 				print("ConfigItem table doesn't exist yet. Ignore if flask db upgrade.")
 
 			from app.models import NatlasServices
@@ -108,7 +108,7 @@ def create_app(config_class=Config, load_config=False):
 					db.session.commit()
 					print("NatlasServices populated with defaults from defaults/natlas-services")
 					app.current_services = current_services.as_dict()
-			except Exception as e:
+			except Exception:
 				print("NatlasServices table doesn't exist yet. Ignore if flask db upgrade.")
 
 			# Load the current agent config, otherwise create it.
@@ -123,7 +123,7 @@ def create_app(config_class=Config, load_config=False):
 					db.session.commit()
 					print("AgentConfig populated with defaults")
 					app.agentConfig = newAgentConfig.as_dict()
-			except Exception as e:
+			except Exception:
 				print("AgentConfig table doesn't exist yet. Ignore if flask db upgrade.")
 
 			# Load the current agent config, otherwise create it.
@@ -138,7 +138,7 @@ def create_app(config_class=Config, load_config=False):
 					agentScripts = AgentScript.query.all()
 				app.agentScripts = agentScripts
 				app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
-			except Exception as e:
+			except Exception:
 				print("AgentScript table doesn't exist yet. Ignore if flask db upgrade.")
 
 		# Grungy thing so we can use flask db and flask shell before the config items are initially populated
@@ -171,4 +171,6 @@ def create_app(config_class=Config, load_config=False):
 
 	return app
 
+
+# Ignore E402 and F401 errors about this line
 from app import models

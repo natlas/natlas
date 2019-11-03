@@ -10,10 +10,12 @@ import ipaddress
 from .util import utcnow_tz, generate_hex_16, generate_hex_32
 
 # Many:Many table mapping scope items to tags and vice versa.
-scopetags = db.Table('scopetags',
+scopetags = db.Table(
+	'scopetags',
 	db.Column('scope_id', db.Integer, db.ForeignKey('scope_item.id'), primary_key=True),
 	db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
 )
+
 
 # Users and related configs
 class User(UserMixin, db.Model):
@@ -38,7 +40,7 @@ class User(UserMixin, db.Model):
 			valid = validate_email(email)
 			email = valid["email"]
 			return email
-		except EmailNotValidError as e:
+		except EmailNotValidError:
 			return False
 
 	# This is really only used by the add-user bootstrap script, but useful to contain it here.
@@ -91,9 +93,12 @@ class ScopeItem(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	target = db.Column(db.String, index=True, unique=True)
 	blacklist = db.Column(db.Boolean, index=True)
-	tags = db.relationship('Tag', secondary=scopetags,
+	tags = db.relationship(
+		'Tag',
+		secondary=scopetags,
 		primaryjoin=(scopetags.c.scope_id == id),
-		backref=db.backref('scope', lazy='dynamic'), lazy='dynamic')
+		backref=db.backref('scope', lazy='dynamic'),
+		lazy='dynamic')
 
 	def getBlacklist():
 		return ScopeItem.query.filter_by(blacklist=True).all()
@@ -140,11 +145,14 @@ class ScopeItem(db.Model):
 		if '/' not in ip:
 			ip = ip + '/32'
 		try:
-			isValid = ipaddress.ip_network(ip, False) # False will mask out hostbits for us, ip_network for eventual ipv6 compat
-		except ValueError as e:
-			failedImports.append(line) # if we hit this ValueError it means that the input couldn't be a CIDR range
+			# False will mask out hostbits for us, ip_network for eventual ipv6 compat
+			isValid = ipaddress.ip_network(ip, False)
+		except ValueError:
+			# if we hit this ValueError it means that the input couldn't be a CIDR range
+			failedImports.append(line)
 			return failedImports, alreadyExists, successImports
-		item = ScopeItem.query.filter_by(target=isValid.with_prefixlen).first() # We only want scope items with masked out host bits
+		# We only want scope items with masked out host bits
+		item = ScopeItem.query.filter_by(target=isValid.with_prefixlen).first()
 		if item:
 			# Add in look for tags and append as necessary
 			if tags:
@@ -271,15 +279,18 @@ class RescanTask(db.Model):
 		self.date_completed = utcnow_tz()
 
 	@staticmethod
-	def getPendingTasks(): # Tasks that haven't been completed and haven't been dispatched
+	def getPendingTasks():
+		# Tasks that haven't been completed and haven't been dispatched
 		return RescanTask.query.filter_by(complete=False).filter_by(dispatched=False).all()
 
 	@staticmethod
-	def getDispatchedTasks(): # Tasks that have been dispatched but haven't been completed
+	def getDispatchedTasks():
+		# Tasks that have been dispatched but haven't been completed
 		return RescanTask.query.filter_by(dispatched=True).filter_by(complete=False).all()
 
 	@staticmethod
-	def getIncompleteTasks(): #All tasks that haven't been marked as complete
+	def getIncompleteTasks():
+		# All tasks that haven't been marked as complete
 		return RescanTask.query.filter_by(complete=False).all()
 
 	@staticmethod
@@ -374,7 +385,8 @@ class EmailToken(db.Model):
 		elif tokenstr:
 			mytoken = EmailToken.get_token(tokenstr)
 			if not mytoken:
-				return True #token already doesn't exist
+				# token already doesn't exist
+				return True
 			db.session.delete(mytoken)
 			db.session.commit()
 			return True

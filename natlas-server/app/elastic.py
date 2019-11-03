@@ -5,6 +5,7 @@ from datetime import datetime
 from config import Config
 from urllib3.exceptions import NewConnectionError
 
+
 class Elastic:
 	es = None
 	status = False
@@ -63,45 +64,45 @@ class Elastic:
 
 	def search(self, query, limit, offset, searchIndex="nmap"):
 		if not self.checkStatus():
-			return 0,[]
+			return 0, []
 		if query == '':
 			query = 'nmap'
 		try:
-			result = self.es.search(index=searchIndex, doc_type="_doc", body=\
-				{
-					"size": limit,
-					"from": offset,
-					"query": {
-						"bool": {
-						   "must": [
-								{
-									"query_string": {
-										"query": query,
-										"fields": ["nmap_data"],
-										"default_operator": "AND"
-									}
-								},
-								{
-									"term": {
-										"is_up": True
-									}
-								},
-								{
-									"range": {
-										"port_count": {
-											"gt": 0
-											}
+			searchBody = {
+				"size": limit,
+				"from": offset,
+				"query": {
+					"bool": {
+						"must": [
+							{
+								"query_string": {
+									"query": query,
+									"fields": ["nmap_data"],
+									"default_operator": "AND"
+								}
+							},
+							{
+								"term": {
+									"is_up": True
+								}
+							},
+							{
+								"range": {
+									"port_count": {
+										"gt": 0
 									}
 								}
-							]
-						}
-					},
-					"sort": {
-						"ctime": {
-							"order": "desc"
 							}
-						}
-				})
+						]
+					}
+				},
+				"sort": {
+					"ctime": {
+						"order": "desc"
+					}
+				}
+			}
+			result = self.es.search(index=searchIndex, doc_type="_doc", body=searchBody)
 			results = []  # collate results
 			for thing in result['hits']['hits']:
 				results.append(thing['_source'])
@@ -111,8 +112,6 @@ class Elastic:
 			self.status = False
 		except Exception:
 			return 0, []  # search borked, return nothing
-
-
 
 	def totalHosts(self):
 		if not self.checkStatus():
@@ -139,10 +138,25 @@ class Elastic:
 
 	def gethost(self, ip):
 		if not self.checkStatus():
-			return 0,None
+			return 0, None
 		try:
-			result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {"query_string": {
-									'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+			searchBody = {
+				"size": 1,
+				"query": {
+					"query_string": {
+						"query": ip,
+						"fields": ["ip"],
+						"default_operator":
+						"AND"
+					}
+				},
+				"sort": {
+					"ctime": {
+						"order": "desc"
+					}
+				}
+			}
+			result = self.es.search(index='nmap_history', doc_type='_doc', body=searchBody)
 			if result['hits']['total'] == 0:
 				return 0, None
 			return result['hits']['total'], result['hits']['hits'][0]['_source']
@@ -151,13 +165,27 @@ class Elastic:
 			self.status = False
 			return 0, None
 
-
 	def gethost_history(self, ip, limit, offset):
 		if not self.checkStatus():
-			return 0,[]
+			return 0, []
 		try:
-			result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": limit, "from": offset, "query": {
-									"query_string": {'query': ip, "fields": ["ip"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+			searchBody = {
+				"size": limit,
+				"from": offset,
+				"query": {
+					"query_string": {
+						"query": ip,
+						"fields": ["ip"],
+						"default_operator": "AND"
+					}
+				},
+				"sort": {
+					"ctime": {
+						"order": "desc"
+					}
+				}
+			}
+			result = self.es.search(index='nmap_history', doc_type='_doc', body=searchBody)
 			results = []  # collate results
 			for thing in result['hits']['hits']:
 				results.append(thing['_source'])
@@ -209,7 +237,7 @@ class Elastic:
 							"range": {
 								"num_screenshots": {
 									"gt": 0
-									}
+								}
 							}
 						}
 					]
@@ -233,14 +261,27 @@ class Elastic:
 		except Exception:
 			return 0, []
 
-
 	def gethost_scan_id(self, scan_id):
 		if not self.checkStatus():
-			return 0,None
+			return 0, None
 
 		try:
-			result = self.es.search(index='nmap_history', doc_type='_doc', body={"size": 1, "query": {
-									"query_string": {'query': scan_id, "fields": ["scan_id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+			searchBody = {
+				"size": 1,
+				"query": {
+					"query_string": {
+						"query": scan_id,
+						"fields": ["scan_id"],
+						"default_operator": "AND"
+					}
+				},
+				"sort": {
+					"ctime": {
+						"order": "desc"
+					}
+				}
+			}
+			result = self.es.search(index='nmap_history', doc_type='_doc', body=searchBody)
 			if result['hits']['total'] == 0:
 				return 0, None
 			return result['hits']['total'], result['hits']['hits'][0]['_source']
@@ -249,30 +290,57 @@ class Elastic:
 			self.status = False
 			return 0, None
 
-
-
 	def delete_scan(self, scan_id):
 		if not self.checkStatus():
 			return False
 
 		migrate = False
 		try:
-			hostResult = self.es.search(index='nmap', doc_type='_doc', body={"size": 1, "query": {
-									"query_string": {'query': scan_id, "fields": ["scan_id"]}}})
+			searchBody = {
+				"size": 1,
+				"query": {
+					"query_string": {
+						"query": scan_id,
+						"fields": ["scan_id"]
+					}
+				}
+			}
+			hostResult = self.es.search(index='nmap', doc_type='_doc', body=searchBody)
 			if hostResult['hits']['total'] != 0:
 				# we're deleting the most recent scan result and need to pull the next most recent into the nmap index
 				# otherwise you won't find the host when doing searches or browsing
 				ipaddr = hostResult['hits']['hits'][0]['_source']['ip']
-				twoscans = self.es.search(index="nmap_history", doc_type="_doc", body={"size":2, "query": {
-							   "query_string": {"query": ipaddr, "fields": ["ip"]}}, "sort": {"ctime": {"order": "desc"}}})
+				secondBody = {
+					"size": 2,
+					"query": {
+						"query_string": {
+							"query": ipaddr,
+							"fields": ["ip"]
+						}
+					},
+					"sort": {
+						"ctime": {
+							"order": "desc"
+						}
+					}
+				}
+				twoscans = self.es.search(index="nmap_history", doc_type="_doc", body=secondBody)
 
 				if len(twoscans['hits']['hits']) != 2:
 					# we're deleting the only scan for this host so we don't need to migrate old scan data into the nmap index
 					migrate = False
 				else:
 					migrate = True
-			result = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body={"query": {
-									 "query_string": {"query": scan_id, "fields": ["scan_id"], "default_operator": "AND"}}})
+			deleteBody = {
+				"query": {
+					"query_string": {
+						"query": scan_id,
+						"fields": ["scan_id"],
+						"default_operator": "AND"
+					}
+				}
+			}
+			result = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body=deleteBody)
 			if migrate:
 				self.es.index(index='nmap', doc_type='_doc', id=ipaddr, body=twoscans['hits']['hits'][1]['_source'])
 			return result["deleted"]
@@ -284,8 +352,21 @@ class Elastic:
 		if not self.checkStatus():
 			return False
 		try:
-			deleted = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body={"query": {
-									"query_string": {'query': ip, "fields": ["ip", "id"], "default_operator": "AND"}}, "sort": {"ctime": {"order": "desc"}}})
+			searchBody = {
+				"query": {
+					"query_string": {
+						"query": ip,
+						"fields": ["ip", "id"],
+						"default_operator": "AND"
+					}
+				},
+				"sort": {
+					"ctime": {
+						"order": "desc"
+					}
+				}
+			}
+			deleted = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body=searchBody)
 			return deleted["deleted"]
 		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
 			self.status = False
@@ -296,43 +377,42 @@ class Elastic:
 			return False
 		import random
 		seed = random.randrange(sys.maxsize)
-		searchQuery = {
-				"from": 0,
-				"size": 1,
-				"query": {
-					"function_score": {
-						"query": {
-							"bool": {
-									   "must": [
-											{
-												"term": {
-													"is_up": True
-												}
-											},
-											{
-												"range": {
-													"port_count": {
-														"gt": 0
-														}
-												}
-											}
-										]
+		searchBody = {
+			"from": 0,
+			"size": 1,
+			"query": {
+				"function_score": {
+					"query": {
+						"bool": {
+							"must": [
+								{
+									"term": {
+										"is_up": True
 									}
-						},
-						"random_score": {
-							"seed": seed,
-							"field": "_id"
+								},
+								{
+									"range": {
+										"port_count": {
+											"gt": 0
+										}
+									}
+								}
+							]
 						}
+					},
+					"random_score": {
+						"seed": seed,
+						"field": "_id"
 					}
 				}
 			}
+		}
 		try:
 
-			random = self.es.search(index="nmap", doc_type="_doc", body=searchQuery)
+			random = self.es.search(index="nmap", doc_type="_doc", body=searchBody)
 			return random
 		except Exception:
 			return False
-
 
 	def get_current_screenshots(self, limit, offset):
 		if not self.checkStatus():
@@ -344,7 +424,7 @@ class Elastic:
 				"range": {
 					"num_screenshots": {
 						"gt": 0
-						}
+					}
 				}
 			},
 			"aggs": {
@@ -360,9 +440,9 @@ class Elastic:
 				}
 			}
 		}
-
+		source_fields = ["screenshots", "ctime", "scan_id", "ip"]
 		try:
-			result = self.es.search(index="nmap", doc_type='_doc', body=searchBody, _source=["screenshots", "ctime", "scan_id", "ip"], track_scores=False,)
+			result = self.es.search(index="nmap", doc_type='_doc', body=searchBody, _source=source_fields, track_scores=False)
 			num_screenshots = int(result['aggregations']["screenshot_count"]["value"])
 			results = []  # collate results
 			for thing in result['hits']['hits']:

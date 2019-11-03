@@ -6,6 +6,7 @@ import os
 
 LOGFILE = 'logs/scopemanager.log'
 
+
 def log(message, printm=False):
 	if not os.path.isdir('logs'):
 		os.makedirs('logs', exist_ok=True)
@@ -13,6 +14,7 @@ def log(message, printm=False):
 		f.write('%s - %s\n' % (str(datetime.now()), message))
 	if printm:
 		print('%s - %s\n' % (str(datetime.now()), message))
+
 
 class ScopeManager():
 
@@ -90,7 +92,7 @@ class ScopeManager():
 			scanrange = [IPNetwork(n.target) for n in ScopeItem.getScope()]
 			blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
 			self.scanmanager = IPScanManager(scanrange, blacklistrange)
-		except Exception as e:
+		except Exception:
 			log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
 
 	def getScanManager(self):

@@ -1,6 +1,7 @@
 from netaddr import IPSet, IPNetwork
 from app.cyclicprng import CyclicPRNG
 
+
 class IPScanManager:
 	networks = []
 	total = 0
@@ -15,7 +16,7 @@ class IPScanManager:
 		for block in whitelist:
 			ipset.add(IPNetwork(block))
 			# Remove invalid broadcast and network addresses
-			if block.broadcast != None:
+			if block.broadcast is not None:
 				ipset.remove(IPNetwork(block.broadcast))
 			if block.size > 2:
 				ipset.remove(IPNetwork(block.network))
@@ -23,7 +24,7 @@ class IPScanManager:
 			ipset.remove(IPNetwork(block))
 		for block in ipset.iter_cidrs():
 			self.total += block.size
-			self.networks.append( { "network": block, "size": block.size, "start": block[0], "index": 0 } )
+			self.networks.append({"network": block, "size": block.size, "start": block[0], "index": 0})
 
 		if self.total < 1:
 			raise Exception("IPScanManager can not be started with an empty target scope")
@@ -47,12 +48,12 @@ class IPScanManager:
 
 	def getIP(self, index):
 		def binarysearch(networks, i):
-			middle = int(len(networks)/2)
+			middle = int(len(networks) / 2)
 			network = networks[middle]
 			if i < network["index"]:
 				return binarysearch(networks[:middle], i)
 			elif i >= (network["index"] + network["size"]):
-				return binarysearch(networks[middle+1:], i)
+				return binarysearch(networks[middle + 1:], i)
 			else:
 				return network["network"][i - network["index"]]
 		return binarysearch(self.networks, index)

@@ -1,11 +1,13 @@
-import os, argparse
+import argparse
+import os
 from dotenv import load_dotenv
+
 
 # Things in the Class object are config options we will likely never want to change from the database.
 class Config(object):
 
 	# Current Version
-	NATLAS_VERSION="0.6.7"
+	NATLAS_VERSION = "0.6.7"
 
 	BASEDIR = os.path.abspath(os.path.dirname(__file__))
 	load_dotenv(os.path.join(BASEDIR, '.env'))
@@ -37,32 +39,35 @@ class Config(object):
 		NATLAS_VERSION = version_override
 
 
-				# NAME,             TYPE, DEFAULT
+# NAME, TYPE, DEFAULT
 defaultConfig = [
-			("LOGIN_REQUIRED","bool","False"),
-			("REGISTER_ALLOWED","bool","False"),
-			("AGENT_AUTHENTICATION", "bool", "False"),
-			("ELASTICSEARCH_URL","string",os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")),
-			("MAIL_SERVER","string","localhost"),
-			("MAIL_PORT","int","25"),
-			("MAIL_USE_TLS","bool","False"),
-			("MAIL_USERNAME","string",""),
-			("MAIL_PASSWORD","string",""),
-			("MAIL_FROM","string",""),
-			("LOCAL_SUBRESOURCES", "bool", "False"),
-			("CUSTOM_BRAND", "string", "")
-			]
+	("LOGIN_REQUIRED", "bool", "False"),
+	("REGISTER_ALLOWED", "bool", "False"),
+	("AGENT_AUTHENTICATION", "bool", "False"),
+	("ELASTICSEARCH_URL", "string", os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")),
+	("MAIL_SERVER", "string", "localhost"),
+	("MAIL_PORT", "int", "25"),
+	("MAIL_USE_TLS", "bool", "False"),
+	("MAIL_USERNAME", "string", ""),
+	("MAIL_PASSWORD", "string", ""),
+	("MAIL_FROM", "string", ""),
+	("LOCAL_SUBRESOURCES", "bool", "False"),
+	("CUSTOM_BRAND", "string", "")
+]
+
 
 def get_defaults():
 	return defaultConfig
 
+
 def get_current_config():
-	from app import create_app, db
+	from app import create_app
 	from app.models import ConfigItem
 	app = create_app(load_config=False)
 	with app.app_context():
 		for item in ConfigItem.query.all():
 			print("%s, %s, %s" % (item.name, item.type, item.value))
+
 
 # run as standalone to populate the config items into the database using environment or default values
 def populate_defaults(verbose=False):
@@ -86,6 +91,7 @@ def populate_defaults(verbose=False):
 		print("[+] Committing config changes to database")
 		db.session.commit()
 
+
 def main():
 	parser_desc = '''
 	Utility for initially populating the database from the environment. Flask will automatically try to populate the database if no config items are found.
@@ -101,6 +107,7 @@ def main():
 	else:
 		print("[+] Getting current config from database\nNAME, TYPE, VALUE")
 		get_current_config()
+
 
 if __name__ == "__main__":
 	main()
