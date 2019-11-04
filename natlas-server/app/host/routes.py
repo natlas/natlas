@@ -151,40 +151,46 @@ def host_screenshots(ip):
 def rescan_host(ip):
 	rescanForm = RescanForm()
 
-	if rescanForm.validate_on_submit():
-		if not current_app.ScopeManager.isAcceptableTarget(ip):
-			# Someone is requesting we scan an ip that isn't allowed
-			flash("We're not allowed to scan %s" % ip, "danger")
-			return redirect(request.referrer)
-
-		incompleteScans = current_app.ScopeManager.getIncompleteScans()
-
-		for scan in incompleteScans:
-			if ip == scan.target:
-				if scan.dispatched:
-					status = "dispatched"
-					if (datetime.utcnow() - scan.date_dispatched).seconds > 1200:
-						# 20 minutes have past since dispatch, something probably wen't seriously wrong
-						# move it back to not dispatched and update the cached rescan data
-						scan.dispatched = False
-						db.session.add(scan)
-						db.session.commit()
-						current_app.ScopeManager.updatePendingRescans()
-						current_app.ScopeManager.updateDispatchedRescans()
-						flash("Refreshed existing rescan request for %s" % ip, "success")
-						return redirect(request.referrer)
-				else:
-					status = "pending"
-				flash("There's already a %s rescan request for %s" % (status, ip), "warning")
-				return redirect(request.referrer)
-
-		rescan = RescanTask(user_id=current_user.id, target=ip)
-		db.session.add(rescan)
-		db.session.commit()
-		flash("Requested rescan of %s" % ip, "success")
-		current_app.ScopeManager.updatePendingRescans()
-		current_app.ScopeManager.updateDispatchedRescans()
+	if not rescanForm.validate_on_submit():
+		flash("Form failed to validate", "danger")
 		return redirect(request.referrer)
+
+	if not current_app.ScopeManager.isAcceptableTarget(ip):
+		# Someone is requesting we scan an ip that isn't allowed
+		flash(f"We're not allowed to scan {ip}", "danger")
+		return redirect(request.referrer)
+
+	incompleteScans = current_app.ScopeManager.getIncompleteScans()
+
+	scan_dispatched = {}
+	for scan in incompleteScans:
+		scan_dispatched[scan.target] = scan.dispatched
+
+	if ip in scan_dispatched:
+		if scan_dispatched[ip]:
+			status = "dispatched"
+			if (datetime.utcnow() - scan.date_dispatched).seconds > 1200:
+				# 20 minutes have past since dispatch, something probably went wrong
+				# move it back to not dispatched and update the cached rescan data
+				scan.dispatched = False
+				db.session.add(scan)
+				db.session.commit()
+				current_app.ScopeManager.updatePendingRescans()
+				current_app.ScopeManager.updateDispatchedRescans()
+				flash(f"Refreshed existing rescan request for {ip}", "success")
+				return redirect(request.referrer)
+		else:
+			status = "pending"
+		flash(f"There's already a {status} rescan request for {ip}", "warning")
+		return redirect(request.referrer)
+
+	rescan = RescanTask(user_id=current_user.id, target=ip)
+	db.session.add(rescan)
+	db.session.commit()
+	current_app.ScopeManager.updatePendingRescans()
+	current_app.ScopeManager.updateDispatchedRescans()
+	flash(f"Requested rescan of {ip}", "success")
+	return redirect(request.referrer)
 
 
 @bp.route("/random")
