@@ -189,11 +189,11 @@ def rescan_host(ip):
 
 @bp.route("/random")
 @bp.route("/random/")
-def randomHost():
-	randomHost = current_app.elastic.random_host()
-	if not randomHost:
+def random_host():
+	random_host = current_app.elastic.random_host()
+	if not random_host:
 		abort(404)
-	ip = randomHost['hits']['hits'][0]['_source']['ip']
+	ip = random_host['hits']['hits'][0]['_source']['ip']
 	info, context = hostinfo(ip)
 	delForm = DeleteForm()
 	delHostForm = DeleteForm()
