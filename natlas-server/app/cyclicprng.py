@@ -8,6 +8,7 @@ mutex = Lock()
 
 LOGFILE = 'logs/scopemanager.log'
 
+
 def modexp(b, e, m):
 	bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
 	s = b
@@ -20,11 +21,13 @@ def modexp(b, e, m):
 		s %= m
 	return v
 
+
 def log(message):
 	if not os.path.isdir('logs'):
 		os.makedirs('logs', exist_ok=True)
 	with open(LOGFILE, 'a') as f:
 		f.write('%s - %s\n' % (str(datetime.now()), message))
+
 
 class CyclicPRNG:
 	N = 0
@@ -58,25 +61,25 @@ class CyclicPRNG:
 				num = num + 1
 			else:
 				num = num + 2
-			while sympy.isprime(num) == False:
+			while not sympy.isprime(num):
 				num = num + 2
 			return num
 		self.Modulus = next_prime(self.N)
-		self.ModulusFactors = sympy.factorint(self.Modulus-1)
+		self.ModulusFactors = sympy.factorint(self.Modulus - 1)
 
 	def initGenerator(self):
 		found = False
-		while found == False:
-			base = random.randint(2, self.Modulus-2)
+		while not found:
+			base = random.randint(2, self.Modulus - 2)
 			found = True
 			for factor in self.ModulusFactors:
-				if modexp(base, int((self.Modulus-1)/factor), self.Modulus) == 1:
+				if modexp(base, int((self.Modulus - 1) / factor), self.Modulus) == 1:
 					found = False
 					break
 		self.G = base
 
 	def initPermutation(self):
-		exp = random.randint(2, self.Modulus-1)
+		exp = random.randint(2, self.Modulus - 1)
 		self.end = modexp(self.G, exp, self.Modulus)
 		while self.end > self.N:
 			self.end = (self.end * self.G) % self.Modulus
@@ -88,7 +91,7 @@ class CyclicPRNG:
 
 	def getRandom(self):
 		if self.N <= 2:
-			return random.randint(1,self.N)
+			return random.randint(1, self.N)
 		mutex.acquire()
 		value = self.current
 		self.current = (self.current * self.G) % self.Modulus

@@ -8,6 +8,7 @@ from app.auth.email import send_password_reset_email
 from app.auth import bp
 from werkzeug.urls import url_parse
 
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
 	if current_user.is_authenticated:
@@ -69,8 +70,12 @@ def reset_password_request():
 			send_password_reset_email(user)
 		flash('Check your email for the instructions to reset your password', "info")
 		return redirect(url_for('auth.login'))
-	return render_template('auth/password_reset.html',
-						   title='Request Password Reset', form=form, pwrequest=True)
+	return render_template(
+		'auth/password_reset.html',
+		title='Request Password Reset',
+		form=form,
+		pwrequest=True
+	)
 
 
 @bp.route('/reset_password/<token>', methods=['GET'])
@@ -79,6 +84,7 @@ def reset_password(token):
 		return redirect(url_for('main.index'))
 	session['reset_token'] = token
 	return redirect(url_for('auth.do_password_reset'))
+
 
 @bp.route('/reset_password/reset', methods=['GET', 'POST'])
 def do_password_reset():
@@ -112,13 +118,14 @@ def invite_user(token):
 	session['invite_token'] = token
 	return redirect(url_for('auth.accept_invite'))
 
+
 @bp.route('/invite/accept', methods=['GET', 'POST'])
 def accept_invite():
 	token = session['invite_token']
 	if not token:
 		flash("Token not found!", "danger")
 		return redirect(url_for('auth.login'))
-	
+
 	user = User.verify_invite_token(token)
 	if not user:
 		flash("Invite token is invalid or has expired", "danger")
@@ -135,4 +142,3 @@ def accept_invite():
 		flash('Your password has been set.', "success")
 		return redirect(url_for('auth.login'))
 	return render_template('auth/accept_invite.html', title="Accept Invitation", form=form)
-

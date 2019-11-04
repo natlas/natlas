@@ -4,10 +4,13 @@ from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, EqualTo, Length
 from app.models import User
 
+
 class ChangePasswordForm(FlaskForm):
 	old_password = PasswordField('Old Password', validators=[DataRequired()])
-	password = PasswordField('Password', validators=[
-							 DataRequired(), Length(min=8)])
+	password = PasswordField(
+		'Password',
+		validators=[DataRequired(), Length(min=8)]
+	)
 	password2 = PasswordField(
 		'Repeat Password', validators=[DataRequired(), EqualTo('password')])
 	changePassword = SubmitField('Change Password')
@@ -19,6 +22,7 @@ class ChangePasswordForm(FlaskForm):
 		if not user.check_password(old_password.data):
 			raise ValidationError("Invalid password! If you forgot your password, please use the password reset form.")
 
+
 class DisplaySettingsForm(FlaskForm):
 	results_per_page = SelectField('Results Per Page', coerce=int)
 	preview_length = SelectField('Preview Length', coerce=int)
@@ -28,6 +32,7 @@ class DisplaySettingsForm(FlaskForm):
 
 class GenerateTokenForm(FlaskForm):
 	generateToken = SubmitField("Generate Token")
+
 
 class AgentNameForm(FlaskForm):
 	agent_name = StringField("New Agent Name", validators=[DataRequired()])

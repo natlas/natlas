@@ -1,5 +1,5 @@
 from flask import redirect, url_for, flash, render_template, \
-				Response, current_app, request, send_from_directory, abort
+	Response, current_app, request, send_from_directory, abort
 
 from flask_login import current_user, login_required
 from app.main import bp
@@ -12,10 +12,12 @@ from app import db
 import json
 from datetime import datetime
 
+
 @bp.route('/')
 @isAuthenticated
 def index():
 	return redirect(url_for('main.search'))
+
 
 # Serve media files in case the front-end proxy doesn't do it
 @bp.route('/media/<path:filename>')
@@ -23,6 +25,7 @@ def send_media(filename):
 	# If you're looking at this function, wondering why your files aren't sending...
 	# It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
 	return send_from_directory(current_app.config['MEDIA_DIRECTORY'], filename)
+
 
 @bp.route('/search')
 @isAuthenticated
@@ -39,18 +42,18 @@ def search():
 	else:
 		searchIndex = "nmap"
 
-	searchOffset = results_per_page * (page-1)
+	searchOffset = results_per_page * (page - 1)
 	count, context = current_app.elastic.search(query, results_per_page, searchOffset, searchIndex=searchIndex)
 	totalHosts = current_app.elastic.totalHosts()
 
 	if includeHistory:
-		next_url = url_for('main.search', query=query, page=page+1, includeHistory=includeHistory) \
-			 if count > page * results_per_page else None
+		next_url = url_for('main.search', query=query, page=page + 1, includeHistory=includeHistory) \
+			if count > page * results_per_page else None
 		prev_url = url_for('main.search', query=query, page=page - 1, includeHistory=includeHistory) \
 			if page > 1 else None
 	else:
-		next_url = url_for('main.search', query=query, page=page+1) \
-			 if count > page * results_per_page else None
+		next_url = url_for('main.search', query=query, page=page + 1) \
+			if count > page * results_per_page else None
 		prev_url = url_for('main.search', query=query, page=page - 1) \
 			if page > 1 else None
 
@@ -66,17 +69,19 @@ def search():
 	else:
 		return render_template("search.html", query=query, numresults=count, totalHosts=totalHosts, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
 
+
 @bp.route('/searchmodal')
 @isAuthenticated
 def search_modal():
 	return render_template("includes/search_modal_content.html")
+
 
 def determine_data_version(hostdata):
 	if 'agent_version' in hostdata:
 		# Do math on version here to determine if we need to fall "up" to 0.6.4
 		version = hostdata['agent_version']
 		verlist = version.split('.')
-		for idx,item in enumerate(verlist):
+		for idx, item in enumerate(verlist):
 			verlist[idx] = int(item)
 
 		if verlist[1] < 6 or (verlist[1] == 6 and verlist[2] < 4):
@@ -86,6 +91,7 @@ def determine_data_version(hostdata):
 		version = '0.6.4'
 
 	return version
+
 
 @bp.route('/host/<ip>')
 @bp.route('/host/<ip>/')
@@ -97,9 +103,16 @@ def host(ip):
 	rescanForm = RescanForm()
 
 	version = determine_data_version(context)
-
-	return render_template("host/versions/"+version+"/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
-		rescanForm=rescanForm)
+	template_str = f"host/versions/{version}/summary.html"
+	return render_template(
+		template_str,
+		**context,
+		host=context,
+		info=info,
+		delForm=delForm,
+		delHostForm=delHostForm,
+		rescanForm=rescanForm
+	)
 
 
 @bp.route('/host/<ip>/history')
@@ -108,7 +121,7 @@ def host(ip):
 def host_history(ip):
 	info, context = hostinfo(ip)
 	page = int(request.args.get('p', 1))
-	searchOffset = current_user.results_per_page * (page-1)
+	searchOffset = current_user.results_per_page * (page - 1)
 
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
@@ -122,8 +135,19 @@ def host_history(ip):
 	prev_url = url_for('main.host_history', ip=ip, p=page - 1) \
 		if page > 1 else None
 
-	return render_template("host/versions/0.6.5/history.html", ip=ip, info=info, page=page, numresults=count, hosts=context, next_url=next_url, prev_url=prev_url, \
-		delHostForm=delHostForm, rescanForm=rescanForm)
+	# TODO Hardcoding the version here is bad. Revisit this.
+	return render_template(
+		"host/versions/0.6.5/history.html",
+		ip=ip, info=info,
+		page=page,
+		numresults=count,
+		hosts=context,
+		next_url=next_url,
+		prev_url=prev_url,
+		delHostForm=delHostForm,
+		rescanForm=rescanForm
+	)
+
 
 @bp.route('/host/<ip>/<scan_id>')
 @isAuthenticated
@@ -135,8 +159,17 @@ def host_historical_result(ip, scan_id):
 	count, context = current_app.elastic.gethost_scan_id(scan_id)
 
 	version = determine_data_version(context)
+	template_str = f"host/versions/{version}/summary.html"
+	return render_template(
+		template_str,
+		host=context,
+		info=info,
+		**context,
+		delForm=delForm,
+		delHostForm=delHostForm,
+		rescanForm=rescanForm
+	)
 
-	return render_template("host/versions/"+version+"/summary.html", host=context, info=info, **context, delForm=delForm, delHostForm=delHostForm, rescanForm=rescanForm)
 
 @bp.route('/host/<ip>/<scan_id>.<ext>')
 @isAuthenticated
@@ -159,12 +192,13 @@ def export_scan(ip, scan_id, ext):
 	else:
 		abort(404)
 
+
 @bp.route('/host/<ip>/screenshots')
 @bp.route('/host/<ip>/screenshots/')
 @isAuthenticated
 def host_screenshots(ip):
 	page = int(request.args.get('p', 1))
-	searchOffset = current_user.results_per_page * (page-1)
+	searchOffset = current_user.results_per_page * (page - 1)
 
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
@@ -177,9 +211,19 @@ def host_screenshots(ip):
 		if page > 1 else None
 
 	version = determine_data_version(context)
+	template_str = f"host/versions/{version}/screenshots.html"
+	return render_template(
+		template_str,
+		**context,
+		historical_screenshots=screenshots,
+		numresults=total_entries,
+		info=info,
+		delHostForm=delHostForm,
+		rescanForm=rescanForm,
+		next_url=next_url,
+		prev_url=prev_url
+	)
 
-	return render_template("host/versions/"+version+"/screenshots.html", **context, historical_screenshots=screenshots, numresults=total_entries, \
-		info=info, delHostForm=delHostForm, rescanForm=rescanForm, next_url=next_url, prev_url=prev_url)
 
 @bp.route('/host/<ip>/rescan', methods=['POST'])
 # login_required ensures that an actual user is logged in to make the request
@@ -198,7 +242,7 @@ def rescan_host(ip):
 
 		for scan in incompleteScans:
 			if ip == scan.target:
-				if scan.dispatched == True:
+				if scan.dispatched:
 					status = "dispatched"
 					if (datetime.utcnow() - scan.date_dispatched).seconds > 1200:
 						# 20 minutes have past since dispatch, something probably wen't seriously wrong
@@ -223,6 +267,7 @@ def rescan_host(ip):
 		current_app.ScopeManager.updateDispatchedRescans()
 		return redirect(request.referrer)
 
+
 @bp.route("/random")
 @bp.route("/random/")
 def randomHost():
@@ -236,16 +281,23 @@ def randomHost():
 	rescanForm = RescanForm()
 
 	version = determine_data_version(context)
-
-	return render_template("host/versions/"+version+"/summary.html", **context, host=context, info=info, delForm=delForm, delHostForm=delHostForm, \
-		rescanForm=rescanForm)
+	template_str = f"host/versions/{version}/summary.html"
+	return render_template(
+		template_str,
+		**context,
+		host=context,
+		info=info,
+		delForm=delForm,
+		delHostForm=delHostForm,
+		rescanForm=rescanForm
+	)
 
 
 @bp.route("/screenshots")
 @bp.route("/screenshots/")
 def browseScreenshots():
 	page = int(request.args.get('p', 1))
-	searchOffset = current_user.results_per_page * (page-1)
+	searchOffset = current_user.results_per_page * (page - 1)
 
 	total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(current_user.results_per_page, searchOffset)
 

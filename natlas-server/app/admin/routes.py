@@ -3,8 +3,8 @@ from flask_login import current_user
 from app import db
 from app.admin import bp
 from app.elastic import Elastic
-from app.admin.forms import *
-from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, Tag
+from app.admin import forms
+from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag
 from app.auth.email import send_user_invite_email
 from app.auth.wrappers import isAuthenticated, isAdmin
 import ipaddress
@@ -15,7 +15,7 @@ import hashlib
 @isAuthenticated
 @isAdmin
 def admin():
-	configForm = ConfigForm()
+	configForm = forms.ConfigForm()
 	configItems = current_app.config
 	if configForm.validate_on_submit():
 		for fieldname, fieldvalue in configForm.data.items():
@@ -37,9 +37,9 @@ def admin():
 @isAdmin
 def users():
 	users = User.query.all()
-	delForm = UserDeleteForm()
-	editForm = UserEditForm()
-	inviteForm = InviteUserForm()
+	delForm = forms.UserDeleteForm()
+	editForm = forms.UserEditForm()
+	inviteForm = forms.InviteUserForm()
 	if inviteForm.validate_on_submit():
 		validemail = User.validate_email(inviteForm.email.data)
 		if not validemail:
@@ -58,7 +58,7 @@ def users():
 @isAuthenticated
 @isAdmin
 def deleteUser(id):
-	delForm = UserDeleteForm()
+	delForm = forms.UserDeleteForm()
 	if delForm.validate_on_submit():
 		if current_user.id == id:
 			flash('You can\'t delete yourself!', 'danger')
@@ -77,7 +77,7 @@ def deleteUser(id):
 @isAuthenticated
 @isAdmin
 def toggleUser(id):
-	editForm = UserEditForm()
+	editForm = forms.UserEditForm()
 	if editForm.validate_on_submit():
 		user = User.query.filter_by(id=id).first()
 		if user.is_admin:
@@ -112,11 +112,11 @@ def scope():
 		scopeSize = current_app.ScopeManager.getScopeSize()
 		# if it's zero again that's fine, we just had to check
 
-	newForm = NewScopeForm()
-	delForm = ScopeDeleteForm()
-	editForm = ScopeToggleForm()
-	importForm = ImportScopeForm()
-	addTagForm = TagScopeForm()
+	newForm = forms.NewScopeForm()
+	delForm = forms.ScopeDeleteForm()
+	editForm = forms.ScopeToggleForm()
+	importForm = forms.ImportScopeForm()
+	addTagForm = forms.TagScopeForm()
 	addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
 	if newForm.validate_on_submit():
 		if '/' not in newForm.target.data:
@@ -139,11 +139,11 @@ def scope():
 def blacklist():
 	scope = ScopeItem.getBlacklist()
 	blacklistSize = current_app.ScopeManager.getBlacklistSize()
-	newForm = NewScopeForm()
-	delForm = ScopeDeleteForm()
-	editForm = ScopeToggleForm()
-	importForm = ImportBlacklistForm()
-	addTagForm = TagScopeForm()
+	newForm = forms.NewScopeForm()
+	delForm = forms.ScopeDeleteForm()
+	editForm = forms.ScopeToggleForm()
+	importForm = forms.ImportBlacklistForm()
+	addTagForm = forms.TagScopeForm()
 	addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
 	if newForm.validate_on_submit():
 		if '/' not in newForm.target.data:
@@ -166,10 +166,10 @@ def blacklist():
 def importScope(scopetype=''):
 	if scopetype == 'blacklist':
 		importBlacklist = True
-		importForm = ImportBlacklistForm()
+		importForm = forms.ImportBlacklistForm()
 	elif scopetype == 'scope':
 		importBlacklist = False
-		importForm = ImportScopeForm()
+		importForm = forms.ImportScopeForm()
 	else:
 		abort(404)
 	if importForm.validate_on_submit():
@@ -191,7 +191,7 @@ def importScope(scopetype=''):
 			flash('%s targets already existed!' % len(alreadyExists), 'info')
 		if len(failedImports) > 0:
 			flash('%s targets failed to import!' % len(failedImports), 'danger')
-			for item in failedImport:
+			for item in failedImports:
 				flash('%s' % item, 'danger')
 	else:
 		for field, errors in importForm.errors.items():
@@ -218,7 +218,7 @@ def exportScope(scopetype=''):
 @isAuthenticated
 @isAdmin
 def deleteScopeItem(id):
-	delForm = ScopeDeleteForm()
+	delForm = forms.ScopeDeleteForm()
 	if delForm.validate_on_submit():
 		item = ScopeItem.query.filter_by(id=id).first()
 		for tag in item.tags:
@@ -236,7 +236,7 @@ def deleteScopeItem(id):
 @isAuthenticated
 @isAdmin
 def toggleScopeItem(id):
-	toggleForm = ScopeToggleForm()
+	toggleForm = forms.ScopeToggleForm()
 	if toggleForm.validate_on_submit():
 		item = ScopeItem.query.filter_by(id=id).first()
 		if item.blacklist:
@@ -256,7 +256,7 @@ def toggleScopeItem(id):
 @isAuthenticated
 @isAdmin
 def tagScopeItem(id):
-	addTagForm = TagScopeForm()
+	addTagForm = forms.TagScopeForm()
 	addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
 	if addTagForm.validate_on_submit():
 		scope = ScopeItem.query.get(id)
@@ -273,7 +273,7 @@ def tagScopeItem(id):
 @isAuthenticated
 @isAdmin
 def untagScopeItem(id):
-	delTagForm = TagScopeForm()
+	delTagForm = forms.TagScopeForm()
 	scope = ScopeItem.query.get(id)
 	delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags.all()]
 	if delTagForm.validate_on_submit():
@@ -290,8 +290,8 @@ def untagScopeItem(id):
 @isAuthenticated
 @isAdmin
 def services():
-	uploadForm = ServicesUploadForm(prefix="upload-services")
-	addServiceForm = AddServiceForm(prefix="add-service")
+	uploadForm = forms.ServicesUploadForm(prefix="upload-services")
+	addServiceForm = forms.AddServiceForm(prefix="add-service")
 	addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp", "UDP")]
 	if uploadForm.uploadFile.data and uploadForm.validate_on_submit():
 		newServicesContent = uploadForm.serviceFile.data.read().decode("utf-8").rstrip('\r\n')
@@ -339,9 +339,9 @@ def exportServices():
 def agentConfig():
 	agentConfig = AgentConfig.query.get(1)
 	# pass the model to the form to populate
-	agentForm = AgentConfigForm(obj=agentConfig)
-	addScriptForm = AddScriptForm(prefix="add-script")
-	delScriptForm = DeleteForm(prefix="del-script")
+	agentForm = forms.AgentConfigForm(obj=agentConfig)
+	addScriptForm = forms.AddScriptForm(prefix="add-script")
+	delScriptForm = forms.DeleteForm(prefix="del-script")
 
 	if agentForm.validate_on_submit():
 		# populate the object from the form data
@@ -358,7 +358,7 @@ def agentConfig():
 @isAuthenticated
 @isAdmin
 def addScript():
-	addScriptForm = AddScriptForm(prefix="add-script")
+	addScriptForm = forms.AddScriptForm(prefix="add-script")
 
 	if addScriptForm.validate_on_submit():
 		newscript = AgentScript(name=addScriptForm.scriptName.data)
@@ -377,7 +377,7 @@ def addScript():
 @isAuthenticated
 @isAdmin
 def deleteScript(name):
-	deleteForm = DeleteForm()
+	deleteForm = forms.DeleteForm()
 
 	if deleteForm.validate_on_submit():
 		delScript = AgentScript.query.filter_by(name=name).first()
@@ -396,7 +396,7 @@ def deleteScript(name):
 @isAuthenticated
 @isAdmin
 def deleteScan(scan_id):
-	delForm = DeleteForm()
+	delForm = forms.DeleteForm()
 
 	if delForm.validate_on_submit():
 		deleted = current_app.elastic.delete_scan(scan_id)
@@ -422,7 +422,7 @@ def deleteScan(scan_id):
 @isAuthenticated
 @isAdmin
 def deleteHost(ip):
-	delForm = DeleteForm()
+	delForm = forms.DeleteForm()
 
 	if delForm.validate_on_submit():
 		deleted = current_app.elastic.delete_host(ip)
@@ -442,7 +442,7 @@ def deleteHost(ip):
 def tags():
 	tags = Tag.query.all()
 
-	addForm = AddTagForm()
+	addForm = forms.AddTagForm()
 	if addForm.validate_on_submit():
 		prepared_tag = addForm.tagname.data.strip()
 		newTag = Tag(name=prepared_tag)

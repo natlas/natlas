@@ -6,6 +6,7 @@ from app.models import User, ScopeItem, AgentScript
 import ipaddress
 from app.elastic import Elastic
 
+
 class ConfigForm(FlaskForm):
 	login_required = BooleanField('Login Required')
 	register_allowed = BooleanField('Registration Allowed')
@@ -25,6 +26,7 @@ class ConfigForm(FlaskForm):
 		tmpElasticInstance = Elastic(elasticsearch_url.data)
 		if not tmpElasticInstance.status:
 			raise ValidationError("%s : %s" % (tmpElasticInstance.errorinfo, elasticsearch_url.data))
+
 
 class InviteUserForm(FlaskForm):
 	email = StringField('Email', validators=[DataRequired(), Email()])
@@ -61,13 +63,16 @@ class NewScopeForm(FlaskForm):
 			raise ValidationError(
 				'Target %s couldn\'t be validated' % target.data)
 
+
 class ImportScopeForm(FlaskForm):
 	scope = TextAreaField("Scope Import")
 	submit = SubmitField("Import Scope")
 
+
 class ImportBlacklistForm(FlaskForm):
 	scope = TextAreaField("Blacklist Import")
 	submit = SubmitField("Import Blacklist")
+
 
 class ScopeDeleteForm(FlaskForm):
 	deleteScopeItem = SubmitField('Delete Target')
@@ -80,6 +85,7 @@ class ScopeToggleForm(FlaskForm):
 class ServicesUploadForm(FlaskForm):
 	serviceFile = FileField('Select a file to upload')
 	uploadFile = SubmitField('Upload Services File')
+
 
 class AddServiceForm(FlaskForm):
 	serviceName = StringField('Service Name', validators=[DataRequired()])
@@ -94,6 +100,7 @@ class AddServiceForm(FlaskForm):
 	def validate_servicePort(self, servicePort):
 		if servicePort.data > 65535 or servicePort.data < 0:
 			raise ValidationError('Port has to be withing range of 0-65535')
+
 
 class AgentConfigForm(FlaskForm):
 	versionDetection = BooleanField("Version Detection (-sV)")
@@ -113,6 +120,7 @@ class AgentConfigForm(FlaskForm):
 
 	updateAgents = SubmitField("Update Agent Config")
 
+
 class AddScriptForm(FlaskForm):
 	scriptName = StringField("Script Name", validators=[DataRequired()])
 	addScript = SubmitField("Add Script")
@@ -122,12 +130,15 @@ class AddScriptForm(FlaskForm):
 		if script is not None:
 			raise ValidationError('%s already exists!' % script.name)
 
+
 class DeleteForm(FlaskForm):
 	delete = SubmitField("Delete")
+
 
 class AddTagForm(FlaskForm):
 	tagname = StringField("Tag Name", validators=[DataRequired()])
 	addTag = SubmitField("Add Tag")
+
 
 class TagScopeForm(FlaskForm):
 	tagname = SelectField("Tag Name", validators=[DataRequired()])
