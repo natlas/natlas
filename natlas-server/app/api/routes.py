@@ -4,7 +4,6 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 import dateutil.parser
 from app.api import bp
-from app.util import isAcceptableTarget
 from app.api.prepare_work import prepare_work
 from app.api.processing.screenshot import process_screenshots
 from app.api.processing.ssl import parse_ssl_data
@@ -30,7 +29,7 @@ def getwork():
 	work = {}
 
 	if manual:
-		canTarget = isAcceptableTarget(manual)
+		canTarget = current_app.ScopeManager.isAcceptableTarget(manual)
 		if canTarget:
 			work['scan_reason'] = 'manual'
 			work['target'] = manual
@@ -92,7 +91,7 @@ def submit():
 			response_body = json.dumps({"status": status_code, "message": "XML had too many hosts in it", "retry": False})
 
 		# If it's not an acceptable target, tell the agent it's out of scope
-		elif not isAcceptableTarget(nmap.hosts[0].address):
+		elif not current_app.ScopeManager.isAcceptableTarget(nmap.hosts[0].address):
 			status_code = 400
 			response_body = json.dumps({"status": status_code, "message": "Out of scope: " + nmap.hosts[0].address, "retry": False})
 

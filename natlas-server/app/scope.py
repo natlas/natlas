@@ -103,3 +103,32 @@ class ScopeManager():
 		self.updateBlacklist()
 		self.updateScanManager()
 		log("ScopeManager Updated")
+
+	def isAcceptableTarget(self, target):
+		try:
+			targetAddr = ipaddress.IPv4Address(target)
+		except ipaddress.AddressValueError:
+			return False
+
+		inScope = False
+		# if zero, update to make sure that the scopemanager has been populated
+		if self.getScopeSize() == 0:
+			self.update()
+		for network in self.getScope():
+			if str(network).endswith('/32'):
+				if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
+					inScope = True
+			if targetAddr in network:
+				inScope = True
+
+		if not inScope:
+			return False
+
+		for network in self.getBlacklist():
+			if str(network).endswith('/32'):
+				if targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
+					return False
+			if targetAddr in network:
+				return False
+
+		return True

@@ -5,27 +5,11 @@ from datetime import datetime
 from app.models import RescanTask
 from app.admin.forms import DeleteForm
 from app.host.forms import RescanForm
+from app.host.summarizers import hostinfo
+from app.host.migrators import determine_data_version
 from app.host import bp
-from app.util import hostinfo, isAcceptableTarget
 from app.auth.wrappers import isAuthenticated
 from app import db
-
-
-def determine_data_version(hostdata):
-	if 'agent_version' in hostdata:
-		# Do math on version here to determine if we need to fall "up" to 0.6.4
-		version = hostdata['agent_version']
-		verlist = version.split('.')
-		for idx, item in enumerate(verlist):
-			verlist[idx] = int(item)
-
-		if verlist[1] < 6 or (verlist[1] == 6 and verlist[2] < 4):
-			version = '0.6.4'
-	else:
-		# Fall "up" to 0.6.4 which is the last release before we introduced versioned host templates
-		version = '0.6.4'
-
-	return version
 
 
 @bp.route('/<ip>')
@@ -168,7 +152,7 @@ def rescan_host(ip):
 	rescanForm = RescanForm()
 
 	if rescanForm.validate_on_submit():
-		if not isAcceptableTarget(ip):
+		if not current_app.ScopeManager.isAcceptableTarget(ip):
 			# Someone is requesting we scan an ip that isn't allowed
 			flash("We're not allowed to scan %s" % ip, "danger")
 			return redirect(request.referrer)
