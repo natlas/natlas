@@ -11,9 +11,9 @@ jobs:
           path: ~/repo
 
       - flake8/setup_flake8:
-          wd: ~/repo/natlas-agent
+          wd: ~/repo
       - flake8/flake8_errors:
-          wd: ~/repo/natlas-agent
+          wd: ~/repo
 workflows:
   version: 2
   normal-build:
