@@ -5,7 +5,10 @@ from datetime import timezone as tz
 import dateutil.parser
 from app.api import bp
 from app.util import isAcceptableTarget
-from app.api import utils
+from app.api.prepare_work import prepare_work
+from app.api.processing.screenshot import process_screenshots
+from app.api.processing.ssl import parse_ssl_data
+from app.api.rescan_handler import mark_scan_dispatched, mark_scan_completed
 from libnmap.parser import NmapParser, NmapParserException
 from app.auth.wrappers import isAgentAuthenticated
 
@@ -31,7 +34,7 @@ def getwork():
 		if canTarget:
 			work['scan_reason'] = 'manual'
 			work['target'] = manual
-			work = utils.prepare_work(work)
+			work = prepare_work(work)
 			response = Response(response=json.dumps(work), status=200, content_type=json_content)
 		else:
 			errmsg = "{} is not a valid target for this server.".format(manual)
@@ -61,9 +64,9 @@ def getwork():
 	else: # Get the ip from the rescan queue, mark the job as dispatched, update the PendingRescans for other requests
 		work['target'] = rescans[0].target
 		work['scan_reason'] = 'requested'
-		utils.mark_scan_dispatched(rescans[0])
+		mark_scan_dispatched(rescans[0])
 
-	work = utils.prepare_work(work)
+	work = prepare_work(work)
 	response_body = json.dumps(work)
 	response = Response(response=response_body, status=200, content_type=json_content)
 	return response
@@ -79,7 +82,7 @@ def submit():
 	newhost = json.loads(data)
 	newhost['ctime'] = dt.now(tz.utc)
 	if newhost['scan_reason'] == 'requested':
-		utils.mark_scan_completed(newhost['ip'], newhost['scan_id'])
+		mark_scan_completed(newhost['ip'], newhost['scan_id'])
 
 	try:
 		nmap = NmapParser.parse(newhost['xml_data'])
@@ -128,14 +131,14 @@ def submit():
 			scriptsave = {"id": script['id'], "output": script["output"]}
 			portinfo['scripts'].append(scriptsave)
 			if script['id'] == "ssl-cert":
-				portinfo['ssl'] = utils.parse_ssl_data(script)
+				portinfo['ssl'] = parse_ssl_data(script)
 
 		newhost['ports'].append(portinfo)
 
 	newhost['port_str'] = ', '.join(tmpports)
 
 	if 'screenshots' in newhost and newhost['screenshots']:
-		newhost['screenshots'], newhost['num_screenshots'] = utils.process_screenshots(newhost['screenshots'])
+		newhost['screenshots'], newhost['num_screenshots'] = process_screenshots(newhost['screenshots'])
 
 	if len(newhost['ports']) == 0:
 		status_code = 200
