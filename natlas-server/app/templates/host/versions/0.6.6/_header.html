@@ -5,7 +5,7 @@
     {% if current_user.is_authenticated %}
     <div class="col-xs-12 col-sm-2" style="text-align:right;">
         <div class="btn-group host-history-export" role="group">
-            <form method="POST" action="{{ url_for('main.rescan_host', ip=ip) }}">{{ rescanForm.hidden_tag() }}<button id="requestRescan" class="btn btn-primary" title="Request Rescan" name="requestRescan" type="submit" onclick="return confirm('Request rescan of {{ ip }}?')"><i class="fas fa-redo-alt"></i></button></form>
+            <form method="POST" action="{{ url_for('host.rescan_host', ip=ip) }}">{{ rescanForm.hidden_tag() }}<button id="requestRescan" class="btn btn-primary" title="Request Rescan" name="requestRescan" type="submit" onclick="return confirm('Request rescan of {{ ip }}?')"><i class="fas fa-redo-alt"></i></button></form>
             {% if current_user.is_admin %}
                 <button id="deleteGroup" type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                  <i class="fas fa-trash-alt text-white"></i>
@@ -24,13 +24,13 @@
 <div class="row">
   <ul class="nav nav-tabs host-nav">
     <li role="presentation" class="nav-item">
-    	<a id="summary" class="nav-link{{ ' active' if active_page == 'summary' }}" href="{{ url_for('main.host', ip=ip) }}">Summary</a>
+    	<a id="summary" class="nav-link{{ ' active' if active_page == 'summary' }}" href="{{ url_for('host.host', ip=ip) }}">Summary</a>
     </li>
     <li role="presentation" class="nav-item">
-    	<a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('main.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
+    	<a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('host.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
     </li>
     <li role="presentation" class="nav-item">
-    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'screenshots' }}" href="{{ url_for('main.host_screenshots', ip=ip) }}">Screenshots {% if info.screenshot_count > 0%}<span class="badge badge-dark">{{ info.screenshot_count }}</span>{% endif %}</a>
+    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'screenshots' }}" href="{{ url_for('host.host_screenshots', ip=ip) }}">Screenshots {% if info.screenshot_count > 0%}<span class="badge badge-dark">{{ info.screenshot_count }}</span>{% endif %}</a>
     </li>
   </ul>
 </div>

@@ -163,6 +163,9 @@ def create_app(config_class=Config, load_config=False):
 	from app.user import bp as user_bp
 	app.register_blueprint(user_bp, url_prefix='/user')
 
+	from app.host import bp as host_bp
+	app.register_blueprint(host_bp, url_prefix='/host')
+
 	from app.main import bp as main_bp
 	app.register_blueprint(main_bp)
 
