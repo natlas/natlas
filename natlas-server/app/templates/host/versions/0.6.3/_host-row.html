@@ -1,12 +1,12 @@
 <div class="row host-row py-1">
   <div class="col-xs-12 col-sm-4 col-md-3">
     {% if pagetype == 'search' %}
-      <h3 class="mt-2"><a href="{{ url_for('main.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
+      <h3 class="mt-2"><a href="{{ url_for('host.host', ip=host.ip) }}">{{ host.ip }}</a></h3>
     {% endif %}
     {% if host.ctime %}
       <div class="date-submitted">
         <span class="submitted-text text-muted pr-1">Submitted:</span>
-        <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
+        <a href="{{ url_for('host.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
           <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
         </a>
       </div>

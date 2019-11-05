@@ -1,5 +1,6 @@
 from flask import render_template
 from app.errors import bp
+from app import db
 
 
 @bp.app_errorhandler(404)
@@ -14,4 +15,5 @@ def method_not_allowed(e):
 
 @bp.app_errorhandler(500)
 def internal_server_error(e):
+	db.session.rollback()
 	return render_template('errors/500.html'), 500

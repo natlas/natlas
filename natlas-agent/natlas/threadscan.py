@@ -162,7 +162,7 @@ class ManualScanWorkItem(ScanWorkItem):
 
 	def complete(self):
 		super()
-		self.queue.mark_done()
+		self.queue.task_done()
 
 
 class ThreadScan(threading.Thread):

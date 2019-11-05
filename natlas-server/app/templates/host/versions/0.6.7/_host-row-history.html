@@ -2,7 +2,7 @@
     <div class="col col-xs-6 col-sm-4 vert-flex-mid">
       <span class="host-row-text pl-2">
         {% include 'host/versions/0.6.7/_host-status.html' %}
-        <a href="{{ url_for('main.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
+        <a href="{{ url_for('host.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
           <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
         </a>
       </span>

@@ -3,9 +3,9 @@
     <i class="fas fa-file-export mr-1"></i>Export
   </button>
   <div class="dropdown-menu" aria-labelledby="exportGroup-{{host.scan_id}}">
-    {% if host.xml_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan', ip=host.ip, scan_id=host.scan_id, ext='xml') }}">.xml</a>{% endif %}
-    {% if host.nmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan', ip=host.ip, scan_id=host.scan_id, ext='nmap') }}">.nmap</a>{% endif %}
-    {% if host.gnmap_data %}<a class="dropdown-item" href="{{ url_for('main.export_scan', ip=host.ip, scan_id=host.scan_id, ext='gnmap') }}">.gnmap</a>{% endif %}
-    <a class="dropdown-item" href="{{ url_for('main.export_scan', ip=host.ip, scan_id=host.scan_id, ext='json') }}">.json</a>
+    {% if host.xml_data %}<a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='xml') }}">.xml</a>{% endif %}
+    {% if host.nmap_data %}<a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='nmap') }}">.nmap</a>{% endif %}
+    {% if host.gnmap_data %}<a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='gnmap') }}">.gnmap</a>{% endif %}
+    <a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='json') }}">.json</a>
   </div>
 </div>
