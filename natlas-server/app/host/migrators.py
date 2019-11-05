@@ -1,15 +1,19 @@
+import semver
+
+
 def determine_data_version(hostdata):
 	if 'agent_version' in hostdata:
-		# Do (bad) math on version here to determine if we need to fall "up" to 0.6.4
-		version = hostdata['agent_version']
-		verlist = version.split('.')
-		for idx, item in enumerate(verlist):
-			verlist[idx] = int(item)
+		ver = semver.VersionInfo.parse(hostdata['agent_version'])
 
-		if verlist[1] < 6 or (verlist[1] == 6 and verlist[2] < 4):
-			version = '0.6.4'
+		# 0.6.3 is our oldest host template set
+		fallupVer = semver.VersionInfo.parse("0.6.3")
+
+		# If agent_version is present and older than 0.6.3, "fall up" to 0.6.3 templates
+		if ver < fallupVer:
+			version = str(fallupVer)
+		else:
+			version = hostdata['agent_version']
 	else:
-		# Fall "up" to 0.6.4 which is the last release before we introduced versioned host templates
-		version = '0.6.4'
+		version = str(fallupVer)
 
 	return version
