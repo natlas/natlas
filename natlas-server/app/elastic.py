@@ -3,7 +3,8 @@ import elasticsearch
 import sys
 from datetime import datetime
 from config import Config
-from urllib3.exceptions import NewConnectionError
+import logging
+from flask import abort
 
 
 class Elastic:
@@ -12,59 +13,53 @@ class Elastic:
 	errrorinfo = ''
 	natlasIndices = ["nmap", "nmap_history"]
 	mapping = {}
-	lastReconnectAttempt = None
+	lastReconnectAttempt = datetime.utcnow()
+	logger = logging.getLogger('elasticsearch')
+	logger.setLevel('ERROR')
 
 	def __init__(self, elasticURL):
 		with open(Config().BASEDIR + '/defaults/elastic/mapping.json') as mapfile:
 			self.mapping = json.loads(mapfile.read())
 		try:
 			self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
-			if "cluster_name" in self.es.nodes.info():
-				self.status = True
+			self.status = self.healthCheck()
 			if self.status:
-				for index in self.natlasIndices: # initialize nmap and nmap_history and give them mappings for known necessary types
-					if not self.es.indices.exists(index):
-						self.es.indices.create(index, body=self.mapping)
-		except NewConnectionError:
-			self.errorinfo = 'urllib3.exceptions.NewConnectionError'
-			return
-		except ConnectionRefusedError:
-			self.errorinfo = 'ConnectionRefusedError'
-			return
-		except elasticsearch.exceptions.NotFoundError:
-			self.errorinfo = 'Cluster Not Found'
-			return
-		except Exception:
-			self.lastReconnectAttempt = datetime.now()
-			self.errorinfo = 'Could not establish connection'
+				self.initializeIndices()
+		except Exception as e:
+			self.errorinfo = e
+			self.status = False
 			return
 
-	def attemptReconnect(self):
-		now = datetime.now()
-		delta = now - self.lastReconnectAttempt
-		if delta.seconds < 60:
+	def initializeIndices(self):
+		for index in self.natlasIndicies:
+			if not self.es.indices.exists(index):
+				self.es.indices.create(index, body=self.mapping)
+
+	def healthCheck(self):
+		try:
+			self.es.cluster.health()
+		except elasticsearch.TransportError:
 			return False
+		return True
+
+	def attemptReconnect(self):
+		now = datetime.utcnow()
+		delta = now - self.lastReconnectAttempt
+		if delta.seconds < 5:
+			return self.status
 		else:
-			try:
-				if "cluster_name" in self.es.nodes.info():
-					self.status = True
-					return True
-				else:
-					self.lastReconnectAttempt = now
-					return False
-			except Exception:
-				self.lastReconnectAttempt = now
-				return False
+			self.status = self.healthCheck()
+			return self.status
 
 	def checkStatus(self):
 		if not self.status:
 			if not self.attemptReconnect():
-				return False
-		return True
+				raise elasticsearch.TransportError
+		return self.status
 
 	def search(self, query, limit, offset, searchIndex="nmap"):
-		if not self.checkStatus():
-			return 0, []
+		self.checkStatus()
+
 		if query == '':
 			query = 'nmap'
 		try:
@@ -108,37 +103,35 @@ class Elastic:
 				results.append(thing['_source'])
 
 			return result['hits']['total'], results
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.TransportError:
 			self.status = False
+			raise elasticsearch.TransportError
 		except Exception:
-			return 0, []  # search borked, return nothing
+			abort(503)  # search borked, return nothing
 
 	def totalHosts(self):
-		if not self.checkStatus():
-			return 0
+		self.checkStatus()
 		try:
 			result = self.es.count(index="nmap", doc_type="_doc")
 			return result["count"]
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.TransportError:
 			self.status = False
-			return 0
+			raise elasticsearch.TransportError
 
 	def newhost(self, host):
-		if not self.checkStatus():
-			return False
+		self.checkStatus()
 		ip = str(host['ip'])
 
 		try:
 			self.es.index(index='nmap_history', doc_type='_doc', body=host)
 			self.es.index(index='nmap', doc_type='_doc', id=ip, body=host)
 			return True
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.ElasticsearchException:
 			self.status = False
-			return False
+			raise elasticsearch.TransportError
 
 	def gethost(self, ip):
-		if not self.checkStatus():
-			return 0, None
+		self.checkStatus()
 		try:
 			searchBody = {
 				"size": 1,
@@ -161,13 +154,12 @@ class Elastic:
 				return 0, None
 			return result['hits']['total'], result['hits']['hits'][0]['_source']
 
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.ElasticsearchException:
 			self.status = False
-			return 0, None
+			raise elasticsearch.TransportError
 
 	def gethost_history(self, ip, limit, offset):
-		if not self.checkStatus():
-			return 0, []
+		self.checkStatus()
 		try:
 			searchBody = {
 				"size": limit,
@@ -192,13 +184,12 @@ class Elastic:
 
 			return result['hits']['total'], results
 
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.TransportError:
 			self.status = False
-			return 0, []
+			raise elasticsearch.TransportError
 
 	def count_host_screenshots(self, ip):
-		if not self.checkStatus():
-			return 0
+		self.checkStatus()
 		searchBody = {
 			"query": {
 				"term": {
@@ -217,11 +208,11 @@ class Elastic:
 			num_screenshots = int(result['aggregations']["screenshot_count"]["value"])
 			return num_screenshots
 		except Exception:
-			return 0
+			self.status = False
+			raise elasticsearch.TransportError
 
 	def get_host_screenshots(self, ip, limit, offset):
-		if not self.checkStatus():
-			return 0, []
+		self.checkStatus()
 		searchBody = {
 			"size": limit,
 			"from": offset,
@@ -258,12 +249,12 @@ class Elastic:
 				results.append(thing['_source'])
 
 			return result['hits']['total'], results
-		except Exception:
-			return 0, []
+		except elasticsearch.TransportError:
+			self.status = False
+			raise elasticsearch.TransportError
 
 	def gethost_scan_id(self, scan_id):
-		if not self.checkStatus():
-			return 0, None
+		self.checkStatus()
 
 		try:
 			searchBody = {
@@ -286,13 +277,12 @@ class Elastic:
 				return 0, None
 			return result['hits']['total'], result['hits']['hits'][0]['_source']
 
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.TransportError:
 			self.status = False
-			return 0, None
+			raise elasticsearch.TransportError
 
 	def delete_scan(self, scan_id):
-		if not self.checkStatus():
-			return False
+		self.checkStatus()
 
 		migrate = False
 		try:
@@ -344,13 +334,12 @@ class Elastic:
 			if migrate:
 				self.es.index(index='nmap', doc_type='_doc', id=ipaddr, body=twoscans['hits']['hits'][1]['_source'])
 			return result["deleted"]
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.TransportError:
 			self.status = False
-			return False
+			raise elasticsearch.TransportError
 
 	def delete_host(self, ip):
-		if not self.checkStatus():
-			return False
+		self.checkStatus()
 		try:
 			searchBody = {
 				"query": {
@@ -368,13 +357,12 @@ class Elastic:
 			}
 			deleted = self.es.delete_by_query(index="nmap,nmap_history", doc_type="_doc", body=searchBody)
 			return deleted["deleted"]
-		except (NewConnectionError, elasticsearch.exceptions.ConnectionError):
+		except elasticsearch.TransportError:
 			self.status = False
-			return False
+			raise elasticsearch.TransportError
 
 	def random_host(self):
-		if not self.checkStatus():
-			return False
+		self.checkStatus()
 		import random
 		seed = random.randrange(sys.maxsize)
 		searchBody = {
@@ -411,12 +399,12 @@ class Elastic:
 
 			random = self.es.search(index="nmap", doc_type="_doc", body=searchBody)
 			return random
-		except Exception:
-			return False
+		except elasticsearch.TransportError:
+			self.status = False
+			raise elasticsearch.TransportError
 
 	def get_current_screenshots(self, limit, offset):
-		if not self.checkStatus():
-			return 0, 0, []
+		self.checkStatus()
 		searchBody = {
 			"size": limit,
 			"from": offset,
@@ -449,5 +437,6 @@ class Elastic:
 				results.append(thing['_source'])
 
 			return result['hits']['total'], num_screenshots, results
-		except Exception:
-			return 0, 0, []
+		except elasticsearch.TransportError:
+			self.status = False
+			raise elasticsearch.TransportError

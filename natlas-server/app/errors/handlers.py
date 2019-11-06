@@ -1,6 +1,8 @@
 from flask import render_template
 from app.errors import bp
 from app import db
+import elasticsearch
+import sentry_sdk
 
 
 @bp.app_errorhandler(404)
@@ -17,3 +19,9 @@ def method_not_allowed(e):
 def internal_server_error(e):
 	db.session.rollback()
 	return render_template('errors/500.html'), 500
+
+
+@bp.app_errorhandler(elasticsearch.TransportError)
+def elastic_unavailable(e):
+	sentry_sdk.capture_exception(e)
+	return render_template('errors/503.html'), 503
