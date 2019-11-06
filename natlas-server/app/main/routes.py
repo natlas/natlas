@@ -1,7 +1,7 @@
 from flask import redirect, url_for, render_template, \
 	Response, current_app, request, send_from_directory
-from flask_login import current_user
 from app.main import bp
+from app.main.pagination import build_pagination_urls, results_offset
 from app.auth.wrappers import isAuthenticated
 
 
@@ -26,9 +26,7 @@ def browse():
 	page = int(request.args.get('page', 1))
 	includeHistory = request.args.get('includeHistory', False)
 
-	results_per_page = current_user.results_per_page
-	search_offset = results_per_page * (page - 1)
-
+	results_per_page, search_offset = results_offset(page)
 
 	searchIndex = "nmap_history" if includeHistory else "nmap"
 
@@ -36,16 +34,11 @@ def browse():
 	totalHosts = current_app.elastic.total_hosts()
 
 	if includeHistory:
-		next_url = url_for('main.browse', page=page + 1, includeHistory=includeHistory) \
-			if count > page * results_per_page else None
-		prev_url = url_for('main.browse', page=page - 1, includeHistory=includeHistory) \
-			if page > 1 else None
+		next_url, prev_url = build_pagination_urls('main.browse', page, count, includeHistory=includeHistory)
 	else:
 		# By using the if/else we can avoid putting includeHistory=False into the url that gets constructed
-		next_url = url_for('main.browse', page=page + 1) \
-			if count > page * results_per_page else None
-		prev_url = url_for('main.browse', page=page - 1) \
-			if page > 1 else None
+		next_url, prev_url = build_pagination_urls('main.browse', page, count)
+
 	return render_template("main/browse.html", numresults=count, totalHosts=totalHosts, page=page, hosts=hostdata, next_url=next_url, prev_url=prev_url)
 
 
@@ -59,23 +52,17 @@ def search():
 	scan_ids = request.args.get('includeScanIDs', '')
 	includeHistory = request.args.get('includeHistory', False)
 
-	results_per_page = current_user.results_per_page
-	search_offset = results_per_page * (page - 1)
+	results_per_page, search_offset = results_offset(page)
+
 	searchIndex = "nmap_history" if includeHistory else "nmap"
 
 	count, context = current_app.elastic.search(results_per_page, search_offset, query=query, searchIndex=searchIndex)
 	totalHosts = current_app.elastic.total_hosts()
 
 	if includeHistory:
-		next_url = url_for('main.search', query=query, page=page + 1, includeHistory=includeHistory) \
-			if count > page * results_per_page else None
-		prev_url = url_for('main.search', query=query, page=page - 1, includeHistory=includeHistory) \
-			if page > 1 else None
+		next_url, prev_url = build_pagination_urls('main.search', page, count, query=query, includeHistory=includeHistory)
 	else:
-		next_url = url_for('main.search', query=query, page=page + 1) \
-			if count > page * results_per_page else None
-		prev_url = url_for('main.search', query=query, page=page - 1) \
-			if page > 1 else None
+		next_url, prev_url = build_pagination_urls('main.search', page, count, query=query)
 
 	# what kind of output are we looking for?
 	if format == 'hostlist':
@@ -87,7 +74,16 @@ def search():
 				hostlist.append(str(host['ip']))
 		return Response('\n'.join(hostlist), mimetype='text/plain')
 	else:
-		return render_template("main/search.html", query=query, numresults=count, totalHosts=totalHosts, page=page, hosts=context, next_url=next_url, prev_url=prev_url)
+		return render_template(
+			"main/search.html",
+			query=query,
+			numresults=count,
+			totalHosts=totalHosts,
+			page=page,
+			hosts=context,
+			next_url=next_url,
+			prev_url=prev_url
+		)
 
 
 @bp.route('/searchmodal')
@@ -97,16 +93,20 @@ def search_modal():
 
 
 @bp.route("/screenshots")
-@bp.route("/screenshots/")
 def browseScreenshots():
-	page = int(request.args.get('p', 1))
-	searchOffset = current_user.results_per_page * (page - 1)
+	page = int(request.args.get('page', 1))
 
-	total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(current_user.results_per_page, searchOffset)
+	results_per_page, search_offset = results_offset(page)
 
-	next_url = url_for('main.browseScreenshots', p=page + 1) \
-		if total_hosts > page * current_user.results_per_page else None
-	prev_url = url_for('main.browseScreenshots', p=page - 1) \
-		if page > 1 else None
+	total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(results_per_page, search_offset)
 
-	return render_template("main/screenshots.html", total_hosts=total_hosts, total_screenshots=total_screenshots, hosts=hosts, next_url=next_url, prev_url=prev_url)
+	next_url, prev_url = build_pagination_urls('main.browseScreenshots', page, total_hosts)
+
+	return render_template(
+		"main/screenshots.html",
+		total_hosts=total_hosts,
+		total_screenshots=total_screenshots,
+		hosts=hosts,
+		next_url=next_url,
+		prev_url=prev_url
+	)

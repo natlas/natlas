@@ -97,7 +97,7 @@ def submit():
 
 		# If there's no further processing to do, store the host and prepare the response
 		elif not newhost["is_up"] or (newhost["is_up"] and newhost["port_count"] == 0):
-			current_app.elastic.newhost(newhost)
+			current_app.elastic.new_result(newhost)
 			status_code = 200
 			response_body = json.dumps({"status": status_code, "message": "Received: " + newhost['ip']})
 	except NmapParserException:
@@ -147,7 +147,7 @@ def submit():
 		response_body = json.dumps({"status": status_code, "message": "More than 500 ports found, throwing data out"})
 	else:
 		status_code = 200
-		current_app.elastic.newhost(newhost)
+		current_app.elastic.new_result(newhost)
 		response_body = json.dumps({"status": status_code, "message": "Received %s ports for %s" % (len(newhost['ports']), newhost['ip'])})
 
 	response = Response(response=response_body, status=status_code, content_type=json_content)

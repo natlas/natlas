@@ -396,6 +396,7 @@ def deleteScript(name):
 @isAuthenticated
 @isAdmin
 def deleteScan(scan_id):
+	# TODO - This function redirects you to the deleted scan, which temporarily works because it's an async delete call.
 	delForm = forms.DeleteForm()
 
 	if delForm.validate_on_submit():
@@ -427,10 +428,10 @@ def deleteHost(ip):
 	if delForm.validate_on_submit():
 		deleted = current_app.elastic.delete_host(ip)
 		if deleted > 0:
-			flash("Successfully deleted host %s" % ip, "success")
+			flash(f"Successfully deleted {deleted - 1 if deleted > 1 else deleted} scans for {ip}", "success")
 			return redirect(url_for('main.browse'))
 		else:
-			flash("Couldn't delete host: %s" % ip, "danger")
+			flash(f"Couldn't delete host: {ip}", "danger")
 	else:
 		flash("Couldn't validate form!")
 		return redirect(request.referrer)

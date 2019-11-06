@@ -3,7 +3,7 @@ from flask import current_app, abort
 
 def hostinfo(ip):
 	hostinfo = {}
-	count, context = current_app.elastic.gethost(ip)
+	count, context = current_app.elastic.get_host(ip)
 	if count == 0:
 		return abort(404)
 	hostinfo['history'] = count

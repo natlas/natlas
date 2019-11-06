@@ -45,7 +45,7 @@ def host_history(ip):
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
 
-	count, context = current_app.elastic.gethost_history(
+	count, context = current_app.elastic.get_host_history(
 		ip, current_user.results_per_page, searchOffset)
 	if count == 0:
 		abort(404)
@@ -75,7 +75,7 @@ def host_historical_result(ip, scan_id):
 	delHostForm = DeleteForm()
 	rescanForm = RescanForm()
 	info, context = hostinfo(ip)
-	count, context = current_app.elastic.gethost_scan_id(scan_id)
+	count, context = current_app.elastic.get_host_by_scan_id(scan_id)
 
 	version = determine_data_version(context)
 	template_str = f"host/versions/{version}/summary.html"
@@ -103,7 +103,7 @@ def export_scan(ip, scan_id, ext):
 	else:
 		mime = "text/plain"
 
-	count, context = current_app.elastic.gethost_scan_id(scan_id)
+	count, context = current_app.elastic.get_host_by_scan_id(scan_id)
 	if ext == 'json' and count > 0:
 		return Response(json.dumps(context), mimetype=mime)
 	elif count > 0 and export_field in context:
@@ -197,9 +197,10 @@ def rescan_host(ip):
 @bp.route("/random/")
 def random_host():
 	random_host = current_app.elastic.random_host()
+	# This would most likely occur when there are no hosts up in the index, so just throw a 404
 	if not random_host:
 		abort(404)
-	ip = random_host['hits']['hits'][0]['_source']['ip']
+	ip = random_host['ip']
 	info, context = hostinfo(ip)
 	delForm = DeleteForm()
 	delHostForm = DeleteForm()
