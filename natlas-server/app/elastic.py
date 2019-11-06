@@ -54,9 +54,8 @@ class Elastic:
 
 	def _check_status(self):
 		''' If we're in a known bad state, try to reconnect '''
-		if not self.status:
-			if not self._attempt_reconnect():
-				raise elasticsearch.ConnectionError
+		if not self.status and not self._attempt_reconnect():
+			raise elasticsearch.ConnectionError
 		return self.status
 
 	def _execute_raw_query(self, func, **kargs):
@@ -98,9 +97,7 @@ class Elastic:
 		results = self._execute_search(**kargs)
 		if not results:
 			return 0, []
-		docsources = []
-		for result in results['hits']['hits']:
-			docsources.append(result['_source'])
+		docsources = self._collate_source(results['hits']['hits'])
 		return results['hits']['total'], docsources
 
 	def _get_single_host(self, **kargs):
@@ -109,6 +106,12 @@ class Elastic:
 		if not results or results['hits']['total'] == 0:
 			return 0, None
 		return results['hits']['total'], results['hits']['hits'][0]['_source']
+
+	def _collate_source(self, documents):
+		results = []
+		for doc in documents:
+			results.append(doc['_source'])
+		return results
 
 	def search(self, limit, offset, query='nmap', searchIndex="nmap"):
 		''' Execute a user supplied search and return the results '''
@@ -412,8 +415,6 @@ class Elastic:
 		# We need to execute_search instead of get_collection here because we also need the aggregation information
 		result = self._execute_search(index="nmap", body=searchBody, _source=source_fields, track_scores=False)
 		num_screenshots = int(result['aggregations']["screenshot_count"]["value"])
-		results = []  # collate results
-		for thing in result['hits']['hits']:
-			results.append(thing['_source'])
+		results = self._collate_source(result['hits']['hits'])
 
 		return result['hits']['total'], num_screenshots, results

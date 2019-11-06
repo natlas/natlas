@@ -93,14 +93,14 @@ def search_modal():
 
 
 @bp.route("/screenshots")
-def browseScreenshots():
+def screenshots():
 	page = int(request.args.get('page', 1))
 
 	results_per_page, search_offset = results_offset(page)
 
 	total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(results_per_page, search_offset)
 
-	next_url, prev_url = build_pagination_urls('main.browseScreenshots', page, total_hosts)
+	next_url, prev_url = build_pagination_urls('main.screenshots', page, total_hosts)
 
 	return render_template(
 		"main/screenshots.html",
