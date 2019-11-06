@@ -21,7 +21,7 @@ def internal_server_error(e):
 	return render_template('errors/500.html'), 500
 
 
-@bp.app_errorhandler(elasticsearch.TransportError)
+@bp.app_errorhandler(elasticsearch.ConnectionError)
 def elastic_unavailable(e):
 	sentry_sdk.capture_exception(e)
 	return render_template('errors/503.html'), 503
