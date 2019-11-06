@@ -408,11 +408,11 @@ def deleteScan(scan_id):
 				else:
 					redirectLoc = request.referrer
 			else:
-				redirectLoc = url_for('main.search')
+				redirectLoc = url_for('main.browse')
 			return redirect(redirectLoc)
 		else:
 			flash("Could not delete scan %s." % scan_id, "danger")
-			return redirect(request.referrer or url_for('main.search'))
+			return redirect(request.referrer or url_for('main.browse'))
 	else:
 		flash("Couldn't validate form!")
 		return redirect(request.referrer)
@@ -428,7 +428,7 @@ def deleteHost(ip):
 		deleted = current_app.elastic.delete_host(ip)
 		if deleted > 0:
 			flash("Successfully deleted host %s" % ip, "success")
-			return redirect(url_for('main.search'))
+			return redirect(url_for('main.browse'))
 		else:
 			flash("Couldn't delete host: %s" % ip, "danger")
 	else:
