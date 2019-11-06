@@ -4,7 +4,6 @@ from wtforms import StringField, BooleanField, SubmitField, TextAreaField, Passw
 from wtforms.validators import DataRequired, ValidationError, Email, Optional
 from app.models import User, ScopeItem, AgentScript
 import ipaddress
-from app.elastic import Elastic
 
 
 class ConfigForm(FlaskForm):
@@ -13,7 +12,6 @@ class ConfigForm(FlaskForm):
 	agent_authentication = BooleanField('Agent Authentication Required')
 	local_subresources = BooleanField('Use Local Subresources (instead of CDN)')
 	custom_brand = StringField('Custom Branding')
-	elasticsearch_url = StringField("Elastic URL")
 	mail_from = StringField("From Address", validators=[Email(), Optional()])
 	mail_server = StringField("Mail Server")
 	mail_port = StringField("Mail Port")
@@ -21,11 +19,6 @@ class ConfigForm(FlaskForm):
 	mail_username = StringField("Mail username")
 	mail_password = PasswordField("Mail password")
 	submit = SubmitField("Save Changes")
-
-	def validate_elasticsearch_url(self, elasticsearch_url):
-		tmpElasticInstance = Elastic(elasticsearch_url.data)
-		if not tmpElasticInstance.status:
-			raise ValidationError("%s : %s" % (tmpElasticInstance.errorinfo, elasticsearch_url.data))
 
 
 class InviteUserForm(FlaskForm):

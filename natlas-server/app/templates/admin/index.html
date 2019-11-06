@@ -28,13 +28,6 @@
             {{ configForm.custom_brand.label(class="control-label") }}
             {{ configForm.custom_brand(value=configItems["CUSTOM_BRAND"], class="form-control", placeholder="Natlas Internal") }}
         </div>
-    	<div class="form-group">
-    		{{ configForm.elasticsearch_url.label(class="control-label") }}
-    		{{ configForm.elasticsearch_url(value=configItems["ELASTICSEARCH_URL"], class="form-control", placeholder="http://localhost:9200") }}
-            {% for error in configForm.elasticsearch_url.errors %}
-                <span style="color: red;">{{ error }}</span>
-            {% endfor %}
-    	</div>
     	<h3>Mail Settings</h3>
     	<small id="mailSettingsHelp" class="form-text text-muted">Mail settings are used to send invitation emails and password resets.</small>
     	<div class="form-group">

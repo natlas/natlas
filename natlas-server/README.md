@@ -15,7 +15,7 @@ The setup script has been tested on Ubuntu 18.10:
 $ sudo ./setup-server.sh
 ```
 
-If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natla-server `. You can also run the complete stack by running ` docker-compose up -d `. Note: This method is only suggested for a Development Environment. Future updates will allow for this to be ran as a production stack. 
+If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natla-server `. You can also run the complete stack by running ` docker-compose up -d `. Note: This method is only suggested for a Development Environment. Future updates will allow for this to be ran as a production stack.
 
 The Config
 ------------------
@@ -27,6 +27,7 @@ Can't be changed via the web interface (only `.env`):
 |---|---|---|
 | `SECRET_KEY` | `you-should-set-a-secret-key` | Used for CSRF tokens and sessions. The `setup-server.sh` script will generate a random value for you if you don't have an existing `SECRET_KEY` set. |
 | `SQLALCHEMY_DATABASE_URI` | `sqlite:///metadata.db` | A SQLALCHEMY URI that points to the database to store natlas metadata in |
+| `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
 | `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
 | `MEDIA_DIRECTORY` | `$BASEDIR/media/` | If you want to store media (screenshots) in a larger mounted storage volume, set this value to an absolute path. If you change this value, be sure to copy the contents of the previous media directory to the new location, otherwise old media will not render.|
@@ -39,7 +40,6 @@ Can be changed via the web interface:
 |---|---|---|
 | `LOGIN_REQUIRED` | `False` | Require login to browse results |
 | `REGISTER_ALLOWED` | `False` | Permit open registration (requires defined `MAIL_*` settings below) for new users |
-| `ELASTICSEARCH_URL` | `http://localhost:9200` | Location of an elasticsearch node that we can store and fetch scan data from |
 | `MAIL_SERVER` | `localhost` | Mail server to use for invitations, registrations, and password resets |
 | `MAIL_PORT` | `25` | Port that `MAIL_SERVER` is listening on |
 | `MAIL_USE_TLS` | `False` | Whether or not to connect to `MAIL_SERVER` with TLS|
