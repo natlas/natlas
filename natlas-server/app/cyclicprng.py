@@ -92,11 +92,17 @@ class CyclicPRNG:
 	def getRandom(self):
 		# PRNG can't iterate on small values
 		if self.N <= 2:
-			if self.current == 0 or self.N == 1:
-				self.current = random.randint(1, self.N)
-				return self.current
+			if self.G == 0 or self.N == 1:
+				self.G = random.randint(1, self.N)
+				value = self.G
+				self.current = self.current + 1
 			else:
-				return (self.current % 2) + 1
+				self.current = self.current + 1
+				value = (self.G % 2) + 1
+			if self.current >= self.N:
+				self.current = 0
+				self.G = 0
+			return value
 		mutex.acquire()
 		value = self.current
 		self.current = (self.current * self.G) % self.Modulus
