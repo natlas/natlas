@@ -392,7 +392,6 @@ def deleteScript(name):
 @isAuthenticated
 @isAdmin
 def deleteScan(scan_id):
-	# TODO - This function redirects you to the deleted scan, which temporarily works because it's an async delete call.
 	delForm = forms.DeleteForm()
 
 	if delForm.validate_on_submit():
