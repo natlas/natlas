@@ -13,6 +13,7 @@ def index():
 
 # Serve media files in case the front-end proxy doesn't do it
 @bp.route('/media/<path:filename>')
+@isAuthenticated
 def send_media(filename):
 	# If you're looking at this function, wondering why your files aren't sending...
 	# It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
@@ -93,6 +94,7 @@ def search_modal():
 
 
 @bp.route("/screenshots")
+@isAuthenticated
 def screenshots():
 	page = int(request.args.get('page', 1))
 

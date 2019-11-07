@@ -195,6 +195,7 @@ def rescan_host(ip):
 
 @bp.route("/random")
 @bp.route("/random/")
+@isAuthenticated
 def random_host():
 	random_host = current_app.elastic.random_host()
 	# This would most likely occur when there are no hosts up in the index, so just throw a 404
