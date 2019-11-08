@@ -1,24 +1,25 @@
 # natlas-server
 
-Installing Elasticsearch
-------------------------
+## Installing Elasticsearch
+
 Natlas uses Elasticsearch 6.6 to store all of the scan results. If you want to run Elasticsearch locally on your natlas-server, simply run the `./setup-elastic.sh` script.
 
 Alternatively, if you already have an elastic cluster that you'd like to use, you can add it to the `.env` file with the name `ELASTICSEARCH_URL`.
 
 
-The Setup
-------------------
+## The Setup
+
 The setup script has been tested on Ubuntu 18.10:
 
 ```
 $ sudo ./setup-server.sh
 ```
 
-If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natla-server `. You can also run the complete stack by running ` docker-compose up -d `. Note: This method is only suggested for a Development Environment. Future updates will allow for this to be ran as a production stack.
+If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natlas-server `. You can also run the complete stack by running ` docker-compose up -d `. Note: This method is only suggested for a Development Environment.
 
-The Config
-------------------
+
+## The Config
+
 There are a number of config options that you can specify in a file called `.env` before initializing the database and launching the application. These options break down into two categories:
 
 Can't be changed via the web interface (only `.env`):
@@ -53,8 +54,8 @@ Can be changed via the web interface:
 For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`, but this should get generated automatically by `setup-server.sh`), however user invitations won't work without a valid mail server.
 
 
-Initializing the Database
-------------------
+## Initializing the Database
+
 The database should be initialized automatically during the `./setup-server` script, but if it is not for whatever reason, this is the manual steps required to intiialize or upgrade the database.
 
 ```
@@ -65,8 +66,8 @@ $ deactivate
 ```
 
 
-Setting the Scope
-------------------
+## Setting the Scope
+
 The scope and blacklist can be set server side without using the admin interface by running the `./add-scope.py` script from within the natlas `venv` with the `--scope` and `--blacklist` arguments, respectively. These each take a file name to read scope from. You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the scope. A scope is **REQUIRED** for agents to do any work, however a blacklist is optional.
 
 ```
@@ -77,8 +78,8 @@ $ python3 add-scope.py --blacklist myblacklist.txt
 ```
 
 
-Giving a User Admin Privilege
-------------------
+## Giving a User Admin Privilege
+
 In order to get started interacting with Natlas, you'll need an administrator account. Admins are allowed to make changes to the following via the web interface:
 
 - application config
@@ -95,15 +96,15 @@ $ python3 add-user.py --admin user@example.com
 ```
 
 
-Starting the Server
-------------------
+## Starting the Server
+
 Starting the server is easy and can pretty much be handled entirely by the `run-server.sh` script. Simply navigate to the natlas-server folder (where this readme is) and `./run-server.sh`. This will start the flask application in your terminal, listening on localhost on port 5000. If you really want, you could change this to listen on a specific IP address on another port, but it is encouraged that you add nginx in front of your flask application.
 
 Furthermore, you might think it's mighty inconvenient that the flask application is running in your terminal and now you can't close the terminal without shutting down the server. You can remediate this with a systemd unit (an example one is provided), or by simply launching the server inside a `screen` session.
 
 
-NGINX as a Reverse Proxy
-------------------
+## NGINX as a Reverse Proxy
+
 As mentioned above, it is not really advisable to run the flask application directly on the internet (or even on your local network). The flask application is just that, an application. It doesn't account for things like SSL certificates, and modifying application logic to add in potential routes for things like Let's Encrypt should be avoided. Luckily, it's very easy to setup a reverse proxy so that all of this stuff can be handled by a proper web server and leave your application to do exactly what it's supposed to do.
 
 To install nginx, you can simply `sudo apt-get install nginx`. Once it's installed, let's make a copy of provided nginx config:
@@ -115,8 +116,8 @@ $ sudo cp natlas/natlas-server/deployment/nginx /etc/nginx/sites-available/natla
 This nginx config expects that you'll be using TLS for your connections to the server. If you're hosting on the internet, letsencrypt makes this really easy. If you're not, you'll want to remove the TLS redirects. You should really be using a TLS certificate, though, even if it's only self-signed. All communications between both the users and the server, and the agents and the server will happen over this connection.  Go ahead and modify the lines that say `server_name <host>` and change `<host>` to whatever hostname your server will be listening on. Then, in the second server block, you'll want to set the `ssl_certificate` and `ssl_certificate_key` values to point to the correct SSL certificate and key. The final `location /` block is where the reverse proxying actually happens, specifically line `proxy_pass http://127.0.0.1:5000;`.
 
 
-Example Systemd Unit
-------------------
+## Example Systemd Unit
+
 An example systemd unit file is provided in `deployment/natlas-server.service`. It can be installed by copying it to `/etc/systemd/system/` and reloading the systemctl daemon.
 
 ```

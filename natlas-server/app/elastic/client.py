@@ -26,6 +26,7 @@ class ElasticClient:
 				self._initialize_indices()
 		except Exception:
 			self.status = False
+			raise
 		finally:
 			# Set the lastReconnectAttempt to the timestamp after initialization
 			self.lastReconnectAttempt = datetime.utcnow()
@@ -66,8 +67,6 @@ class ElasticClient:
 		except elasticsearch.ConnectionError:
 			self.status = False
 			raise elasticsearch.ConnectionError
-		except Exception:
-			return None
 
 	def execute_search(self, **kargs):
 		''' Execute an arbitrary search. This is where we should instrument things specific to es.search '''
@@ -107,7 +106,4 @@ class ElasticClient:
 		return results['hits']['total'], results['hits']['hits'][0]['_source']
 
 	def collate_source(self, documents):
-		results = []
-		for doc in documents:
-			results.append(doc['_source'])
-		return results
+		return map(lambda doc: doc['_source'], documents)

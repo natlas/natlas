@@ -45,8 +45,7 @@ class ElasticInterface:
 				}
 			}
 		}
-		result = self.client.get_collection(index=searchIndex, body=searchBody)
-		return result
+		return self.client.get_collection(index=searchIndex, body=searchBody)
 
 	def total_hosts(self):
 		''' Count the number of documents in nmap and return the count '''
@@ -79,8 +78,7 @@ class ElasticInterface:
 				}
 			}
 		}
-		result = self.client.get_single_host(index='nmap_history', body=searchBody)
-		return result
+		return self.client.get_single_host(index='nmap_history', body=searchBody)
 
 	def get_host_history(self, ip, limit, offset):
 		''' Gets a collection of historical results for a specific ip address '''
@@ -100,8 +98,7 @@ class ElasticInterface:
 				}
 			}
 		}
-		result = self.client.get_collection(index='nmap_history', body=searchBody)
-		return result
+		return self.client.get_collection(index='nmap_history', body=searchBody)
 
 	def count_host_screenshots(self, ip):
 		''' Search history for an ip address and returns the number of historical screenshots '''
@@ -119,7 +116,7 @@ class ElasticInterface:
 			}
 		}
 		# By setting size to 0, _source to False, and track_scores to False, we're able to optimize this query to give us only what we care about
-		result = self.client.execute_search(index="nmap_history", body=searchBody, size=0, _source=False, track_scores=False)
+		result = self.client.execute_search(index="nmap_history", body=searchBody, size=0, track_scores=False)
 		num_screenshots = int(result['aggregations']["screenshot_count"]["value"])
 		return num_screenshots
 
@@ -153,8 +150,7 @@ class ElasticInterface:
 			}
 		}
 		source_fields = ['screenshots', 'ctime', 'scan_id']
-		result = self.client.get_collection(index="nmap_history", body=searchBody, _source=source_fields, track_scores=False)
-		return result
+		return self.client.get_collection(index="nmap_history", body=searchBody, _source=source_fields, track_scores=False)
 
 	def get_host_by_scan_id(self, scan_id):
 		''' Get a specific historical result based on scan_id, which should be unique '''
@@ -173,8 +169,7 @@ class ElasticInterface:
 				}
 			}
 		}
-		result = self.client.get_single_host(index='nmap_history', body=searchBody)
-		return result
+		return self.client.get_single_host(index='nmap_history', body=searchBody)
 
 	def delete_scan(self, scan_id):
 		''' Delete a specific scan, if it's the most recent then try to migrate the next oldest back into the nmap index '''
