@@ -15,16 +15,16 @@ services:
         hard: -1
     volumes:
       - elastic:/usr/share/elasticsearch/data
-    ports:
-      - 9200:9200
+    # ports:
+    #   - 9200:9200
     networks:
       - backend
     restart: on-failure
 
   natlas-server:
     build: natlas-server
-    ports:
-      - 5000:5000
+    # ports:
+    #   - 5000:5000
     networks:
       - backend
     environment:
@@ -48,7 +48,25 @@ services:
     links:
       - natlas-server
 
+  nginx: 
+    build: 
+      context: .
+      dockerfile: docker-nginx/Dockerfile.dev
+    container_name: nginx_fe
+    restart: on-failure
+    volumes:
+      - ns-data:/data
+    networks:
+      - backend
+      - frontend
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - natlas-server
+
 networks:
+  frontend:
   backend:
 
 volumes:

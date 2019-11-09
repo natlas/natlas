@@ -1,0 +1,16 @@
+FROM ubuntu:latest as cert_gen
+
+RUN apt update && apt install -y openssl && \
+  	openssl ecparam -name secp384r1 -genkey -noout -out /tmp/dev.key && \
+  	openssl req -new -batch -x509 -days 30 -key /tmp/dev.key -out /tmp/dev.crt
+
+
+FROM nginx:latest
+
+RUN mkdir -p {/etc/ssl/certs/,/etc/ssl/private/dev.key,/opt/natlas/natlas-server/app/static/}
+
+COPY ./docker-nginx/nginx.dev /etc/nginx/conf.d/default.conf
+COPY --from=cert_gen /tmp/dev.crt /etc/ssl/certs/dev.crt
+COPY --from=cert_gen /tmp/dev.key /etc/ssl/private/dev.key
+COPY ./natlas-server/app/static /opt/natlas/natlas-server/app/static/
+
