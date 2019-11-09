@@ -2,7 +2,6 @@ from flask import render_template, redirect, url_for, current_app, flash, Respon
 from flask_login import current_user
 from app import db
 from app.admin import bp
-from app.elastic import Elastic
 from app.admin import forms
 from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag
 from app.auth.email import send_user_invite_email
@@ -21,9 +20,6 @@ def admin():
 		for fieldname, fieldvalue in configForm.data.items():
 			if fieldname.upper() in ["SUBMIT", "CSRF_TOKEN"]:
 				continue
-			# if we've got a new elasticsearch address, update our current handle to elastic
-			if fieldname.upper() == "ELASTICSEARCH_URL" and fieldvalue != current_app.config["ELASTICSEARCH_URL"]:
-				current_app.elastic = Elastic(fieldvalue)
 			current_app.config[fieldname.upper()] = fieldvalue
 			confitem = ConfigItem.query.filter_by(name=fieldname.upper()).first()
 			confitem.value = str(fieldvalue)
@@ -408,11 +404,11 @@ def deleteScan(scan_id):
 				else:
 					redirectLoc = request.referrer
 			else:
-				redirectLoc = url_for('main.search')
+				redirectLoc = url_for('main.browse')
 			return redirect(redirectLoc)
 		else:
 			flash("Could not delete scan %s." % scan_id, "danger")
-			return redirect(request.referrer or url_for('main.search'))
+			return redirect(request.referrer or url_for('main.browse'))
 	else:
 		flash("Couldn't validate form!")
 		return redirect(request.referrer)
@@ -427,10 +423,10 @@ def deleteHost(ip):
 	if delForm.validate_on_submit():
 		deleted = current_app.elastic.delete_host(ip)
 		if deleted > 0:
-			flash("Successfully deleted host %s" % ip, "success")
-			return redirect(url_for('main.search'))
+			flash(f"Successfully deleted {deleted - 1 if deleted > 1 else deleted} scans for {ip}", "success")
+			return redirect(url_for('main.browse'))
 		else:
-			flash("Couldn't delete host: %s" % ip, "danger")
+			flash(f"Couldn't delete host: {ip}", "danger")
 	else:
 		flash("Couldn't validate form!")
 		return redirect(request.referrer)

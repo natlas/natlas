@@ -5,7 +5,7 @@ from flask_login import LoginManager, AnonymousUserMixin, current_user
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from config import Config, populate_defaults, get_defaults
-from app.elastic import Elastic
+from app.elastic import ElasticInterface
 from app.scope import ScopeManager
 from urllib.parse import urlparse
 import os
@@ -143,7 +143,7 @@ def create_app(config_class=Config, load_config=False):
 
 		# Grungy thing so we can use flask db and flask shell before the config items are initially populated
 		if "ELASTICSEARCH_URL" in app.config:
-			app.elastic = Elastic(app.config['ELASTICSEARCH_URL'])
+			app.elastic = ElasticInterface(app.config['ELASTICSEARCH_URL'])
 
 	app.ScopeManager = ScopeManager()
 

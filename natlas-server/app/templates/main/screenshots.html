@@ -3,9 +3,9 @@
 {% block content %}
 	<div class="row search-header">
 		<div class="col">
-			<h2 class="sub-header">{{numresults}} screenshots</h2>
+			<h2 class="sub-header">{{total_screenshots}} screenshots across {{total_hosts}} hosts</h2>
 		</div>
-		{% if numresults > current_user.results_per_page %}
+		{% if total_hosts > current_user.results_per_page %}
 		<div class="col-xs-12 col-sm-1 text-center">
 		{% include 'includes/pagination.html' %}
 		</div>
@@ -30,7 +30,7 @@
 			{% endfor %}
 		</div>
 
-	{% if numresults > current_user.results_per_page %}
+	{% if total_hosts > current_user.results_per_page %}
     <div class="row">
       <div class="col text-center my-2">
       {% include 'includes/pagination.html' %}

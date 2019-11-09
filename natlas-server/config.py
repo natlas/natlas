@@ -29,6 +29,9 @@ class Config(object):
 	# Also make sure that you're using an absolute path if you're serving your app directly via flask
 	MEDIA_DIRECTORY = os.environ.get('MEDIA_DIRECTORY') or os.path.join(BASEDIR, 'media/')
 
+	# Elasticsearch only gets loaded from environment
+	ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL') or 'http://localhost:9200'
+
 	# Allow version overrides for local development
 	# Necessary to test versioned host data templates before release
 	version_override = os.environ.get("NATLAS_VERSION_OVERRIDE") or None
@@ -44,7 +47,6 @@ defaultConfig = [
 	("LOGIN_REQUIRED", "bool", "False"),
 	("REGISTER_ALLOWED", "bool", "False"),
 	("AGENT_AUTHENTICATION", "bool", "False"),
-	("ELASTICSEARCH_URL", "string", os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")),
 	("MAIL_SERVER", "string", "localhost"),
 	("MAIL_PORT", "int", "25"),
 	("MAIL_USE_TLS", "bool", "False"),

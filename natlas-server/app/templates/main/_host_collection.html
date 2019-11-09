@@ -1,0 +1,12 @@
+{% for host in hosts %}
+  {% if host['agent_version'] %}
+    {% set version_list = host['agent_version'].split('.') %}
+    {% if version_list[0] == 0 and version_list[1]|int <= 6 and version_list[2]|int <= 4 %}
+      {% include 'host/versions/0.6.4/_host-row.html' %}
+    {% else %}
+      {% include 'host/versions/'+host["agent_version"]+'/_host-row.html' %}
+    {% endif %}
+  {% else %}
+    {% include 'host/versions/0.6.4/_host-row.html' %}
+  {% endif %}
+{% endfor %}
