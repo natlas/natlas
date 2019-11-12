@@ -28,7 +28,7 @@ def render_template_start(app, template, context):
 def initialize_opencensus(config, flask_app):
 	if config.opencensus_enable:
 		agent = config.opencensus_agent
-		print("OpenCensus enabled and reporting to %s using gRPC" % agent)
+		print(f"OpenCensus enabled and reporting to {agent} using gRPC")
 		exporter = ocagent_trace_exporter.TraceExporter(service_name=SERVICE_NAME, endpoint=agent)
 		sampler = samplers.ProbabilitySampler(rate=config.opencensus_sample_rate)
 		config_integration.trace_integrations(['sqlalchemy'])
@@ -42,6 +42,6 @@ def initialize_opencensus(config, flask_app):
 def initialize_sentryio(config):
 	if config.sentry_dsn:
 		url = urlparse(config.sentry_dsn)
-		print("Sentry.io enabled and reporting errors to %s://%s" % (url.scheme, url.hostname))
+		print(f"Sentry.io enabled and reporting errors to {url.scheme}://{url.hostname}")
 		from sentry_sdk.integrations.flask import FlaskIntegration
 		sentry_sdk.init(dsn=config.sentry_dsn, release=config.NATLAS_VERSION, integrations=[FlaskIntegration()])
