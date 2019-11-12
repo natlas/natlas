@@ -42,7 +42,7 @@ class ElasticClient:
 
 	def _ping(self):
 		''' Returns True if the cluster is up, False otherwise'''
-		with self._new_trace_span(operation='ping') as span:
+		with self._new_trace_span(operation='ping'):
 			return self.es.ping()
 
 	def _attempt_reconnect(self):
@@ -107,7 +107,7 @@ class ElasticClient:
 
 	def execute_index(self, **kwargs):
 		''' Executes an arbitrary index. '''
-		with self._new_trace_span(operation='index', **kwargs) as span:
+		with self._new_trace_span(operation='index', **kwargs):
 			results = self._execute_raw_query(self.es.index, doc_type='_doc', **kwargs)
 			return results
 

@@ -1,12 +1,9 @@
 import flask
 import sentry_sdk
 import threading
-from opencensus.ext.ocagent import stats_exporter as ocagent_stats_exporter
 from opencensus.ext.ocagent import trace_exporter as ocagent_trace_exporter
 from opencensus.ext.flask.flask_middleware import FlaskMiddleware
-from opencensus.trace.print_exporter import PrintExporter
 from opencensus.trace import config_integration, samplers
-from opencensus.trace import tracer as tracer_module
 from opencensus.trace import execution_context
 from .sentryio_middleware import SentryIoContextMiddleware
 from urllib.parse import urlparse

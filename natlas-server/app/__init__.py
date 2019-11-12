@@ -43,7 +43,7 @@ def create_app(config_class=Config, load_config=False):
 	app = Flask(__name__)
 	initialize_opencensus(config_class, app)
 
-	app.config.from_object(Config)
+	app.config.from_object(config_class)
 	app.jinja_env.add_extension('jinja2.ext.do')
 
 	db.init_app(app)
