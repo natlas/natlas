@@ -3,6 +3,8 @@ from config import Config
 import elasticsearch
 from datetime import datetime
 import logging
+from opencensus.trace import execution_context
+from opencensus.trace import span as span_module
 
 
 class ElasticClient:
@@ -40,7 +42,8 @@ class ElasticClient:
 
 	def _ping(self):
 		''' Returns True if the cluster is up, False otherwise'''
-		return self.es.ping()
+		with self._new_trace_span(operation='ping'):
+			return self.es.ping()
 
 	def _attempt_reconnect(self):
 		''' Attempt to reconnect if we haven't tried to reconnect too recently '''
@@ -58,52 +61,80 @@ class ElasticClient:
 			raise elasticsearch.ConnectionError
 		return self.status
 
-	def _execute_raw_query(self, func, **kargs):
-		''' Wraps the es client to make sure that ConnectionErrors are handled uniformly '''
-		self._check_status()
-		try:
-			results = func(**kargs)
-			return results
-		except elasticsearch.ConnectionError:
-			self.status = False
-			raise elasticsearch.ConnectionError
-
-	def execute_search(self, **kargs):
-		''' Execute an arbitrary search. This is where we should instrument things specific to es.search '''
-		results = self._execute_raw_query(self.es.search, doc_type='_doc', **kargs)
-		return results
-
-	def execute_count(self, **kargs):
-		''' Executes an arbitrary count. This is where we should instrument things specific to es.count '''
-		results = self._execute_raw_query(self.es.count, doc_type='_doc', **kargs)
-		if not results:
-			return 0
-		return results
-
-	def execute_delete_by_query(self, **kargs):
-		''' Executes an arbitrary delete_by_query. This is where we should instrument things specific to es.delete_by_query '''
-		results = self._execute_raw_query(self.es.delete_by_query, doc_type='_doc', **kargs)
-		return results
-
-	def execute_index(self, **kargs):
-		''' Executes an arbitrary index. This is where we should instrument things specific to es.index '''
-		results = self._execute_raw_query(self.es.index, doc_type='_doc', **kargs)
-		return results
-
-	def get_collection(self, **kargs):
+	def get_collection(self, **kwargs):
 		''' Execute a search and return a collection of results '''
-		results = self.execute_search(**kargs)
+		results = self.execute_search(**kwargs)
 		if not results:
 			return 0, []
 		docsources = self.collate_source(results['hits']['hits'])
 		return results['hits']['total'], docsources
 
-	def get_single_host(self, **kargs):
+	def get_single_host(self, **kwargs):
 		''' Execute a search and return a single result '''
-		results = self.execute_search(**kargs)
+		results = self.execute_search(**kwargs)
 		if not results or results['hits']['total'] == 0:
 			return 0, None
 		return results['hits']['total'], results['hits']['hits'][0]['_source']
 
 	def collate_source(self, documents):
 		return map(lambda doc: doc['_source'], documents)
+
+	# Mid-level query executor abstraction.
+	def execute_search(self, **kwargs):
+		''' Execute an arbitrary search.'''
+		with self._new_trace_span(operation='search', **kwargs) as span:
+			results = self._execute_raw_query(self.es.search, doc_type='_doc', **kwargs)
+			span.add_attribute('es.hits.total', results['hits']['total'])
+			self._attach_shard_span_attrs(span, results)
+			return results
+
+	def execute_count(self, **kwargs):
+		''' Executes an arbitrary count.'''
+		results = None
+		with self._new_trace_span(operation='count', **kwargs) as span:
+			results = self._execute_raw_query(self.es.count, doc_type='_doc', **kwargs)
+			self._attach_shard_span_attrs(span, results)
+		if not results:
+			return 0
+		return results
+
+	def execute_delete_by_query(self, **kwargs):
+		''' Executes an arbitrary delete_by_query.'''
+		with self._new_trace_span(operation='delete_by', **kwargs) as span:
+			results = self._execute_raw_query(self.es.delete_by_query, doc_type='_doc', **kwargs)
+			self._attach_shard_span_attrs(span, results)
+			return results
+
+	def execute_index(self, **kwargs):
+		''' Executes an arbitrary index. '''
+		with self._new_trace_span(operation='index', **kwargs):
+			results = self._execute_raw_query(self.es.index, doc_type='_doc', **kwargs)
+			return results
+
+	# Inner-most query executor. All queries route through here.
+	def _execute_raw_query(self, func, **kwargs):
+		''' Wraps the es client to make sure that ConnectionErrors are handled uniformly '''
+		self._check_status()
+		try:
+			return func(**kwargs)
+		except elasticsearch.ConnectionError:
+			self.status = False
+			raise elasticsearch.ConnectionError
+
+	# Tracing methods
+	def _new_trace_span(self, operation, **kwargs):
+		tracer = execution_context.get_opencensus_tracer()
+		span_name = "elasticsearch"
+		if 'index' in kwargs:
+			span_name += '.' + operation
+		span = tracer.span(name=span_name)
+		span.span_kind = span_module.SpanKind.CLIENT
+		if 'index' in kwargs:
+			span.add_attribute('es.index', kwargs['index'])
+		if 'body' in kwargs:
+			span.add_attribute('es.query', kwargs['body'])
+		return span
+
+	def _attach_shard_span_attrs(self, span, results):
+		span.add_attribute('es.shards.total', results['_shards']['total'])
+		span.add_attribute('es.shards.successful', results['_shards']['successful'])

@@ -65,11 +65,8 @@ class ElasticInterface:
 		searchBody = {
 			"size": 1,
 			"query": {
-				"query_string": {
-					"query": ip,
-					"fields": ["ip"],
-					"default_operator":
-					"AND"
+				"term": {
+					"ip": ip
 				}
 			},
 			"sort": {
@@ -86,10 +83,8 @@ class ElasticInterface:
 			"size": limit,
 			"from": offset,
 			"query": {
-				"query_string": {
-					"query": ip,
-					"fields": ["ip"],
-					"default_operator": "AND"
+				"term": {
+					"ip": ip
 				}
 			},
 			"sort": {
@@ -106,7 +101,8 @@ class ElasticInterface:
 			"query": {
 				"term": {
 					"ip": ip
-				}},
+				}
+			},
 			"aggs": {
 				"screenshot_count": {
 					"sum": {
