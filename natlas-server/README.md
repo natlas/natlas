@@ -33,6 +33,10 @@ Can't be changed via the web interface (only `.env`):
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
 | `MEDIA_DIRECTORY` | `$BASEDIR/media/` | If you want to store media (screenshots) in a larger mounted storage volume, set this value to an absolute path. If you change this value, be sure to copy the contents of the previous media directory to the new location, otherwise old media will not render.|
 | `NATLAS_VERSION_OVERRIDE` | `None` | **Danger**: This can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented. |
+| `SENTRY_DSN` | `""` | Enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: http://mytoken@mysentry.example.com/1 |
+| `OPENCENSUS_ENABLE` | `false` | Enables OpenCensus instrumentation to help identify performance bottlenecks. |
+| `OPENCENSUS_SAMPLE_RATE` | `1.0` | Specifies the percentage of requests that are traced with OpenCensus. A number from 0 to 1. |
+| `OPENCENSUS_AGENT` | `127.0.0.1:55678` | An OpenCensus agent or collector that this instance will emit traffic to. |
 
 
 Can be changed via the web interface:
@@ -49,7 +53,6 @@ Can be changed via the web interface:
 | `MAIL_FROM` | `""` | Address to be used as the "From" address for outgoing mail |
 | `LOCAL_SUBRESOURCES` | `False` | Use local subresources (js,css,fonts) instead of CDN resources |
 | `CUSTOM_BRAND` | `""` | Custom branding for the navigation bar to help distinguish different natlas installations from one another |
-| `SENTRY_DSN` | `""` | Enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: http://mytoken@mysentry.example.com/1 |
 
 For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`, but this should get generated automatically by `setup-server.sh`), however user invitations won't work without a valid mail server.
 

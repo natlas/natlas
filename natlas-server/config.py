@@ -38,6 +38,10 @@ class Config(object):
 
 	sentry_dsn = os.environ.get("SENTRY_DSN") or None
 
+	opencensus_enable = os.environ.get("OPENCENSUS_ENABLE") or False
+	opencensus_sample_rate = float(os.environ.get("OPENCENSUS_SAMPLE_RATE") or 1)
+	opencensus_agent = os.environ.get("OPENCENSUS_AGENT") or '127.0.0.1:55678'
+
 	if version_override:
 		NATLAS_VERSION = version_override
 
