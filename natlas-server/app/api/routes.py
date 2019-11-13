@@ -91,7 +91,7 @@ def submit():
 			response_body = json.dumps({"status": status_code, "message": "XML had too many hosts in it", "retry": False})
 
 		# If it's not an acceptable target, tell the agent it's out of scope
-		elif not current_app.ScopeManager.isAcceptableTarget(nmap.hosts[0].address):
+		elif len(nmap.hosts) == 1 and current_app.ScopeManager.isAcceptableTarget(nmap.hosts[0].address):
 			status_code = 400
 			response_body = json.dumps({"status": status_code, "message": "Out of scope: " + nmap.hosts[0].address, "retry": False})
 
