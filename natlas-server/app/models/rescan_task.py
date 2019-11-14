@@ -1,11 +1,12 @@
 from app import db
 from app.util import utcnow_tz
+from app.models.dict_serializable import DictSerializable
 
 
 # Rescan Queue
 # Each record represents a user-requested rescan of a given target.
 # Tracks when it was dispatched, when it was completed, and the scan id of the complete scan.
-class RescanTask(db.Model):
+class RescanTask(db.Model, DictSerializable):
 	id = db.Column(db.Integer, primary_key=True)
 	date_added = db.Column(db.DateTime, index=True, default=utcnow_tz, nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -43,6 +44,3 @@ class RescanTask(db.Model):
 	@staticmethod
 	def getIncompleteTaskForTarget(ip):
 		return RescanTask.query.filter_by(target=ip).filter_by(complete=False).all()
-
-	def as_dict(self):
-		return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -1,9 +1,10 @@
 from app import db
 from app.util import utcnow_tz, generate_hex_32
 from datetime import datetime, timedelta
+from app.models.dict_serializable import DictSerializable
 
 
-class EmailToken(db.Model):
+class EmailToken(db.Model, DictSerializable):
 	id = db.Column(db.Integer, primary_key=True)
 	token = db.Column(db.String(32), index=False, unique=True, nullable=False)
 	date_generated = db.Column(db.DateTime, nullable=False, default=utcnow_tz)
@@ -15,10 +16,14 @@ class EmailToken(db.Model):
 
 	# Build a new token
 	@staticmethod
-	def new_token(user_id, token_type, expires_in):
-		expiration = utcnow_tz() + timedelta(seconds=expires_in)
-		if token_type not in ['register', 'invite', 'reset']:
+	def new_token(user_id, token_type):
+		supported_token_types = {
+			"invite": 60 * 60 * 24 * 2, # 48 hours
+			"reset": 60 * 10 # 10 minutes
+		}
+		if token_type not in supported_token_types:
 			return False
+		expiration = utcnow_tz() + timedelta(seconds=supported_token_types[token_type])
 		hasToken = EmailToken.query.filter_by(user_id=user_id, token_type=token_type).first()
 		if hasToken:
 			EmailToken.expire_token(hasToken)

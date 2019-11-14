@@ -93,7 +93,7 @@ def do_password_reset():
 		flash("Token not found!", "danger")
 		return redirect(url_for('auth.login'))
 
-	user = User.verify_reset_password_token(token)
+	user = User.verify_token(token, 'reset')
 	if not user:
 		flash("Password reset token is invalid or has expired.", "danger")
 		session.pop('reset_token', None) # remove the invalid token from the session
@@ -126,7 +126,7 @@ def accept_invite():
 		flash("Token not found!", "danger")
 		return redirect(url_for('auth.login'))
 
-	user = User.verify_invite_token(token)
+	user = User.verify_token(token, 'invite')
 	if not user:
 		flash("Invite token is invalid or has expired", "danger")
 		session.pop('invite_token', None) # remove the invalid token from the session

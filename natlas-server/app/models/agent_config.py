@@ -1,7 +1,8 @@
 from app import db
+from app.models.dict_serializable import DictSerializable
 
 
-class AgentConfig(db.Model):
+class AgentConfig(db.Model, DictSerializable):
 	id = db.Column(db.Integer, primary_key=True)
 	versionDetection = db.Column(db.Boolean, default=True) # Enable Version Detection (-sV)
 	osDetection = db.Column(db.Boolean, default=True) # Enable OS Detection (-O)
@@ -18,6 +19,3 @@ class AgentConfig(db.Model):
 	osScanLimit = db.Column(db.Boolean, default=True) # --osscan-limit
 	noPing = db.Column(db.Boolean, default=False) # -Pn
 	udpScan = db.Column(db.Boolean, default=False) # -sSU
-
-	def as_dict(self):
-		return {c.name: getattr(self, c.name) for c in self.__table__.columns}

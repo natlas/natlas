@@ -2,12 +2,13 @@ from app import db
 from app.util import utcnow_tz, generate_hex_16
 import string
 import random
+from app.models.dict_serializable import DictSerializable
 
 
 # Agent registration
 # Users can have many agents, each agent has an ID and a secret (token)
 # Friendly name is purely for identification of agents in the management page
-class Agent(db.Model):
+class Agent(db.Model, DictSerializable):
 	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	# agent identification string for storing in reports

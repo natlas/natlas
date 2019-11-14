@@ -1,5 +1,6 @@
 from app import db
 import ipaddress
+from app.models.dict_serializable import DictSerializable
 
 
 # Many to many table that ties tags and scopes together
@@ -10,7 +11,7 @@ scopetags = db.Table(
 )
 
 
-class ScopeItem(db.Model):
+class ScopeItem(db.Model, DictSerializable):
 	id = db.Column(db.Integer, primary_key=True)
 	target = db.Column(db.String, index=True, unique=True)
 	blacklist = db.Column(db.Boolean, index=True)
@@ -20,14 +21,6 @@ class ScopeItem(db.Model):
 		primaryjoin=(scopetags.c.scope_id == id),
 		backref=db.backref('scope', lazy='dynamic'),
 		lazy='dynamic')
-
-	@staticmethod
-	def getBlacklist():
-		return ScopeItem.query.filter_by(blacklist=True).all()
-
-	@staticmethod
-	def getScope():
-		return ScopeItem.query.filter_by(blacklist=False).all()
 
 	def addTag(self, tag):
 		if not self.is_tagged(tag):
@@ -41,33 +34,54 @@ class ScopeItem(db.Model):
 		return self.tags.filter(scopetags.c.tag_id == tag.id).count() > 0
 
 	@staticmethod
+	def getBlacklist():
+		return ScopeItem.query.filter_by(blacklist=True).all()
+
+	@staticmethod
+	def getScope():
+		return ScopeItem.query.filter_by(blacklist=False).all()
+
+	@staticmethod
 	def addTags(scopeitem, tags):
 		from app.models import Tag
 		for tag in tags:
 			if tag.strip() == '': # If the tag is an empty string then don't use it
 				continue
-			existingTag = Tag.query.filter_by(name=tag).first()
-			if existingTag:
-				scopeitem.addTag(existingTag)
-			else:
-				newTag = Tag(name=tag.strip())
-				db.session.add(newTag)
-				scopeitem.addTag(newTag)
+			tag_obj = Tag.create_if_none(tag)
+			scopeitem.addTag(tag_obj)
 
 	@staticmethod
-	def importScope(line, blacklist):
-		failedImports = []
-		alreadyExists = []
-		successImports = []
-		if len(line.split(',')) > 1:
-			ip = line.split(',')[0]
-			tags = line.split(',')[1:]
+	def parse_import_line(line):
+		splitline = line.split(',')
+		if len(splitline) > 1:
+			ip = splitline[0]
+			tags = splitline[1:]
 		else:
 			ip = line
 			tags = []
 
 		if '/' not in ip:
 			ip = ip + '/32'
+
+		return ip, tags
+
+	@staticmethod
+	def create_if_none(ip, blacklist):
+		new = False
+		item = ScopeItem.query.filter_by(target=ip).first()
+		if not item:
+			item = ScopeItem(target=ip, blacklist=blacklist)
+			db.session.add(item)
+			new = True
+		return new, item
+
+	@staticmethod
+	def importScope(line, blacklist):
+		failedImports = []
+		alreadyExists = []
+		successImports = []
+		ip, tags = ScopeItem.parse_import_line(line)
+
 		try:
 			# False will mask out hostbits for us, ip_network for eventual ipv6 compat
 			isValid = ipaddress.ip_network(ip, False)
@@ -75,22 +89,14 @@ class ScopeItem(db.Model):
 			# if we hit this ValueError it means that the input couldn't be a CIDR range
 			failedImports.append(line)
 			return failedImports, alreadyExists, successImports
-		# We only want scope items with masked out host bits
-		item = ScopeItem.query.filter_by(target=isValid.with_prefixlen).first()
-		if item:
-			# Add in look for tags and append as necessary
-			if tags:
-				ScopeItem.addTags(item, tags)
-			alreadyExists.append(isValid.with_prefixlen)
+
+		new, item = ScopeItem.create_if_none(isValid.with_prefixlen, blacklist)
+		if tags:
+			ScopeItem.addTags(item, tags)
+		if not new:
+			alreadyExists.append(item.target)
 			return failedImports, alreadyExists, successImports
 		else:
-			newTarget = ScopeItem(target=isValid.with_prefixlen, blacklist=blacklist)
-			db.session.add(newTarget)
-			if tags:
-				ScopeItem.addTags(newTarget, tags)
-			successImports.append(isValid.with_prefixlen)
+			successImports.append(item.target)
 
 		return failedImports, alreadyExists, successImports
-
-	def as_dict(self):
-		return {c.name: getattr(self, c.name) for c in self.__table__.columns}

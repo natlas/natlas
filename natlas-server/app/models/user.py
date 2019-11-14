@@ -4,9 +4,10 @@ import string
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login, db
+from app.models.dict_serializable import DictSerializable
 
 
-class User(UserMixin, db.Model):
+class User(UserMixin, db.Model, DictSerializable):
 	id = db.Column(db.Integer, primary_key=True)
 	email = db.Column(db.String(128), index=True, unique=True)
 	password_hash = db.Column(db.String(128))
@@ -47,34 +48,16 @@ class User(UserMixin, db.Model):
 	def load_user(id):
 		return User.query.get(int(id))
 
-	def get_reset_password_token(self, expires_in=600):
+	def new_token(self, token_type):
 		from app.models import EmailToken
-		newToken = EmailToken.new_token(user_id=self.id, token_type='reset', expires_in=expires_in)
+		newToken = EmailToken.new_token(user_id=self.id, token_type=token_type)
 		return newToken.token
 
 	@staticmethod
-	def verify_reset_password_token(token):
+	def verify_token(token, token_type):
 		from app.models import EmailToken
 		myToken = EmailToken.get_token(token)
-		if myToken and myToken.verify_token('reset'):
+		if myToken and myToken.verify_token(token_type):
 			return User.query.get(myToken.user_id)
 		else:
 			return False
-
-	# 172800 seconds == 48 hours
-	def get_invite_token(self, expires_in=172800):
-		from app.models import EmailToken
-		newToken = EmailToken.new_token(user_id=self.id, token_type='invite', expires_in=expires_in)
-		return newToken.token
-
-	@staticmethod
-	def verify_invite_token(token):
-		from app.models import EmailToken
-		myToken = EmailToken.get_token(token)
-		if myToken and myToken.verify_token('invite'):
-			return User.query.get(myToken.user_id)
-		else:
-			return False
-
-	def as_dict(self):
-		return {c.name: getattr(self, c.name) for c in self.__table__.columns}

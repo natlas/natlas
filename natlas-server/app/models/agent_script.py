@@ -1,4 +1,5 @@
 from app import db
+from app.models.dict_serializable import DictSerializable
 
 
 # Scripts for agents to run
@@ -6,12 +7,9 @@ from app import db
 # groups of scripts are also accepted, such as "safe" and "default"
 # auth, broadcast, default, discovery, dos, exploit, external, fuzzer, intrusive, malware, safe, version, vuln
 # https://nmap.org/book/nse-usage.html#nse-categories
-class AgentScript(db.Model):
+class AgentScript(db.Model, DictSerializable):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String, index=True, unique=True)
-
-	def as_dict(self):
-		return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 	@staticmethod
 	def getScriptsString(scriptList=None):

@@ -3,7 +3,7 @@ from app.email import send_email
 
 
 def send_password_reset_email(user):
-		token = user.get_reset_password_token()
+		token = user.new_token('reset')
 		send_email(
 			'[Natlas] Reset Your Password',
 			sender=current_app.config['MAIL_FROM'],
@@ -13,7 +13,7 @@ def send_password_reset_email(user):
 
 
 def send_user_invite_email(user):
-		token = user.get_invite_token()
+		token = user.new_token('invite')
 		send_email(
 			'[Natlas] You\'ve been invited to Natlas!',
 			sender=current_app.config['MAIL_FROM'],
