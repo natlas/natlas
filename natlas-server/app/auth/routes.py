@@ -4,7 +4,7 @@ from app import db
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, \
 	ResetPasswordForm, InviteConfirmForm
 from app.models import User, EmailToken
-from app.auth.email import send_password_reset_email
+from app.auth.email import send_auth_email
 from app.auth import bp
 from werkzeug.urls import url_parse
 
@@ -63,11 +63,11 @@ def reset_password_request():
 	if form.validate_on_submit():
 		validemail = User.validate_email(form.email.data)
 		if not validemail:
-			flash("%s does not appear to be a valid, deliverable email address." % form.email.data, "danger")
+			flash(f"{form.email.data} does not appear to be a valid, deliverable email address.", "danger")
 			return redirect(url_for('auth.reset_password_request'))
 		user = User.query.filter_by(email=validemail).first()
 		if user:
-			send_password_reset_email(user)
+			send_auth_email(user, 'reset')
 		flash('Check your email for the instructions to reset your password', "info")
 		return redirect(url_for('auth.login'))
 	return render_template(
@@ -88,10 +88,7 @@ def reset_password(token):
 
 @bp.route('/reset_password/reset', methods=['GET', 'POST'])
 def do_password_reset():
-	token = session['reset_token']
-	if not token:
-		flash("Token not found!", "danger")
-		return redirect(url_for('auth.login'))
+	token = get_token('reset_token')
 
 	user = User.verify_token(token, 'reset')
 	if not user:
@@ -121,10 +118,7 @@ def invite_user(token):
 
 @bp.route('/invite/accept', methods=['GET', 'POST'])
 def accept_invite():
-	token = session['invite_token']
-	if not token:
-		flash("Token not found!", "danger")
-		return redirect(url_for('auth.login'))
+	token = get_token('invite_token')
 
 	user = User.verify_token(token, 'invite')
 	if not user:
@@ -142,3 +136,11 @@ def accept_invite():
 		flash('Your password has been set.', "success")
 		return redirect(url_for('auth.login'))
 	return render_template('auth/accept_invite.html', title="Accept Invitation", form=form)
+
+
+def get_token(token_name):
+	token = session[token_name]
+	if not token:
+		flash("Token not found!", "danger")
+		return redirect(url_for('auth.login'))
+	return token
