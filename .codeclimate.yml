@@ -21,3 +21,12 @@ plugins:
     enabled: true
   stylelint:
     enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python:
+          python_version: 3
+    exclude_patterns:
+    # machine generated, duplication likely
+    - "natlas-server/migrations/versions/" 
