@@ -4,7 +4,7 @@ from app import db
 from app.admin import bp
 from app.admin import forms
 from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag
-from app.auth.email import send_user_invite_email
+from app.auth.email import send_auth_email
 from app.auth.wrappers import isAuthenticated, isAdmin
 import ipaddress
 import hashlib
@@ -39,12 +39,12 @@ def users():
 	if inviteForm.validate_on_submit():
 		validemail = User.validate_email(inviteForm.email.data)
 		if not validemail:
-			flash("%s does not appear to be a valid, deliverable email address." % inviteForm.email.data, "danger")
+			flash(f"{inviteForm.email.data} does not appear to be a valid, deliverable email address.", "danger")
 			return redirect(request.referrer)
 		newUser = User(email=validemail)
 		db.session.add(newUser)
 		db.session.commit()
-		send_user_invite_email(newUser)
+		send_auth_email(newUser, 'invite')
 		flash('Invitation Sent!', 'success')
 		return redirect(url_for('admin.users'))
 	return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
