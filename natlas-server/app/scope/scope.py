@@ -1,6 +1,7 @@
 import ipaddress
-from netaddr import IPNetwork
-from app.ipscanmanager import IPScanManager
+from netaddr import IPNetwork, IPAddress
+from netaddr.core import AddrFormatError
+from app.scope.ipscanmanager import IPScanManager
 from datetime import datetime
 import os
 
@@ -92,7 +93,8 @@ class ScopeManager():
 			scanrange = [IPNetwork(n.target) for n in ScopeItem.getScope()]
 			blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
 			self.scanmanager = IPScanManager(scanrange, blacklistrange)
-		except Exception:
+		except Exception as e:
+			log(e)
 			log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
 
 	def getScanManager(self):
@@ -104,39 +106,24 @@ class ScopeManager():
 		self.updateScanManager()
 		log("ScopeManager Updated")
 
-	def address_in_collection(self, targetAddr, networkCollection):
-		""" Take in a collection of networks, identify if the target address is in one of those networks """
-		inCollection = False
-		for network in networkCollection:
-			# TODO this eventually needs to be upgraded to support IPv6
-			if str(network).endswith('/32') and targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
-				inCollection = True
-			if targetAddr in network:
-				inCollection = True
-		return inCollection
-
 	def isAcceptableTarget(self, target):
 		# Ensure it's a valid IPv4Address
 		try:
 			# TODO this eventually needs to be upgraded to support IPv6
-			targetAddr = ipaddress.IPv4Address(target)
-		except ipaddress.AddressValueError:
+			targetAddr = IPAddress(target)
+		except AddrFormatError:
 			return False
 
 		# if zero, update to make sure that the scopemanager has been populated
 		if self.getScopeSize() == 0:
 			self.update()
 
-		inScope = self.address_in_collection(targetAddr, self.getScope())
-
 		# Address doesn't fall in scope ranges
-		if not inScope:
+		if not self.scanmanager.inWhitelist(target):
 			return False
 
-		inBlacklist = self.address_in_collection(targetAddr, self.getBlacklist())
-
 		# Address falls in blacklist ranges
-		if inBlacklist:
+		if self.scanmanager.inBlacklist(target):
 			return False
 
 		# Address is in scope and not blacklisted

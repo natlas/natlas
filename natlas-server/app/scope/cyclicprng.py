@@ -40,7 +40,7 @@ class CyclicPRNG:
 
 	def __init__(self, N):
 		self.N = N
-		if N > 2:
+		if N > 1:
 			self.initCyclicGroup()
 			self.initGenerator()
 			self.initPermutation()
@@ -70,7 +70,7 @@ class CyclicPRNG:
 	def initGenerator(self):
 		found = False
 		while not found:
-			base = random.randint(2, self.Modulus - 2)
+			base = random.randint(2, self.Modulus - 1)
 			found = True
 			for factor in self.ModulusFactors:
 				if modexp(base, int((self.Modulus - 1) / factor), self.Modulus) == 1:
@@ -90,8 +90,8 @@ class CyclicPRNG:
 		self.current = self.start
 
 	def getRandom(self):
-		if self.N <= 2:
-			return random.randint(1, self.N)
+		if self.N <= 1:
+			return 1
 		mutex.acquire()
 		value = self.current
 		self.current = (self.current * self.G) % self.Modulus
