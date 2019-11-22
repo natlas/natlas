@@ -1,21 +1,17 @@
-FROM python:3.6.0 as build
+FROM python:3.7.5 as build
 
 WORKDIR /opt/natlas/natlas-server
 COPY requirements.txt /opt/natlas/natlas-server
 
-RUN pip3 --disable-pip-version-check --no-cache-dir install --root=/install -r requirements.txt \
-	&& rm -rf requirements.txt
+RUN pip3 --disable-pip-version-check --no-cache-dir install --no-warn-script-location --root=/install -r requirements.txt \
+        && rm -rf requirements.txt
 
 COPY . /opt/natlas/natlas-server
 
 RUN python3 -m compileall .
 
 # Build final image
-FROM python:3.6.0-slim
-
-RUN export DEBIAN_FRONTEND=noninteractive \
-	&& apt-get update \
-	&& apt-get install --no-install-recommends -qy libsqlite3-0
+FROM python:3.7.5-slim
 
 COPY --from=build /install /
 COPY --from=build /opt/natlas /opt/natlas
