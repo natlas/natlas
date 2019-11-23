@@ -38,7 +38,7 @@ paths:
           description:
             "Not authorized. Please provide a valid agent token"
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/GenericResponse'
   /getwork:
     get:
       operationId: getWork
@@ -59,7 +59,7 @@ paths:
           description:
            "Not authorized. Please provide a valid agent token"
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/GenericResponse'
   /submit:
     post:
       operationId: submitScanResult
@@ -77,12 +77,12 @@ paths:
           description:
             "The server was able to parse the response and handled it accordingly."
           schema:
-            $ref: '#/definitions/SubmitResponse'
+            $ref: '#/definitions/GenericResponse'
         '403':
           description:
             "Not authorized. Please provide a valid agent token"
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/GenericResponse'
 definitions:
   NatlasServices:
     type: object
@@ -102,18 +102,6 @@ definitions:
           "A text blob of newline separated services for natlas to scan for. This is fed directly into nmap via the --servicedb parameter."
         example:
           "http\t80/tcp\ntelnet\t23/tcp\nhttps\t443/tcp\nftp\t21/tcp\nssh\t22/tcp\nsmtp\t25/tcp\n"
-  SubmitResponse:
-    type: object
-    properties:
-      status:
-        type: integer
-        example: 200
-      message:
-        type: string
-        description:
-          "A human readable message that prints to the logs of the agent"
-        example:
-          "Received 4 ports for 192.168.13.37"
   ScanResult:
     type: object
     properties:
@@ -306,12 +294,12 @@ definitions:
               "The list of scripts to run if enableScripts is true"
             example: "default, ssh-auth-methods"
             default: "default"
-  ErrorResponse:
+  GenericResponse:
     type: object
     properties:
       status:
         type: integer
-        minimum: 400
+        minimum: 200
         example: 403
         maximum: 599
         description:
@@ -324,4 +312,8 @@ definitions:
       retry:
         type: boolean
         description:
-          "true if this message is retryable, false if it is permanent"
+          "If true, retry the request, otherwise do not"
+        default: false
+    required:
+    - status
+    - message
