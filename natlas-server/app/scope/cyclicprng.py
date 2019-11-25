@@ -78,15 +78,16 @@ class CyclicPRNG:
 					break
 		self.G = base
 
+	def _cycle_until_in_range(self, element):
+		""" Cycle the element until it is self.N or less """
+		while element > self.N:
+			element = (element * self.G) % self.Modulus
+		return element
+
 	def init_permutation(self):
 		exp = random.randint(2, self.Modulus - 1)
-		self.end = modexp(self.G, exp, self.Modulus)
-		while self.end > self.N:
-			self.end = (self.end * self.G) % self.Modulus
-
-		self.start = (self.end * self.G) % self.Modulus
-		while self.start > self.N:
-			self.start = (self.start * self.G) % self.Modulus
+		self.end = self._cycle_until_in_range(modexp(self.G, exp, self.Modulus))
+		self.start = self._cycle_until_in_range((self.end * self.G) % self.Modulus)
 		self.current = self.start
 
 	def get_random(self):
@@ -94,9 +95,7 @@ class CyclicPRNG:
 			return 1
 		mutex.acquire()
 		value = self.current
-		self.current = (self.current * self.G) % self.Modulus
-		while self.current > self.N:
-			self.current = (self.current * self.G) % self.Modulus
+		self.current = self._cycle_until_in_range((self.current * self.G) % self.Modulus)
 		if value == self.end:
 			log('PRNG Cycle Restarted')
 			self.init_generator()
