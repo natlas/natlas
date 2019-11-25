@@ -6,7 +6,7 @@ from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from config import Config, populate_defaults, get_defaults
 from app.elastic import ElasticInterface
-from app.scope.scope import ScopeManager
+from app.scope import ScopeManager
 import os
 import hashlib
 from .instrumentation import initialize_opencensus
