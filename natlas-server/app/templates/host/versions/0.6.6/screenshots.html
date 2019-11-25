@@ -14,7 +14,7 @@
 	{% for entry in historical_screenshots %}
 		<div class="row screenshot-header-row">
 			<h5 class="border-bottom">
-				<a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}">{{ entry.ctime | ctime }}</a>
+				<a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}"><time datetime={{ entry.ctime }} title="{{ entry.ctime|ctime(human=True) }}">{{ entry.ctime | ctime }}</time></a>
 			</h5>
 		</div>
 		<div class="row image-row">

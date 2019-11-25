@@ -82,3 +82,11 @@ $(document).ready(function() {
 	});
 
 });
+
+$(document).ready(function() {
+	let times = document.body.getElementsByTagName('time');
+	for (let i = 0; i < times.length; i++){
+		let localDate = new Date(times[i].dateTime)
+		times[i].textContent = localDate.toLocaleString()
+	}
+})
