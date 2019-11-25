@@ -7,11 +7,6 @@ class IPScanManager:
 	total = 0
 	rng = None
 
-	def __init__(self):
-		self.networks = []
-		self.total = 0
-		self.rng = None
-
 	def __init__(self, whitelist, blacklist):
 		self.networks = []
 		self.total = 0

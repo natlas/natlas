@@ -8,6 +8,7 @@ mutex = Lock()
 
 LOGFILE = 'logs/cyclicprng.log'
 
+
 def modexp(b, e, m):
 	bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
 	s = b
