@@ -94,7 +94,7 @@ class ScopeManager():
 			blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
 			self.scanmanager = IPScanManager(scanrange, blacklistrange)
 		except Exception as e:
-			if self.scanmanager != None and self.scanmanager.get_total() == 0:
+			if self.scanmanager is not None and self.scanmanager.get_total() == 0:
 				log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
 			else:
 				raise e
@@ -121,7 +121,7 @@ class ScopeManager():
 			self.update()
 
 		# There is no scan manager
-		if self.scanmanager == None:
+		if self.scanmanager is None:
 			return False
 
 		# Address doesn't fall in scope ranges or address falls in blacklist ranges
