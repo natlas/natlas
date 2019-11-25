@@ -99,13 +99,13 @@ def toggleUser(id):
 @isAuthenticated
 @isAdmin
 def scope():
-	scope = ScopeItem.getScope()
-	scopeSize = current_app.ScopeManager.getScopeSize()
+	scope = ScopeItem.get_scope()
+	scopeSize = current_app.ScopeManager.get_scope_size()
 
 	# if it's zero, let's make sure the ScopeManager is up to date
 	if scopeSize == 0:
 		current_app.ScopeManager.update()
-		scopeSize = current_app.ScopeManager.getScopeSize()
+		scopeSize = current_app.ScopeManager.get_scope_size()
 		# if it's zero again that's fine, we just had to check
 
 	newForm = forms.NewScopeForm()
@@ -134,7 +134,7 @@ def scope():
 @isAdmin
 def blacklist():
 	scope = ScopeItem.getBlacklist()
-	blacklistSize = current_app.ScopeManager.getBlacklistSize()
+	blacklistSize = current_app.ScopeManager.get_blacklist_size()
 	newForm = forms.NewScopeForm()
 	delForm = forms.ScopeDeleteForm()
 	editForm = forms.ScopeToggleForm()

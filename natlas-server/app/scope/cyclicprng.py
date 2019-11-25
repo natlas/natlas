@@ -6,8 +6,7 @@ import os
 
 mutex = Lock()
 
-LOGFILE = 'logs/scopemanager.log'
-
+LOGFILE = 'logs/cyclicprng.log'
 
 def modexp(b, e, m):
 	bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
@@ -40,22 +39,22 @@ class CyclicPRNG:
 
 	def __init__(self, N):
 		self.N = N
-		if N > 2:
-			self.initCyclicGroup()
-			self.initGenerator()
-			self.initPermutation()
+		if N > 1:
+			self.init_cyclic_group()
+			self.init_generator()
+			self.init_permutation()
 		if N < 1:
 			raise Exception("Random Number Generator must be given a positive non-zero integer")
 
 		log('PRNG Starting Up')
 
-	def getN(self):
+	def get_n(self):
 		return self.N
 
-	def getModulus(self):
+	def get_modulus(self):
 		return self.Modulus
 
-	def initCyclicGroup(self):
+	def init_cyclic_group(self):
 		def next_prime(num):
 			if (num % 2) == 0:
 				num = num + 1
@@ -67,10 +66,10 @@ class CyclicPRNG:
 		self.Modulus = next_prime(self.N)
 		self.ModulusFactors = sympy.factorint(self.Modulus - 1)
 
-	def initGenerator(self):
+	def init_generator(self):
 		found = False
 		while not found:
-			base = random.randint(2, self.Modulus - 2)
+			base = random.randint(2, self.Modulus - 1)
 			found = True
 			for factor in self.ModulusFactors:
 				if modexp(base, int((self.Modulus - 1) / factor), self.Modulus) == 1:
@@ -78,7 +77,7 @@ class CyclicPRNG:
 					break
 		self.G = base
 
-	def initPermutation(self):
+	def init_permutation(self):
 		exp = random.randint(2, self.Modulus - 1)
 		self.end = modexp(self.G, exp, self.Modulus)
 		while self.end > self.N:
@@ -89,9 +88,9 @@ class CyclicPRNG:
 			self.start = (self.start * self.G) % self.Modulus
 		self.current = self.start
 
-	def getRandom(self):
-		if self.N <= 2:
-			return random.randint(1, self.N)
+	def get_random(self):
+		if self.N <= 1:
+			return 1
 		mutex.acquire()
 		value = self.current
 		self.current = (self.current * self.G) % self.Modulus
@@ -99,7 +98,7 @@ class CyclicPRNG:
 			self.current = (self.current * self.G) % self.Modulus
 		if value == self.end:
 			log('PRNG Cycle Restarted')
-			self.initGenerator()
-			self.initPermutation()
+			self.init_generator()
+			self.init_permutation()
 		mutex.release()
 		return value

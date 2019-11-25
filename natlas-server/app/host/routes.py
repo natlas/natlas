@@ -155,12 +155,12 @@ def rescan_host(ip):
 		flash("Form failed to validate", "danger")
 		return redirect(request.referrer)
 
-	if not current_app.ScopeManager.isAcceptableTarget(ip):
+	if not current_app.ScopeManager.is_acceptable_target(ip):
 		# Someone is requesting we scan an ip that isn't allowed
 		flash(f"We're not allowed to scan {ip}", "danger")
 		return redirect(request.referrer)
 
-	incompleteScans = current_app.ScopeManager.getIncompleteScans()
+	incompleteScans = current_app.ScopeManager.get_incomplete_scans()
 
 	scan_dispatched = {}
 	for scan in incompleteScans:
@@ -175,8 +175,8 @@ def rescan_host(ip):
 				scan.dispatched = False
 				db.session.add(scan)
 				db.session.commit()
-				current_app.ScopeManager.updatePendingRescans()
-				current_app.ScopeManager.updateDispatchedRescans()
+				current_app.ScopeManager.update_pending_rescans()
+				current_app.ScopeManager.update_dispatched_rescans()
 				flash(f"Refreshed existing rescan request for {ip}", "success")
 				return redirect(request.referrer)
 		else:
@@ -187,8 +187,8 @@ def rescan_host(ip):
 	rescan = RescanTask(user_id=current_user.id, target=ip)
 	db.session.add(rescan)
 	db.session.commit()
-	current_app.ScopeManager.updatePendingRescans()
-	current_app.ScopeManager.updateDispatchedRescans()
+	current_app.ScopeManager.update_pending_rescans()
+	current_app.ScopeManager.update_dispatched_rescans()
 	flash(f"Requested rescan of {ip}", "success")
 	return redirect(request.referrer)
 
