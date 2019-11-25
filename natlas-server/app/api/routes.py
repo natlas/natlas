@@ -29,7 +29,7 @@ def getwork():
 	work = {}
 
 	if manual:
-		canTarget = current_app.ScopeManager.isAcceptableTarget(manual)
+		canTarget = current_app.ScopeManager.is_acceptable_target(manual)
 		if canTarget:
 			work['scan_reason'] = 'manual'
 			work['target'] = manual
@@ -41,23 +41,23 @@ def getwork():
 			response = Response(response=response_body, status=400, content_type=json_content)
 		return response
 
-	rescans = current_app.ScopeManager.getPendingRescans()
+	rescans = current_app.ScopeManager.get_pending_rescans()
 	if len(rescans) == 0: # If there aren't any rescans, update the Rescan Queue and get it again, because of lazy loading
-		current_app.ScopeManager.updatePendingRescans()
-		rescans = current_app.ScopeManager.getPendingRescans()
+		current_app.ScopeManager.update_pending_rescans()
+		rescans = current_app.ScopeManager.get_pending_rescans()
 
 	if len(rescans) == 0: # if we don't have rescans, use the ScanManager
-		scanmanager = current_app.ScopeManager.getScanManager()
+		scanmanager = current_app.ScopeManager.get_scan_manager()
 		if not scanmanager:
 			current_app.ScopeManager.update()
-			scanmanager = current_app.ScopeManager.getScanManager()
+			scanmanager = current_app.ScopeManager.get_scan_manager()
 
 			if not scanmanager:
 				response_body = json.dumps({'status': 404, 'message': 'No scope is currently configured.', "retry": True})
 				response = Response(response=response_body, status=404, content_type=json_content)
 				return response
 
-		work['target'] = str(scanmanager.getNextIP())
+		work['target'] = str(scanmanager.get_next_ip())
 		work['scan_reason'] = 'auto'
 
 	else: # Get the ip from the rescan queue, mark the job as dispatched, update the PendingRescans for other requests
@@ -91,7 +91,7 @@ def submit():
 			response_body = json.dumps({"status": status_code, "message": "XML had too many hosts in it", "retry": False})
 
 		# If it's not an acceptable target, tell the agent it's out of scope
-		elif len(nmap.hosts) == 1 and not current_app.ScopeManager.isAcceptableTarget(nmap.hosts[0].address):
+		elif len(nmap.hosts) == 1 and not current_app.ScopeManager.is_acceptable_target(nmap.hosts[0].address):
 			status_code = 400
 			response_body = json.dumps({"status": status_code, "message": "Out of scope: " + nmap.hosts[0].address, "retry": False})
 

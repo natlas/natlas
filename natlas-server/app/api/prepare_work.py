@@ -8,7 +8,7 @@ from app.models import ScopeItem
 def get_target_tags(target):
 	targetnet = ip_network(target)
 	tags = []
-	for scope in current_app.ScopeManager.getScope():
+	for scope in current_app.ScopeManager.get_scope():
 		if scope.overlaps(targetnet):
 			scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags.all()
 			for tag in scopetags:

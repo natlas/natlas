@@ -1,5 +1,5 @@
 from netaddr import IPSet, IPNetwork
-from app.cyclicprng import CyclicPRNG
+from .cyclicprng import CyclicPRNG
 
 
 class IPScanManager:
@@ -8,30 +8,45 @@ class IPScanManager:
 	rng = None
 
 	def __init__(self, whitelist, blacklist):
-		ipset = IPSet([])
 		self.networks = []
 		self.total = 0
 		self.rng = None
 
+		self.set_whitelist(whitelist)
+		self.set_blacklist(blacklist)
+		self.initialize_manager()
+
+	def set_whitelist(self, whitelist):
+		self.whitelist = IPSet([])
 		for block in whitelist:
-			ipset.add(IPNetwork(block))
+			self.whitelist.add(IPNetwork(block))
 			# Remove invalid broadcast and network addresses
 			if block.broadcast is not None:
-				ipset.remove(IPNetwork(block.broadcast))
+				self.whitelist.remove(IPNetwork(block.broadcast))
 			if block.size > 2:
-				ipset.remove(IPNetwork(block.network))
+				self.whitelist.remove(IPNetwork(block.network))
+
+	def set_blacklist(self, blacklist):
+		self.blacklist = IPSet([])
 		for block in blacklist:
-			ipset.remove(IPNetwork(block))
-		for block in ipset.iter_cidrs():
+			self.blacklist.add(IPNetwork(block))
+
+	def initialize_manager(self):
+		self.networks = []
+		self.ipset = self.whitelist - self.blacklist
+
+		for block in self.ipset.iter_cidrs():
 			self.total += block.size
 			self.networks.append({"network": block, "size": block.size, "start": block[0], "index": 0})
 
 		if self.total < 1:
 			raise Exception("IPScanManager can not be started with an empty target scope")
+
 		self.rng = CyclicPRNG(self.total)
 
 		def blockcomp(b):
 			return b["start"]
+
 		self.networks.sort(key=blockcomp)
 
 		start = 1
@@ -39,14 +54,28 @@ class IPScanManager:
 			self.networks[i]["index"] = start
 			start += self.networks[i]["size"]
 
-	def getTotal(self):
+		self.initialized = True
+
+	def in_whitelist(self, ip):
+		return ip in self.whitelist
+
+	def in_blacklist(self, ip):
+		return ip in self.blacklist
+
+	def get_total(self):
 		return self.total
 
-	def getNextIP(self):
-		index = self.rng.getRandom()
-		return self.getIP(index)
+	def get_ready(self):
+		return self.rng and self.total > 0 and self.initialized
 
-	def getIP(self, index):
+	def get_next_ip(self):
+		if self.rng:
+			index = self.rng.get_random()
+			return self.get_ip(index)
+		else:
+			return None
+
+	def get_ip(self, index):
 		def binarysearch(networks, i):
 			middle = int(len(networks) / 2)
 			network = networks[middle]

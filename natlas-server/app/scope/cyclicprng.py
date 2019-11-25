@@ -6,7 +6,7 @@ import os
 
 mutex = Lock()
 
-LOGFILE = 'logs/scopemanager.log'
+LOGFILE = 'logs/cyclicprng.log'
 
 
 def modexp(b, e, m):
@@ -40,22 +40,22 @@ class CyclicPRNG:
 
 	def __init__(self, N):
 		self.N = N
-		if N > 2:
-			self.initCyclicGroup()
-			self.initGenerator()
-			self.initPermutation()
+		if N > 1:
+			self.init_cyclic_group()
+			self.init_generator()
+			self.init_permutation()
 		if N < 1:
 			raise Exception("Random Number Generator must be given a positive non-zero integer")
 
 		log('PRNG Starting Up')
 
-	def getN(self):
+	def get_n(self):
 		return self.N
 
-	def getModulus(self):
+	def get_modulus(self):
 		return self.Modulus
 
-	def initCyclicGroup(self):
+	def init_cyclic_group(self):
 		def next_prime(num):
 			if (num % 2) == 0:
 				num = num + 1
@@ -67,10 +67,10 @@ class CyclicPRNG:
 		self.Modulus = next_prime(self.N)
 		self.ModulusFactors = sympy.factorint(self.Modulus - 1)
 
-	def initGenerator(self):
+	def init_generator(self):
 		found = False
 		while not found:
-			base = random.randint(2, self.Modulus - 2)
+			base = random.randint(2, self.Modulus - 1)
 			found = True
 			for factor in self.ModulusFactors:
 				if modexp(base, int((self.Modulus - 1) / factor), self.Modulus) == 1:
@@ -78,28 +78,27 @@ class CyclicPRNG:
 					break
 		self.G = base
 
-	def initPermutation(self):
-		exp = random.randint(2, self.Modulus - 1)
-		self.end = modexp(self.G, exp, self.Modulus)
-		while self.end > self.N:
-			self.end = (self.end * self.G) % self.Modulus
+	def _cycle_until_in_range(self, element):
+		""" Cycle the element until it is self.N or less """
+		while element > self.N:
+			element = (element * self.G) % self.Modulus
+		return element
 
-		self.start = (self.end * self.G) % self.Modulus
-		while self.start > self.N:
-			self.start = (self.start * self.G) % self.Modulus
+	def init_permutation(self):
+		exp = random.randint(2, self.Modulus - 1)
+		self.end = self._cycle_until_in_range(modexp(self.G, exp, self.Modulus))
+		self.start = self._cycle_until_in_range((self.end * self.G) % self.Modulus)
 		self.current = self.start
 
-	def getRandom(self):
-		if self.N <= 2:
-			return random.randint(1, self.N)
+	def get_random(self):
+		if self.N <= 1:
+			return 1
 		mutex.acquire()
 		value = self.current
-		self.current = (self.current * self.G) % self.Modulus
-		while self.current > self.N:
-			self.current = (self.current * self.G) % self.Modulus
+		self.current = self._cycle_until_in_range((self.current * self.G) % self.Modulus)
 		if value == self.end:
 			log('PRNG Cycle Restarted')
-			self.initGenerator()
-			self.initPermutation()
+			self.init_generator()
+			self.init_permutation()
 		mutex.release()
 		return value

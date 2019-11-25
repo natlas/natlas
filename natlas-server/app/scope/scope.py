@@ -1,6 +1,7 @@
 import ipaddress
-from netaddr import IPNetwork
-from app.ipscanmanager import IPScanManager
+from netaddr import IPNetwork, IPAddress
+from netaddr.core import AddrFormatError
+from .ipscanmanager import IPScanManager
 from datetime import datetime
 import os
 
@@ -30,40 +31,40 @@ class ScopeManager():
 		self.scope = []
 		self.blacklist = []
 
-	def getScopeSize(self):
+	def get_scope_size(self):
 		return self.scopeSize
 
-	def getBlacklistSize(self):
+	def get_blacklist_size(self):
 		return self.blacklistSize
 
-	def getScope(self):
+	def get_scope(self):
 		return self.scope
 
-	def getBlacklist(self):
+	def get_blacklist(self):
 		return self.blacklist
 
-	def getPendingRescans(self):
+	def get_pending_rescans(self):
 		return self.pendingRescans
 
-	def getDispatchedRescans(self):
+	def get_dispatched_rescans(self):
 		return self.dispatchedRescans
 
-	def getIncompleteScans(self):
+	def get_incomplete_scans(self):
 		if self.pendingRescans == [] or self.dispatchedRescans == []:
 			from app.models import RescanTask
 			self.pendingRescans = RescanTask.getPendingTasks()
 			self.dispatchedRescans = RescanTask.getDispatchedTasks()
 		return self.pendingRescans + self.dispatchedRescans
 
-	def updateDispatchedRescans(self):
+	def update_dispatched_rescans(self):
 		from app.models import RescanTask
 		self.dispatchedRescans = RescanTask.getDispatchedTasks()
 
-	def updatePendingRescans(self):
+	def update_pending_rescans(self):
 		from app.models import RescanTask
 		self.pendingRescans = RescanTask.getPendingTasks()
 
-	def updateScope(self):
+	def update_scope(self):
 		from app.models import ScopeItem
 		newScopeSize = 0
 		newScope = []
@@ -74,7 +75,7 @@ class ScopeManager():
 		self.scope = newScope
 		self.scopeSize = newScopeSize
 
-	def updateBlacklist(self):
+	def update_blacklist(self):
 		from app.models import ScopeItem
 		newBlacklistSize = 0
 		newBlacklist = []
@@ -85,58 +86,46 @@ class ScopeManager():
 		self.blacklist = newBlacklist
 		self.blacklistSize = newBlacklistSize
 
-	def updateScanManager(self):
+	def update_scan_manager(self):
 		from app.models import ScopeItem
 		self.scanmanager = None
 		try:
 			scanrange = [IPNetwork(n.target) for n in ScopeItem.getScope()]
 			blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
 			self.scanmanager = IPScanManager(scanrange, blacklistrange)
-		except Exception:
-			log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
+		except Exception as e:
+			if self.scanmanager is not None and self.scanmanager.get_total() == 0:
+				log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
+			else:
+				raise e
 
-	def getScanManager(self):
+	def get_scan_manager(self):
 		return self.scanmanager
 
 	def update(self):
-		self.updateScope()
-		self.updateBlacklist()
-		self.updateScanManager()
+		self.update_scope()
+		self.update_blacklist()
+		self.update_scan_manager()
 		log("ScopeManager Updated")
 
-	def address_in_collection(self, targetAddr, networkCollection):
-		""" Take in a collection of networks, identify if the target address is in one of those networks """
-		inCollection = False
-		for network in networkCollection:
-			# TODO this eventually needs to be upgraded to support IPv6
-			if str(network).endswith('/32') and targetAddr == ipaddress.IPv4Address(str(network).split('/32')[0]):
-				inCollection = True
-			if targetAddr in network:
-				inCollection = True
-		return inCollection
-
-	def isAcceptableTarget(self, target):
+	def is_acceptable_target(self, target):
 		# Ensure it's a valid IPv4Address
 		try:
 			# TODO this eventually needs to be upgraded to support IPv6
-			targetAddr = ipaddress.IPv4Address(target)
-		except ipaddress.AddressValueError:
+			IPAddress(target)
+		except AddrFormatError:
 			return False
 
 		# if zero, update to make sure that the scopemanager has been populated
-		if self.getScopeSize() == 0:
+		if self.get_scope_size() == 0:
 			self.update()
 
-		inScope = self.address_in_collection(targetAddr, self.getScope())
-
-		# Address doesn't fall in scope ranges
-		if not inScope:
+		# There is no scan manager
+		if self.scanmanager is None:
 			return False
 
-		inBlacklist = self.address_in_collection(targetAddr, self.getBlacklist())
-
-		# Address falls in blacklist ranges
-		if inBlacklist:
+		# Address doesn't fall in scope ranges or address falls in blacklist ranges
+		if not self.scanmanager.in_whitelist(target) or self.scanmanager.in_blacklist(target):
 			return False
 
 		# Address is in scope and not blacklisted
