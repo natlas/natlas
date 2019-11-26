@@ -99,7 +99,7 @@ def toggleUser(id):
 @isAuthenticated
 @isAdmin
 def scope():
-	scope = ScopeItem.get_scope()
+	scope = ScopeItem.getScope()
 	scopeSize = current_app.ScopeManager.get_scope_size()
 
 	# if it's zero, let's make sure the ScopeManager is up to date
