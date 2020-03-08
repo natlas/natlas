@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% set title = "View Logs" %}
+{% set active_page = "logs" %}
+{% block content %}
+  {% include 'admin/_header.html' %}
+  <div class="row">
+    <div class="col">
+      <h3>View Logs</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <table class="table table-striped dataTable" data-order='[[ 1, "desc" ]]' data-page-length='25'>
+        <thead>
+          <tr>
+            <th scope="col" style="width:33%;">Timestamp</th>
+            <th scope="col">Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in scope_logs %}
+          <tr>
+            <th scope="row">{{ item.created_at | string | ctime(human=True)}}</th>
+            <td>{{ item.msg }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

@@ -11,6 +11,9 @@ plugins:
         enabled: false
       E117:
         enabled: false
+    exclude_patterns:
+    # machine generated, duplication likely
+    - "natlas-server/migrations/versions/" 
   radon:
     enabled: true
     config:

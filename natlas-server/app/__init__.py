@@ -6,7 +6,6 @@ from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from config import Config, populate_defaults, get_defaults
 from app.elastic import ElasticInterface
-from app.scope import ScopeManager
 import os
 import hashlib
 from .instrumentation import initialize_opencensus
@@ -137,6 +136,7 @@ def create_app(config_class=Config, load_config=False):
 		if "ELASTICSEARCH_URL" in app.config:
 			app.elastic = ElasticInterface(app.config['ELASTICSEARCH_URL'])
 
+	from app.scope import ScopeManager
 	app.ScopeManager = ScopeManager()
 
 	from app.errors import bp as errors_bp

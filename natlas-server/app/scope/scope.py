@@ -1,5 +1,5 @@
 import ipaddress
-from netaddr import IPNetwork, IPAddress
+from netaddr import IPNetwork, IPAddress, IPSet
 from netaddr.core import AddrFormatError
 from .ipscanmanager import IPScanManager
 from datetime import datetime
@@ -12,24 +12,30 @@ def log(message, printm=False):
 	if not os.path.isdir('logs'):
 		os.makedirs('logs', exist_ok=True)
 	with open(LOGFILE, 'a') as f:
-		f.write('%s - %s\n' % (str(datetime.now()), message))
+		f.write('%s - %s\n' % (str(datetime.utcnow()), message))
 	if printm:
-		print('%s - %s\n' % (str(datetime.now()), message))
+		print('%s - %s\n' % (str(datetime.utcnow()), message))
 
 
 class ScopeManager():
 
 	scope = []
 	blacklist = []
+	scope_set = IPSet()
+	blacklist_set = IPSet()
 	pendingRescans = []
 	dispatchedRescans = []
 	scopeSize = 0
 	blacklistSize = 0
 	scanmanager = None
+	init_time = None
 
 	def __init__(self):
 		self.scope = []
 		self.blacklist = []
+		self.scope_set = IPSet()
+		self.blacklist_set = IPSet()
+		self.init_time = datetime.utcnow()
 
 	def get_scope_size(self):
 		return self.scopeSize
@@ -42,6 +48,9 @@ class ScopeManager():
 
 	def get_blacklist(self):
 		return self.blacklist
+
+	def get_effective_scope_size(self):
+		return len(self.scope_set - self.blacklist_set)
 
 	def get_pending_rescans(self):
 		return self.pendingRescans
@@ -66,25 +75,29 @@ class ScopeManager():
 
 	def update_scope(self):
 		from app.models import ScopeItem
-		newScopeSize = 0
 		newScope = []
+		newScopeSet = IPSet()
 		for item in ScopeItem.getScope():
 			newItem = ipaddress.ip_network(item.target, False)
+			newSetItem = IPNetwork(item.target, False)
 			newScope.append(newItem)
-			newScopeSize += newItem.num_addresses
+			newScopeSet.add(newSetItem)
 		self.scope = newScope
-		self.scopeSize = newScopeSize
+		self.scope_set = newScopeSet
+		self.scopeSize = len(self.scope_set)
 
 	def update_blacklist(self):
 		from app.models import ScopeItem
-		newBlacklistSize = 0
 		newBlacklist = []
+		newBlacklistSet = IPSet()
 		for item in ScopeItem.getBlacklist():
 			newItem = ipaddress.ip_network(item.target, False)
+			newSetItem = IPNetwork(item.target, False)
 			newBlacklist.append(newItem)
-			newBlacklistSize += newItem.num_addresses
+			newBlacklistSet.add(newSetItem)
 		self.blacklist = newBlacklist
-		self.blacklistSize = newBlacklistSize
+		self.blacklist_set = newBlacklistSet
+		self.blacklistSize = len(self.blacklist_set)
 
 	def update_scan_manager(self):
 		from app.models import ScopeItem
@@ -94,7 +107,7 @@ class ScopeManager():
 			blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
 			self.scanmanager = IPScanManager(scanrange, blacklistrange)
 		except Exception as e:
-			if self.scanmanager is not None and self.scanmanager.get_total() == 0:
+			if self.scanmanager is None or self.scanmanager.get_total() == 0:
 				log("Scan manager could not be instantiated because there was no scope configured.", printm=True)
 			else:
 				raise e
@@ -130,3 +143,15 @@ class ScopeManager():
 
 		# Address is in scope and not blacklisted
 		return True
+
+	def get_last_cycle_start(self):
+		if self.scanmanager is None:
+			return False
+		else:
+			return self.scanmanager.rng.cycle_start_time
+
+	def get_completed_cycle_count(self):
+		if self.scanmanager is None:
+			return 0
+		else:
+			return self.scanmanager.rng.completed_cycle_count

@@ -38,7 +38,6 @@ def command_builder(scan_id, agentConfig, target):
 			command.append(commandDict[k].format(**agentConfig))
 
 	command.append(target)
-
 	return command
 
 
@@ -177,6 +176,8 @@ class ThreadScan(threading.Thread):
 	def execute_scan(self, work_item):
 		target_data = work_item.target_data
 		utils.create_data_dir(target_data['scan_id'])
+		# setting this here ensures the finally block won't error if we don't submit data
+		response = False
 		try:
 			result = scan(target_data, self.config)
 
