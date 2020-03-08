@@ -4,6 +4,9 @@ import sympy
 from datetime import datetime
 import os
 
+from app import db
+from app.models import ScopeLog
+
 mutex = Lock()
 
 LOGFILE = 'logs/cyclicprng.log'
@@ -26,7 +29,10 @@ def log(message):
 	if not os.path.isdir('logs'):
 		os.makedirs('logs', exist_ok=True)
 	with open(LOGFILE, 'a') as f:
-		f.write('%s - %s\n' % (str(datetime.now()), message))
+		f.write('%s - %s\n' % (str(datetime.utcnow()), message))
+	db_log = ScopeLog(message)
+	db.session.add(db_log)
+	db.session.commit()
 
 
 class CyclicPRNG:
@@ -37,6 +43,8 @@ class CyclicPRNG:
 	start = 0
 	end = 0
 	current = 0
+	cycle_start_time = None
+	completed_cycle_count = 0
 
 	def __init__(self, N):
 		self.N = N
@@ -44,6 +52,7 @@ class CyclicPRNG:
 			self.init_cyclic_group()
 			self.init_generator()
 			self.init_permutation()
+			self.cycle_start_time = datetime.utcnow()
 		if N < 1:
 			raise Exception("Random Number Generator must be given a positive non-zero integer")
 
@@ -100,5 +109,7 @@ class CyclicPRNG:
 			log('PRNG Cycle Restarted')
 			self.init_generator()
 			self.init_permutation()
+			self.cycle_start_time = datetime.utcnow()
+			self.completed_cycle_count += 1
 		mutex.release()
 		return value

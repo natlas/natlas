@@ -20,8 +20,11 @@
   </div>
   <div class="row">
     <div class="col">
-      <h3 class="mt-3">Manage Scope ({{ scopeSize }} hosts)</h3>
-      <table class="table table-striped dataTable">
+      <h3 class="mt-3 mb-0">Manage Scope ({{ scopeSize }} hosts)</h3>
+      {%if scopeSize != effectiveScopeSize %}
+      <div class="mb-4"><small>Some addresses in scope are included in blacklisted ranges. The effective scope size is <strong>{{ effectiveScopeSize }} hosts</strong>.</small></div>
+      {% endif %}
+      <table class="table table-striped dataTable mt-4">
         <thead>
           <tr>
             <th scope="col">#</th>

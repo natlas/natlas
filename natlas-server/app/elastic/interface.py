@@ -305,3 +305,17 @@ class ElasticInterface:
 		results = self.client.collate_source(result['hits']['hits'])
 
 		return result['hits']['total'], num_screenshots, results
+
+	def count_scans_since(self, timestamp):
+		''' Count the number of scans that started after a given timestamp '''
+		searchBody = {
+			"query": {
+				"range": {
+					"scan_start": {
+						"gte": timestamp
+					}
+				}
+			}
+		}
+		result = self.client.execute_search(index="nmap_history", body=searchBody, size=0, track_scores=False)
+		return result["hits"]["total"]

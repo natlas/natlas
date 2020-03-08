@@ -112,3 +112,10 @@ def screenshots():
 		next_url=next_url,
 		prev_url=prev_url
 	)
+
+
+@bp.route('/status')
+@isAuthenticated
+def status():
+	''' Simple html representation of the status api'''
+	return render_template('main/status.html')

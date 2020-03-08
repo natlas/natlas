@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% set pagetype = 'status' %}
+{% set title = "Status" %}
+
+{% block content %}
+<script>
+	fetch('/api/status', {
+		credentials: 'same-origin'
+	})
+	.then((response) => {
+		return response.json()
+	})
+	.then((data) => {
+		console.log(data)
+		var progbar = document.getElementById("cycle_status")
+		var width = (data['scans_this_cycle'] / data['effective_scope_size']) * 100;
+		progbar.setAttribute('aria-valuenow', width);
+		progbar.setAttribute('style', 'width:' + width + "%;");
+		const entries = Object.entries(data);
+		for (const [key, val] of entries) {
+			document.getElementById(key).innerText = val
+		}
+		document.getElementById('prog_percent').innerText = Math.round(width)+"%";
+	})
+</script>
+	<h2>System Status</h2>
+	<div class="progress mb-4">
+		<div id="cycle_status" class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+	</div>
+<div class="row mb-4">
+	<div class="col">
+		<div class="card text-center">
+			<div class="card-body">
+				<h3 class="card-title">Natlas Start Time</h3>
+				<div class="card-text" id="natlas_start_time"></div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card text-center">
+			<div class="card-body">
+				<h3 class="card-title">Cycle Start Time</h3>
+				<div class="card-text" id="cycle_start_time"></div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card text-center">
+			<div class="card-body">
+				<h3 class="card-title">Completed Cycles</h3>
+				<div class="card-text" id="completed_cycles"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<div class="card text-center">
+			<div class="card-body">
+				<h3 class="card-title">Scans This Cycle</h3>
+				<div class="card-text" id="scans_this_cycle"></div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card text-center">
+			<div class="card-body">
+				<h3 class="card-title">Effective Scope Size</h3>
+				<div class="card-text" id="effective_scope_size"></div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card text-center">
+			<div class="card-body">
+				<h3 class="card-title">Percentage Complete</h3>
+				<div class="card-text" id="prog_percent"></div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask import current_app, request, Response
+from flask import current_app, request, Response, jsonify
 import json
 from datetime import datetime as dt
 from datetime import timezone as tz
@@ -9,7 +9,7 @@ from app.api.processing.screenshot import process_screenshots
 from app.api.processing.ssl import parse_ssl_data
 from app.api.rescan_handler import mark_scan_dispatched, mark_scan_completed
 from libnmap.parser import NmapParser, NmapParserException
-from app.auth.wrappers import isAgentAuthenticated
+from app.auth.wrappers import isAgentAuthenticated, isAuthenticated
 
 
 json_content = 'application/json'
@@ -167,3 +167,21 @@ def natlasServices():
 		status_code = 404
 	response = Response(response=response_body, status=status_code, content_type=json_content)
 	return response
+
+
+@bp.route('/status', methods=['GET'])
+@isAuthenticated
+def status():
+	last_cycle_start = current_app.ScopeManager.get_last_cycle_start()
+	if last_cycle_start:
+		scans_this_cycle = current_app.elastic.count_scans_since(last_cycle_start)
+	else:
+		scans_this_cycle = 0
+	payload = {
+		'natlas_start_time': current_app.ScopeManager.init_time,
+		'cycle_start_time': last_cycle_start,
+		'completed_cycles': current_app.ScopeManager.get_completed_cycle_count(),
+		'scans_this_cycle': scans_this_cycle,
+		'effective_scope_size': current_app.ScopeManager.get_effective_scope_size()
+	}
+	return jsonify(payload)

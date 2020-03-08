@@ -3,7 +3,7 @@ from flask_login import current_user
 from app import db
 from app.admin import bp
 from app.admin import forms
-from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag
+from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag, ScopeLog
 from app.auth.email import send_auth_email
 from app.auth.wrappers import isAuthenticated, isAdmin
 import ipaddress
@@ -108,6 +108,8 @@ def scope():
 		scopeSize = current_app.ScopeManager.get_scope_size()
 		# if it's zero again that's fine, we just had to check
 
+	effectiveScopeSize = current_app.ScopeManager.get_effective_scope_size()
+
 	newForm = forms.NewScopeForm()
 	delForm = forms.ScopeDeleteForm()
 	editForm = forms.ScopeToggleForm()
@@ -126,7 +128,8 @@ def scope():
 		return redirect(url_for('admin.scope'))
 	return render_template(
 		"admin/scope.html", scope=scope, scopeSize=scopeSize, delForm=delForm,
-		editForm=editForm, newForm=newForm, importForm=importForm, addTagForm=addTagForm)
+		editForm=editForm, newForm=newForm, importForm=importForm, addTagForm=addTagForm,
+		effectiveScopeSize=effectiveScopeSize)
 
 
 @bp.route('/blacklist', methods=['GET', 'POST'])
@@ -447,3 +450,12 @@ def tags():
 		flash('Successfully added tag %s' % newTag.name, 'success')
 		return redirect(url_for('admin.tags'))
 	return render_template("admin/tags.html", tags=tags, addForm=addForm)
+
+
+@bp.route('/logs', methods=['GET'])
+@isAuthenticated
+@isAdmin
+def logs():
+	scope_logs = ScopeLog.query.order_by(ScopeLog.created_at.desc()).all()
+	return render_template(
+		'admin/logs.html', scope_logs=scope_logs)
