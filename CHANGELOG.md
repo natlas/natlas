@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project strives to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.6.8]
+
+### Added
+- Docker files are available for the agent and server now. 
+- Request tracing and metrics integration are now available via integrations with OpenCensus ([#219](https://github.com/natlas/natlas/issues/219))
+- API Swagger Spec can be found in `/spec/swagger.yaml` and will be very helpful as natlas moves towards more of an api model. ([#225](https://github.com/natlas/natlas/issues/225))
+- Client-side timezone localization for scan results using javascript. ([#240](https://github.com/natlas/natlas/issues/240))
+- A simple status interface and api to look at the current status of the natlas deployment. Includes information about when the server was started, the number of completed scan cycles, when the last scan cycle started, the number of effective hosts in scope, and how many scans have been submitted in the current scan cycle. (No ticket)
+
+### Changed
+- A lot of files have been refactored to simplify the code and reduce complexity. 
+
+### Fixed
+- Fixed the add scope function when no tags are defined for a scope item. ([#196](https://github.com/natlas/natlas/issues/196))
+- Fixed a bug where the tagging interface for blacklisted IPs was exposed but not functional. ([#206](https://github.com/natlas/natlas/issues/206))
+- Fixed a bug where a scope of 2 addresses would not be randomly selected very well. ([#215](https://github.com/natlas/natlas/issues/215))
+- Fixed a bug where elastic connections where after one failed attempt to connect, it could never reconnect. ([#221](https://github.com/natlas/natlas/issues/221))
+- Fixed a bug where Screenshot and Random routes did not require authentication even if it was marked as required in the config. ([#228](https://github.com/natlas/natlas/issues/228))
+
 ## [v0.6.7]
 
 ### Added

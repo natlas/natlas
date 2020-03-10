@@ -83,6 +83,17 @@ paths:
             "Not authorized. Please provide a valid agent token"
           schema:
             $ref: '#/definitions/GenericResponse'
+  /status:
+    get:
+      operationId: status
+      produces:
+      - application/json
+      responses:
+        '200':
+          description:
+            "The server was able to parse the response and handled it accordingly."
+          schema:
+            $ref: '#/definitions/StatusResponse'
 definitions:
   NatlasServices:
     type: object
@@ -317,3 +328,36 @@ definitions:
     required:
     - status
     - message
+  StatusResponse:
+    type: object
+    properties:
+      completed_cycles:
+        type: integer
+        minimum: 0
+        example: 4
+        description:
+          "The number of scan cycles natlas has completed since it was last started"
+      cycle_start_time:
+        type: string
+        format: date-time
+        description:
+          "The timestamp at which the current scan cycle started"
+        example: "Tue, 10 Mar 2020 02:01:26 GMT"
+      effective_scope_size:
+        type: integer
+        minimum: 0
+        example: 16
+        description:
+          "Effective Scope Size is a measure of the number of unique IP addresses in scope, excluding any IP addresses that appear in the blacklist"
+      natlas_start_time:
+        type: string
+        format: date-time
+        description:
+          "The timestamp at which the natlas server was started"
+        example: "Tue, 10 Mar 2020 02:01:16 GMT"
+      scans_this_cycle:
+        type: integer
+        minimum: 0
+        example: 13
+        description:
+          "The number of scans that have been submitted with a scan_start time newer than cycle_start_time"
