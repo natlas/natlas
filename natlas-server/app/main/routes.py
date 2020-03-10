@@ -1,5 +1,5 @@
 from flask import redirect, url_for, render_template, \
-	Response, current_app, request, send_from_directory
+	Response, current_app, request, send_from_directory, jsonify
 from app.main import bp
 from app.main.pagination import build_pagination_urls, results_offset
 from app.auth.wrappers import isAuthenticated
@@ -74,6 +74,8 @@ def search():
 			else:
 				hostlist.append(str(host['ip']))
 		return Response('\n'.join(hostlist), mimetype='text/plain')
+	elif format == 'json':
+		return jsonify(list(context))
 	else:
 		return render_template(
 			"main/search.html",
