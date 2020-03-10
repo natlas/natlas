@@ -1,6 +1,5 @@
-from flask import current_app, render_template, url_for, Response, request, flash, abort, redirect
+from flask import current_app, render_template, url_for, Response, request, flash, abort, redirect, jsonify
 from flask_login import current_user, login_required
-import json
 from datetime import datetime
 from app.models import RescanTask
 from app.admin.forms import DeleteForm
@@ -105,7 +104,7 @@ def export_scan(ip, scan_id, ext):
 
 	count, context = current_app.elastic.get_host_by_scan_id(scan_id)
 	if ext == 'json' and count > 0:
-		return Response(json.dumps(context), mimetype=mime)
+		return jsonify(context)
 	elif count > 0 and export_field in context:
 		return Response(context[export_field], mimetype=mime)
 	else:
