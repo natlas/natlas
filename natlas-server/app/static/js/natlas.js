@@ -89,4 +89,11 @@ $(document).ready(function() {
 		let localDate = new Date(times[i].dateTime)
 		times[i].textContent = localDate.toLocaleString()
 	}
-})
+});
+
+$(document).ready(function() {
+	if (window.location.pathname == '/host/random/') {
+		var permalink = document.getElementsByClassName('date-submitted')[0].childNodes[3].href;
+		history.replaceState(null, '', permalink);
+	}
+});
