@@ -22,7 +22,7 @@ netaddr==0.7.19
 opencensus-ext-flask==0.7.3
 opencensus-ext-ocagent==0.7.1
 opencensus-ext-sqlalchemy==0.1.2
-Pillow==6.2.0
+Pillow==6.2.2
 PyJWT==1.7.1
 python-dateutil==2.8.0
 python-dotenv==0.10.1
