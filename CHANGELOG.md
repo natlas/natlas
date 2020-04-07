@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project strives to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.6.9]
+
+### Added
+- Search can now be augmented with `&format=json` to return search results in json format.
+
+### Changed
+- Random button now replaces the url with the current host it finds. This means you can no longer spam f5 to load a new random host, however you can now go back in history to previous random findings.
+
+### Security
+- Updated Pillow dependency to address CVE-2020-5313 and CVE-2019-19911.
+
 ## [v0.6.8]
 
 ### Added
@@ -222,7 +233,9 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 * Ability to run in standalone mode
 
 
-[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.7...HEAD
+[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.9...HEAD
+[v0.6.7]: https://github.com/natlas/natlas/compare/v0.6.8...v0.6.9
+[v0.6.8]: https://github.com/natlas/natlas/compare/v0.6.7...v0.6.8
 [v0.6.7]: https://github.com/natlas/natlas/compare/v0.6.6...v0.6.7
 [v0.6.6]: https://github.com/natlas/natlas/compare/v0.6.5...v0.6.6
 [v0.6.5]: https://github.com/natlas/natlas/compare/v0.6.4...v0.6.5
