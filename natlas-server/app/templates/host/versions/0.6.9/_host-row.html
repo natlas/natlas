@@ -30,7 +30,7 @@
       {% endfor %}
     {% endif %}
     <div class="btn-group export-group mt-2" role="group">
-        {% include 'host/versions/0.6.8/_host-export.html' %}
+        {% include 'host/versions/0.6.9/_host-export.html' %}
       </div>
 
     {% for screenshot in host.screenshots %}
@@ -44,7 +44,7 @@
   <div class="col-xs-12 col-sm-8 col-md-9">
       {% for port in host.ports %}
           {% set portloop = loop %}
-          {% include 'host/versions/0.6.8/_port-info.html' %}
+          {% include 'host/versions/0.6.9/_port-info.html' %}
       {% endfor %}
     </div><!--data column-->
   {% elif current_user.result_format == 1 %}
