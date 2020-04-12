@@ -100,32 +100,9 @@ def scan(target_data, config):
 		result.add_item('port_count', len(nmap_report.hosts[0].get_ports()))
 
 	if agentConfig["webScreenshots"] and shutil.which("aquatone") is not None:
-		targetServices = []
-		if "80/tcp" in result.result['nmap_data']:
-			targetServices.append("http")
-		if "443/tcp" in result.result['nmap_data']:
-			targetServices.append("https")
-		if len(targetServices) > 0:
-			screenshots.get_web_screenshots(target, scan_id, targetServices, agentConfig["webScreenshotTimeout"])
-
-		serviceMapping = {
-			"http": 80,
-			"https": 443
-		}
-		for service in targetServices:
-			screenshotPath = f"{data_dir}/aquatone.{scan_id}/screenshots/{service}__{target.replace('.','_')}.png"
-			# "data/aquatone." + scan_id + "/screenshots/" + service + "__" + target.replace('.', '_') + ".png"
-
-			if not os.path.isfile(screenshotPath):
-				continue
-
-			result.add_screenshot({
-				"host": target,
-				"port": serviceMapping[service],
-				"service": service.upper(),
-				"data": str(base64.b64encode(open(screenshotPath, 'rb').read()))[2:-1]
-			})
-			logger.info("%s screenshot acquired for %s" % (service.upper(), target))
+		screens = screenshots.get_web_screenshots(target, scan_id, result.result['xml_data'], agentConfig["webScreenshotTimeout"])
+		for item in screens:
+			result.add_screenshot(item)
 
 	if agentConfig["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
 		if "5900/tcp" in result.result['nmap_data']:
