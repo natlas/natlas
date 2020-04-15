@@ -12,7 +12,7 @@
 	    </div>
 	  {% endif %}
 	{% for entry in historical_screenshots %}
-		<div class="row screenshot-header-row">
+		<div class="row screenshot-header-row mt-2">
 			<h5 class="border-bottom">
 				<a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}"><time datetime={{ entry.ctime }} title="{{ entry.ctime|ctime(human=True) }}">{{ entry.ctime | ctime }}</time></a>
 			</h5>
@@ -21,7 +21,8 @@
 			{% for screenshot in entry.screenshots %}
 				{% if screenshot.hash %}
 			    <div class="col-xs-12 col-sm-3">
-					<strong class="mt-2">{{ screenshot.service }}</strong>
+					<strong class="mt-2 mb-n1">Port {{ screenshot.port }}</strong>
+					<small><strong>Host:</strong> {{screenshot.host}}</small>
 					<div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
 				</div>
 				{% endif %}
