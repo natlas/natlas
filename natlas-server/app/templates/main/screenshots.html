@@ -16,9 +16,9 @@
 			{% for host in hosts %}
 				{% for screenshot in host.screenshots %}
 					{% if screenshot.hash %}
-				    <div class="col-xs-12 col-sm-3">
-						<strong class="mt-2">{{ screenshot.service }}</strong>
-						<div class="image-browser"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ host.ip }} - {{ screenshot.service }}"></div>
+				    <div class="col-xs-12 col-sm-3 mt-1">
+						<strong class="mt-2">{{ screenshot.host }}:{{ screenshot.port }}</strong>
+						<div class="image-browser"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != host.ip %} ({{host.ip}}){%endif%}"></div>
 					</div>
 					{% endif %}
 					{% if screenshot.path %}
