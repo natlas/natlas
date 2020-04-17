@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project strives to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [v0.6.10]
+
+### Changed
+- Web screenshots now use aquatone 1.7.0 for more reliability
+- Web screenshots now apply to all http ports instead of just 80/443
+- Web screenshots have been cleaned up in the UI to look cleaner.
+
 ## [v0.6.9]
 
 ### Added
@@ -18,14 +27,14 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 ## [v0.6.8]
 
 ### Added
-- Docker files are available for the agent and server now. 
+- Docker files are available for the agent and server now.
 - Request tracing and metrics integration are now available via integrations with OpenCensus ([#219](https://github.com/natlas/natlas/issues/219))
 - API Swagger Spec can be found in `/spec/swagger.yaml` and will be very helpful as natlas moves towards more of an api model. ([#225](https://github.com/natlas/natlas/issues/225))
 - Client-side timezone localization for scan results using javascript. ([#240](https://github.com/natlas/natlas/issues/240))
 - A simple status interface and api to look at the current status of the natlas deployment. Includes information about when the server was started, the number of completed scan cycles, when the last scan cycle started, the number of effective hosts in scope, and how many scans have been submitted in the current scan cycle. (No ticket)
 
 ### Changed
-- A lot of files have been refactored to simplify the code and reduce complexity. 
+- A lot of files have been refactored to simplify the code and reduce complexity.
 
 ### Fixed
 - Fixed the add scope function when no tags are defined for a scope item. ([#196](https://github.com/natlas/natlas/issues/196))
@@ -233,8 +242,9 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 * Ability to run in standalone mode
 
 
-[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.9...HEAD
-[v0.6.7]: https://github.com/natlas/natlas/compare/v0.6.8...v0.6.9
+[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.10...HEAD
+[v0.6.10]: https://github.com/natlas/natlas/compare/v0.6.9...v0.6.10
+[v0.6.9]: https://github.com/natlas/natlas/compare/v0.6.8...v0.6.9
 [v0.6.8]: https://github.com/natlas/natlas/compare/v0.6.7...v0.6.8
 [v0.6.7]: https://github.com/natlas/natlas/compare/v0.6.6...v0.6.7
 [v0.6.6]: https://github.com/natlas/natlas/compare/v0.6.5...v0.6.6
