@@ -5,7 +5,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install --no-install-recommends -qy $BUILD_PKGS
 
-RUN export AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.4.3/aquatone_linux_amd64_1.4.3.zip' \
+RUN export AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.7.0/aquatone_linux_amd64_1.7.0.zip' \
 	&& wget $AQUATONEURL -O /tmp/aquatone.zip -q \
 	&& unzip /tmp/aquatone.zip -d /tmp/aquatone
 
