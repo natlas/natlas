@@ -2,8 +2,8 @@
 {% set title = ip ~ " | Screenshots" %}
 {% set active_page = "screenshots" %}
 {% block content %}
-    {% include 'host/versions/0.6.9/_header.html' %}
-    {% include 'host/versions/0.6.9/_imagemodal.html' %}
+    {% include 'host/versions/0.6.10/_header.html' %}
+    {% include 'host/versions/0.6.10/_imagemodal.html' %}
 	{% if numresults > current_user.results_per_page %}
 	    <div class="row">
 	      <div class="col text-center my-2">
@@ -27,7 +27,7 @@
 							<div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
 						</div>
 						<img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{ip}}' data-scan_id='{{entry.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != ip %} ({{ip}}){%endif%}">
-					</div>
+					</div>	
 				</div>
 				{% endif %}
 				{% if screenshot.path %}

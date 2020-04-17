@@ -35,7 +35,8 @@
 
     {% for screenshot in host.screenshots %}
       {% if screenshot.hash %}
-      <h5 class="mt-2">{{ screenshot.service }}</h5>
+      <h5 class="mt-2">Port {{ screenshot.port }}</h5>
+      <small>{{screenshot.host}}</small>
       <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ host.ip }} - {{ screenshot.service }} Screenshot"></div>
       {% endif %}
     {% endfor %}

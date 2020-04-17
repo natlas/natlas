@@ -1,7 +1,7 @@
 #!/bin/bash
 # sudo bash setup-agent.sh
 
-AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.4.3/aquatone_linux_amd64_1.4.3.zip'
+AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.7.0/aquatone_linux_amd64_1.7.0.zip'
 
 if [[ "$EUID" -ne 0 ]]; then
 	echo "[!] This script needs elevated permissions to run."
@@ -140,7 +140,8 @@ else
 	echo "[+] Found vncsnapshot: $(which vncsnapshot)"
 fi
 
-if ! which aquatone >/dev/null; then
+# The old supported aquatone, 1.4.3, did not support the -version flag, so we can use this to tell if we need to upgrade
+if ! which aquatone >/dev/null || aquatone -version 2>&1 | grep "flag provided but not defined: -version" >/dev/null; then
 	echo '[+] Downloading Aquatone'
 	wget $AQUATONEURL -O /tmp/aquatone.zip -q && unzip /tmp/aquatone.zip -d /tmp/aquatone && cp /tmp/aquatone/aquatone /usr/local/bin/aquatone
 	rm -rf /tmp/aquatone.zip /tmp/aquatone

@@ -3,6 +3,9 @@
 import subprocess
 import os
 import time
+import json
+import base64
+from urllib.parse import urlparse
 
 from natlas import logging
 from natlas import utils
@@ -10,32 +13,63 @@ from natlas import utils
 logger = logging.get_logger("ScreenshotUtils")
 
 
-def get_web_screenshots(target, scan_id, services, proctimeout):
+def base64_image(path):
+	img = None
+	with open(path, 'rb') as f:
+		img = f.read()
+	return str(base64.b64encode(img))[2:-1]
+
+
+def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 	data_dir = utils.get_data_dir(scan_id)
 	outFiles = f"{data_dir}/aquatone.{scan_id}"
-	inputstring = ""
-	for service in services:
-		inputstring += service + "://" + target + "\n"
 
-	if inputstring:
-		inputstring = inputstring[:-1] # trim trailing newline because otherwise chrome spits garbage into localhost for some reason
+	logger.info(f"Attempting to take screenshots for {target}")
 
-	logger.info("Attempting to take %s screenshot(s) for %s" % (', '.join(services).upper(), target))
-
-	p1 = subprocess.Popen(["echo", inputstring], stdout=subprocess.PIPE) # nosec
-	process = subprocess.Popen(["aquatone", "-scan-timeout", "2500", "-out", outFiles], stdin=p1.stdout, stdout=subprocess.DEVNULL) # nosec
+	p1 = subprocess.Popen(["echo", xml_data], stdout=subprocess.PIPE) # nosec
+	aquatoneArgs = [
+		"aquatone",
+		"-nmap",
+		"-scan-timeout", "2500",
+		"-out", outFiles
+	]
+	process = subprocess.Popen(aquatoneArgs, stdin=p1.stdout, stdout=subprocess.DEVNULL) # nosec
 	p1.stdout.close()
 
 	try:
 		out, err = process.communicate(timeout=proctimeout)
 		if process.returncode == 0:
 			time.sleep(0.5) # a small sleep to make sure all file handles are closed so that the agent can read them
-			return True
 	except subprocess.TimeoutExpired:
-		logger.warning("TIMEOUT: Killing aquatone against %s" % target)
+		logger.warning(f"TIMEOUT: Killing aquatone against {target}")
 		process.kill()
 
-	return False
+	with open(os.path.join(outFiles, 'aquatone_session.json')) as f:
+		session = json.load(f)
+
+	output = []
+
+	if session['stats']['screenshotSuccessful'] > 0:
+		logger.info(f"{target} - Success: {session['stats']['screenshotSuccessful']}, Fail: {session['stats']['screenshotFailed']}")
+
+		for k, page in session['pages'].items():
+			fqScreenshotPath = os.path.join(outFiles, page['screenshotPath'])
+			if page['hasScreenshot'] and os.path.isfile(fqScreenshotPath):
+				urlp = urlparse(page['url'])
+				if not urlp.port and urlp.scheme == 'http':
+					port = 80
+				elif not urlp.port and urlp.scheme == 'https':
+					port = 443
+				else:
+					port = urlp.port
+				logger.info(f"{urlp.scheme.upper()} screenshot acquired for {page['hostname']} on port {port}")
+				output.append({
+					"host": page['hostname'],
+					"port": port,
+					"service": urlp.scheme.upper(),
+					"data": base64_image(fqScreenshotPath)
+				})
+	return output
 
 
 def get_vnc_screenshots(target, scan_id, proctimeout):
@@ -45,7 +79,7 @@ def get_vnc_screenshots(target, scan_id, proctimeout):
 	data_dir = utils.get_data_dir(scan_id)
 	outFile = f"{data_dir}/vncsnapshot.{scan_id}.jpg"
 
-	logger.info("Attempting to take VNC screenshot for %s" % target)
+	logger.info(f"Attempting to take VNC screenshot for {target}")
 
 	process = subprocess.Popen(["xvfb-run", "vncsnapshot", "-quality", "50", target, outFile], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # nosec
 	try:
@@ -54,7 +88,7 @@ def get_vnc_screenshots(target, scan_id, proctimeout):
 			return True
 	except Exception:
 		try:
-			logger.warning("TIMEOUT: Killing vncsnapshot against %s" % target)
+			logger.warning(f"TIMEOUT: Killing vncsnapshot against {target}")
 			process.kill()
 			return False
 		except Exception:
