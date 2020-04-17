@@ -11,15 +11,10 @@ SLEEP_TIME=60
 #BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CURRENT_BRANCH=$(git status | grep "On branch" | cut -d" " -f3)
 
-echo "PLEASE DONT USE ME YET. TEST A RELEASE MANUALLY BEFORE ATTEMPTING TO AUTOMATE IT."
-exit
 
-
-if [[ $CURRENT_BRANCH == "main" ]]; then
-	echo "[!] Attempting to create a release from the main branch is not currently supported."
+if [[ $CURRENT_BRANCH != "main" ]]; then
+	echo "[!] Releases must come from the main branch, not the $CURRENT_BRANCH branch"
 	exit
-else
-	echo "[+] Building release from branch $CURRENT_BRANCH"
 fi
 
 # The CHANGELOG is very important, if you're creating a release then the CHANGELOG should be accurate.
@@ -93,14 +88,7 @@ for file in "${TO_UPDATE[@]}"; do
 done
 
 # Commit the version string changes to version branch
-git commit -m "Preparing configs for v${NEW_VERSION}"
-git push
-
-# Switch to main, make sure there's no upstream changes, and merge version branch to main
-git checkout main
-git pull origin main
-git merge "$CURRENT_BRANCH"
-git commit -m "Releasing v${NEW_VERSION}"
+git commit -m "Preparing for v${NEW_VERSION}"
 git push
 
 # Create a tag for the release and push it to github
