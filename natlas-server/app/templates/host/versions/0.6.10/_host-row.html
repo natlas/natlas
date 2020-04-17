@@ -30,14 +30,22 @@
       {% endfor %}
     {% endif %}
     <div class="btn-group export-group mt-2" role="group">
-        {% include 'host/versions/0.6.9/_host-export.html' %}
+        {% include 'host/versions/0.6.10/_host-export.html' %}
       </div>
 
     {% for screenshot in host.screenshots %}
       {% if screenshot.hash %}
-      <h5 class="mt-2">Port {{ screenshot.port }}</h5>
+      <div class="image-browser">
+        <div class="thumbnail-hover d-flex flex-column justify-content-between">
+          <div class="image-browser-service p-2">{{ screenshot.service }}</div>
+          <div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
+        </div>
+        <img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != host.ip %} ({{host.ip}}){%endif%}">
+      </div>
+      <!--<h5 class="mt-2">Port {{ screenshot.port }}</h5>
       <small>Host: {{screenshot.host}}</small>
       <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ host.ip }} - {{ screenshot.service }} Screenshot"></div>
+      -->
       {% endif %}
     {% endfor %}
   </div><!--meta column-->
