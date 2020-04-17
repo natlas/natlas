@@ -23,7 +23,7 @@ def base64_image(path):
 def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 	data_dir = utils.get_data_dir(scan_id)
 	outFiles = f"{data_dir}/aquatone.{scan_id}"
-
+	output = []
 	logger.info(f"Attempting to take screenshots for {target}")
 
 	p1 = subprocess.Popen(["echo", xml_data], stdout=subprocess.PIPE) # nosec
@@ -44,10 +44,12 @@ def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 		logger.warning(f"TIMEOUT: Killing aquatone against {target}")
 		process.kill()
 
-	with open(os.path.join(outFiles, 'aquatone_session.json')) as f:
-		session = json.load(f)
+	session_path = os.path.join(outFiles, 'aquatone_session.json')
+	if not os.path.isfile(session_path):
+		return output
 
-	output = []
+	with open(session_path) as f:
+		session = json.load(f)
 
 	if session['stats']['screenshotSuccessful'] > 0:
 		logger.info(f"{target} - Success: {session['stats']['screenshotSuccessful']}, Fail: {session['stats']['screenshotFailed']}")
