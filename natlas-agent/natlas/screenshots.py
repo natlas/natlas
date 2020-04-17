@@ -13,6 +13,13 @@ from natlas import utils
 logger = logging.get_logger("ScreenshotUtils")
 
 
+def base64_image(path):
+	img = None
+	with open(path, 'rb') as f:
+		img = f.read()
+	return str(base64.b64encode(img))[2:-1]
+
+
 def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 	data_dir = utils.get_data_dir(scan_id)
 	outFiles = f"{data_dir}/aquatone.{scan_id}"
@@ -20,12 +27,11 @@ def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 	logger.info(f"Attempting to take screenshots for {target}")
 
 	p1 = subprocess.Popen(["echo", xml_data], stdout=subprocess.PIPE) # nosec
-	#logger.info(" ".join(["echo", xml_data]))
-	#logger.info(" ".join(["aquatone", "-scan-timeout", "2500", "-out", outFiles]))
-	aquatoneArgs = ["aquatone", 
-					"-nmap", 
-					"-scan-timeout", "2500", 
-					"-out", outFiles
+	aquatoneArgs = [
+		"aquatone",
+		"-nmap",
+		"-scan-timeout", "2500",
+		"-out", outFiles
 	]
 	process = subprocess.Popen(aquatoneArgs, stdin=p1.stdout, stdout=subprocess.DEVNULL) # nosec
 	p1.stdout.close()
@@ -40,12 +46,12 @@ def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 
 	with open(os.path.join(outFiles, 'aquatone_session.json')) as f:
 		session = json.load(f)
-	
+
 	output = []
 
 	if session['stats']['screenshotSuccessful'] > 0:
 		logger.info(f"{target} - Success: {session['stats']['screenshotSuccessful']}, Fail: {session['stats']['screenshotFailed']}")
-		
+
 		for k, page in session['pages'].items():
 			fqScreenshotPath = os.path.join(outFiles, page['screenshotPath'])
 			if page['hasScreenshot'] and os.path.isfile(fqScreenshotPath):
@@ -61,7 +67,7 @@ def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 					"host": page['hostname'],
 					"port": port,
 					"service": urlp.scheme.upper(),
-					"data": str(base64.b64encode(open(fqScreenshotPath, 'rb').read()))[2:-1]
+					"data": base64_image(fqScreenshotPath)
 				})
 	return output
 

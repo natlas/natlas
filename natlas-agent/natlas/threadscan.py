@@ -1,4 +1,3 @@
-import base64
 import subprocess
 import threading
 import shutil
@@ -114,7 +113,7 @@ def scan(target_data, config):
 						"host": target,
 						"port": 5900,
 						"service": "VNC",
-						"data": str(base64.b64encode(open(screenshotPath, 'rb').read()))[2:-1]
+						"data": screenshots.base64_image(screenshotPath)
 					})
 					logger.info("VNC screenshot acquired for %s" % result.result['ip'])
 
