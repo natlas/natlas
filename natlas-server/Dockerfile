@@ -1,3 +1,12 @@
+FROM node:10.20.0-jessie as webpack
+
+WORKDIR /app
+COPY ["package.json", "yarn.lock", "/app/"]
+RUN yarn --no-progress
+COPY . /app
+RUN yarn run webpack --mode production
+RUN rm -rf static/{css,js}
+
 FROM python:3.7.5 as build
 
 WORKDIR /opt/natlas/natlas-server
@@ -7,6 +16,9 @@ RUN pip3 --disable-pip-version-check --no-cache-dir install --no-warn-script-loc
         && rm -rf requirements.txt
 
 COPY . /opt/natlas/natlas-server
+
+# Prepare assets
+COPY --from=webpack /app/app/static/dist static/dist
 
 RUN python3 -m compileall .
 

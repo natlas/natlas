@@ -21,6 +21,17 @@ services:
       - backend
     restart: on-failure
 
+  webpack-server:
+    image: node:10.17.0-stretch
+    command: /bin/bash -c '/usr/local/bin/yarn install && /usr/local/bin/yarn run webpack --mode development --watch'
+    networks:
+      - backend
+    volumes:
+      - ./natlas-server:/app
+      - node_modules:/app/node_modules
+      - html_assets:/app/static/dist
+    working_dir: /app
+
   natlas-server:
     build: natlas-server
     ports:
@@ -31,6 +42,8 @@ services:
       - ELASTICSEARCH_URL=http://elastic:9200
     volumes:
       - ns-data:/data
+      - ./natlas-server:/opt/natlas/natlas-server
+      - html_assets:/opt/natlas/natlas-server/static/dist
     restart: on-failure
     links:
       - elastic
@@ -45,6 +58,8 @@ services:
       - NATLAS_SCAN_LOCAL=true
     cap_add:
       - NET_ADMIN
+    volumes:
+      - ./natlas-agent:/opt/natlas/natlas-agent
     links:
       - natlas-server
 
@@ -54,3 +69,5 @@ networks:
 volumes:
   ns-data:
   elastic:
+  node_modules:
+  html_assets:

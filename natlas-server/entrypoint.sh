@@ -1,4 +1,5 @@
 #!/bin/sh
+set +x
 
 mkdir -p /data/{db,media,logs}
 ln -s /data/logs logs
