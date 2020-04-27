@@ -18,3 +18,5 @@ rules:
   indent:
   - error
   - tab
+  semi: error
+  camelcase: error

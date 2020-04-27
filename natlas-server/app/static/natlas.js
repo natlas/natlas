@@ -2,9 +2,9 @@ import $ from 'jquery';
 import dataTable from 'datatables.net'; // TODO: Switch to a NPM native
 
 import { getLatestVersion, LatestURL, thisVersion } from './util/version-check';
+import { registerTagModalEvents } from './controls/natlas-tagging';
 import 'natlas.scss';
 import 'bootstrap';
-import 'controls/natlas-tagging';
 
 // Install Datatables.net library onto existing jQuery
 dataTable(window, $);
@@ -13,7 +13,7 @@ $(function() {
 	$('.expand-img').on('click', function() {
 		var selectAttr = 'src';
 		if ($(this).find('img')[0].hasAttribute('data-path')) {
-			selectAttr = 'data-path'
+			selectAttr = 'data-path';
 		}
 		$('.imagetitle').text($(this).find('img').attr('alt'));
 		$('.imagepreview').attr('src', $(this).find('img').attr(selectAttr));
@@ -29,19 +29,19 @@ $(function() {
 	});
 });
 
-var modal_content_loaded = false;
+var modalContentLoaded = false;
 window.loadModalContent = function() {
-	if (modal_content_loaded){
-		return
+	if (modalContentLoaded){
+		return;
 	}
 	let xhr = new XMLHttpRequest();
-	xhr.open("GET", "/searchmodal")
+	xhr.open("GET", "/searchmodal");
 	xhr.send();
 	xhr.onload = function() {
 		$('#searchHelpContent').html(xhr.response);
-		modal_content_loaded = true;
-	}
-}
+		modalContentLoaded = true;
+	};
+};
 
 $(document).ready(function() {
 	$('#checkForUpdate').click(function() {
@@ -64,7 +64,7 @@ $(document).ready(function() {
 			})
 			.catch(console.log);
 	});
-})
+});
 
 $(document).ready(function() {
 	$('.dataTable').DataTable( {
@@ -72,7 +72,7 @@ $(document).ready(function() {
 			{ "orderable": false, "targets": 'table-controls' }
 		]
 	});
-	$('[data-toggle="popover"]').popover()
+	$('[data-toggle="popover"]').popover();
 });
 
 $(document).ready(function() {
@@ -96,8 +96,8 @@ $(document).ready(function() {
 $(document).ready(function() {
 	let times = document.body.getElementsByTagName('time');
 	for (let i = 0; i < times.length; i++){
-		let localDate = new Date(times[i].dateTime)
-		times[i].textContent = localDate.toLocaleString()
+		let localDate = new Date(times[i].dateTime);
+		times[i].textContent = localDate.toLocaleString();
 	}
 });
 
@@ -107,3 +107,5 @@ $(document).ready(function() {
 		history.replaceState(null, '', permalink);
 	}
 });
+
+registerTagModalEvents();

@@ -1,2 +1,6 @@
 <!-- Scripts -->
-{{ config['webpack'].main.js | safe }}
+<!-- Scripts -->
+{% set mainjs = config['webpack'].main.js %}
+{% for url in mainjs.rel_urls %}
+<script type="text/javascript" src="{{ mainjs.static_url + url }}" defer async></script>
+{% endfor %}
