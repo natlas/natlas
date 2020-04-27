@@ -3,7 +3,7 @@ import dataTable from 'datatables.net-bs4'; // TODO: Switch to a NPM native
 
 import { isNewerVersionAvailable } from './util/version-check';
 import { registerTagModalEvents } from './controls/natlas-tagging';
-import { registerAgentModalEvents } from './controls/user-profile';
+import { registerAgentEvents } from './controls/user-profile';
 import 'natlas.scss';
 import 'bootstrap';
 
@@ -109,12 +109,5 @@ $(document).ready(function() {
 	}
 });
 
-$('.showtoken').on('click', function() {
-	var tokentarget = event.target.id.split("-")[1];
-	$(event.target).hide();
-	$('#showtokenwrapper-' + tokentarget).hide();
-	$('#tokenval-' + tokentarget).show();
-});
-
 registerTagModalEvents();
-registerAgentModalEvents();
+registerAgentEvents();

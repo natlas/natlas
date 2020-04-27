@@ -16,12 +16,20 @@ function onModalShow(event: JQueryEventObject): void {
 	var formaction = button.data('action')
 	var modal = $(this)
 	if (formaction == 'changename') {
-		setModalDetails(modal, 'Change Name of ' + agentid, "/user/agent/"+agentid+"/newName", agentname, 'Change Name')
+		setModalDetails(modal, `Change Name of ${agentid}`, `/user/agent/${agentid}/newName`, agentname, 'Change Name')
 	} else if (formaction == 'newagent') {
 		setModalDetails(modal, 'New Agent', '/user/agent/newAgent', "", 'New Agent')
 	}
 }
 
-export function registerAgentModalEvents(): void {
+function showToken(event: JQueryEventObject): void {
+	var tokentarget = event.target.id.split("-")[1];
+	$(event.target).hide();
+	$(`#showtokenwrapper-${tokentarget}`).hide();
+	$('#tokenval-' + tokentarget).show();
+}
+
+export function registerAgentEvents(): void {
 	$('#agentmodal').on('show.bs.modal', onModalShow);
+	$('.showtoken').on('click', showToken)
 }
