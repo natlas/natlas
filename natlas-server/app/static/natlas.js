@@ -114,7 +114,7 @@ $('.showtoken').on('click', function() {
 	$(event.target).hide();
 	$('#showtokenwrapper-' + tokentarget).hide();
 	$('#tokenval-' + tokentarget).show();
-})
+});
 
 registerTagModalEvents();
 registerAgentModalEvents();
