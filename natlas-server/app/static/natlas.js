@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import dataTable from 'datatables.net'; // TODO: Switch to a NPM native
+import dataTable from 'datatables.net-bs4'; // TODO: Switch to a NPM native
 
 import { getLatestVersion, LatestURL, thisVersion } from './util/version-check';
 import { registerTagModalEvents } from './controls/natlas-tagging';
