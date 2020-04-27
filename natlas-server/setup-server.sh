@@ -3,11 +3,24 @@
 export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
 BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SETUP_ENV=""
 
 if [[ "$EUID" -ne 0 ]]; then
 	echo "[!] This script needs elevated permissions to run."
 	exit 2
 fi
+
+case $1 in
+	"prod")
+		echo "Setting up a production natlas environment"
+		SETUP_ENV="prod" ;;
+	"dev")
+		echo "Setting up a development natlas environment"
+		SETUP_ENV="dev" ;;
+	*)
+		echo "Please specify setup environment: prod or dev"
+		exit 3 ;;
+esac
 
 if [[ ! -d logs ]]; then
 	mkdir logs
@@ -16,18 +29,20 @@ fi
 echo "[+] Updating apt repositories"
 apt-get update >/dev/null
 
-if ! id -u "natlas" >/dev/null 2>&1; then
-	echo "[+] Creating natlas group: groupadd -r natlas"
-	groupadd -r natlas
-	echo "[+] Creating natlas user: useradd -M -N -r -s /bin/false -d /opt/natlas natlas"
-	useradd -M -N -r -s /bin/false -g natlas -d /opt/natlas natlas
-	if ! id natlas >/dev/null 2>&1; then
-		echo "[!] Failed to create natlas user"
+if [ "$SETUP_ENV" == "prod" ]; then
+	if ! id -u "natlas" >/dev/null 2>&1; then
+		echo "[+] Creating natlas group: groupadd -r natlas"
+		groupadd -r natlas
+		echo "[+] Creating natlas user: useradd -M -N -r -s /bin/false -d /opt/natlas natlas"
+		useradd -M -N -r -s /bin/false -g natlas -d /opt/natlas natlas
+		if ! id natlas >/dev/null 2>&1; then
+			echo "[!] Failed to create natlas user"
+		else
+			echo "[+] Successfully created natlas user"
+		fi
 	else
-		echo "[+] Successfully created natlas user"
+		echo "[+] Found natlas user"
 	fi
-else
-	echo "[+] Found natlas user"
 fi
 
 ELASTIC=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9200/_nodes)
@@ -49,6 +64,31 @@ if ! which python3 >/dev/null; then
 	fi
 else
 	echo "[+] Found python3: $(which python3)"
+fi
+
+if ! which yarn >/dev/null; then
+	echo "[+] Fetching yarn gpg key: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -"
+	curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+	echo "[+] Adding yarn repository: echo \"deb https://dl.yarnpkg.com/debian/ stable main\" | tee /etc/apt/sources.list.d/yarn.list"
+	echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+	echo "[+] Updating apt repositories"
+	apt-get update >/dev/null
+	echo "[+] Installing yarn: apt-get -y install yarn"
+	apt-get -y install yarn
+	if ! which yarn >/dev/null; then
+		echo "[!] Failed to install yarn" && exit 1
+	else
+		echo "[+] Successfully installed yarn: $(which yarn)"
+	fi
+else
+	echo "[+] Found yarn: $(which yarn)"
+fi
+
+echo "[+] Installing yarn dependencies"
+yarn --no-progress
+if [ "$SETUP_ENV" == "prod" ]; then
+	echo "[+] Building assets for production"
+	yarn run webpack --mode production
 fi
 
 if ! which pip3 >/dev/null; then
@@ -115,8 +155,10 @@ else
 	deactivate
 fi
 
-echo "[+] Giving natlas user ownership of all project files"
-chown -R natlas:natlas "$BASEDIR"
+if [ "$SETUP_ENV" == "prod" ]; then
+	echo "[+] Giving natlas user ownership of all project files"
+	chown -R natlas:natlas "$BASEDIR"
+fi
 
 echo "[+] Setup Complete"
 echo "------------------"
