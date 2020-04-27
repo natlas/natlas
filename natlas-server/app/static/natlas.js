@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import dataTable from 'datatables.net-bs4'; // TODO: Switch to a NPM native
 
-import { getLatestVersion, LatestURL, thisVersion } from './util/version-check';
+import { isNewerVersionAvailable } from './util/version-check';
 import { registerTagModalEvents } from './controls/natlas-tagging';
 import { registerAgentModalEvents } from './controls/user-profile';
 import 'natlas.scss';
@@ -47,12 +47,12 @@ window.loadModalContent = function() {
 $(document).ready(function() {
 	$('#checkForUpdate').click(function() {
 		var btn = $(this);
-		getLatestVersion()
-			.then(latestVersion => {
+		isNewerVersionAvailable()
+			.then(result => {
 				let params;
-				if (latestVersion != thisVersion()) {
+				if (result.isNewerAvailable) {
 					params = {
-						content: "Update found: <a href=\"" + LatestURL + "\">" + latestVersion + "</a>",
+						content: "Update found: <a href=\"" + result.downloadUrl + "\">" + result.version + "</a>",
 						html: true
 					};
 				} else {
