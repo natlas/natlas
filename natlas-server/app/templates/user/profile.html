@@ -115,32 +115,4 @@
     </div>
   </div>
 </div>
-
-<script>
-$('#agentmodal').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget) // Button that triggered the modal
-  var agentid = button.data('agentid') // Extract info from data-* attributes
-  var agentname = button.data('agentname') // Extract info from data-* attributes
-  var formaction = button.data('action')
-
-  var modal = $(this)
-  if (formaction == 'changename') {
-    modal.find('.modal-title').text('Change Name of ' + agentid)
-    modal.find('#agentNameForm').attr('action', "/user/agent/"+agentid+"/newName")
-    modal.find('#change_name').text('Change Name')
-    modal.find("#agent_name").attr('placeholder', agentname)
-  } else if (formaction == 'newagent') {
-    modal.find('.modal-title').text('New Agent')
-    modal.find('#agentNameForm').attr('action', '/user/agent/newAgent')
-    modal.find('#change_name').text('New Agent')
-  }
-})
-
-$('.showtoken').on('click', function() {
-        var tokentarget = event.target.id.split("-")[1];
-        $(event.target).hide();
-        $('#showtokenwrapper-' + tokentarget).hide();
-        $('#tokenval-' + tokentarget).show();
-})
-</script>
 {% endblock %}
