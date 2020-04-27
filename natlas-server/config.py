@@ -57,7 +57,6 @@ defaultConfig = [
 	("MAIL_USERNAME", "string", ""),
 	("MAIL_PASSWORD", "string", ""),
 	("MAIL_FROM", "string", ""),
-	("LOCAL_SUBRESOURCES", "bool", "False"),
 	("CUSTOM_BRAND", "string", "")
 ]
 

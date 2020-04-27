@@ -20,10 +20,6 @@
             {{ configForm.agent_authentication(checked=configItems["AGENT_AUTHENTICATION"], class="form-check-input", id="agentAuthentication") }}
             {{ configForm.agent_authentication.label(class="form-check-label", for="agentAuthentication") }}
         </div>
-        <div class="form-check">
-            {{ configForm.local_subresources(checked=configItems["LOCAL_SUBRESOURCES"], class="form-check-input", id="localSubresources") }}
-            {{ configForm.local_subresources.label(class="form-check-label", for="localSubresources") }}
-        </div>
         <div class="form-group">
             {{ configForm.custom_brand.label(class="control-label") }}
             {{ configForm.custom_brand(value=configItems["CUSTOM_BRAND"], class="form-control", placeholder="Natlas Internal") }}
