@@ -3,7 +3,7 @@ export const LatestURL = "https://github.com/natlas/natlas/releases/latest";
 
 // Not ideal. We should pack this into the bundle instead
 export function thisVersion(): String {
-	return document.getElementById('natlas-version').innerText
+	return document.getElementById('natlasVersion').innerText
 }
 
 function extractVersion(result: any) {
