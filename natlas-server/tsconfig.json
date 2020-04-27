@@ -5,6 +5,10 @@
 		"module": "es6",
 		"target": "es5",
 		"allowJs": true,
+		"lib": [
+			"es2017",
+			"dom"
+		],
 		"types": [
 			"jquery"
 		]

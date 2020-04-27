@@ -2,6 +2,7 @@ import $ from 'jquery';
 import dataTable from 'datatables.net-bs4'; // TODO: Switch to a NPM native
 
 import { isNewerVersionAvailable } from './util/version-check';
+import { updateStatus } from './util/system-status';
 import { registerTagModalEvents } from './controls/natlas-tagging';
 import { registerAgentEvents } from './controls/user-profile';
 import 'natlas.scss';
@@ -24,7 +25,7 @@ $(function() {
 
 $(function() {
 	$('.image-browser').on('click', function() {
-		$('.imagetitle').html("<a href=/host/" + $(this).find('img').attr('data-ip') + "/" + $(this).find('img').attr('data-scan_id') + ">" + $(this).find('img').attr('alt') + "</a>");
+		$('.imagetitle').html(`<a href=/host/${$(this).find('img').attr('data-ip')}/${$(this).find('img').attr('data-scan_id')}>${$(this).find('img').attr('alt')}</a>`);
 		$('.imagepreview').attr('src', $(this).find('img').attr('data-path'));
 		$('#imagemodal').modal('show');
 	});
@@ -52,7 +53,7 @@ $(document).ready(function() {
 				let params;
 				if (result.isNewerAvailable) {
 					params = {
-						content: "Update found: <a href=\"" + result.downloadUrl + "\">" + result.version + "</a>",
+						content: `Update found: <a href=\\"${result.downloadUrl}\\">${result.version}</a>`,
 						html: true
 					};
 				} else {
@@ -107,6 +108,13 @@ $(document).ready(function() {
 		history.replaceState(null, '', permalink);
 	}
 });
+
+$(document).ready(function() {
+	if (document.getElementById('cycle_status')) {
+		updateStatus();
+	}
+});
+
 
 registerTagModalEvents();
 registerAgentEvents();
