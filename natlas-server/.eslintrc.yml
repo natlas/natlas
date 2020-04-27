@@ -20,3 +20,76 @@ rules:
   - tab
   semi: error
   camelcase: error
+  no-unexpected-multiline: error
+  no-extra-parens:
+    - error
+    - all
+    - ignoreJSX: multi-line
+  no-unsafe-negation: warn
+  complexity:
+    - warn
+    - 4
+  curly:
+    - warn
+    - all
+  no-alert: error
+  no-extra-bind: error
+  no-eval: error
+  radix:
+    - error
+    - always
+  no-shadow: error
+
+  prefer-const: error
+
+  # Class Layout
+  no-useless-constructor: error
+
+  # Code style
+  yoda:
+    - warn
+    - never
+  brace-style:
+    - error
+    - 1tbs
+  no-multi-spaces: error
+  padded-blocks:
+    - error
+    - never
+  spaced-comment: error
+  semi-spacing: error
+  keyword-spacing: error
+
+  sort-keys: error
+  eqeqeq: error
+  no-floating-decimal: error
+  dot-notation: error
+  dot-location:
+    - error
+    - property
+
+  # Control Flow
+  max-depth:
+    - error
+    - 3
+
+  no-implicit-coercion: error
+
+  no-confusing-arrow: error
+  space-infix-ops:
+    - error
+    - int32Hint: false
+  space-before-blocks: error
+  space-before-function-paren:
+    - error
+    - never
+  space-in-parens:
+    - error
+    - never
+
+  import/no-unused-modules:
+  - error
+  - unusedExports: true
+  import/no-extraneous-dependencies: error
+  import/no-useless-path-segments: error
+  import/order: error

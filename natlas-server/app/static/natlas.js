@@ -24,7 +24,7 @@ $(function() {
 
 $(function() {
 	$('.image-browser').on('click', function() {
-		$('.imagetitle').html("<a href=/host/"+$(this).find('img').attr('data-ip')+"/" + $(this).find('img').attr('data-scan_id') + ">"+$(this).find('img').attr('alt')+"</a>");
+		$('.imagetitle').html("<a href=/host/" + $(this).find('img').attr('data-ip') + "/" + $(this).find('img').attr('data-scan_id') + ">" + $(this).find('img').attr('alt') + "</a>");
 		$('.imagepreview').attr('src', $(this).find('img').attr('data-path'));
 		$('#imagemodal').modal('show');
 	});
@@ -32,10 +32,10 @@ $(function() {
 
 var modalContentLoaded = false;
 window.loadModalContent = function() {
-	if (modalContentLoaded){
+	if (modalContentLoaded) {
 		return;
 	}
-	let xhr = new XMLHttpRequest();
+	const xhr = new XMLHttpRequest();
 	xhr.open("GET", "/searchmodal");
 	xhr.send();
 	xhr.onload = function() {
@@ -68,7 +68,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-	$('.dataTable').DataTable( {
+	$('.dataTable').DataTable({
 		"columnDefs": [
 			{ "orderable": false, "targets": 'table-controls' }
 		]
@@ -77,7 +77,6 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-
 	var btn = $('#backtotop');
 	btn.tooltip();
 	$(window).scroll(function() {
@@ -95,15 +94,15 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-	let times = document.body.getElementsByTagName('time');
-	for (let i = 0; i < times.length; i++){
-		let localDate = new Date(times[i].dateTime);
+	const times = document.body.getElementsByTagName('time');
+	for (let i = 0; i < times.length; i++) {
+		const localDate = new Date(times[i].dateTime);
 		times[i].textContent = localDate.toLocaleString();
 	}
 });
 
 $(document).ready(function() {
-	if (window.location.pathname == '/host/random/') {
+	if (window.location.pathname === '/host/random/') {
 		var permalink = document.getElementsByClassName('date-submitted')[0].childNodes[3].href;
 		history.replaceState(null, '', permalink);
 	}
