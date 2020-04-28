@@ -2,7 +2,7 @@ FROM node:10.20.0-jessie as webpack
 
 WORKDIR /app
 COPY ["package.json", "yarn.lock", "/app/"]
-RUN yarn --no-progress
+RUN yarn --no-progress --frozen-lockfile --non-interactive
 COPY . /app
 RUN yarn run webpack --mode production
 RUN rm -rf static/{css,js}
