@@ -12,10 +12,16 @@ Alternatively, if you already have an elastic cluster that you'd like to use, yo
 The setup script has been tested on Ubuntu 18.10:
 
 ```
-$ sudo ./setup-server.sh
+$ sudo ./setup-server.sh prod
 ```
 
 If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natlas-server `. You can also run the complete stack by running ` docker-compose up -d `. Note: This method is only suggested for a Development Environment.
+
+Alternatively, you could setup a development environment with the setup-server.sh script. The main difference here is that in development, we don't setup a natlas user, chown the files to natlas:natlas, or do a webpack production build. Later on, this will also include setting up things like linting and testing that are not needed for prod but are for dev.
+
+```
+$ sudo ./setup-server.sh dev
+```
 
 
 ## The Config
@@ -104,6 +110,12 @@ $ python3 add-user.py --admin user@example.com
 Starting the server is easy and can pretty much be handled entirely by the `run-server.sh` script. Simply navigate to the natlas-server folder (where this readme is) and `./run-server.sh`. This will start the flask application in your terminal, listening on localhost on port 5000. If you really want, you could change this to listen on a specific IP address on another port, but it is encouraged that you add nginx in front of your flask application.
 
 Furthermore, you might think it's mighty inconvenient that the flask application is running in your terminal and now you can't close the terminal without shutting down the server. You can remediate this with a systemd unit (an example one is provided), or by simply launching the server inside a `screen` session.
+
+When running in development, you will want to run webpack as a development server to monitor for changes to assets.
+
+```
+$ yarn run webpack --mode development --watch
+```
 
 
 ## NGINX as a Reverse Proxy

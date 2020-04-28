@@ -1,5 +1,17 @@
 version: "2"
 plugins:
+  eslint:
+    enabled: true
+    channel: eslint-6
+    config:
+      config: ./natlas-server/.eslintrc.yml
+  scss-lint:
+    enabled: true
+    checks:
+      Comment:
+        enabled: false
+      LeadingZero:
+        enabled: false
   pep8:
     enabled: true
     checks:
@@ -13,7 +25,7 @@ plugins:
         enabled: false
     exclude_patterns:
     # machine generated, duplication likely
-    - "natlas-server/migrations/versions/" 
+    - "natlas-server/migrations/versions/"
   radon:
     enabled: true
     config:
@@ -32,4 +44,4 @@ plugins:
           python_version: 3
     exclude_patterns:
     # machine generated, duplication likely
-    - "natlas-server/migrations/versions/" 
+    - "natlas-server/migrations/versions/"

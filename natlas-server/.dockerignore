@@ -6,6 +6,7 @@ elastic-snapshot.py
 *.md
 .dockerignore
 Dockerfile
+.eslintrc
 
 # Dev Environment
 .env

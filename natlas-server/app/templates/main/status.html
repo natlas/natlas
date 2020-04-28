@@ -3,26 +3,6 @@
 {% set title = "Status" %}
 
 {% block content %}
-<script>
-	fetch('/api/status', {
-		credentials: 'same-origin'
-	})
-	.then((response) => {
-		return response.json()
-	})
-	.then((data) => {
-		console.log(data)
-		var progbar = document.getElementById("cycle_status")
-		var width = (data['scans_this_cycle'] / data['effective_scope_size']) * 100;
-		progbar.setAttribute('aria-valuenow', width);
-		progbar.setAttribute('style', 'width:' + width + "%;");
-		const entries = Object.entries(data);
-		for (const [key, val] of entries) {
-			document.getElementById(key).innerText = val
-		}
-		document.getElementById('prog_percent').innerText = Math.round(width)+"%";
-	})
-</script>
 	<h2>System Status</h2>
 	<div class="progress mb-4">
 		<div id="cycle_status" class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>

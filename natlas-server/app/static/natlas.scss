@@ -1,61 +1,79 @@
 /*
 * Natlas custom styles
-* Really needs to be organized and minified
+* Really needs to be organized
 *
 */
+@import '~@fortawesome/fontawesome-free/css/fontawesome.css';
+@import '~@fortawesome/fontawesome-free/css/solid.css';
+@import '~bootstrap/dist/css/bootstrap.css';
+@import '~datatables.net-bs4/css/dataTables.bootstrap4.css';
+
+$natlas-pink: #ed1e79;
+$natlas-purple: #620ee1;
+$natlas-blue: #0b59bd;
+$natlas-soft-blue: #0064b7;
+$white: #fff;
+$off-white: #f1f1f1;
+$green: #008000;
+$red: #f00;
 
 .natlas-pink {
-  color:#ed1e79;
+  color: $natlas-pink;
 }
 
 .natlas-purple {
-  color:#620ee1;
+  color: $natlas-purple;
 }
 
 .natlas-blue {
-  color:#0b59bd;
+  color: $natlas-blue;
 }
 
 .natlas-soft-blue {
-  color:#0064b7;
+  color: $natlas-soft-blue;
 }
-
 
 html {
-  height:100%;
   box-sizing: border-box;
+  height: 100%;
 }
-*, *:before, *:after {
+
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
+
 body {
-  position:relative;
-  min-height:100%;
-  background-color:#f1f1f1;
+  position: relative;
+  min-height: 100%;
+  background-color: $off-white;
 }
-.main-content{
-  padding-top:100px;
-  padding-bottom:100px;
+
+.main-content {
+  padding-bottom: 100px;
+  padding-top: 100px;
 }
 
 /*
  * Global add-ons
  */
-
 .search-header {
   border-bottom: 1px solid #eee;
 }
+
 .pagenav {
-  display:inline-block;
+  display: inline-block;
 }
 
 .natlas-logo {
-  max-height:50px;
-  height:100%;
+  max-height: 50px;
+  height: 100%;
 }
+
 .natlas-name {
-  max-height:32px;
-  height:100%;
+  height: 100%;
+  max-height: 32px;
 }
 
 /*
@@ -63,85 +81,96 @@ body {
  */
 .global-footer {
   position: absolute;
-  right:0;
-  bottom:0;
-  left:0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   padding: 1rem;
-  text-align:left;
-  margin-top:100px;
-  color:#99979c;
-  background-color:#222;
+  text-align: left;
+  margin-top: 100px;
+  color: #99979c;
+  background-color: #222;
 }
+
 .footer-links {
-  padding-left:0;
-  margin-bottom:0;
+  padding-left: 0;
+  margin-bottom: 0;
 }
+
 .footer-links li {
-  display:inline-block;
-  margin-left:3em;
+  display: inline-block;
+  margin-left: 3em;
 }
+
 .footer-links li:first-child {
-  margin-left:0em;
+  margin-left: 0;
 }
+
 .footer-links a {
-  color: #fff;
+  color: $white;
 }
+
 .version-string a {
   color: #99979c;
 }
+
 /*
  * Main content
  */
 
 .nmap_data {
-  background-color:rgba(0,0,0,0.05);
-  border-radius:10px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
   font-size: 75%;
 }
+
 .preview_nmap {
-  background-color:rgba(0,0,0,0.75);
-  text-align:center;
-  line-height:2em;
-  margin-top:-1em;
-  color:#fff;
+  background-color: rgba(0, 0, 0, 0.75);
+  text-align: center;
+  line-height: 2em;
+  margin-top: -1em;
+  color: $white;
 }
+
 .preview_nmap:hover {
-  background-color:rgba(0,0,0,1);
+  background-color: rgba(0, 0, 0, 1);
 }
-a.preview_link, a:hover.preview_link {
-  color:#fff;
-  display:block;
+
+a.preview_link,
+a:hover.preview_link {
+  color: $white;
+  display: block;
 }
 
 .messages {
-  margin-top:1em;
+  margin-top: 1em;
 }
 
 .register-link {
-  margin-top:1em;
+  margin-top: 1em;
 }
 
 .host-nav {
-  margin-bottom:1em;
+  margin-bottom: 1em;
 }
 
-.table-striped>tbody>tr:first-child>td {
-  border-top:none;
+.table-striped > tbody > tr:first-child > td {
+  border-top: 0;
 }
 
 .host-headshot {
-  max-width:100%;
+  max-width: 100%;
 }
+
 .headshot-header {
-  border-bottom:1px solid #cfcfcf;
+  border-bottom: 1px solid #cfcfcf;
 }
 
 .green {
-  color:green;
+  color: $green;
 }
 
 .red {
-  color:red;
+  color: $red;
 }
 
 div.expand-img {
@@ -149,41 +178,48 @@ div.expand-img {
 }
 
 .imagetitle {
-  display:inline;
+  display: inline;
 }
+
 .date-submitted {
-  font-size: .75rem;
+  font-size: 0.75rem;
 }
+
 .port-str {
-  font-size: .85rem;
+  font-size: 0.85rem;
 }
+
 .host-hostname {
-  font-size: .85rem;
+  font-size: 0.85rem;
 }
-.host-export>button {
-  font-size: .85rem;
+
+.host-export > button {
+  font-size: 0.85rem;
 }
-@media only screen and (min-width:1000px) {
+
+@media only screen and (min-width: 1000px) {
   .modal-dialog {
     width: 1000px;
   }
 }
 
-@media only screen and (min-width:1200px) {
+@media only screen and (min-width: 1200px) {
   .modal-dialog {
     width: 1170px;
   }
 }
 
 label.config-form {
-  margin-top:4px;
+  margin-top: 4px;
 }
-form.config-form>div, form.pwchange-form>div {
-  margin-top:1em;
+
+form.config-form > div,
+form.pwchange-form > div {
+  margin-top: 1em;
 }
 
 .services-box {
-  max-height:20em;
+  max-height: 20;
 }
 
 .host-row:first-of-type {
@@ -206,7 +242,7 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .host-header-date {
-  font-size:50%;
+  font-size: 50%;
 }
 
 .nmap_history {
@@ -215,18 +251,18 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .export-group {
-  display:block;
+  display: block;
 }
 
 .btn-trash {
-  background:none;
-  border:none;
-  padding:0;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .inline-submit {
-  display:inline-block;
-  margin:0;
+  display: inline-block;
+  margin: 0;
 }
 
 .script-id {
@@ -238,32 +274,32 @@ form.config-form>div, form.pwchange-form>div {
 }
 
 .port-row {
-  border-bottom:1px solid #d6d6d6;
+  border-bottom: 1px solid #d6d6d6;
 }
 
 .port-summary {
-  text-align:center;
+  text-align: center;
 }
 
 .port-number {
-  background-color: #36978D;
-  color: white;
+  background-color: #36978d;
+  color: $white;
   border-top-left-radius: 10px;
   width: 50%;
   float: left;
 }
 
 .port-protocol {
-  background-color: #62A9E3;
-  color: white;
+  background-color: #62a9e3;
+  color: $white;
   border-top-right-radius: 10px;
   width: 50%;
-  float:left;
+  float: left;
 }
 
 .port-service {
-  background-color: #2B2D33;
-  color: white;
+  background-color: #2b2d33;
+  color: $white;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
@@ -273,72 +309,78 @@ form.config-form>div, form.pwchange-form>div {
   border-radius: 10px;
   margin-top: 0.75rem;
 }
-.port-link>a {
-  color:white;
+
+.port-link > a {
+  color: $white;
 }
 
 .service-header {
-  border-bottom:1px dotted #e3e3e3;
+  border-bottom: 1px dotted #e3e3e3;
 }
+
 .service-version {
-  font-size:0.95rem;
+  font-size: 0.95rem;
 }
+
 .service-extrainfo {
-  font-size:0.7rem;
+  font-size: 0.7rem;
 }
 
 .vert-flex-mid {
-  display:flex;
-  justify-content:center;
-  flex-direction:column;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 a > .badge-tag {
-  color:white;
+  color: $white;
 }
 
 .dropright .dropdown-no-arrow::after {
-  display:none;
+  display: none;
 }
 
 .showtoken {
-  color:#777 !important;
-}
-.showtoken:hover {
-  color:#111 !important;
+  color: #777 !important;
 }
 
+.showtoken:hover {
+  color: #111 !important;
+}
 
 .github-corner:hover .octo-arm {
-  animation:octocat-wave 560ms ease-in-out;
+  animation: octocat-wave 560ms ease-in-out;
 }
 
-@keyframes octocat-wave{
-  0%,100% {
-    transform:rotate(0)
-    }
-    20%,60% {
-      transform:rotate(-25deg)
-    }
-    40%,80% {
-      transform:rotate(10deg)
-    }
+@keyframes octocat-wave {
+  0%,
+  100% {
+    transform: rotate(0);
   }
+  20%,
+  60% {
+    transform: rotate(-25deg);
+  }
+  40%,
+  80% {
+    transform: rotate(10deg);
+  }
+}
 
-@media (max-width:500px) {
+@media (max-width: 500px) {
   .github-corner:hover .octo-arm {
-    animation:none
+    animation: none;
   }
+
   .github-corner .octo-arm {
-    animation:octocat-wave 560ms ease-in-out
+    animation: octocat-wave 560ms ease-in-out;
   }
 }
-
 
 #backtotop {
   display: inline-block;
   color: #ed1e79;
-  font-size:2em;
+  font-size: 2em;
   text-align: center;
   border-radius: 4px;
   margin: 5px;
@@ -346,15 +388,16 @@ a > .badge-tag {
   bottom: 5px;
   right: 5px;
   z-index: 1000;
-  transition: color .3s
-    opacity .5s, visibility .5s;
+  transition: color 0.3s opacity 0.5s, visibility 0.5s;
   opacity: 0;
   visibility: hidden;
 }
+
 #backtotop:hover {
   cursor: pointer;
   color: #620ee1;
 }
+
 #backtotop:active {
   color: #ed1e79;
 }
@@ -365,8 +408,8 @@ a > .badge-tag {
 }
 
 button.check-update {
-  font-size:.9rem;
-  font-weight:bold;
+  font-size: 0.9rem;
+  font-weight: bold;
 }
 
 .image-browser {
@@ -377,7 +420,7 @@ button.check-update {
 .image-browser > img {
   opacity: 1;
   display: block;
-  transition: .3s;
+  transition: 0.3s;
   backface-visibility: hidden;
 }
 
@@ -390,7 +433,7 @@ button.check-update {
 }
 
 .thumbnail-hover {
-  transition: .3s;
+  transition: 0.3s;
   opacity: 0;
   position: absolute;
   top: 50%;

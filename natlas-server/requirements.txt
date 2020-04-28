@@ -36,3 +36,4 @@ sympy==1.4
 urllib3==1.24.2
 Werkzeug==0.15.3
 WTForms==2.2.1
+webpack-manifest==2.1.1

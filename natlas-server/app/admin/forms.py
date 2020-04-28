@@ -10,7 +10,6 @@ class ConfigForm(FlaskForm):
 	login_required = BooleanField('Login Required')
 	register_allowed = BooleanField('Registration Allowed')
 	agent_authentication = BooleanField('Agent Authentication Required')
-	local_subresources = BooleanField('Use Local Subresources (instead of CDN)')
 	custom_brand = StringField('Custom Branding')
 	mail_from = StringField("From Address", validators=[Email(), Optional()])
 	mail_server = StringField("Mail Server")

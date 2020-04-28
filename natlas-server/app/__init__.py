@@ -6,6 +6,7 @@ from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from config import Config, populate_defaults, get_defaults
 from app.elastic import ElasticInterface
+from webpack_manifest import webpack_manifest
 import os
 import hashlib
 from .instrumentation import initialize_opencensus
@@ -50,6 +51,13 @@ def create_app(config_class=Config, load_config=False):
 	login.init_app(app)
 	mail.init_app(app)
 	csrf.init_app(app)
+	app.config['webpack'] = webpack_manifest.load(
+		# An absolute path to a manifest file
+		path=os.path.join(app.config['BASEDIR'], 'app', 'static', 'dist', 'webpack_manifest.json'),
+
+		# The root url that your static assets are served from
+		static_url='/static/',
+	)
 
 	if load_config:
 		print("Loading Config from database")
