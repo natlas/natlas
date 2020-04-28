@@ -2,7 +2,7 @@ import $ from 'jquery';
 import dataTable from 'datatables.net-bs4'; // TODO: Switch to a NPM native
 
 import { isNewerVersionAvailable } from './util/version-check';
-import { updateStatus } from './util/system-status';
+import { initializeStatusUpdates } from './util/system-status';
 import { registerTagModalEvents } from './controls/natlas-tagging';
 import { registerAgentEvents } from './controls/user-profile';
 import 'natlas.scss';
@@ -109,12 +109,6 @@ $(document).ready(function() {
 	}
 });
 
-$(document).ready(function() {
-	if (document.getElementById('cycle_status')) {
-		updateStatus();
-	}
-});
-
-
 registerTagModalEvents();
 registerAgentEvents();
+initializeStatusUpdates();
