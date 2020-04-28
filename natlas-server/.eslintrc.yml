@@ -87,9 +87,6 @@ rules:
     - error
     - never
 
-  import/no-unused-modules:
-  - error
-  - unusedExports: true
   import/no-extraneous-dependencies: error
   import/no-useless-path-segments: error
   import/order: error

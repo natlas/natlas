@@ -4,7 +4,9 @@ plugins:
     enabled: true
     channel: eslint-6
     config:
-      config: natlas-server/.eslintrc.yml
+      config: ./natlas-server/.eslintrc.yml
+  scss-lint:
+    enabled: true
   pep8:
     enabled: true
     checks:
