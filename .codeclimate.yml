@@ -7,6 +7,11 @@ plugins:
       config: ./natlas-server/.eslintrc.yml
   scss-lint:
     enabled: true
+    checks:
+      Comment:
+        enabled: false
+      LeadingZero:
+        enabled: false
   pep8:
     enabled: true
     checks:
