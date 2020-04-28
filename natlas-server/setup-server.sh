@@ -85,10 +85,13 @@ else
 fi
 
 echo "[+] Installing yarn dependencies"
-yarn --no-progress
+yarn install --no-progress --frozen-lockfile
 if [ "$SETUP_ENV" == "prod" ]; then
 	echo "[+] Building assets for production"
 	yarn run webpack --mode production
+elif [ "$SETUP_ENV" == "dev" ]; then
+	echo "[+] Building assets for production"
+	yarn run webpack --mode development
 fi
 
 if ! which pip3 >/dev/null; then
@@ -158,6 +161,11 @@ fi
 if [ "$SETUP_ENV" == "prod" ]; then
 	echo "[+] Giving natlas user ownership of all project files"
 	chown -R natlas:natlas "$BASEDIR"
+elif [ "$SETUP_ENV" == "dev" ]; then
+	echo "[+] Giving current user ownership of all project files"
+	if [ ! -z "$SUDO_USER" ]; then
+		chown -R "$SUDO_USER":"$SUDO_USER" "$BASEDIR"
+	fi
 fi
 
 echo "[+] Setup Complete"
