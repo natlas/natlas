@@ -14,9 +14,9 @@ const config = {
 				}
 			},
 			{
+				exclude: /node_modules/,
 				test: /\.ts$/,
-				use: 'ts-loader',
-				exclude: /node_modules/
+				use: 'ts-loader'
 			},
 			{
 				test: /\.(sass|scss|css)$/,
@@ -34,16 +34,9 @@ const config = {
 			}
 		]
 	},
-	resolve: {
-		extensions: ['.ts', '.js'],
-		modules: [
-			'static',
-			'node_modules'
-		]
-	},
 	output: {
-		path: path.resolve(assetRootPath, 'dist'),
-		filename: '[name].js'
+		filename: '[name].js',
+		path: path.resolve(assetRootPath, 'dist')
 	},
 	plugins: [
 		new MiniCssExtractPlugin(),
@@ -51,7 +44,14 @@ const config = {
 			manifestPath: path.resolve(assetRootPath, 'dist', 'webpack_manifest.json'),
 			outputRoot: assetRootPath
 		})
-	]
+	],
+	resolve: {
+		extensions: ['.ts', '.js'],
+		modules: [
+			'static',
+			'node_modules'
+		]
+	}
 };
 
 module.exports = config;
