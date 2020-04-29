@@ -1,3 +1,7 @@
+import makeAuthXhrCall from './xhr';
+
+const statusApiURL = '/api/status';
+
 type StatusUpdateResult = {
 	completed_cycles: number;
 	cycle_start_time: string | null;
@@ -7,13 +11,12 @@ type StatusUpdateResult = {
 	avg_cycle_duration: string | null;
 };
 
+function fetchStatusUpdate(): Promise<StatusUpdateResult> {
+	return makeAuthXhrCall<StatusUpdateResult>(statusApiURL);
+}
+
 function updateStatus(): void {
-	fetch('/api/status', {
-		credentials: 'same-origin',
-	})
-	.then((response) => {
-		return response.json();
-	})
+	fetchStatusUpdate()
 	.then((data: StatusUpdateResult) => {
 		const progbar = document.getElementById('cycle_status');
 		const progbg = document.getElementById('cycle_status_overlay');
