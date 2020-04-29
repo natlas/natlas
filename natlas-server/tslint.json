@@ -16,7 +16,11 @@
                 "timeEnd",
                 "trace"
             ]
-        }
+        },
+        "indent": [true, "tabs", 2],
+        "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+        "arrow-parens": true,
+        "trailing-comma": true
     },
     "rulesDirectory": []
 }

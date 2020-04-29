@@ -4,8 +4,8 @@ function setModalDetails(modal: any, title: string, action: string, agentName: s
 	modal.find('.modal-title').text(title);
 	modal.find('#agentNameForm').attr('action', action);
 	modal.find('#change_name').text(submitLabel);
-	if (agentName !== "") {
-		modal.find("#agent_name").attr('placeholder', agentName);
+	if (agentName !== '') {
+		modal.find('#agent_name').attr('placeholder', agentName);
 	}
 }
 
@@ -18,12 +18,12 @@ function onModalShow(event: JQueryEventObject): void {
 	if (formaction === 'changename') {
 		setModalDetails(modal, `Change Name of ${agentid}`, `/user/agent/${agentid}/newName`, agentname, 'Change Name');
 	} else if (formaction === 'newagent') {
-		setModalDetails(modal, 'New Agent', '/user/agent/newAgent', "", 'New Agent');
+		setModalDetails(modal, 'New Agent', '/user/agent/newAgent', '', 'New Agent');
 	}
 }
 
 function showToken(event: JQueryEventObject): void {
-	const tokentarget = event.target.id.split("-")[1];
+	const tokentarget = event.target.id.split('-')[1];
 	$(event.target).hide();
 	$(`#showtokenwrapper-${tokentarget}`).hide();
 	$('#tokenval-' + tokentarget).show();

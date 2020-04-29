@@ -175,7 +175,7 @@ def natlasServices():
 def status():
 	last_cycle_start = current_app.ScopeManager.get_last_cycle_start()
 	completed_cycles = current_app.ScopeManager.get_completed_cycle_count()
-	avg_cycle_time = "N/A"
+	avg_cycle_time = None
 	if last_cycle_start:
 		scans_this_cycle = current_app.elastic.count_scans_since(last_cycle_start)
 		if completed_cycles > 0:

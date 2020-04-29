@@ -11,28 +11,28 @@ function onModalShow(event: JQueryEventObject): void {
 	const scopeid = button.data('scopeid'); // Extract info from data-* attributes
 	const scopetarget = button.data('scopetarget'); // Extract info from data-* attributes
 	const tagaction = button.data('action');
-	const tagstr = $('#scopeTags-'+scopeid).text().trim(); // Trim whitespace in jinja formatting leaves whitespace
+	const tagstr = $(`#scopeTags-${scopeid}`).text().trim(); // Trim whitespace in jinja formatting leaves whitespace
 	const tags = tagstr.split(', ');
 	const modal = $(this);
-	$("select[name='tagname']").val("");
+	$("select[name='tagname']").val('');
 	if (tagaction === 'add') {
-		setModalDetails(modal, 'Add tag to ' + scopetarget, "/admin/scope/"+scopeid+"/tag", 'Add Tag');
+		setModalDetails(modal, `Add tag to ${scopetarget}`, `/admin/scope/${scopeid}/tag`, 'Add Tag');
 		if (tagstr !== '') {
 			for (const item of tags) {
-				$("option[value=\"" + item.trim() + "\"]").attr({'hidden': '', 'disabled': ''});
+				$('option[value="' + item.trim() + '"]').attr({hidden: '', disabled: ''});
 			}
 		}
 	} else {
-		setModalDetails(modal, 'Remove tag from ' + scopetarget, "/admin/scope/" + scopeid + "/untag", 'Remove Tag');
+		setModalDetails(modal, `Remove tag from ${scopetarget}`, `/admin/scope/${scopeid}/untag`, 'Remove Tag');
 
 		// Set all options to hidden & disabled by default
 		$("select[name='tagname'] > option").each(function() {
-			$(this).attr({'hidden': '', 'disabled': ''});
+			$(this).attr({hidden: '', disabled: ''});
 		});
 
 		// Enable options that are relevant
 		for (const item of tags) {
-			$("option[value=\"" + item.trim() + "\"]").removeAttr('hidden disabled');
+			$('option[value="' + item.trim() + '"]').removeAttr('hidden disabled');
 		}
 	}
 }

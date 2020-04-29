@@ -7,6 +7,7 @@
 @import '~@fortawesome/fontawesome-free/css/solid.css';
 @import '~bootstrap/dist/css/bootstrap.css';
 @import '~datatables.net-bs4/css/dataTables.bootstrap4.css';
+@import 'css/status-page.scss';
 
 $natlas-pink: #ed1e79;
 $natlas-purple: #620ee1;
@@ -443,38 +444,4 @@ button.check-update {
   text-align: center;
   font-weight: bolder;
   color: #000;
-}
-
-.statusbar {
-  height: 2rem;
-}
-
-.statusbar-content {
-  font-size: 1.25rem;
-  height: 2rem;
-  line-height: 2rem;
-}
-
-#cycle_status_overlay {
-  display: flex !important;
-}
-
-#progbarbg:hover #cycle_status_overlay {
-  display: none !important;
-}
-
-#cycle_status_overlay_exact {
-  display: none !important;
-}
-
-#progbarbg:hover #cycle_status_overlay_exact {
-  display: flex !important;
-}
-
-#scans_this_cycle {
-  padding-right: 0.5rem;
-}
-
-#effective_scope_size {
-  padding-left: 0.5rem;
 }
