@@ -9,25 +9,17 @@
 }
 
 #cycle_status_overlay {
-	display: flex !important;
+	display: flex;
 }
 
 #progbarbg:hover #cycle_status_overlay {
-	display: none !important;
+	display: none;
 }
 
 #cycle_status_overlay_exact {
-	display: none !important;
+	display: none;
 }
 
 #progbarbg:hover #cycle_status_overlay_exact {
-	display: flex !important;
-}
-
-#scans_this_cycle {
-	padding-right: 0.5rem;
-}
-
-#effective_scope_size {
-	padding-left: 0.5rem;
+	display: flex;
 }
