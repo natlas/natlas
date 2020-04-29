@@ -4,7 +4,8 @@
 		"bootstrap": "^4.4.1",
 		"datatables.net-bs4": "^1.10.20",
 		"jquery": "^3.4.1",
-		"popper.js": "^1.16.0"
+		"popper.js": "^1.16.0",
+		"tslint": "^6.1.2"
 	},
 	"devDependencies": {
 		"@types/jquery": "^3.3.35",

@@ -1,7 +1,7 @@
 import makeXhrCall from './xhr';
 
 const updateURL = "https://api.github.com/repos/natlas/natlas/releases/latest";
-const downloadUrl = "https://github.com/natlas/natlas/releases/latest";
+const downloadURL = "https://github.com/natlas/natlas/releases/latest";
 
 type GithubReleases = {
 	tag_name: string
@@ -10,11 +10,11 @@ type GithubReleases = {
 class UpdateCheckResult {
 	constructor(private isNewerAvailable: boolean, private downloadUrl: string, private version: string) {
 	}
-};
+}
 
 // Not ideal. We should pack this into the bundle instead
 function thisVersion(): string {
-	return document.getElementById('natlasVersion').innerText
+	return document.getElementById('natlasVersion').innerText;
 }
 
 function extractVersion(result: GithubReleases): string {
@@ -28,5 +28,5 @@ function getLatestVersion(): Promise<string> {
 
 export function isNewerVersionAvailable(): Promise<UpdateCheckResult> {
 	return getLatestVersion()
-		.then(latestVersion => new UpdateCheckResult(latestVersion != thisVersion(), downloadUrl, latestVersion));
+		.then(latestVersion => new UpdateCheckResult(latestVersion !== thisVersion(), downloadURL, latestVersion));
 }
