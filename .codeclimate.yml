@@ -10,6 +10,7 @@ plugins:
       config: ./natlas-server/tslint.json
   scss-lint:
     enabled: true
+    config: ./natlas-server/.scss-lint.yml
     checks:
       Comment:
         enabled: false
