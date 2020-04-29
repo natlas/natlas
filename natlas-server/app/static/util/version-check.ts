@@ -3,12 +3,12 @@ import makeXhrCall from './xhr';
 const updateURL = 'https://api.github.com/repos/natlas/natlas/releases/latest';
 const downloadURL = 'https://github.com/natlas/natlas/releases/latest';
 
-type GithubReleases = {
-	tag_name: string
-};
+interface GithubReleases {
+	tag_name: string;
+}
 
 class UpdateCheckResult {
-	constructor(private isNewerAvailable: boolean, private download: string, private version: string) {
+	constructor(private isNewerAvailable: boolean, private downloadUrl: string, private version: string) {
 	}
 }
 

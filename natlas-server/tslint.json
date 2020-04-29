@@ -34,7 +34,8 @@
             "check-type-operator",
             "check-preblock",
             "check-postbrace"
-        ]
+        ],
+        "interface-name": false
     },
     "rulesDirectory": []
 }

@@ -53,7 +53,7 @@ $(document).ready(function() {
 				let params;
 				if (result.isNewerAvailable) {
 					params = {
-						content: `Update found: <a href=\\"${result.download}\\">${result.version}</a>`,
+						content: `Update found: <a href="${result.downloadUrl}">${result.version}</a>`,
 						html: true
 					};
 				} else {

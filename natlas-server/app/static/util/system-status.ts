@@ -2,14 +2,14 @@ import makeAuthXhrCall from './xhr';
 
 const statusApiURL = '/api/status';
 
-type StatusUpdateResult = {
+interface StatusUpdateResult {
 	completed_cycles: number;
 	cycle_start_time: string | null;
 	effective_scope_size: number;
 	natlas_start_time: string;
 	scans_this_cycle: number;
 	avg_cycle_duration: string | null;
-};
+}
 
 function fetchStatusUpdate(): Promise<StatusUpdateResult> {
 	return makeAuthXhrCall<StatusUpdateResult>(statusApiURL);
