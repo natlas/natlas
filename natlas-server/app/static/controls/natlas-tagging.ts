@@ -19,7 +19,7 @@ function onModalShow(event: JQueryEventObject): void {
 		setModalDetails(modal, `Add tag to ${scopetarget}`, `/admin/scope/${scopeid}/tag`, 'Add Tag');
 		if (tagstr !== '') {
 			for (const item of tags) {
-				$('option[value="' + item.trim() + '"]').attr({hidden: '', disabled: ''});
+				$('option[value="' + item.trim() + '"]').attr({ hidden: '', disabled: ''});
 			}
 		}
 	} else {
@@ -27,7 +27,7 @@ function onModalShow(event: JQueryEventObject): void {
 
 		// Set all options to hidden & disabled by default
 		$("select[name='tagname'] > option").each(function() {
-			$(this).attr({hidden: '', disabled: ''});
+			$(this).attr({ hidden: '', disabled: ''});
 		});
 
 		// Enable options that are relevant

@@ -20,7 +20,21 @@
         "indent": [true, "tabs", 2],
         "quotemark": [true, "single", "avoid-escape", "avoid-template"],
         "arrow-parens": true,
-        "trailing-comma": true
+        "trailing-comma": true,
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-module",
+            "check-separator",
+            "check-rest-spread",
+            "check-type",
+            "check-typecast",
+            "check-type-operator",
+            "check-preblock",
+            "check-postbrace"
+        ]
     },
     "rulesDirectory": []
 }
