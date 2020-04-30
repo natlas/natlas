@@ -146,7 +146,7 @@ class ScopeManager():
 
 	def get_last_cycle_start(self):
 		if self.scanmanager is None:
-			return False
+			return None
 		else:
 			return self.scanmanager.rng.cycle_start_time
 

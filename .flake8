@@ -12,4 +12,6 @@ exclude =
 	# Ignore dependencies in virtual environments
 	venv,
 	# Ignore migrations as they are mostly auto-generated
-	migrations
+	migrations,
+	# Ignore node_modules for local dev testing
+	node_modules

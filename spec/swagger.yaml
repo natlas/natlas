@@ -91,7 +91,7 @@ paths:
       responses:
         '200':
           description:
-            "The server was able to parse the response and handled it accordingly."
+            "The server was able to parse the request and handled it accordingly."
           schema:
             $ref: '#/definitions/StatusResponse'
 definitions:
@@ -339,6 +339,7 @@ definitions:
           "The number of scan cycles natlas has completed since it was last started"
       cycle_start_time:
         type: string
+        nullable: true
         format: date-time
         description:
           "The timestamp at which the current scan cycle started"
@@ -361,3 +362,9 @@ definitions:
         example: 13
         description:
           "The number of scans that have been submitted with a scan_start time newer than cycle_start_time"
+      avg_cycle_duration:
+        type: string
+        nullable: true
+        example: "13d, 14h, 15m, 16s"
+        description:
+          "A human readable string measuring the average duration per completed scan cycle"

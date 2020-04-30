@@ -5,8 +5,12 @@ plugins:
     channel: eslint-6
     config:
       config: ./natlas-server/.eslintrc.yml
+  tslint:
+      enabled: true
+      config: ./natlas-server/tslint.json
   scss-lint:
     enabled: true
+    config: ./natlas-server/.scss-lint.yml
     checks:
       Comment:
         enabled: false
