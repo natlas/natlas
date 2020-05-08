@@ -2,7 +2,7 @@
 
 ## Installing Elasticsearch
 
-Natlas uses Elasticsearch 6.6 to store all of the scan results. If you want to run Elasticsearch locally on your natlas-server, simply run the `./setup-elastic.sh` script.
+Natlas uses Elasticsearch 7 to store all of the scan results. If you want to run Elasticsearch locally on your natlas-server, simply run the `./setup-elastic.sh` script.
 
 Alternatively, if you already have an elastic cluster that you'd like to use, you can add it to the `.env` file with the name `ELASTICSEARCH_URL`.
 
