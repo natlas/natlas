@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TARGETVER="7.6.0"
-ELASTICDOWNLOAD="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${TARGETVER}.deb"
+TARGETVER="7.6.2"
+ELASTICDOWNLOAD="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${TARGETVER}-amd64.deb"
 
 if [[ "$EUID" -ne 0 ]]; then
 	echo "[!] This script needs elevated permissions to run."
