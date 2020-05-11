@@ -6,6 +6,7 @@ from datetime import datetime
 import logging
 from opencensus.trace import execution_context
 from opencensus.trace import span as span_module
+import semver
 
 
 class ElasticClient:
@@ -26,8 +27,8 @@ class ElasticClient:
 			self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
 			self.status = self._ping()
 			if self.status:
-				self.esversion = self.es.info()['version']['number']
-				self.logger.info("Elastic Version: " + self.esversion)
+				self.esversion = semver.VersionInfo.parse(self.es.info()['version']['number'])
+				self.logger.info("Elastic Version: " + str(self.esversion))
 
 				self._initialize_indices()
 				self.logger.info("Initialized Elasticsearch indices")
@@ -49,7 +50,7 @@ class ElasticClient:
 		time.sleep(2)
 
 		for index in self.natlasIndices:
-			if int(self.esversion.split(".")[0]) >= 7:
+			if self.esversion.match(">=7.0.0"):
 				self.es.indices.put_mapping(index=index, doc_type='_doc', body=self.mapping, include_type_name=True)
 			else:
 				self.es.indices.put_mapping(index=index, doc_type='_doc', body=self.mapping)
