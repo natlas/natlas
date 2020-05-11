@@ -8,6 +8,7 @@ if [[ "$EUID" -ne 0 ]]; then
 	exit 2
 fi
 
+# Install Java when not installed for Elastic < 7
 if ! which java >/dev/null && [ ${TARGETVER%%.*} -lt 7 ]; then
 	echo "[+] Installing java: apt-get install -y default-jre"
 	apt-get update && apt-get install -y default-jre
