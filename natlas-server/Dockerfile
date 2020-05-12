@@ -5,7 +5,6 @@ COPY ["package.json", "yarn.lock", "/app/"]
 RUN yarn --no-progress --frozen-lockfile --non-interactive
 COPY . /app
 RUN yarn run webpack --mode production
-RUN rm -rf static/{css,js}
 
 FROM python:3.7.5 as build
 
@@ -18,7 +17,7 @@ RUN pip3 --disable-pip-version-check --no-cache-dir install --no-warn-script-loc
 COPY . /opt/natlas/natlas-server
 
 # Prepare assets
-COPY --from=webpack /app/app/static/dist static/dist
+COPY --from=webpack /app/app/static/dist app/static/dist
 
 RUN python3 -m compileall .
 
