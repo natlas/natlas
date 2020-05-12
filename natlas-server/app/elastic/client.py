@@ -1,10 +1,12 @@
 import json
 from config import Config
 import elasticsearch
+import time
 from datetime import datetime
 import logging
 from opencensus.trace import execution_context
 from opencensus.trace import span as span_module
+import semver
 
 
 class ElasticClient:
@@ -25,7 +27,11 @@ class ElasticClient:
 			self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
 			self.status = self._ping()
 			if self.status:
+				self.esversion = semver.VersionInfo.parse(self.es.info()['version']['number'])
+				self.logger.info("Elastic Version: " + str(self.esversion))
+
 				self._initialize_indices()
+				self.logger.info("Initialized Elasticsearch indices")
 		except Exception:
 			self.status = False
 			raise
@@ -38,7 +44,16 @@ class ElasticClient:
 		''' Check each required index and make sure it exists, if it doesn't then create it '''
 		for index in self.natlasIndices:
 			if not self.es.indices.exists(index):
-				self.es.indices.create(index, body=self.mapping)
+				self.es.indices.create(index)
+
+		# Avoid a race condition
+		time.sleep(2)
+
+		for index in self.natlasIndices:
+			if self.esversion.match(">=7.0.0"):
+				self.es.indices.put_mapping(index=index, doc_type='_doc', body=self.mapping, include_type_name=True)
+			else:
+				self.es.indices.put_mapping(index=index, doc_type='_doc', body=self.mapping)
 
 	def _ping(self):
 		''' Returns True if the cluster is up, False otherwise'''
@@ -83,7 +98,7 @@ class ElasticClient:
 	def execute_search(self, **kwargs):
 		''' Execute an arbitrary search.'''
 		with self._new_trace_span(operation='search', **kwargs) as span:
-			results = self._execute_raw_query(self.es.search, doc_type='_doc', **kwargs)
+			results = self._execute_raw_query(self.es.search, doc_type='_doc', rest_total_hits_as_int=True, **kwargs)
 			span.add_attribute('es.hits.total', results['hits']['total'])
 			self._attach_shard_span_attrs(span, results)
 			return results

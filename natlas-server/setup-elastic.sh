@@ -1,14 +1,15 @@
 #!/bin/bash
 
-TARGETVER="6.6.0"
-ELASTICDOWNLOAD='https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.6.0.deb'
+TARGETVER="7.6.2"
+ELASTICDOWNLOAD="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${TARGETVER}-amd64.deb"
 
 if [[ "$EUID" -ne 0 ]]; then
 	echo "[!] This script needs elevated permissions to run."
 	exit 2
 fi
 
-if ! which java >/dev/null; then
+# Install Java when not installed for Elastic < 7
+if ! which java >/dev/null && [ ${TARGETVER%%.*} -lt 7 ]; then
 	echo "[+] Installing java: apt-get install -y default-jre"
 	apt-get update && apt-get install -y default-jre
 	if ! which java >/dev/null; then
