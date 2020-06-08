@@ -1,0 +1,724 @@
+# TODO
+# - User apis
+# - Admin apis
+#
+
+openapi: 3.0.0
+info:
+  version: "1"
+  title: Natlas API
+  description: Specification for natlas server APIs
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+- url: /{basePath}
+  description: This API Server
+  variables:
+    basePath:
+      default: api
+paths:
+  /agent/enroll:
+    post:
+      tags:
+        - agent
+      operationId: agent.enroll
+      parameters:
+        - in: query
+          name: enrollment_token
+          schema:
+            type: string
+      security:
+        - api_key: []
+      responses:
+        "200":
+          description: Associate this agent with a user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentEnrollment"
+        "403":
+          description: Not authorized. Please provide a valid enrollment token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /agent/work:
+    get:
+      tags:
+        - agent
+      operationId: agent.get_work
+      parameters:
+        - in: query
+          name: target
+          schema:
+            type: string
+      security:
+        - api_key: []
+      responses:
+        "200":
+          description: Get a job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanAssignment"
+        "403":
+          description: Not authorized. Please provide a valid agent token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+    post:
+      tags:
+        - agent
+      operationId: agent.submit_work
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScanResult"
+      responses:
+        "200":
+          description: The server was able to parse the response and handled it accordingly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: Not authorized. Please provide a valid agent token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /config/natlas-services:
+    get:
+      tags:
+        - config
+      operationId: api.natlas_services
+      security:
+        - api_key: []
+      description: Returns the latest version of all services for nmap to scan for
+      responses:
+        "200":
+          description: The list of natlas services to use for the client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NatlasServices"
+        "403":
+          description: Not authorized. Please provide a valid api token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+    post:
+      tags:
+        - config
+        - admin
+      operationId: api.update_natlas_services
+      security:
+        - api_key: []
+      description: Updates natlas-services file used by agents
+      responses:
+        "200":
+          description: Successfully updated natlas-services file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: Not authorized. Please provide a valid admin api token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /config/agent-config:
+    get:
+      tags:
+        - config
+      operationId: api.agent_config
+      security:
+        - api_key: []
+      description: Returns the latest version of agent configuration
+      responses:
+        "200":
+          description: Agent configuration definition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentConfig"
+        "403":
+          description: Not authorized. Please provide a valid api token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+    post:
+      tags:
+        - config
+        - admin
+      operationId: api.update_agent_config
+      security:
+        - api_key: []
+      description: Updates agent-config used by agents
+      responses:
+        "200":
+          description: Successfully updated agent-config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: Not authorized. Please provide a valid admin api token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /host/{ip}:
+    get:
+      tags:
+        - host
+      operationId: api.get_host
+      parameters:
+        - in: path
+          name: ip
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Returns latest scan result for provided host"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResult"
+        "404":
+          description: "Host not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /host/random:
+    get:
+      tags:
+        - host
+      operationId: api.get_random_host
+      responses:
+        "200":
+          description: "Returns latest scan result for random host"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  permalink:
+                    type: string
+                    description: "Permalink for this result"
+                    example: "https://natlas.io/host/127.0.0.1/dqulxkpro6p3a84a"
+                  host:
+                    $ref: "#/components/schemas/ScanResult"
+        "404":
+          description: "Host not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /host/{ip}/history:
+    get:
+      tags:
+        - host
+      operationId: api.host_history
+      parameters:
+        - in: path
+          name: ip
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: "Returns historical results for provided IP"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryResults"
+        "404":
+          description: "Host not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /host/{ip}/{scan_id}:
+    get:
+      tags:
+        - host
+      operationId: api.host_historical_result
+      parameters:
+        - in: path
+          name: ip
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: scan_id
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Host exists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResult"
+        "404":
+          description: "Host not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /status:
+    get:
+      operationId: api.status
+      responses:
+        "200":
+          description: The server was able to parse the request and handled it accordingly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+  /search:
+    get:
+      operationId: api.search
+      security:
+        - api_key: []
+      description: Returns results matching a provided query
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Search query succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResults"
+        "403":
+          description: Not authorized. Please provide a valid API token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "500":
+          description: Not authorized. Please provide a valid API token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+  /browse:
+    get:
+      operationId: api.browse
+      security:
+        - api_key: []
+      description: Returns latest results in descending
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Successfully retrieved the latest scan results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrowseResults"
+        "403":
+          description: Not authorized. Please provide a valid API token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: bearer {api_key}
+      in: header
+      name: Authorization
+  schemas:
+    AgentEnrollment:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        agent_secret:
+          type: string
+    NatlasServices:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        sha256:
+          type: string
+          description: Sha256 of the natlas-services file contents
+          example: 9b1ecb78562746ceea9d7122d6f2624b6bb09f3d27da2731ede545ef301d4126
+        services:
+          type: string
+          description: A text blob of newline separated services for natlas to scan for.
+            This is fed directly into nmap via the --servicedb parameter.
+          example: |
+            http  80/tcp
+            telnet  23/tcp
+            https  443/tcp
+            ftp  21/tcp
+            ssh  22/tcp
+            smtp  25/tcp
+    AgentConfig:
+      type: object
+      properties:
+        config_version:
+          type: integer
+          description: Agent config version
+          example: 1
+        nmap:
+          type: object
+          properties:
+            timeout:
+              type: integer
+              description: Kill nmap if it takes more than this many seconds
+              minimum: 0
+              default: 660
+              example: 660
+            versionDetection:
+              type: boolean
+              description: Tell nmap to attempt version detection (-sV)
+              default: true
+            osDetection:
+              type: boolean
+              description: Tell nmap to attempt OS detection (-O)
+              default: true
+            enableScripts:
+              type: boolean
+              description: Tell nmap to use it's scripting engine (--script). Loads all
+                'scripts'
+              default: true
+            onlyOpens:
+              type: boolean
+              description: Tell nmap to only report open ports (--open)
+              default: true
+            scriptTimeout:
+              type: integer
+              description: Nmap script timeout (--script-timeout) in seconds
+              minimum: 0
+              default: 60
+              example: 60
+            hostTimeout:
+              type: integer
+              description: Nmap host timeout (--host-timeout) in seconds
+              minimum: 0
+              default: 600
+              example: 600
+            osScanLimit:
+              type: boolean
+              description: Limit attempts to identify OS (--osscan-limit)
+              default: true
+            noPing:
+              type: boolean
+              description: Tell nmap to ignore host discovery (-Pn)
+              default: false
+            udpScan:
+              type: boolean
+              description: Tell nmap to do UDP scan in addition to TCP SYN (-sSU)
+              default: false
+            scripts:
+              type: string
+              description: The list of scripts to run if enableScripts is true
+              example: default, ssh-auth-methods
+              default: default
+            verbose:
+              type: integer
+              description: Verbosity level of scan results
+              default: 0
+              example: 0
+        webScreenshots:
+          type: object
+          description: Attempt to take screenshots of web servers
+          nullable: true
+          properties:
+            timeout:
+              type: integer
+              description: Kill web screenshot process if it takes more than this many seconds
+              example: 60
+        vncScreenshots:
+          type: object
+          description: Attempt to take screenshots of VNC servers
+          nullable: true
+          properties:
+            timeout:
+              type: integer
+              description: Kill vnc process if it takes more than this many seconds
+              example: 60
+
+    BrowseResults:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            total_results:
+              type: integer
+              description: "Total number of results"
+              example: 1234
+            results_per_page:
+              type: integer
+              description: "How many results are displayed per page"
+              example: 50
+            current_page:
+              type: integer
+              description: "Current page of results"
+              example: 2
+            next_url:
+              type: string
+              example: "https://natlas.io/api/browse&page=3"
+            prev_url:
+              type: string
+              example: "https://natlas.io/api/browse&page=1"
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScanResult"
+    SearchResults:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            total_results:
+              type: integer
+              description: "Total number of results matching the query"
+              example: 1234
+            results_per_page:
+              type: integer
+              description: "How many results are displayed per page"
+              example: 50
+            current_page:
+              type: integer
+              description: "Current page of results"
+              example: 2
+            next_url:
+              type: string
+              example: "https://natlas.io/api/search?query=ports.port%3A8080&page=3"
+            prev_url:
+              type: string
+              example: "https://natlas.io/api/search?query=ports.port%3A8080&page=1"
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScanResult"
+    HistoryResults:
+      type: object
+      properties:
+        meta:
+          type: object
+          properties:
+            total_results:
+              type: integer
+              description: "Total number of historical results"
+              example: 115
+            results_per_page:
+              type: integer
+              description: "How many results are displayed per page"
+              example: 50
+            current_page:
+              type: integer
+              description: "Current page of results"
+              example: 2
+            next_url:
+              type: string
+              example: "https://natlas.io/api/host/127.0.0.1/history?page=3"
+            prev_url:
+              type: string
+              example: "https://natlas.io/api/host/127.0.0.1/history?page=3"
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScanResult"
+    ScanResult:
+      type: object
+      properties:
+        scan_id:
+          type: string
+          description: The scan id given to the agent identify this scan
+        ip:
+          type: string
+          description: The ip address that was scanned
+        tags:
+          type: array
+          description: The tags that apply the scanned ip address
+          items:
+            type: string
+        scan_reason:
+          type: string
+          description: The reason for performing this scan.
+          enum:
+            - automatic
+            - manual
+            - requested
+        xml_data:
+          type: string
+          description: The .xml output from nmap
+        nmap_data:
+          type: string
+          description: The .nmap output from nmap
+        gnmap_data:
+          type: string
+          description: The .gnmap output from nmap
+        scan_start:
+          type: string
+          description: Timestamp when the agent started its scan
+        scan_stop:
+          type: string
+          description: Timestamp when the agent stopped its scan
+        is_up:
+          type: boolean
+          description: Whether the host was determined to be up or down
+        port_count:
+          type: integer
+          description: Number of ports found if the host is up
+        timed_out:
+          type: boolean
+          description: True if the nmap process timed out
+        screenshots:
+          type: array
+          description: Array of screenshot objects representing all the screenshots taken
+            against a host
+          items:
+            type: object
+            properties:
+              host:
+                type: string
+              port:
+                type: integer
+              service:
+                type: string
+              data:
+                type: string
+      required:
+        - scan_id
+        - ip
+        - scan_reason
+        - xml_data
+        - nmap_data
+        - gnmap_data
+        - scan_start
+        - scan_stop
+    ScanAssignment:
+      type: object
+      properties:
+        scan_id:
+          type: string
+          example: 7v8emfj4ux2vutmn
+          description: A randomly generated identifier for the agent to store work on disk
+            temporarily
+        scan_reason:
+          type: string
+          description: The reason for performing this scan.
+          enum:
+            - automatic
+            - manual
+            - requested
+        target:
+          type: string
+          description: The target IP address to scan
+          example: 127.34.23.56
+        tags:
+          type: array
+          description: A list of tags for the result to be tagged with
+          items:
+            type: string
+          example:
+            - corpnet-a
+            - marketing
+        config_version:
+          type: integer
+          description: Agent config version
+          default: 1
+
+    GenericResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          minimum: 200
+          example: 403
+          maximum: 599
+          description: An HTTP Status code
+        message:
+          type: string
+          description: A human friendly error message
+          example: Can't not frobinate the foobar
+        retry:
+          type: boolean
+          description: If true, retry the request, otherwise do not
+          default: false
+      required:
+        - status
+        - message
+    StatusResponse:
+      type: object
+      properties:
+        completed_cycles:
+          type: integer
+          minimum: 0
+          example: 4
+          description: The number of scan cycles natlas has completed since it was last
+            started
+        cycle_start_time:
+          type: string
+          nullable: true
+          format: date-time
+          description: The timestamp at which the current scan cycle started
+          example: Tue, 10 Mar 2020 02:01:26 GMT
+        effective_scope_size:
+          type: integer
+          minimum: 0
+          example: 16
+          description: Effective Scope Size is a measure of the number of unique IP
+            addresses in scope, excluding any IP addresses that appear in the
+            blacklist
+        natlas_start_time:
+          type: string
+          format: date-time
+          description: The timestamp at which the natlas server was started
+          example: Tue, 10 Mar 2020 02:01:16 GMT
+        scans_this_cycle:
+          type: integer
+          minimum: 0
+          example: 13
+          description: The number of scans that have been submitted with a scan_start time
+            newer than cycle_start_time
+        avg_cycle_duration:
+          type: string
+          nullable: true
+          example: 13d, 14h, 15m, 16s
+          description: A human readable string measuring the average duration per completed
+            scan cycle
