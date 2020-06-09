@@ -20,6 +20,8 @@ COPY . /opt/natlas/natlas-server
 COPY --from=webpack /app/app/static/dist app/static/dist
 
 RUN python3 -m compileall .
+RUN mkdir logs \
+  && chown www-data logs
 
 # Build final image
 FROM python:3.7.5-slim
