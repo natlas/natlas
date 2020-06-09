@@ -66,6 +66,24 @@ else
 	echo "[+] Found python3: $(which python3)"
 fi
 
+if ! which node >/dev/null || ! node --version | grep "v12." >/dev/null; then
+	echo "[+] Installing dependencies for nodejs: apt-get -y install curl dirmngr apt-transport-https lsb-release ca-certificates"
+	apt-get -y install curl dirmngr apt-transport-https lsb-release ca-certificates
+	echo "[+] Downloading NodeJS 12.x: curl -sL https://deb.nodesource.com/setup_12.x | bash -"
+	curl -sL https://deb.nodesource.com/setup_12.x | bash -
+	echo "[+] Installing NodeJS 12.x: apt-get  -y install nodejs"
+	apt-get install -y nodejs
+	if ! which node >/dev/null; then
+		echo "[!] Failed to install nodejs" && exit 1
+	else
+		echo "[+] Successfully installed nodejs: $(which node)"
+		echo "[+] Nodejs version: $(node --version)"
+	fi
+else
+	echo "[+] Found Nodejs: $(which node)"
+	echo "[+] Nodejs version: $(node --version)"
+fi
+
 if ! which yarn >/dev/null; then
 	echo "[+] Fetching yarn gpg key: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -"
 	curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
