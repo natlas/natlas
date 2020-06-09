@@ -42,7 +42,7 @@ def save_files(scan_id):
 		os.mkdir(failroot)
 	if os.path.isdir(f"data/natlas.{scan_id}"):
 		src = f"data/natlas.{scan_id}"
-		dst = f"data/failures/"
+		dst = "data/failures/"
 		shutil.move(src, dst)
 
 
