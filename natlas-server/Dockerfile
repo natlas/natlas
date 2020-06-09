@@ -1,4 +1,4 @@
-FROM node:10.20.0-jessie as webpack
+FROM node:10-jessie as webpack
 
 WORKDIR /app
 COPY ["package.json", "yarn.lock", "/app/"]
@@ -6,7 +6,7 @@ RUN yarn --no-progress --frozen-lockfile --non-interactive
 COPY . /app
 RUN yarn run webpack --mode production
 
-FROM python:3.7.5 as build
+FROM python:3.7 as build
 
 WORKDIR /opt/natlas/natlas-server
 COPY requirements.txt /opt/natlas/natlas-server
@@ -24,7 +24,7 @@ RUN mkdir logs \
   && chown www-data logs
 
 # Build final image
-FROM python:3.7.5-slim
+FROM python:3.7-slim
 
 COPY --from=build /install /
 COPY --from=build /opt/natlas /opt/natlas
