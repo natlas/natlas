@@ -34,12 +34,15 @@ services:
 
   natlas-server:
     build: natlas-server
+    command: /usr/local/bin/flask run --host 0.0.0.0
+    working_dir: /opt/natlas/natlas-server
     ports:
       - 5000:5000
     networks:
       - backend
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
+      - FLASK_ENV=development
     volumes:
       - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
