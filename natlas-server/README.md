@@ -2,29 +2,29 @@
 
 ## Summary
 
-Natlas-server is a flask application that handles browsing and searching natlas scan data, as well as distributing jobs to agents and collecting the results. It also offers a back-office interface for administrators to make changes to scanning scope, exclusions, ports to scan for, and more.
+Natlas-server is a flask application that handles browsing and searching natlas scan data, as well as distributing jobs to agents and collecting the results. It also offers an administrative web interface to make changes to scanning scope, exclusions, ports to scan for, and more.
 
 ## Backing Services
 
 Backing services in natlas-server are defined via environment configs. They are as follows:
 
 * A SQL Database (SQLite is used if an external Database connection string is not supplied)
-* An Elasticsearch 7.x Cluster (Targeted against 7.6.2)
+* An Elasticsearch 7.x Cluster
 * (Optional) A mail server for user account related functionality
 
 ## Installation (Production)
 
-Production-ready natlas docker containers are available on dockerhub. The current stable version is `0.6.10`, which uses Elasticsearch 6.x. If you pull from `main` then Elasticsearch 7.x is required.
+Production-ready natlas docker containers are available on dockerhub. The current stable version is `0.6.10`, which uses Elasticsearch 6.x. If you pull from `main` then Elasticsearch 7.x is recommended, as a future version will drop support for ES6.
 
 ```bash
 docker pull natlas/server:0.6.10
-docker run -ti -p 5000:5000 -v natlas_ns-data:/data:rw --mount type=bind,source=$(pwd)/natlas_env,target=/opt/natlas/natlas-server/.env natlas/server:0.6.10
+docker run -d -p 5000:5000 --restart=always -v natlas_ns-data:/data:rw -v $(pwd)/natlas_env:/opt/natlas/natlas-server/.env natlas/server:0.6.10
 ```
 
 The natlas-server depends on the following:
 
-* First is an `env` file that gets bind mounted to `/opt/natlas/natlas-server/.env`. This is automatically read by the natlas-server config and contains some subset of the values specified in [The Config](#the-config) table below.
-* Second is the `/data` directory which is where, by default, screenshots, logs, and the sqlite config database get stored.
+* An `env` file that gets bind mounted to `/opt/natlas/natlas-server/.env`. This is automatically read by the natlas-server config and contains some subset of the values specified in [The Config](#the-config) table below. An [example](#example-ENV) is also provided.
+* The `/data` directory which is where, by default, screenshots, logs, and the sqlite config database get stored.
 * The `env` file needs to point `ELASTICSEARCH_URL` to the address of an elasticsearch node.
 
 **NOTE:** If you used natlas 0.6.10 or before, you may be used to running a `setup-server.sh` script. This has been removed in favor of the docker workflow. Docker makes the builds much more reliable and significantly easier to support than the janky setup script.
@@ -35,18 +35,18 @@ To setup for development, you'll want to fork this repository and then clone it 
 
 Development makes use of docker through the `docker-compose.yml` file at the root of the repository. You can modify the desired environment variables and run `docker-compose up -d natlas-server`. You can also run the complete stack by running ` docker-compose up -d `. **This method is only suggested for a development environment.**
 
-**NOTE:** If you used natlas 0.6.10 or before, you may be used to running a `setup-server.sh` script. This has been removed in favor of the docker workflow. Docker makes the builds much more reliable and significantly easier to support than the janky setup script.
-
 ## The Config
 
-There are a number of config options that you can specify in the application environment or in a file called `.env` before initializing the database and launching the application. These options break down into two categories:
+There are a number of config options that you can specify in the application environment or in a file called `.env` before initializing the database and launching the application. These options break down into two categories: environment configs and web configs. For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`), however user invitations and password resets won't work without a valid mail server.
 
-Can't be changed via the web interface (only `.env`):
+### Environment Config
+
+Environment configs are loaded from the environment or a `.env` file and require an application restart to change.
 
 | Variable | Default | Explanation |
 |---|---|---|
 | `SECRET_KEY` | `you-should-set-a-secret-key` | Used for CSRF tokens and sessions. You should generate a unique value for this in `.env` |
-| `SQLALCHEMY_DATABASE_URI` | `sqlite:///metadata.db` | A SQLALCHEMY URI that points to the database to store natlas metadata in |
+| `SQLALCHEMY_DATABASE_URI` | `sqlite:///metadata.db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the database to store natlas metadata in |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
 | `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
@@ -57,7 +57,17 @@ Can't be changed via the web interface (only `.env`):
 | `OPENCENSUS_SAMPLE_RATE` | `1.0` | Specifies the percentage of requests that are traced with OpenCensus. A number from 0 to 1. |
 | `OPENCENSUS_AGENT` | `127.0.0.1:55678` | An OpenCensus agent or collector that this instance will emit traffic to. |
 
-Can be changed via the web interface:
+#### Example ENV
+
+```text
+SECRET_KEY=Y91gWepML8Bq1IqDO7MFy9LDbtuPrS3Z9Ge6TX3a
+ELASTICSEARCH_URL=http://172.17.0.2:9200
+FLASK_ENV=production
+```
+
+### Web Config
+
+Web configs are loaded from the SQL database and changeable from the web interface without requiring an application restart.
 
 | Variable | Default | Explanation |
 |---|---|---|
@@ -72,16 +82,14 @@ Can be changed via the web interface:
 | `MAIL_FROM` | `""` | Address to be used as the "From" address for outgoing mail |
 | `CUSTOM_BRAND` | `""` | Custom branding for the navigation bar to help distinguish different natlas installations from one another |
 
-For most installations, the defaults will probably be fine (with the exception of `SECRET_KEY`), however user invitations and password resets won't work without a valid mail server.
-
 ## Setting the Scope
 
-The scope and blacklist can be set server side without using the admin interface by running the `python3 add-scope.py --scope <file>` script from within the natlas container with the `--scope` and `--blacklist` arguments, respectively. These each take a file name to read scope from, which means you need to put them in a volume that is mounted in your container. You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the scope. A scope is **REQUIRED** for agents to do any work, however a blacklist is optional.
+The scope and blacklist can be set server side without using the admin interface by running the `python add-scope.py --scope <file>` script from within the natlas container with the `--scope` and `--blacklist` arguments, respectively. These each take a file name to read scope from, which means you need to put them in a volume that is mounted in your container. You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the scope. A scope is **REQUIRED** for agents to do any work, however a blacklist is optional.
 
 ```bash
 $ docker exec -it $(docker ps | grep natlas | cut -d' ' -f1) /bin/bash
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python3 add-scope.py --scope /data/bootstrap/myscopefile.txt
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python3 add-scope.py --blacklist /data/bootstrap/myblacklistfile.txt
+root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python add-scope.py --scope /data/bootstrap/myscopefile.txt
+root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python add-scope.py --blacklist /data/bootstrap/myblacklistfile.txt
 ```
 
 ## Giving a User Admin Privilege
@@ -98,13 +106,13 @@ To create a new admin account, ensure that you're in the natlas server container
 
 ```bash
 $ docker exec -it $(docker ps | grep natlas-server | cut -d' ' -f1) /bin/bash
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python3 add-user.py --admin user@example.com
+root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python add-user.py --admin user@example.com
 User user@example.com has been created as an admin with password Wns6lwSlzRbzKV8P
 ```
 
 ## NGINX as a Reverse Proxy
 
-As mentioned above, it is not really advisable to run the flask application directly on the internet (or even on your local network). The flask application is just that, an application. It doesn't account for things like SSL certificates, and modifying application logic to add in potential routes for things like Let's Encrypt should be avoided. Luckily, it's very easy to setup a reverse proxy so that all of this stuff can be handled by a proper web server and leave your application to do exactly what it's supposed to do.
+It is not really advisable to run the flask application directly on the internet (or even on your local network). The flask application is just that, an application. It doesn't account for things like SSL certificates, and modifying application logic to add in potential routes for things like Let's Encrypt should be avoided. Luckily, it's very easy to setup a reverse proxy so that all of this stuff can be handled by a proper web server and leave your application to do exactly what it's supposed to do.
 
 To install nginx, you can simply `sudo apt-get install nginx`. Once it's installed, you can use the provided example config as a starting point:
 
