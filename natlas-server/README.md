@@ -1,6 +1,7 @@
 # natlas-server
 
 ## Summary
+
 Natlas-server is a flask application that handles browsing and searching natlas scan data, as well as distributing jobs to agents and collecting the results. It also offers a back-office interface for administrators to make changes to scanning scope, exclusions, ports to scan for, and more.
 
 ## Backing Services
@@ -11,16 +12,20 @@ Backing services in natlas-server are defined via environment configs. They are 
 * An Elasticsearch 7.x Cluster (Targeted against 7.6.2)
 * (Optional) A mail server for user account related functionality
 
-
 ## Installation (Production)
 
-Production-ready natlas docker containers are available on dockerhub. The current stable version is `v0.6.10`.
+Production-ready natlas docker containers are available on dockerhub. The current stable version is `0.6.10`, which uses Elasticsearch 6.x. If you pull from `main` then Elasticsearch 7.x is required.
 
 ```bash
-docker pull natlas/server:v0.6.10
+docker pull natlas/server:0.6.10
+docker run -ti -p 5000:5000 -v natlas_ns-data:/data:rw --mount type=bind,source=$(pwd)/natlas_env,target=/opt/natlas/natlas-server/.env natlas/server:0.6.10
 ```
 
-**TODO:** Document how to launch the container, what things need to be mounted into the container at runtime, etc
+The natlas-server depends on the following:
+
+* First is an `env` file that gets bind mounted to `/opt/natlas/natlas-server/.env`. This is automatically read by the natlas-server config and contains some subset of the values specified in [The Config](#the-config) table below.
+* Second is the `/data` directory which is where, by default, screenshots, logs, and the sqlite config database get stored.
+* The `env` file needs to point `ELASTICSEARCH_URL` to the address of an elasticsearch node.
 
 **NOTE:** If you used natlas 0.6.10 or before, you may be used to running a `setup-server.sh` script. This has been removed in favor of the docker workflow. Docker makes the builds much more reliable and significantly easier to support than the janky setup script.
 
@@ -31,7 +36,6 @@ To setup for development, you'll want to fork this repository and then clone it 
 Development makes use of docker through the `docker-compose.yml` file at the root of the repository. You can modify the desired environment variables and run `docker-compose up -d natlas-server`. You can also run the complete stack by running ` docker-compose up -d `. **This method is only suggested for a development environment.**
 
 **NOTE:** If you used natlas 0.6.10 or before, you may be used to running a `setup-server.sh` script. This has been removed in favor of the docker workflow. Docker makes the builds much more reliable and significantly easier to support than the janky setup script.
-
 
 ## The Config
 
@@ -48,7 +52,7 @@ Can't be changed via the web interface (only `.env`):
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
 | `MEDIA_DIRECTORY` | `$BASEDIR/media/` | If you want to store media (screenshots) in a larger mounted storage volume, set this value to an absolute path. If you change this value, be sure to copy the contents of the previous media directory to the new location, otherwise old media will not render.|
 | `NATLAS_VERSION_OVERRIDE` | `None` | **Danger**: This can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented. |
-| `SENTRY_DSN` | `""` | Enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: http://mytoken@mysentry.example.com/1 |
+| `SENTRY_DSN` | `""` | Enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: `http://mytoken@mysentry.example.com/1` |
 | `OPENCENSUS_ENABLE` | `false` | Enables OpenCensus instrumentation to help identify performance bottlenecks. |
 | `OPENCENSUS_SAMPLE_RATE` | `1.0` | Specifies the percentage of requests that are traced with OpenCensus. A number from 0 to 1. |
 | `OPENCENSUS_AGENT` | `127.0.0.1:55678` | An OpenCensus agent or collector that this instance will emit traffic to. |
@@ -84,11 +88,11 @@ root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python3 add-scope.py --blacklist /d
 
 In order to get started interacting with Natlas, you'll need an administrator account. Admins are allowed to make changes to the following via the web interface:
 
-- application config
-- the user list
-- the scope
-- the blacklist
-- services that agents scan for
+* application config
+* the user list
+* the scope
+* the blacklist
+* services that agents scan for
 
 To create a new admin account, ensure that you're in the natlas server container and then run `python3 add-user.py --admin <email>`. If this email doesn't already exist in the User table, it will be created with admin privileges and a random password will be generated and spit out to the command line. If the email *does* already exist in the User table, it will be toggled to be an admin. This can be helpful if you accidentally remove yourself as an admin and can't get back into the admin interface.
 
