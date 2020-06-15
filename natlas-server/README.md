@@ -71,9 +71,9 @@ Web configs are loaded from the SQL database and changeable from the web interfa
 
 | Variable | Default | Explanation |
 |---|---|---|
-| `LOGIN_REQUIRED` | `False` | Require login to browse results |
+| `LOGIN_REQUIRED` | `True` | Require login to browse results |
 | `REGISTER_ALLOWED` | `False` | Permit open registration (requires defined `MAIL_*` settings below) for new users |
-| `AGENT_AUTHENTICATION` | `False` | Optionally require agents to authenticate before being allowed to get or submit work |
+| `AGENT_AUTHENTICATION` | `True` | Optionally require agents to authenticate before being allowed to get or submit work |
 | `MAIL_SERVER` | `localhost` | Mail server to use for invitations, registrations, and password resets |
 | `MAIL_PORT` | `25` | Port that `MAIL_SERVER` is listening on |
 | `MAIL_USE_TLS` | `False` | Whether or not to connect to `MAIL_SERVER` with TLS|
