@@ -42,7 +42,7 @@
 			</div>
 			<form class="form-inline" action="{{ url_for('main.search') }}" name="search">
 				<div class="input-group">
-					<input type="text" class="form-control" aria-label="Search" value="{{query}}" name="query" placeholder="Search..." aria-describedby="search-addon"/>
+					<input type="text" class="form-control" aria-label="Search" value="{{query}}" required name="query" placeholder="Search..." aria-describedby="search-addon"/>
 					<div class="input-group-append">
 						<button class="btn btn-outline-secondary" type="submit" id="search-addon"><i class="fas fa-search"></i></button>
 					</div>

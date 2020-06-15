@@ -48,6 +48,8 @@ def browse():
 def search():
 	''' Return search results for a given query '''
 	query = request.args.get('query', '')
+	if query == '':
+		return redirect(url_for('main.browse'))
 	page = int(request.args.get('page', 1))
 	format = request.args.get('format', '')
 	scan_ids = request.args.get('includeScanIDs', '')
