@@ -57,12 +57,12 @@ class NewScopeForm(FlaskForm):
 
 
 class ImportScopeForm(FlaskForm):
-	scope = TextAreaField("Scope Import")
+	scope = TextAreaField("Scope Import", validators=[DataRequired()])
 	submit = SubmitField("Import Scope")
 
 
 class ImportBlacklistForm(FlaskForm):
-	scope = TextAreaField("Blacklist Import")
+	scope = TextAreaField("Blacklist Import", validators=[DataRequired()])
 	submit = SubmitField("Import Blacklist")
 
 
@@ -75,7 +75,7 @@ class ScopeToggleForm(FlaskForm):
 
 
 class ServicesUploadForm(FlaskForm):
-	serviceFile = FileField('Select a file to upload')
+	serviceFile = FileField('Select a file to upload', validators=[DataRequired()])
 	uploadFile = SubmitField('Upload Services File')
 
 
