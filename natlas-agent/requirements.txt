@@ -1,8 +1,8 @@
-certifi==2018.11.29
+certifi==2020.4.5.2
 chardet==3.0.4
-idna==2.8
-python-dotenv==0.10.1
+idna==2.9
+python-dotenv==0.13.0
 python-libnmap==0.7.0
-requests==2.21.0
-sentry-sdk[flask]==0.10.2
-urllib3==1.24.2
+requests==2.23.0
+sentry-sdk==0.14.4
+urllib3==1.25.9
