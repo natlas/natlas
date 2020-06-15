@@ -48,9 +48,9 @@ class Config(object):
 
 # NAME, TYPE, DEFAULT
 defaultConfig = [
-	("LOGIN_REQUIRED", "bool", "False"),
+	("LOGIN_REQUIRED", "bool", "True"),
 	("REGISTER_ALLOWED", "bool", "False"),
-	("AGENT_AUTHENTICATION", "bool", "False"),
+	("AGENT_AUTHENTICATION", "bool", "True"),
 	("MAIL_SERVER", "string", "localhost"),
 	("MAIL_PORT", "int", "25"),
 	("MAIL_USE_TLS", "bool", "False"),
