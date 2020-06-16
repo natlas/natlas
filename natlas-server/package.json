@@ -1,4 +1,10 @@
 {
+	"name": "natlas-web",
+	"description": "Natlas web app logic",
+	"license": "Apache-2.0",
+	"homepage": "https://github.com/natlas",
+	"bugs": "https://github.com/natlas/natlas/issues",
+	"repository": "github:natlas/natlas",
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^5.13.0",
 		"bootstrap": "^4.4.1",
