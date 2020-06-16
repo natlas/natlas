@@ -18,13 +18,8 @@ paths:
       tags:
         - agent
       operationId: agent.enroll
-      parameters:
-        - in: query
-          name: enrollment_token
-          schema:
-            type: string
       security:
-        - api_key: []
+        - enrollment_token: []
       responses:
         "200":
           description: "Associate this agent with a user"
@@ -50,7 +45,7 @@ paths:
           schema:
             type: string
       security:
-        - api_key: []
+        - agent: []
       responses:
         "200":
           description: Get a job
@@ -69,7 +64,7 @@ paths:
         - agent
       operationId: agent.submit_work
       security:
-        - api_key: []
+        - agent: []
       requestBody:
         content:
           application/json:
@@ -96,7 +91,7 @@ paths:
         - admin
       operationId: api.get_natlas_config
       security:
-        - api_key: []
+        - admin_key: []
       description: "Returns the current natlas server configuration"
       responses:
         "200":
@@ -117,7 +112,7 @@ paths:
         - admin
       operationId: api.update_natlas_config
       security:
-        - api_key: []
+        - admin_key: []
       description: "Updates natlas server configuration settings"
       responses:
         "200":
@@ -140,6 +135,7 @@ paths:
       operationId: api.get_services
       security:
         - api_key: []
+        - agent: []
       description: "Returns the latest version of all services for nmap to scan for"
       responses:
         "200":
@@ -160,7 +156,7 @@ paths:
         - admin
       operationId: api.update_services
       security:
-        - api_key: []
+        - admin_key: []
       description: "Updates natlas-services file used by agents"
       responses:
         "200":
@@ -182,7 +178,8 @@ paths:
         - config
       operationId: api.get_agent_config
       security:
-        - api_key: []
+        - admin_key: []
+        - agent: []
       description: "Returns the latest version of agent configuration"
       responses:
         "200":
@@ -203,7 +200,7 @@ paths:
         - admin
       operationId: api.update_agent_config
       security:
-        - api_key: []
+        - admin_key: []
       description: "Updates agent-config used by agents"
       requestBody: #TODO: Do we actually want the post to match format exactly? Need to define required fields, etc.
         content:
@@ -231,7 +228,7 @@ paths:
         - admin
       operationId: api.get_scope
       security:
-        - api_key: []
+        - admin_key: []
       description: "Returns paginated list of scope objects"
       responses:
         "200":
@@ -252,7 +249,7 @@ paths:
         - admin
       operationId: api.update_scope
       security:
-        - api_key: []
+        - admin_key: []
       description: "Updates natlas scope"
       responses:
         "200":
@@ -275,7 +272,7 @@ paths:
         - admin
       operationId: api.get_tags
       security:
-        - api_key: []
+        - admin_key: []
       description: "Returns paginated list of tag objects"
       responses:
         "200":
@@ -296,7 +293,7 @@ paths:
         - admin
       operationId: api.update_tags
       security:
-        - api_key: []
+        - admin_key: []
       description: "Updates natlas tags"
       responses:
         "200":
@@ -558,6 +555,10 @@ paths:
                   token:
                     type: string
                     description: "Agent enrollment token used by agents to enroll themselves"
+                  expiration:
+                    type: string
+                    format: date-time
+                    description: "Expiration timestamp for this enrollment token"
         "403":
           description: "Not authorized. Please provide a valid api token"
           content:
@@ -667,6 +668,21 @@ components:
     api_key:
       type: apiKey
       description: "bearer {api_key}"
+      in: header
+      name: Authorization
+    admin_key:
+      type: apiKey
+      description: "bearer {admin_key}"
+      in: header
+      name: Authorization
+    agent:
+      type: apiKey
+      description: "bearer {agent_secret}"
+      in: header
+      name: Authorization
+    enrollment_token:
+      type: apiKey
+      description: "bearer {enrollment_token}"
       in: header
       name: Authorization
   schemas:
