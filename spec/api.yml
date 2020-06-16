@@ -1,6 +1,3 @@
-# TODO
-# - Admin apis
-
 openapi: 3.0.0
 info:
   version: "1"
@@ -92,6 +89,50 @@ paths:
               schema:
                 $ref: "#/components/schemas/GenericResponse"
 
+  /config:
+    get:
+      tags:
+        - config
+        - admin
+      operationId: api.get_natlas_config
+      security:
+        - api_key: []
+      description: "Returns the current natlas server configuration"
+      responses:
+        "200":
+          description: "Successfully returned natlas configuration"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: "Not authorized. Please provide a valid admin api token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+    post: #TODO: Define what this requestBody actually looks like
+      tags:
+        - config
+        - admin
+      operationId: api.update_natlas_config
+      security:
+        - api_key: []
+      description: "Updates natlas server configuration settings"
+      responses:
+        "200":
+          description: "Successfully updated natlas config"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: "Not authorized. Please provide a valid admin api token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+
   /config/natlas-services:
     get:
       tags:
@@ -139,7 +180,7 @@ paths:
     get:
       tags:
         - config
-      operationId: api.agent_config
+      operationId: api.get_agent_config
       security:
         - api_key: []
       description: "Returns the latest version of agent configuration"
@@ -176,6 +217,94 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AgentConfig"
+        "403":
+          description: "Not authorized. Please provide a valid admin api token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+
+  /config/scope:
+    get:
+      tags:
+        - config
+        - admin
+      operationId: api.get_scope
+      security:
+        - api_key: []
+      description: "Returns paginated list of scope objects"
+      responses:
+        "200":
+          description: "Successfully returned scope objects"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: "Not authorized. Please provide a valid admin api token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+    post: #TODO: Define what this requestBody actually looks like
+      tags:
+        - config
+        - admin
+      operationId: api.update_scope
+      security:
+        - api_key: []
+      description: "Updates natlas scope"
+      responses:
+        "200":
+          description: "Successfully updated natlas scope"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: "Not authorized. Please provide a valid admin api token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+
+  /config/tags:
+    get:
+      tags:
+        - config
+        - admin
+      operationId: api.get_tags
+      security:
+        - api_key: []
+      description: "Returns paginated list of tag objects"
+      responses:
+        "200":
+          description: "Successfully returned tag objects"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+        "403":
+          description: "Not authorized. Please provide a valid admin api token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
+    post: #TODO: Define what this requestBody actually looks like
+      tags:
+        - config
+        - admin
+      operationId: api.update_tags
+      security:
+        - api_key: []
+      description: "Updates natlas tags"
+      responses:
+        "200":
+          description: "Successfully updated natlas tags"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericResponse"
         "403":
           description: "Not authorized. Please provide a valid admin api token"
           content:
@@ -415,7 +544,7 @@ paths:
     get:
       tags:
         - user
-      operationId: api.get_user_enrollment_token
+      operationId: api.get_enrollment_token
       security:
         - api_key: []
       responses:
@@ -438,7 +567,7 @@ paths:
     post: #TODO: Define what this requestBody looks like
       tags:
         - user
-      operationId: api.update_user_enrollment_token
+      operationId: api.update_enrollment_token
       security:
         - api_key: []
       responses:
