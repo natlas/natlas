@@ -1,4 +1,4 @@
-FROM node:10-jessie as webpack
+FROM node:12-stretch as webpack
 
 WORKDIR /app
 COPY ["package.json", "yarn.lock", "/app/"]
