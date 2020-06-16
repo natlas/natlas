@@ -1,19 +1,35 @@
 # Natlas-agent
 
-The Setup
-------------
-To get started using the natlas-agent, you should be able to simply run `setup-agent.sh`. This script requires elevated privileges in order to install the necessary packages to run an agent. This script has been tested on Ubuntu 18.04 and Ubuntu 18.10.
+## Summary
 
+Natlas-agent is the worker that is responsible for scanning and screenshotting hosts provided by the natlas-server that it is connected to.
+
+## Backing Services
+
+Backing services in natlas-agent are defined via environment configs. They are as follows:
+
+* A natlas-server of the same version as the agent
+
+## Installation (Production)
+
+Production ready docker containers for natlas-agent are available on dockerhub. The current stable version is `0.6.10`.
+
+```bash
+docker pull natlas/agent:0.6.10
+docker run -d --restart=always --cap-add=NET_ADMIN -v $(pwd)/agent_env:/opt/natlas/natlas-agent/.env natlas/agent:0.6.10
 ```
-$ sudo ./setup-agent.sh
-```
 
-If you would like to run this in docker, you can modify the desired environment variables and run ` docker-compose up -d natla-agent `.  Be sure to set the 'NATLAS_SERVER_ADDRESS' variable to point at your Natlas server if you are not going to run the full stack in docker. Note: This method is only suggested for a Development Environment. Future updates will allow for this to be ran as a production stack. 
+## Installation (Development)
 
+To setup for development, you'll want to fork this repository and then clone it from your fork. See our [contributing guidelines](https://github.com/natlas/natlas/blob/main/CONTRIBUTING.md) for more information.
 
-The Config
-------------
-To make modifications to your agent, you can modify environment variables to match your specifications. These options can be placed in a file called `.env` in the `natlas-agent` directory. Available options include:
+Development makes use of docker through the `docker-compose.yml` file at the root of the repository. You can modify the desired environment variables and run `docker-compose up -d natlas-agent`. You can also run the complete stack by running ` docker-compose up -d `. **This method is only suggested for a development environment.**
+
+## The Config
+
+All agent configurations are controlled via environment variables. To make modifications to your agent, you can modify environment variables to match your specifications. These options should be placed in a file called `.env` that gets mounted into your container in `/opt/natlas/natlas-agent/.env`. An [example](#example-ENV) is also provided.
+
+Available options include:
 
 | Variable | Default | Explanation |
 |---|---|---|
@@ -29,26 +45,12 @@ To make modifications to your agent, you can modify environment variables to mat
 | `NATLAS_AGENT_TOKEN` | `None` | Secret token only needed when agent authentication is required. Generate this with the ID on the `/user/` page on the Natlas server.
 | `NATLAS_SAVE_FAILS` | `False` | Optionally save scan data that fails to upload for whatever reason.
 | `NATLAS_VERSION_OVERRIDE` | `None` | **Danger**: This can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented.
-| `SENTRY_DSN` | `""` | If set, enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: http://mytoken@mysentry.example.com/1 |
+| `SENTRY_DSN` | `""` | If set, enables automatic reporting of all exceptions to a [Sentry.io instance](https://sentry.io/). Example: `http://mytoken@mysentry.example.com/1` |
 
-Starting the Agent
-------------
-Once you've gone through the setup and made any necessary changes to the config, starting the agent is very easy:
+### Example ENV
 
-```
-$ source venv/bin/activate
-$ sudo python3 natlas-agent.py
-```
-
-You may want to run the agent in the background once you've confirmed everything is working. This can be achieved by running the above commands in a screen session, or alternatively (preferably) running it as a system service.
-
-
-Example Systemd Unit
-------------------
-An example systemd unit is provided in `deployment/natlas-agent.service`. It can be installed by copying it to `/etc/systemd/system/` and reloading the systemctl daemon.
-
-```
-$ sudo cp deployment/natlas-agent.service /etc/systemd/system/natlas-agent.service
-$ sudo systemctl daemon-reload
-$ sudo systemctl start natlas-agent
+```text
+NATLAS_SERVER_ADDRESS=https://natlas.io
+NATLAS_MAX_THREADS=10
+NATLAS_AGENT_ID=dade-agent-01
 ```
