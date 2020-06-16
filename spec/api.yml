@@ -133,11 +133,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/GenericResponse"
 
-  /config/natlas-services:
+  /config/services:
     get:
       tags:
         - config
-      operationId: api.natlas_services
+      operationId: api.get_services
       security:
         - api_key: []
       description: "Returns the latest version of all services for nmap to scan for"
@@ -158,7 +158,7 @@ paths:
       tags:
         - config
         - admin
-      operationId: api.update_natlas_services
+      operationId: api.update_services
       security:
         - api_key: []
       description: "Updates natlas-services file used by agents"
@@ -176,7 +176,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/GenericResponse"
 
-  /config/agent-config:
+  /config/agent:
     get:
       tags:
         - config
