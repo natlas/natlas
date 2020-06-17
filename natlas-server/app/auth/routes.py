@@ -1,9 +1,9 @@
-from flask import redirect, url_for, flash, render_template, request, current_app, session
+from flask import redirect, url_for, flash, render_template, request, current_app
 from flask_login import login_user, logout_user, current_user
 from app import db
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, \
-	ResetPasswordForm, InviteConfirmForm
-from app.models import User, EmailToken
+	ResetPasswordForm
+from app.models import User, UserInvitation
 from app.auth.email import send_auth_email
 from app.auth import bp
 from werkzeug.urls import url_parse
@@ -78,69 +78,52 @@ def reset_password_request():
 	)
 
 
-@bp.route('/reset_password/<token>', methods=['GET'])
+@bp.route('/reset_password', methods=['GET', 'POST'])
 def reset_password(token):
-	if current_user.is_authenticated:
-		return redirect(url_for('main.index'))
-	session['reset_token'] = token
-	return redirect(url_for('auth.do_password_reset'))
-
-
-@bp.route('/reset_password/reset', methods=['GET', 'POST'])
-def do_password_reset():
-	token = get_token('reset_token')
-
-	user = User.verify_token(token, 'reset')
+	url_token = request.args.get('token', None)
+	if not url_token:
+		flash("No reset token found")
+		return redirect(url_for('auth.login'))
+	user = User.get_user_by_token(url_token)
 	if not user:
 		flash("Password reset token is invalid or has expired.", "danger")
-		session.pop('reset_token', None) # remove the invalid token from the session
 		return redirect(url_for('auth.login'))
 
 	form = ResetPasswordForm()
 	if form.validate_on_submit():
 		user.set_password(form.password.data)
-		EmailToken.expire_token(tokenstr=token)
-		session.pop('reset_token', None) # remove the reset token from the session
-		# No need to db.session.commit() because expire_token commits the session for us
-
+		user.expire_reset_token()
+		db.session.commit()
 		flash('Your password has been reset.', "success")
 		return redirect(url_for('auth.login'))
 	return render_template('auth/password_reset.html', title="Reset Password", form=form)
 
 
-@bp.route('/invite/<token>', methods=['GET'])
+@bp.route('/invite', methods=['GET', 'POST'])
 def invite_user(token):
 	if current_user.is_authenticated:
 		return redirect(url_for('main.index'))
-	session['invite_token'] = token
-	return redirect(url_for('auth.accept_invite'))
-
-
-@bp.route('/invite/accept', methods=['GET', 'POST'])
-def accept_invite():
-	token = get_token('invite_token')
-
-	user = User.verify_token(token, 'invite')
-	if not user:
+	url_token = request.args.get('token', None)
+	if not url_token:
+		flash("No invite token found")
+		return redirect(url_for('auth.login'))
+	invite = UserInvitation.get_invite(url_token)
+	if not invite:
 		flash("Invite token is invalid or has expired", "danger")
-		session.pop('invite_token', None) # remove the invalid token from the session
 		return redirect(url_for('auth.login'))
 
-	form = InviteConfirmForm()
+	form = RegistrationForm()
 	if form.validate_on_submit():
-		user.set_password(form.password.data)
-		EmailToken.expire_token(tokenstr=token)
-		session.pop('invite_token', None) # remove the invite token from the session
-		# No need to db.session.commit() because expire_token commits the session for us
+		validemail = User.validate_email(form.email.data)
+		if not validemail:
+			flash("%s does not appear to be a valid, deliverable email address." % form.email.data, "danger")
+			return redirect(url_for('auth.invite_user', token=url_token))
+		new_user = User(email=validemail, is_admin=invite.is_admin)
+		new_user.set_password(form.password.data)
+		invite.accept_invite()
+		db.session.add(new_user)
+		db.session.commit()
 
 		flash('Your password has been set.', "success")
 		return redirect(url_for('auth.login'))
-	return render_template('auth/accept_invite.html', title="Accept Invitation", form=form)
-
-
-def get_token(token_name):
-	token = session[token_name]
-	if not token:
-		flash("Token not found!", "danger")
-		return redirect(url_for('auth.login'))
-	return token
+	return render_template('auth/register.html', title="Accept Invitation", form=form)

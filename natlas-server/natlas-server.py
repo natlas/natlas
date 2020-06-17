@@ -1,6 +1,6 @@
 from app import create_app, db
 from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, RescanTask, \
-	Tag, Agent, AgentScript, EmailToken, ScopeLog
+	Tag, Agent, AgentScript, ScopeLog, UserInvitation
 from app.instrumentation import initialize_sentryio
 from sentry_sdk import capture_exception
 from config import Config
@@ -28,6 +28,6 @@ def make_shell_context():
 		'Tag': Tag,
 		'Agent': Agent,
 		'AgentScript': AgentScript,
-		'EmailToken': EmailToken,
+		'UserInvitation': UserInvitation,
 		'ScopeLog': ScopeLog
 	}
