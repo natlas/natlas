@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login, db
 from app.models.dict_serializable import DictSerializable
+from app.models.token_validation import validate_token
 import secrets
 from app.util import utcnow_tz
 from datetime import timedelta
@@ -67,13 +68,9 @@ class User(UserMixin, db.Model, DictSerializable):
 
 	@staticmethod
 	def get_user_by_token(url_token):
-		token_user = User.query.filter_by(token=url_token).first()
-		if token_user and secrets.compare_digest(url_token, token_user.password_reset_token) and token_user.validate_reset_token():
-			return token_user
-		else:
-			# still do a digest compare of equal sizes to resist timing attacks
-			secrets.compare_digest(url_token, secrets.token_urlsafe(User.token_length))
-			return False
+		record = User.query.filter_by(password_reset_token=url_token).first()
+		result = validate_token(record, url_token, record.password_reset_token, record.validate_reset_token)
+		return result
 
 	@staticmethod
 	def new_user_from_invite(invite, password, email=None):

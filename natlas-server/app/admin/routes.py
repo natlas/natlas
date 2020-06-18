@@ -42,8 +42,12 @@ def users():
 			flash(f"{inviteForm.email.data} does not appear to be a valid, deliverable email address.", "danger")
 			return redirect(request.referrer)
 		invitation = UserInvitation.new_invite(validemail)
-		send_auth_email(invitation.email, invitation.token, 'invite')
-		flash('Invitation Sent!', 'success')
+		if current_app.config.get('MAIL_SERVER', None):
+			send_auth_email(invitation.email, invitation.token, 'invite')
+			flash('Invitation Sent!', 'success')
+		else:
+			invite_url = url_for('auth.invite_user', token=invitation.token, _external=True, _scheme=current_app.config['PREFERRED_URL_SCHEME'])
+			flash(f"Share this link: {invite_url}", "success")
 		db.session.commit()
 		return redirect(url_for('admin.users'))
 	return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)

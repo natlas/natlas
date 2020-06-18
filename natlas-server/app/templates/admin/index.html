@@ -24,34 +24,6 @@
             {{ configForm.custom_brand.label(class="control-label") }}
             {{ configForm.custom_brand(value=configItems["CUSTOM_BRAND"], class="form-control", placeholder="Natlas Internal") }}
         </div>
-    	<h3>Mail Settings</h3>
-    	<small id="mailSettingsHelp" class="form-text text-muted">Mail settings are used to send invitation emails and password resets.</small>
-    	<div class="form-group">
-    		{{ configForm.mail_from.label(class="control-label") }}
-    		{{ configForm.mail_from(value=configItems["MAIL_FROM"], class="form-control") }}
-    	</div>
-    	<div class="form-group">
-    		{{ configForm.mail_server.label(class="control-label") }}
-    		{{ configForm.mail_server(value=configItems["MAIL_SERVER"], class="form-control") }}
-    	</div>
-    	<div class="form-group">
-    		{{ configForm.mail_port.label(class="control-label") }}
-    		{{ configForm.mail_port(value=configItems["MAIL_PORT"], class="form-control") }}
-    	</div>
-    	<div class="form-check">
-            {{ configForm.mail_use_tls(checked=configItems["MAIL_USE_TLS"], class="form-check-input") }}
-            {{ configForm.mail_use_tls.label(class="form-check-label") }}
-        </div>
-    	<div class="form-group">
-    		{{ configForm.mail_username.label(class="control-label") }}
-    		{{ configForm.mail_username(value=configItems["MAIL_USERNAME"], class="form-control", readonly="readonly", onfocus="javascript: this.removeAttribute('readonly')") }}
-    		<small id="usernameHelpBlock" class="form-text text-muted">Click the field to make changes</small>
-    	</div>
-    	<div class="form-group">
-    		{{ configForm.mail_password.label(class="control-label") }}
-    		{{ configForm.mail_password(value=configItems["MAIL_PASSWORD"], class="form-control", readonly="readonly", onfocus="javascript: this.removeAttribute('readonly')") }}
-    		<small id="passwordHelpBlock" class="form-text text-muted">Click the field to make changes</small>
-    	</div>
     	{{ configForm.submit(class="btn btn-primary") }}
     </form>
     </div>

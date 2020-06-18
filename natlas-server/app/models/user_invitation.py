@@ -3,6 +3,7 @@ from app.util import utcnow_tz
 import secrets
 from datetime import timedelta, datetime
 from app.models.dict_serializable import DictSerializable
+from app.models.token_validation import validate_token
 
 
 class UserInvitation(db.Model, DictSerializable):
@@ -38,13 +39,9 @@ class UserInvitation(db.Model, DictSerializable):
 	# Get invite from database in (roughly) constant time
 	@staticmethod
 	def get_invite(url_token):
-		db_token = UserInvitation.query.filter_by(token=url_token).first()
-		if db_token and secrets.compare_digest(url_token, db_token.token) and db_token.validate_invite():
-			return db_token
-		else:
-			# still do a digest compare of equal sizes to resist timing attacks
-			secrets.compare_digest(url_token, secrets.token_urlsafe(UserInvitation.token_length))
-			return False
+		record = UserInvitation.query.filter_by(token=url_token).first()
+		result = validate_token(record, url_token, record.token, record.validate_invite)
+		return result
 
 	def accept_invite(self):
 		now = datetime.utcnow()

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from wtforms import StringField, BooleanField, SubmitField, TextAreaField, PasswordField, IntegerField, SelectField
-from wtforms.validators import DataRequired, ValidationError, Email, Optional
+from wtforms import StringField, BooleanField, SubmitField, TextAreaField, IntegerField, SelectField
+from wtforms.validators import DataRequired, ValidationError, Email
 from app.models import User, ScopeItem, AgentScript
 import ipaddress
 
@@ -11,12 +11,6 @@ class ConfigForm(FlaskForm):
 	register_allowed = BooleanField('Registration Allowed')
 	agent_authentication = BooleanField('Agent Authentication Required')
 	custom_brand = StringField('Custom Branding')
-	mail_from = StringField("From Address", validators=[Email(), Optional()])
-	mail_server = StringField("Mail Server")
-	mail_port = StringField("Mail Port")
-	mail_use_tls = BooleanField("Use TLS")
-	mail_username = StringField("Mail username")
-	mail_password = PasswordField("Mail password")
 	submit = SubmitField("Save Changes")
 
 

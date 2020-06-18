@@ -122,7 +122,7 @@ def invite_user():
 	form_type = 'invite' if invite.email else 'register'
 	form = supported_forms[form_type]['form']()
 	if form.validate_on_submit():
-		email = invite.email if form_type == 'invite' else form.email.data
+		email = invite.email if invite.email else form.email.data
 		new_user = User.new_user_from_invite(invite, form.password.data, email=email)
 		db.session.commit()
 		login_user(new_user)

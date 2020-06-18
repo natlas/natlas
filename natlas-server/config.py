@@ -1,6 +1,7 @@
 import argparse
 import os
 import secrets
+import json
 from dotenv import load_dotenv
 
 
@@ -61,16 +62,25 @@ class Config(object):
 
 
 # NAME, TYPE, DEFAULT
-defaultConfig = [
-	("LOGIN_REQUIRED", "bool", "True"),
-	("REGISTER_ALLOWED", "bool", "False"),
-	("AGENT_AUTHENTICATION", "bool", "True"),
-	("CUSTOM_BRAND", "string", "")
-]
+defaultConfig = json.load(open('defaults/db_configs.json', 'r'))
 
 
 def get_defaults():
 	return defaultConfig
+
+
+def casted_value(type, value):
+	if type == "bool":
+		if value.lower() == "true":
+			return True
+		else:
+			return False
+	elif type == "string":
+		return str(value)
+	elif type == "int":
+		return int(value)
+	else:
+		return None
 
 
 def get_current_config():
