@@ -8,7 +8,7 @@ defaultConfig = json.load(open('defaults/db_configs.json', 'r'))
 
 
 def get_defaults():
-	return defaultConfig
+	return defaultConfig.items()
 
 
 # This mechanism for casting a bool is needed because bool("False") == True

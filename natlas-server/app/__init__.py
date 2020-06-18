@@ -39,6 +39,71 @@ def unauthorized():
 		return redirect(url_for('main.index'))
 
 
+def load_natlas_config(app):
+	if not db.engine.has_table("config_item"):
+		return
+
+	updated_items = 0
+	from app.models import ConfigItem
+	# Look to see if any new config items were added that aren't currently in db
+	default_configs = config.get_defaults()
+	for key, item in default_configs:
+		conf_item = ConfigItem.query.filter_by(name=key).first()
+		if not conf_item:
+			conf_item = ConfigItem(name=key, type=item['type'], value=item['default'])
+			db.session.add(conf_item)
+			updated_items += 1
+		app.config[conf_item.name] = config.casted_value(conf_item.type, conf_item.value)
+	if updated_items > 0:
+		db.session.commit()
+
+
+def load_natlas_services(app):
+	if not db.engine.has_table("natlas_services"):
+		return
+	from app.models import NatlasServices
+	current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
+	if not current_services:
+		# Let's populate server defaults
+		defaultServices = open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")).read().rstrip('\r\n')
+		defaultSha = hashlib.sha256(defaultServices.encode()).hexdigest()
+		current_services = NatlasServices(sha256=defaultSha, services=defaultServices) # default values until we load something
+		db.session.add(current_services)
+		db.session.commit()
+		print("NatlasServices populated with defaults")
+	app.current_services = current_services.as_dict()
+
+
+def load_agent_config(app):
+	if not db.engine.has_table("agent_config"):
+		return
+	# Load the current agent config, otherwise create it.
+	from app.models import AgentConfig
+	agentConfig = AgentConfig.query.get(1) # the agent config is updated in place so only 1 record
+	if not agentConfig:
+		agentConfig = AgentConfig() # populate an agent config with database defaults
+		db.session.add(agentConfig)
+		db.session.commit()
+		print("AgentConfig populated with defaults")
+	app.agentConfig = agentConfig.as_dict()
+
+
+def load_agent_scripts(app):
+	if not db.engine.has_table("agent_script"):
+		return
+	# Load the current agent config, otherwise create it.
+	from app.models import AgentScript
+	agentScripts = AgentScript.query.all()
+	if not agentScripts:
+		defaultAgentScript = AgentScript(name="default")
+		db.session.add(defaultAgentScript)
+		db.session.commit()
+		print("AgentScript populated with default")
+		agentScripts = [defaultAgentScript]
+	app.agentScripts = agentScripts
+	app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
+
+
 def create_app(config_class=config.Config, load_config=False):
 	app = Flask(__name__)
 	initialize_opencensus(config_class, app)
@@ -60,58 +125,10 @@ def create_app(config_class=config.Config, load_config=False):
 	)
 
 	with app.app_context():
-		if db.engine.has_table("config_item"):
-			print("Loading Config from database")
-			from app.models import ConfigItem
-			# Look to see if any new config items were added that aren't currently in db
-			default_configs = config.get_defaults()
-			for key, item in default_configs.items():
-				existing_item = ConfigItem.query.filter_by(name=key).first()
-				if not existing_item:
-					newConfItem = ConfigItem(name=key, type=item['type'], value=item['default'])
-					db.session.add(newConfItem)
-					app.config[newConfItem.name] = config.casted_value(newConfItem.type, newConfItem.value)
-					db.session.commit()
-				# config item exists so lets add it to app config
-				else:
-					app.config[existing_item.name] = config.casted_value(existing_item.type, existing_item.value)
-
-		if db.engine.has_table("natlas_services"):
-			from app.models import NatlasServices
-			current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
-			if not current_services:
-				# Let's populate server defaults
-				defaultServices = open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")).read().rstrip('\r\n')
-				defaultSha = hashlib.sha256(defaultServices.encode()).hexdigest()
-				current_services = NatlasServices(sha256=defaultSha, services=defaultServices) # default values until we load something
-				db.session.add(current_services)
-				db.session.commit()
-				print("NatlasServices populated with defaults")
-			app.current_services = current_services.as_dict()
-
-		if db.engine.has_table("agent_config"):
-			# Load the current agent config, otherwise create it.
-			from app.models import AgentConfig
-			agentConfig = AgentConfig.query.get(1) # the agent config is updated in place so only 1 record
-			if not agentConfig:
-				agentConfig = AgentConfig() # populate an agent config with database defaults
-				db.session.add(agentConfig)
-				db.session.commit()
-				print("AgentConfig populated with defaults")
-			app.agentConfig = agentConfig.as_dict()
-
-		if db.engine.has_table("agent_script"):
-			# Load the current agent config, otherwise create it.
-			from app.models import AgentScript
-			agentScripts = AgentScript.query.all()
-			if not agentScripts:
-				defaultAgentScript = AgentScript(name="default")
-				db.session.add(defaultAgentScript)
-				db.session.commit()
-				print("AgentScript populated with default")
-				agentScripts = [defaultAgentScript]
-			app.agentScripts = agentScripts
-			app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
+		load_natlas_config(app)
+		load_natlas_services(app)
+		load_agent_config(app)
+		load_agent_scripts(app)
 
 	from app.scope import ScopeManager
 	app.ScopeManager = ScopeManager()
