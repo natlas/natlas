@@ -1,7 +1,7 @@
 from app import db
 from app.util import utcnow_tz
 import secrets
-from datetime import timedelta
+from datetime import timedelta, datetime
 from app.models.dict_serializable import DictSerializable
 
 
@@ -22,19 +22,18 @@ class UserInvitation(db.Model, DictSerializable):
 
 	# Build a new invitation
 	@staticmethod
-	def new_invite(email=None):
-		now = utcnow_tz()
+	def new_invite(email=None, is_admin=False):
+		now = datetime.utcnow()
 		expiration_date = now + timedelta(seconds=UserInvitation.expiration_duration)
 		new_token = secrets.token_urlsafe(UserInvitation.token_length)
-		if email:
-			existing_invite = UserInvitation.query.filter_by(email=email).first()
-			if existing_invite:
-				existing_invite.expire_invite(now)
-			newInvite = UserInvitation(email=email, token=new_token, expiration_date=expiration_date)
+		invite = UserInvitation.query.filter_by(email=email).first()
+		if invite and not invite.accepted_date:
+			invite.token = new_token
+			invite.expiration_date = expiration_date
 		else:
-			newInvite = UserInvitation(token=new_token, expiration_date=expiration_date)
-		db.session.add(newInvite)
-		return newInvite
+			invite = UserInvitation(email=email, token=new_token, is_admin=is_admin, expiration_date=expiration_date)
+			db.session.add(invite)
+		return invite
 
 	# Get invite from database in (roughly) constant time
 	@staticmethod
@@ -48,24 +47,24 @@ class UserInvitation(db.Model, DictSerializable):
 			return False
 
 	def accept_invite(self):
-		now = utcnow_tz()
-		self.date_accepted = now
+		now = datetime.utcnow()
+		self.accepted_date = now
 		self.expire_invite(now)
 
 	# If a token is expired, mark it as such
 	def expire_invite(self, timestamp):
-		if self.token_expiration < timestamp:
+		if self.expiration_date < timestamp:
 			# Leave original expiration date in tact since it's already past
 			self.is_expired = True
 		else:
 			# Mark now as the expiration because it's been redeemed
-			self.token_expiration = timestamp
+			self.expiration_date = timestamp
 			self.is_expired = True
 
 	# verify that the token is not expired
 	def validate_invite(self):
-		now = utcnow_tz()
-		if self.token_expiration > now and not self.is_expired:
+		now = datetime.utcnow()
+		if self.expiration_date > now and not self.is_expired:
 			return True
 		else:
 			return False

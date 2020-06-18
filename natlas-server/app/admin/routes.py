@@ -3,7 +3,7 @@ from flask_login import current_user
 from app import db
 from app.admin import bp
 from app.admin import forms
-from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag, ScopeLog
+from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag, ScopeLog, UserInvitation
 from app.auth.email import send_auth_email
 from app.auth.wrappers import isAuthenticated, isAdmin
 import ipaddress
@@ -41,11 +41,10 @@ def users():
 		if not validemail:
 			flash(f"{inviteForm.email.data} does not appear to be a valid, deliverable email address.", "danger")
 			return redirect(request.referrer)
-		newUser = User(email=validemail)
-		db.session.add(newUser)
-		db.session.commit()
-		send_auth_email(newUser, 'invite')
+		invitation = UserInvitation.new_invite(validemail)
+		send_auth_email(invitation.email, invitation.token, 'invite')
 		flash('Invitation Sent!', 'success')
+		db.session.commit()
 		return redirect(url_for('admin.users'))
 	return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
 

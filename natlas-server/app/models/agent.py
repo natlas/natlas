@@ -1,7 +1,7 @@
 from app import db
 from app.util import utcnow_tz, generate_hex_16
 import string
-import random
+import secrets
 from app.models.dict_serializable import DictSerializable
 
 
@@ -31,7 +31,7 @@ class Agent(db.Model, DictSerializable):
 	@staticmethod
 	def generate_token():
 		tokencharset = string.ascii_uppercase + string.ascii_lowercase + string.digits
-		return ''.join(random.choice(tokencharset) for _ in range(32))
+		return ''.join(secrets.choice(tokencharset) for _ in range(32))
 
 	@staticmethod
 	def generate_agentid():

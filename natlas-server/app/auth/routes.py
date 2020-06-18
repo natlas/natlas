@@ -12,17 +12,21 @@ from werkzeug.urls import url_parse
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
 	if current_user.is_authenticated:
+		print("current user is authenticated")
 		return redirect(url_for('main.index'))
 	form = LoginForm()
 	if form.validate_on_submit():
+		print("form validated")
 		user = User.query.filter_by(email=User.validate_email(form.email.data)).first()
 		if user is None or not user.check_password(form.password.data):
 			flash('Invalid email or password', 'danger')
 			return redirect(url_for('auth.login'))
+		print("login user?")
 		login_user(user, remember=form.remember_me.data)
 		next_page = request.args.get('next')
 		if not next_page or url_parse(next_page).netloc != '':
 			next_page = url_for('main.index')
+		print(f"next_page={next_page}")
 		return redirect(next_page)
 	return render_template('auth/login.html', title='Sign In', form=form)
 
@@ -79,7 +83,7 @@ def reset_password_request():
 
 
 @bp.route('/reset_password', methods=['GET', 'POST'])
-def reset_password(token):
+def reset_password():
 	url_token = request.args.get('token', None)
 	if not url_token:
 		flash("No reset token found")
@@ -100,7 +104,7 @@ def reset_password(token):
 
 
 @bp.route('/invite', methods=['GET', 'POST'])
-def invite_user(token):
+def invite_user():
 	if current_user.is_authenticated:
 		return redirect(url_for('main.index'))
 	url_token = request.args.get('token', None)
@@ -118,7 +122,7 @@ def invite_user(token):
 		if not validemail:
 			flash("%s does not appear to be a valid, deliverable email address." % form.email.data, "danger")
 			return redirect(url_for('auth.invite_user', token=url_token))
-		new_user = User(email=validemail, is_admin=invite.is_admin)
+		new_user = User(email=validemail, is_admin=invite.is_admin, is_active=True)
 		new_user.set_password(form.password.data)
 		invite.accept_invite()
 		db.session.add(new_user)

@@ -1,5 +1,6 @@
 import argparse
 import os
+import secrets
 from dotenv import load_dotenv
 
 
@@ -12,38 +13,51 @@ class Config(object):
 	BASEDIR = os.path.abspath(os.path.dirname(__file__))
 	load_dotenv(os.path.join(BASEDIR, '.env'))
 
-	# We aren't storing this in the database because it wouldn't be a very good secret then
-	SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-should-set-a-secret-key'
+	# Leaving this empty will work fine for requests but scripts won't be able to generate links
+	# Examples: localhost:5000, natlas.io
+	SERVER_NAME = os.environ.get('SERVER_NAME', None)
 
-	# This isn't in the database because it doesn't _really_ matter.
-	PREFERRED_URL_SCHEME = 'https'
+	# We aren't storing this in the database because it wouldn't be a very good secret then
+	# If a key is not provided, generate a new one when the application starts
+	SECRET_KEY = os.environ.get('SECRET_KEY', secrets.token_urlsafe(64))
+
+	# Optionally generate links with http instead of https by overriding this value
+	PREFERRED_URL_SCHEME = os.environ.get('PREFERRED_URL_SCHEME', 'https')
 
 	# This isn't in the database because this is where we find the database.
-	SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or \
-		'sqlite:///' + os.path.join(BASEDIR, 'metadata.db')
+	SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///' + os.path.join(BASEDIR, 'metadata.db'))
 
 	# This isn't in the database because we'll never want to change it
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 	# This isn't in the database because it really shouldn't be changing on-the-fly
 	# Also make sure that you're using an absolute path if you're serving your app directly via flask
-	MEDIA_DIRECTORY = os.environ.get('MEDIA_DIRECTORY') or os.path.join(BASEDIR, 'media/')
+	MEDIA_DIRECTORY = os.environ.get('MEDIA_DIRECTORY', os.path.join(BASEDIR, 'media/'))
 
 	# Elasticsearch only gets loaded from environment
-	ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL') or 'http://localhost:9200'
+	ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL', 'http://localhost:9200')
+
+	# MAIL SETTINGS
+	MAIL_SERVER = os.environ.get('MAIL_SERVER', None)
+	MAIL_PORT = int(os.environ.get('MAIL_PORT', 25))
+	MAIL_USE_TLS = bool(os.environ.get('MAIL_USE_TLS', False))
+	MAIL_USERNAME = os.environ.get('MAIL_USERNAME', None)
+	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', None)
+	MAIL_FROM = os.environ.get('MAIL_FROM', None)
 
 	# Allow version overrides for local development
 	# Necessary to test versioned host data templates before release
-	version_override = os.environ.get("NATLAS_VERSION_OVERRIDE") or None
+	version_override = os.environ.get("NATLAS_VERSION_OVERRIDE", None)
 
-	sentry_dsn = os.environ.get("SENTRY_DSN") or None
-
-	opencensus_enable = os.environ.get("OPENCENSUS_ENABLE") or False
-	opencensus_sample_rate = float(os.environ.get("OPENCENSUS_SAMPLE_RATE") or 1)
-	opencensus_agent = os.environ.get("OPENCENSUS_AGENT") or '127.0.0.1:55678'
-
+	# Replace NATLAS_VERSION so that the rest of the code doesn't have to care if it's being overridden
 	if version_override:
 		NATLAS_VERSION = version_override
+
+	# Instrumentation isn't directly used by the flask app context so does not need to be ALL_CAPS
+	sentry_dsn = os.environ.get("SENTRY_DSN", None)
+	opencensus_enable = os.environ.get("OPENCENSUS_ENABLE", False)
+	opencensus_sample_rate = float(os.environ.get("OPENCENSUS_SAMPLE_RATE", 1))
+	opencensus_agent = os.environ.get("OPENCENSUS_AGENT", '127.0.0.1:55678')
 
 
 # NAME, TYPE, DEFAULT
@@ -51,12 +65,6 @@ defaultConfig = [
 	("LOGIN_REQUIRED", "bool", "True"),
 	("REGISTER_ALLOWED", "bool", "False"),
 	("AGENT_AUTHENTICATION", "bool", "True"),
-	("MAIL_SERVER", "string", "localhost"),
-	("MAIL_PORT", "int", "25"),
-	("MAIL_USE_TLS", "bool", "False"),
-	("MAIL_USERNAME", "string", ""),
-	("MAIL_PASSWORD", "string", ""),
-	("MAIL_FROM", "string", ""),
 	("CUSTOM_BRAND", "string", "")
 ]
 

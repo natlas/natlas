@@ -1,5 +1,4 @@
 from email_validator import validate_email, EmailNotValidError
-import string
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login, db
@@ -17,13 +16,12 @@ class User(UserMixin, db.Model, DictSerializable):
 	results_per_page = db.Column(db.Integer, default=100)
 	preview_length = db.Column(db.Integer, default=100)
 	result_format = db.Column(db.Integer, default=0)
-	rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
-	agents = db.relationship('Agent', backref='user', lazy=True)
-
 	password_reset_token = db.Column(db.String(32), unique=True)
 	password_reset_expiration = db.Column(db.DateTime)
 	creation_date = db.Column(db.DateTime, default=utcnow_tz)
 	is_active = db.Column(db.Boolean, default=False)
+	rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
+	agents = db.relationship('Agent', backref='user', lazy=True)
 
 	# Tokens expire after 48 hours or upon use
 	expiration_duration = 60 * 60 * 24 * 2
@@ -42,12 +40,6 @@ class User(UserMixin, db.Model, DictSerializable):
 		except EmailNotValidError:
 			return False
 
-	# This is really only used by the add-user bootstrap script, but useful to contain it here.
-	@staticmethod
-	def generate_password(length):
-		passcharset = string.ascii_uppercase + string.ascii_lowercase + string.digits
-		return ''.join(secrets.choice(passcharset) for i in range(16))
-
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
 
@@ -56,7 +48,7 @@ class User(UserMixin, db.Model, DictSerializable):
 
 	@login.user_loader
 	def load_user(id):
-		return User.query.get(int(id))
+		return User.query.get(id)
 
 	def new_reset_token(self):
 		self.password_reset_token = secrets.token_urlsafe(User.token_length)
