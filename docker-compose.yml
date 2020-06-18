@@ -22,7 +22,7 @@ services:
     restart: on-failure
 
   webpack-server:
-    image: node:10.17.0-stretch
+    image: node:12-stretch
     command: /bin/bash -c '/usr/local/bin/yarn install && /usr/local/bin/yarn run webpack --mode development --watch'
     networks:
       - backend
