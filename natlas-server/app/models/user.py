@@ -74,3 +74,12 @@ class User(UserMixin, db.Model, DictSerializable):
 			# still do a digest compare of equal sizes to resist timing attacks
 			secrets.compare_digest(url_token, secrets.token_urlsafe(User.token_length))
 			return False
+
+	@staticmethod
+	def new_user_from_invite(invite, password, email=None):
+		user_email = email if email else invite.email
+		new_user = User(email=user_email, is_admin=invite.is_admin, is_active=True)
+		new_user.set_password(password)
+		invite.accept_invite()
+		db.session.add(new_user)
+		return new_user

@@ -103,30 +103,29 @@ def reset_password():
 @is_not_authenticated
 def invite_user():
 	url_token = request.args.get('token', None)
-	if not url_token:
-		flash("No invite token found")
-		return redirect(url_for('auth.login'))
 	invite = UserInvitation.get_invite(url_token)
 	if not invite:
 		flash("Invite token is invalid or has expired", "danger")
 		return redirect(url_for('auth.login'))
-	if invite.email:
-		form = AcceptInviteForm()
-		template = 'auth/accept_invite.html'
-	else:
-		form = RegistrationForm()
-		template = 'auth/register.html'
+
+	supported_forms = {
+		'invite': {
+			'form': AcceptInviteForm,
+			'template': 'auth/accept_invite.html'
+		},
+		'register': {
+			'form': RegistrationForm,
+			'template': 'auth/register.html'
+		}
+	}
+
+	form_type = 'invite' if invite.email else 'register'
+	form = supported_forms[form_type]['form']()
 	if form.validate_on_submit():
-		if invite.email:
-			email = invite.email
-		elif form.email.data:
-			email = form.email.data
-		new_user = User(email=email, is_admin=invite.is_admin, is_active=True)
-		new_user.set_password(form.password.data)
-		invite.accept_invite()
-		db.session.add(new_user)
+		email = invite.email if form_type == 'invite' else form.email.data
+		new_user = User.new_user_from_invite(invite, form.password.data, email=email)
 		db.session.commit()
 		login_user(new_user)
 		flash('Your password has been set.', "success")
 		return redirect(url_for('main.browse'))
-	return render_template(template, title="Accept Invitation", form=form)
+	return render_template(supported_forms[form_type]['template'], title="Accept Invitation", form=form)

@@ -37,11 +37,13 @@ def is_admin(f):
 def is_agent_authenticated(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
-		if current_app.config['AGENT_AUTHENTICATION']:
-			if 'Authorization' not in request.headers or not Agent.verify_agent(request.headers["Authorization"]):
-				status_code = 403
-				response_body = json.dumps({'status': status_code, 'message': 'Authorization is required to access this endpoint', 'retry': False})
-				response = Response(response=response_body, status=status_code, content_type='application/json')
-				return response
+		# if we don't require agent authentication then don't bother
+		if not current_app.config['AGENT_AUTHENTICATION']:
+			return f(*args, **kwargs)
+		if not request.headers.get("Authorization", None) or not Agent.verify_agent(request.headers["Authorization"]):
+			status_code = 403
+			response_body = json.dumps({'status': status_code, 'message': 'Authorization is required to access this endpoint', 'retry': False})
+			response = Response(response=response_body, status=status_code, content_type='application/json')
+			return response
 		return f(*args, **kwargs)
 	return decorated_function
