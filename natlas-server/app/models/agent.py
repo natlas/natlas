@@ -19,10 +19,19 @@ class Agent(db.Model, DictSerializable):
 	# optional friendly name for viewing on user page
 	friendly_name = db.Column(db.String(32), default="")
 
-	def verify_token(self, token):
-		if self.token == token:
-			return True
-		return False
+	def verify_secret(self, secret):
+		return secrets.compare_digest(secret, self.token)
+
+	@staticmethod
+	def verify_agent(auth_header):
+		auth_list = auth_header.split()
+		if auth_list[0].lower() != "bearer":
+			return False
+		agent_id, agent_token = auth_list[1].split(':', 1)
+		agent = Agent.load_agent(agent_id)
+		if not agent or not agent.verify_secret(agent_token):
+			return False
+		return True
 
 	@staticmethod
 	def load_agent(agentid):
