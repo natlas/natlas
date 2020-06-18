@@ -1,46 +1,42 @@
 from flask import redirect, url_for, flash, render_template, request, current_app
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user
 from app import db
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, \
-	ResetPasswordForm
+	ResetPasswordForm, AcceptInviteForm
 from app.models import User, UserInvitation
 from app.auth.email import send_auth_email
 from app.auth import bp
+from app.auth.wrappers import isNotAuthenticated, isAuthenticated
 from werkzeug.urls import url_parse
 
 
 @bp.route('/login', methods=['GET', 'POST'])
+@isNotAuthenticated
 def login():
-	if current_user.is_authenticated:
-		print("current user is authenticated")
-		return redirect(url_for('main.index'))
 	form = LoginForm()
 	if form.validate_on_submit():
-		print("form validated")
 		user = User.query.filter_by(email=User.validate_email(form.email.data)).first()
 		if user is None or not user.check_password(form.password.data):
 			flash('Invalid email or password', 'danger')
 			return redirect(url_for('auth.login'))
-		print("login user?")
 		login_user(user, remember=form.remember_me.data)
 		next_page = request.args.get('next')
 		if not next_page or url_parse(next_page).netloc != '':
 			next_page = url_for('main.index')
-		print(f"next_page={next_page}")
 		return redirect(next_page)
 	return render_template('auth/login.html', title='Sign In', form=form)
 
 
 @bp.route('/logout')
+@isAuthenticated
 def logout():
 	logout_user()
-	return redirect(url_for('main.index'))
+	return redirect(url_for('auth.login'))
 
 
 @bp.route('/register', methods=['GET', 'POST'])
+@isNotAuthenticated
 def register():
-	if current_user.is_authenticated:
-		return redirect(url_for('main.index'))
 	if not current_app.config['REGISTER_ALLOWED']:
 		flash("Sorry, we're not currently accepting new users. If you feel you've received this message in error, please contact an administrator.", "warning")
 		return redirect(url_for('auth.login'))
@@ -60,9 +56,8 @@ def register():
 
 
 @bp.route('/reset_password', methods=['GET', 'POST'])
+@isNotAuthenticated
 def reset_password_request():
-	if current_user.is_authenticated:
-		return redirect(url_for('main.index'))
 	form = ResetPasswordRequestForm()
 	if form.validate_on_submit():
 		validemail = User.validate_email(form.email.data)
@@ -83,6 +78,7 @@ def reset_password_request():
 
 
 @bp.route('/reset_password', methods=['GET', 'POST'])
+@isNotAuthenticated
 def reset_password():
 	url_token = request.args.get('token', None)
 	if not url_token:
@@ -104,9 +100,8 @@ def reset_password():
 
 
 @bp.route('/invite', methods=['GET', 'POST'])
+@isNotAuthenticated
 def invite_user():
-	if current_user.is_authenticated:
-		return redirect(url_for('main.index'))
 	url_token = request.args.get('token', None)
 	if not url_token:
 		flash("No invite token found")
@@ -115,19 +110,23 @@ def invite_user():
 	if not invite:
 		flash("Invite token is invalid or has expired", "danger")
 		return redirect(url_for('auth.login'))
-
-	form = RegistrationForm()
+	if invite.email:
+		form = AcceptInviteForm()
+		template = 'auth/accept_invite.html'
+	else:
+		form = RegistrationForm()
+		template = 'auth/register.html'
 	if form.validate_on_submit():
-		validemail = User.validate_email(form.email.data)
-		if not validemail:
-			flash("%s does not appear to be a valid, deliverable email address." % form.email.data, "danger")
-			return redirect(url_for('auth.invite_user', token=url_token))
-		new_user = User(email=validemail, is_admin=invite.is_admin, is_active=True)
+		if invite.email:
+			email = invite.email
+		elif form.email.data:
+			email = form.email.data
+		new_user = User(email=email, is_admin=invite.is_admin, is_active=True)
 		new_user.set_password(form.password.data)
 		invite.accept_invite()
 		db.session.add(new_user)
 		db.session.commit()
-
+		login_user(new_user)
 		flash('Your password has been set.', "success")
-		return redirect(url_for('auth.login'))
-	return render_template('auth/register.html', title="Accept Invitation", form=form)
+		return redirect(url_for('main.browse'))
+	return render_template(template, title="Accept Invitation", form=form)

@@ -1,4 +1,4 @@
-from flask import current_app, request
+from flask import current_app, request, flash, url_for, redirect
 from flask_login import current_user
 from app import login as lm
 from app.models import Agent
@@ -11,6 +11,16 @@ def isAuthenticated(f):
 	def decorated_function(*args, **kwargs):
 		if current_app.config['LOGIN_REQUIRED'] and not current_user.is_authenticated:
 			return lm.unauthorized()
+		return f(*args, **kwargs)
+	return decorated_function
+
+
+def isNotAuthenticated(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		if current_user.is_authenticated:
+			flash("You're already logged in!", "warning")
+			return redirect(url_for('main.browse'))
 		return f(*args, **kwargs)
 	return decorated_function
 
