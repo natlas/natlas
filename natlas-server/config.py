@@ -1,8 +1,33 @@
-import argparse
 import os
 import secrets
 import json
 from dotenv import load_dotenv
+
+# NAME, TYPE, DEFAULT
+defaultConfig = json.load(open('defaults/db_configs.json', 'r'))
+
+
+def get_defaults():
+	return defaultConfig
+
+
+# This mechanism for casting a bool is needed because bool("False") == True
+def casted_bool(value):
+	if isinstance(value, bool):
+		return value
+	if value.lower() == "true":
+		return True
+	else:
+		return False
+
+
+def casted_value(expected_type, value):
+	cast_map = {
+		"bool": casted_bool,
+		"string": str,
+		"int": int
+	}
+	return cast_map[expected_type](value)
 
 
 # Things in the Class object are config options we will likely never want to change from the database.
@@ -41,7 +66,7 @@ class Config(object):
 	# MAIL SETTINGS
 	MAIL_SERVER = os.environ.get('MAIL_SERVER', None)
 	MAIL_PORT = int(os.environ.get('MAIL_PORT', 25))
-	MAIL_USE_TLS = bool(os.environ.get('MAIL_USE_TLS', False))
+	MAIL_USE_TLS = casted_bool(os.environ.get('MAIL_USE_TLS', False))
 	MAIL_USERNAME = os.environ.get('MAIL_USERNAME', None)
 	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', None)
 	MAIL_FROM = os.environ.get('MAIL_FROM', None)
@@ -56,81 +81,6 @@ class Config(object):
 
 	# Instrumentation isn't directly used by the flask app context so does not need to be ALL_CAPS
 	sentry_dsn = os.environ.get("SENTRY_DSN", None)
-	opencensus_enable = os.environ.get("OPENCENSUS_ENABLE", False)
+	opencensus_enable = casted_bool(os.environ.get("OPENCENSUS_ENABLE", False))
 	opencensus_sample_rate = float(os.environ.get("OPENCENSUS_SAMPLE_RATE", 1))
 	opencensus_agent = os.environ.get("OPENCENSUS_AGENT", '127.0.0.1:55678')
-
-
-# NAME, TYPE, DEFAULT
-defaultConfig = json.load(open('defaults/db_configs.json', 'r'))
-
-
-def get_defaults():
-	return defaultConfig
-
-
-def casted_value(type, value):
-	if type == "bool":
-		if value.lower() == "true":
-			return True
-		else:
-			return False
-	elif type == "string":
-		return str(value)
-	elif type == "int":
-		return int(value)
-	else:
-		return None
-
-
-def get_current_config():
-	from app import create_app
-	from app.models import ConfigItem
-	app = create_app(load_config=False)
-	with app.app_context():
-		for item in ConfigItem.query.all():
-			print("%s, %s, %s" % (item.name, item.type, item.value))
-
-
-# run as standalone to populate the config items into the database using environment or default values
-def populate_defaults(verbose=False):
-
-	from app import create_app, db
-	from app.models import ConfigItem
-	app = create_app(load_config=False)
-	with app.app_context():
-		for item in defaultConfig:
-			conf = ConfigItem.query.filter_by(name=item[0]).first()
-			if conf:
-				conf.type = item[1]
-				conf.value = os.environ.get(item[0]) or item[2]
-				if verbose:
-					print("[+] Item named %s already existed. Setting type to '%s' and value to '%s'" % (item[0], item[1], conf.value))
-			else:
-				if verbose:
-					print("[+] Adding config item named '%s', of type '%s', with value '%s'." % (item[0], item[1], item[2]))
-				conf = ConfigItem(name=item[0], type=item[1], value=os.environ.get(item[0]) or item[2])
-			db.session.add(conf)
-		print("[+] Committing config changes to database")
-		db.session.commit()
-
-
-def main():
-	parser_desc = '''
-	Utility for initially populating the database from the environment. Flask will automatically try to populate the database if no config items are found.
-	Only run this if you want to reset the config settings to default or to environment variables.
-	'''
-	parser_epil = "Be sure that you're running this from within the virtual environment for the server."
-	parser = argparse.ArgumentParser(description=parser_desc, epilog=parser_epil)
-	parser.add_argument("--populate", action="store_true", default=False)
-	parser.add_argument("-v", "--verbose", action="store_true", default=False)
-	args = parser.parse_args()
-	if args.populate:
-		populate_defaults(args.verbose)
-	else:
-		print("[+] Getting current config from database\nNAME, TYPE, VALUE")
-		get_current_config()
-
-
-if __name__ == "__main__":
-	main()

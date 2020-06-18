@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask import flash
 from flask_wtf.file import FileField
 from wtforms import StringField, BooleanField, SubmitField, TextAreaField, IntegerField, SelectField
 from wtforms.validators import DataRequired, ValidationError, Email
@@ -19,9 +20,13 @@ class InviteUserForm(FlaskForm):
 	submit = SubmitField('Invite User')
 
 	def validate_email(self, email):
+		if not User.validate_email(email.data):
+			flash(f"{email.data} does not appear to be a valid, deliverable email address.", "danger")
+			raise ValidationError
 		user = User.query.filter_by(email=email.data).first()
 		if user is not None:
-			raise ValidationError('Email %s already exists!' % user.email)
+			flash(f"Email {user.email} already exists!", "danger")
+			raise ValidationError
 
 
 class UserDeleteForm(FlaskForm):

@@ -33,15 +33,9 @@ def admin():
 @is_admin
 def users():
 	users = User.query.all()
-	delForm = forms.UserDeleteForm()
-	editForm = forms.UserEditForm()
 	inviteForm = forms.InviteUserForm()
 	if inviteForm.validate_on_submit():
-		validemail = User.validate_email(inviteForm.email.data)
-		if not validemail:
-			flash(f"{inviteForm.email.data} does not appear to be a valid, deliverable email address.", "danger")
-			return redirect(request.referrer)
-		invitation = UserInvitation.new_invite(validemail)
+		invitation = UserInvitation.new_invite(inviteForm.email.data)
 		if current_app.config.get('MAIL_SERVER', None):
 			send_auth_email(invitation.email, invitation.token, 'invite')
 			flash('Invitation Sent!', 'success')
@@ -50,7 +44,7 @@ def users():
 			flash(f"Share this link: {invite_url}", "success")
 		db.session.commit()
 		return redirect(url_for('admin.users'))
-	return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
+	return render_template("admin/users.html", users=users, delForm=forms.UserDeleteForm(), editForm=forms.UserEditForm(), inviteForm=inviteForm)
 
 
 @bp.route('/users/<int:id>/delete', methods=['POST'])
