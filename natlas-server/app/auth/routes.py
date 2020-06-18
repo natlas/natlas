@@ -6,12 +6,12 @@ from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm
 from app.models import User, UserInvitation
 from app.auth.email import send_auth_email
 from app.auth import bp
-from app.auth.wrappers import isNotAuthenticated, isAuthenticated
+from app.auth.wrappers import is_not_authenticated, is_authenticated
 from werkzeug.urls import url_parse
 
 
 @bp.route('/login', methods=['GET', 'POST'])
-@isNotAuthenticated
+@is_not_authenticated
 def login():
 	form = LoginForm()
 	if form.validate_on_submit():
@@ -28,14 +28,14 @@ def login():
 
 
 @bp.route('/logout')
-@isAuthenticated
+@is_authenticated
 def logout():
 	logout_user()
 	return redirect(url_for('auth.login'))
 
 
 @bp.route('/register', methods=['GET', 'POST'])
-@isNotAuthenticated
+@is_not_authenticated
 def register():
 	if not current_app.config['REGISTER_ALLOWED']:
 		flash("Sorry, we're not currently accepting new users. If you feel you've received this message in error, please contact an administrator.", "warning")
@@ -56,7 +56,7 @@ def register():
 
 
 @bp.route('/reset_password', methods=['GET', 'POST'])
-@isNotAuthenticated
+@is_not_authenticated
 def reset_password_request():
 	form = ResetPasswordRequestForm()
 	if form.validate_on_submit():
@@ -78,7 +78,7 @@ def reset_password_request():
 
 
 @bp.route('/reset_password', methods=['GET', 'POST'])
-@isNotAuthenticated
+@is_not_authenticated
 def reset_password():
 	url_token = request.args.get('token', None)
 	if not url_token:
@@ -100,7 +100,7 @@ def reset_password():
 
 
 @bp.route('/invite', methods=['GET', 'POST'])
-@isNotAuthenticated
+@is_not_authenticated
 def invite_user():
 	url_token = request.args.get('token', None)
 	if not url_token:

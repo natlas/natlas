@@ -6,7 +6,7 @@ import json
 from functools import wraps
 
 
-def isAuthenticated(f):
+def is_authenticated(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		if current_app.config['LOGIN_REQUIRED'] and not current_user.is_authenticated:
@@ -15,7 +15,7 @@ def isAuthenticated(f):
 	return decorated_function
 
 
-def isNotAuthenticated(f):
+def is_not_authenticated(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		if current_user.is_authenticated:
@@ -25,7 +25,7 @@ def isNotAuthenticated(f):
 	return decorated_function
 
 
-def isAdmin(f):
+def is_admin(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		if current_user.is_anonymous or not current_user.is_admin:
@@ -34,7 +34,7 @@ def isAdmin(f):
 	return decorated_function
 
 
-def isAgentAuthenticated(f):
+def is_agent_authenticated(f):
 	@wraps(f)
 	def decorated_function(*args, **kwargs):
 		if current_app.config['AGENT_AUTHENTICATION']:

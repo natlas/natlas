@@ -2,18 +2,18 @@ from flask import redirect, url_for, render_template, \
 	Response, current_app, request, send_from_directory, jsonify
 from app.main import bp
 from app.main.pagination import build_pagination_urls, results_offset
-from app.auth.wrappers import isAuthenticated
+from app.auth.wrappers import is_authenticated
 
 
 @bp.route('/')
-@isAuthenticated
+@is_authenticated
 def index():
 	return redirect(url_for('main.browse'))
 
 
 # Serve media files in case the front-end proxy doesn't do it
 @bp.route('/media/<path:filename>')
-@isAuthenticated
+@is_authenticated
 def send_media(filename):
 	# If you're looking at this function, wondering why your files aren't sending...
 	# It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
@@ -21,7 +21,7 @@ def send_media(filename):
 
 
 @bp.route('/browse')
-@isAuthenticated
+@is_authenticated
 def browse():
 	''' A simple browser that doesn't deal with queries at all '''
 	page = int(request.args.get('page', 1))
@@ -44,7 +44,7 @@ def browse():
 
 
 @bp.route('/search')
-@isAuthenticated
+@is_authenticated
 def search():
 	''' Return search results for a given query '''
 	query = request.args.get('query', '')
@@ -92,13 +92,13 @@ def search():
 
 
 @bp.route('/searchmodal')
-@isAuthenticated
+@is_authenticated
 def search_modal():
 	return render_template("includes/search_modal_content.html")
 
 
 @bp.route("/screenshots")
-@isAuthenticated
+@is_authenticated
 def screenshots():
 	page = int(request.args.get('page', 1))
 
@@ -119,7 +119,7 @@ def screenshots():
 
 
 @bp.route('/status')
-@isAuthenticated
+@is_authenticated
 def status():
 	''' Simple html representation of the status api'''
 	return render_template('main/status.html')

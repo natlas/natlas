@@ -9,7 +9,7 @@ from app.api.processing.screenshot import process_screenshots
 from app.api.processing.ssl import parse_ssl_data
 from app.api.rescan_handler import mark_scan_dispatched, mark_scan_completed
 from libnmap.parser import NmapParser, NmapParserException
-from app.auth.wrappers import isAgentAuthenticated, isAuthenticated
+from app.auth.wrappers import is_agent_authenticated, is_authenticated
 from app.util import pretty_time_delta
 
 
@@ -17,7 +17,7 @@ json_content = 'application/json'
 
 
 @bp.route('/getwork', methods=['GET'])
-@isAgentAuthenticated
+@is_agent_authenticated
 def getwork():
 	manual = request.args.get('target', '')
 	if "natlas-agent" in request.headers["user-agent"]:
@@ -73,7 +73,7 @@ def getwork():
 
 
 @bp.route('/submit', methods=['POST'])
-@isAgentAuthenticated
+@is_agent_authenticated
 def submit():
 	status_code = None
 	response_body = None
@@ -156,7 +156,7 @@ def submit():
 
 
 @bp.route('/natlas-services', methods=['GET'])
-@isAgentAuthenticated
+@is_agent_authenticated
 def natlasServices():
 	if current_app.current_services["id"] != "None":
 		tmpdict = current_app.current_services.copy() # make an actual copy of the dict so that we can remove the list
@@ -171,7 +171,7 @@ def natlasServices():
 
 
 @bp.route('/status', methods=['GET'])
-@isAuthenticated
+@is_authenticated
 def status():
 	last_cycle_start = current_app.ScopeManager.get_last_cycle_start()
 	completed_cycles = current_app.ScopeManager.get_completed_cycle_count()
