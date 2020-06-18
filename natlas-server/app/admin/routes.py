@@ -4,7 +4,6 @@ from app import db
 from app.admin import bp
 from app.admin import forms
 from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag, ScopeLog, UserInvitation
-from app.auth.email import send_auth_email
 from app.auth.wrappers import is_authenticated, is_admin
 import ipaddress
 import hashlib
@@ -36,12 +35,8 @@ def users():
 	inviteForm = forms.InviteUserForm()
 	if inviteForm.validate_on_submit():
 		invitation = UserInvitation.new_invite(inviteForm.email.data)
-		if current_app.config.get('MAIL_SERVER', None):
-			send_auth_email(invitation.email, invitation.token, 'invite')
-			flash('Invitation Sent!', 'success')
-		else:
-			invite_url = url_for('auth.invite_user', token=invitation.token, _external=True, _scheme=current_app.config['PREFERRED_URL_SCHEME'])
-			flash(f"Share this link: {invite_url}", "success")
+		msg = UserInvitation.deliver_invite(invitation)
+		flash(msg, "success")
 		db.session.commit()
 		return redirect(url_for('admin.users'))
 	return render_template("admin/users.html", users=users, delForm=forms.UserDeleteForm(), editForm=forms.UserEditForm(), inviteForm=inviteForm)

@@ -2,10 +2,6 @@
 import argparse
 from app import create_app, db
 from app.models import User, UserInvitation
-from flask import url_for, current_app
-from app.auth.email import send_auth_email
-
-PASS_LENGTH = 16
 
 
 def make_user_admin(user):
@@ -21,12 +17,8 @@ def make_user_admin(user):
 # Create a new invitation because no user with supplied email exists
 def new_invite(email=None, admin=False):
 	invite = UserInvitation.new_invite(email=email, is_admin=admin)
-	if current_app.config.get('MAIL_SERVER', None) and email:
-		send_auth_email(email, invite.token, 'invite')
-		print(f"Sent {email} an invitation email via {current_app.config['MAIL_SERVER']}")
-	else:
-		invite_url = url_for('auth.invite_user', token=invite.token, _external=True, _scheme=current_app.config['PREFERRED_URL_SCHEME'])
-		print(f"Accept invitation: {invite_url}")
+	msg = UserInvitation.deliver_invite(invite)
+	print(msg)
 
 
 def main():
