@@ -42,6 +42,5 @@ COPY --from=build /.venv/lib/python3.6/site-packages /usr/local/lib/python3.6/di
 WORKDIR /opt/natlas/natlas-agent
 USER www-data
 ENV LC_ALL='C.UTF-8'
-ENV PATH="$PATH:/opt/natlas/natlas-agent/.venv/bin"
 
 CMD ["python3", "/opt/natlas/natlas-agent/natlas-agent.py"]
