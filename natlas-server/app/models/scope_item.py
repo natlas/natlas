@@ -62,41 +62,43 @@ class ScopeItem(db.Model, DictSerializable):
 
 		if '/' not in ip:
 			ip = ip + '/32'
-
+		ip = ScopeItem.validate_ip(ip)
 		return ip, tags
 
 	@staticmethod
-	def create_if_none(ip, blacklist):
+	def create_if_none(ip, blacklist, tags=[]):
 		new = False
 		item = ScopeItem.query.filter_by(target=ip).first()
 		if not item:
 			item = ScopeItem(target=ip, blacklist=blacklist)
 			db.session.add(item)
 			new = True
+		if tags:
+			ScopeItem.addTags(item, tags)
 		return new, item
 
 	@staticmethod
-	def importScope(line, blacklist):
-		failedImports = []
-		alreadyExists = []
-		successImports = []
-		ip, tags = ScopeItem.parse_import_line(line)
-
+	def validate_ip(ip_str):
 		try:
 			# False will mask out hostbits for us, ip_network for eventual ipv6 compat
-			isValid = ipaddress.ip_network(ip, False)
+			return ipaddress.ip_network(ip_str, False)
 		except ValueError:
 			# if we hit this ValueError it means that the input couldn't be a CIDR range
-			failedImports.append(line)
-			return failedImports, alreadyExists, successImports
+			return False
 
-		new, item = ScopeItem.create_if_none(isValid.with_prefixlen, blacklist)
-		if tags:
-			ScopeItem.addTags(item, tags)
-		if not new:
-			alreadyExists.append(item.target)
-			return failedImports, alreadyExists, successImports
-		else:
-			successImports.append(item.target)
+	@staticmethod
+	def import_scope_list(address_list, blacklist):
+		fail, exists, success = [], [], []
+		for line in address_list:
+			ip, tags = ScopeItem.parse_import_line(line.strip())
+			if not ip:
+				fail.append(line)
+				continue
 
-		return failedImports, alreadyExists, successImports
+			new, item = ScopeItem.create_if_none(ip.with_prefixlen, blacklist, tags)
+			if not new:
+				exists.append(item.target)
+			else:
+				success.append(item.target)
+
+		return fail, exists, success

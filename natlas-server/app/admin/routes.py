@@ -164,31 +164,23 @@ def importScope(scopetype=''):
 	else:
 		abort(404)
 	if importForm.validate_on_submit():
-		successImports = []
-		alreadyExists = []
-		failedImports = []
 		newScopeItems = importForm.scope.data.split('\n')
-		for item in newScopeItems:
-			item = item.strip()
-			fail, exist, success = ScopeItem.importScope(item, importBlacklist)
-			failedImports += fail
-			alreadyExists += exist
-			successImports += success
+		fail, exist, success = ScopeItem.import_scope(newScopeItems, importBlacklist)
 		db.session.commit()
 		current_app.ScopeManager.update()
-		if successImports:
-			flash('%s targets added to %s!' % (len(successImports), scopetype), 'success')
-		if alreadyExists:
-			flash('%s targets already existed!' % len(alreadyExists), 'info')
-		if failedImports:
-			flash('%s targets failed to import!' % len(failedImports), 'danger')
-			for item in failedImports:
-				flash('%s' % item, 'danger')
+		if success:
+			flash(f'{len(success)} targets added to {scopetype}!', 'success')
+		if exist:
+			flash(f'{len(exist)} targets already existed!', 'info')
+		if fail:
+			flash(f'{len(fail)} targets failed to import!', 'danger')
+			for item in fail:
+				flash(f'{item}', 'danger')
 	else:
 		for field, errors in importForm.errors.items():
 			for error in errors:
 				flash(error, 'danger')
-	return redirect(url_for('admin.%s' % scopetype))
+	return redirect(url_for(f'admin.{scopetype}'))
 
 
 @bp.route('/export/<string:scopetype>', methods=['GET'])
