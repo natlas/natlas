@@ -1,3 +1,5 @@
+import hashlib
+
 from app import db
 
 
@@ -7,6 +9,13 @@ class NatlasServices(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	sha256 = db.Column(db.String(64))
 	services = db.Column(db.Text)
+
+	def __init__(self, services):
+		self.services = services
+		self.sha256 = hashlib.sha256(self.services.encode()).hexdigest()
+
+	def hash_equals(self, hash):
+		return self.sha256 == hash
 
 	def services_as_list(self):
 		servlist = []

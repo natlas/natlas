@@ -1,12 +1,13 @@
+import ipaddress
+
 from flask import render_template, redirect, url_for, current_app, flash, Response, abort, request
 from flask_login import current_user
+
 from app import db
 from app.admin import bp
 from app.admin import forms
 from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag, ScopeLog, UserInvitation
 from app.auth.wrappers import is_authenticated, is_admin
-import ipaddress
-import hashlib
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -55,10 +56,10 @@ def deleteUser(id):
 		User.query.filter_by(id=id).delete()
 		db.session.commit()
 		flash('%s deleted!' % user.email, 'success')
-		return redirect(url_for('admin.users'))
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(url_for('admin.users'))
+
+	return redirect(url_for('admin.users'))
 
 
 @bp.route('/users/<int:id>/toggle', methods=['POST'])
@@ -76,15 +77,14 @@ def toggleUser(id):
 			user.is_admin = False
 			db.session.commit()
 			flash('User demoted!', 'success')
-			return redirect(url_for('admin.users'))
 		else:
 			user.is_admin = True
 			db.session.commit()
 			flash('User promoted!', 'success')
-			return redirect(url_for('admin.users'))
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(url_for('admin.users'))
+
+	return redirect(url_for('admin.users'))
 
 
 @bp.route('/scope', methods=['GET', 'POST'])
@@ -171,16 +171,16 @@ def importScope(scopetype=''):
 		for item in newScopeItems:
 			item = item.strip()
 			fail, exist, success = ScopeItem.importScope(item, importBlacklist)
-			failedImports = failedImports + fail
-			alreadyExists = alreadyExists + exist
-			successImports = successImports + success
+			failedImports += fail
+			alreadyExists += exist
+			successImports += success
 		db.session.commit()
 		current_app.ScopeManager.update()
-		if len(successImports) > 0:
+		if successImports:
 			flash('%s targets added to %s!' % (len(successImports), scopetype), 'success')
-		if len(alreadyExists) > 0:
+		if alreadyExists:
 			flash('%s targets already existed!' % len(alreadyExists), 'info')
-		if len(failedImports) > 0:
+		if failedImports:
 			flash('%s targets failed to import!' % len(failedImports), 'danger')
 			for item in failedImports:
 				flash('%s' % item, 'danger')
@@ -286,13 +286,12 @@ def services():
 	addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp", "UDP")]
 	if uploadForm.uploadFile.data and uploadForm.validate_on_submit():
 		newServicesContent = uploadForm.serviceFile.data.read().decode("utf-8").rstrip('\r\n')
-		newServicesSha = hashlib.sha256(newServicesContent.encode()).hexdigest()
-		if newServicesSha != current_app.current_services["sha256"]:
-			ns = NatlasServices(sha256=newServicesSha, services=newServicesContent)
-			db.session.add(ns)
+		new_services = NatlasServices(services=newServicesContent)
+		if not new_services.hash_equals(current_app.current_services["sha256"]):
+			db.session.add(new_services)
 			db.session.commit()
-			current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
-			flash("New services file with hash %s has been uploaded." % current_app.current_services["sha256"], "success")
+			current_app.current_services = new_services.as_dict()
+			flash(f'New services file with hash {current_app.current_services["sha256"]} has been uploaded.', "success")
 		else:
 			flash("That file is an exact match for our current services file!", "warning")
 		return redirect(url_for('admin.services'))
@@ -304,8 +303,7 @@ def services():
 			flash("A service with port %s already exists!" % newServicePort, "danger")
 		else:
 			newServices = current_app.current_services["services"] + "\n" + newServiceName + "\t" + newServicePort
-			newSha = hashlib.sha256(newServices.encode()).hexdigest()
-			ns = NatlasServices(sha256=newSha, services=newServices)
+			ns = NatlasServices(services=newServices)
 			db.session.add(ns)
 			db.session.commit()
 			current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
@@ -358,10 +356,10 @@ def addScript():
 		current_app.agentScripts = AgentScript.query.all()
 		current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)
 		flash("%s successfully added to scripts" % newscript.name, "success")
-		return redirect(request.referrer)
 	else:
 		flash("%s couldn't be added to scripts" % addScriptForm.scriptName.data, "danger")
-		return redirect(request.referrer)
+
+	return redirect(request.referrer)
 
 
 @bp.route('/agents/script/<string:name>/delete', methods=['POST'])

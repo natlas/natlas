@@ -1,14 +1,15 @@
+import os
+
 from flask import Flask, flash, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
+from webpack_manifest import webpack_manifest
+
 import config
 from app.elastic import ElasticInterface
-from webpack_manifest import webpack_manifest
-import os
-import hashlib
 from .instrumentation import initialize_opencensus
 
 
@@ -66,8 +67,7 @@ def load_natlas_services(app):
 	if not current_services:
 		# Let's populate server defaults
 		defaultServices = open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")).read().rstrip('\r\n')
-		defaultSha = hashlib.sha256(defaultServices.encode()).hexdigest()
-		current_services = NatlasServices(sha256=defaultSha, services=defaultServices) # default values until we load something
+		current_services = NatlasServices(services=defaultServices)
 		db.session.add(current_services)
 		db.session.commit()
 		print("NatlasServices populated with defaults")

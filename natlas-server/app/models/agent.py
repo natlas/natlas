@@ -29,9 +29,7 @@ class Agent(db.Model, DictSerializable):
 			return False
 		agent_id, agent_token = auth_list[1].split(':', 1)
 		agent = Agent.load_agent(agent_id)
-		if not agent or not agent.verify_secret(agent_token):
-			return False
-		return True
+		return bool(agent and agent.verify_secret(agent_token))
 
 	@staticmethod
 	def load_agent(agentid):
