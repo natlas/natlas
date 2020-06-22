@@ -65,7 +65,7 @@ class UserInvitation(db.Model, DictSerializable):
 			# Mark now as the expiration because it's been redeemed
 			self.expiration_date = timestamp
 
-		# Leave original expiration date in tact since it's already past
+		# Leave original expiration date intact since it's already past
 		self.is_expired = True
 
 	# verify that the token is not expired
