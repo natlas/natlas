@@ -5,6 +5,8 @@ deployment/
 setup-agent.sh
 .dockerignore
 Dockerfile
+chrome.jason
+.python-version
 
 # Dev Environment
 .env
@@ -12,3 +14,4 @@ venv/
 tmp/
 logs/
 data/
+pip.log
