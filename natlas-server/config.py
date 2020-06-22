@@ -15,10 +15,7 @@ def get_defaults():
 def casted_bool(value):
 	if isinstance(value, bool):
 		return value
-	if value.lower() == "true":
-		return True
-	else:
-		return False
+	return value.lower() == "true"
 
 
 def casted_value(expected_type, value):
@@ -65,7 +62,7 @@ class Config(object):
 
 	# MAIL SETTINGS
 	MAIL_SERVER = os.environ.get('MAIL_SERVER', None)
-	MAIL_PORT = int(os.environ.get('MAIL_PORT', 25))
+	MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
 	MAIL_USE_TLS = casted_bool(os.environ.get('MAIL_USE_TLS', False))
 	MAIL_USERNAME = os.environ.get('MAIL_USERNAME', None)
 	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', None)

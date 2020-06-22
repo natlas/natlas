@@ -52,8 +52,7 @@ class UserInvitation(db.Model, DictSerializable):
 	@staticmethod
 	def get_invite(url_token):
 		record = UserInvitation.query.filter_by(token=url_token).first()
-		result = validate_token(record, url_token, record.token, record.validate_invite)
-		return result
+		return validate_token(record, url_token, record.token, record.validate_invite)
 
 	def accept_invite(self):
 		now = datetime.utcnow()
@@ -62,18 +61,14 @@ class UserInvitation(db.Model, DictSerializable):
 
 	# If a token is expired, mark it as such
 	def expire_invite(self, timestamp):
-		if self.expiration_date < timestamp:
-			# Leave original expiration date in tact since it's already past
-			self.is_expired = True
-		else:
+		if self.expiration_date >= timestamp:
 			# Mark now as the expiration because it's been redeemed
 			self.expiration_date = timestamp
-			self.is_expired = True
+
+		# Leave original expiration date in tact since it's already past
+		self.is_expired = True
 
 	# verify that the token is not expired
 	def validate_invite(self):
 		now = datetime.utcnow()
-		if self.expiration_date > now and not self.is_expired:
-			return True
-		else:
-			return False
+		return self.expiration_date > now and not self.is_expired

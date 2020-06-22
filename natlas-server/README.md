@@ -57,7 +57,7 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `OPENCENSUS_SAMPLE_RATE` | `1.0` | Specifies the percentage of requests that are traced with OpenCensus. A number from 0 to 1. |
 | `OPENCENSUS_AGENT` | `127.0.0.1:55678` | An OpenCensus agent or collector that this instance will emit traffic to. |
 | `MAIL_SERVER` | `None` | Mail server to use for invitations, registrations, and password resets |
-| `MAIL_PORT` | `25` | Port that `MAIL_SERVER` is listening on |
+| `MAIL_PORT` | `587` | Port that `MAIL_SERVER` is listening on |
 | `MAIL_USE_TLS` | `False` | Whether or not to connect to `MAIL_SERVER` with TLS|
 | `MAIL_USERNAME` | `None` | Username (if required) to connect to `MAIL_SERVER` |
 | `MAIL_PASSWORD` | `None` | Password (if required) to connect to `MAIL_SERVER` |
