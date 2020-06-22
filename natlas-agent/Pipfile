@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+
+[packages]
+python-dotenv = "~=0.13.0"
+python-libnmap = "~=0.7.0"
+requests = "~=2.23.0"
+sentry-sdk = "~=0.14.4"
+
+[requires]
+python_version = "3.6"

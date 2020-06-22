@@ -1,0 +1,32 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+
+[packages]
+contextvars = "~=2.4"
+elasticsearch = "~=7.7.1"
+email-validator = "~=1.1.1"
+Flask-Login = "~=0.5.0"
+Flask-Mail = "~=0.9.1"
+Flask-Migrate = "~=2.5.3"
+Flask-WTF = "~=0.14.3"
+gunicorn = "~=20.0.4"
+netaddr = "~=0.7.19"
+opencensus-ext-flask = "~=0.7.3"
+opencensus-ext-ocagent = "~=0.7.1"
+opencensus-ext-sqlalchemy = "~=0.1.2"
+Pillow = "~=7.1.2"
+PyJWT = "~=1.7.1"
+python-dotenv = "~=0.13.0"
+python-libnmap = "~=0.7.0"
+semver = "~=2.10.1"
+sentry-sdk = "~=0.14.4"
+sympy = "~=1.6"
+webpack-manifest = "~=2.1.1"
+
+[requires]
+python_version = "3.8"

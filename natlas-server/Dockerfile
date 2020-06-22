@@ -8,12 +8,14 @@ RUN yarn run webpack --mode production
 
 FROM python:3.8 as build
 
+COPY Pipfile .
+COPY Pipfile.lock .
+
+RUN pip install pipenv
+RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy \
+	&& rm -rf Pipfile Pipfile.lock
+
 WORKDIR /opt/natlas/natlas-server
-COPY requirements.txt /opt/natlas/natlas-server
-
-RUN pip3 --disable-pip-version-check --no-cache-dir install --no-warn-script-location --root=/install -r requirements.txt \
-        && rm -rf requirements.txt
-
 COPY . /opt/natlas/natlas-server
 
 # Prepare assets
@@ -26,7 +28,7 @@ RUN mkdir logs \
 # Build final image
 FROM python:3.8-slim
 
-COPY --from=build /install /
+COPY --from=build /.venv /.venv
 COPY --from=build /opt/natlas /opt/natlas
 
 WORKDIR /opt/natlas/natlas-server/
@@ -37,7 +39,8 @@ ENV FLASK_APP=./natlas-server.py
 ENV FLASK_ENV=production
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+ENV PATH="/.venv/bin:$PATH"
 EXPOSE 5000
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 
-CMD ["/usr/local/bin/gunicorn", "-b", "0.0.0.0:5000", "natlas-server:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "natlas-server:app"]
