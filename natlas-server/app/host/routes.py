@@ -97,11 +97,7 @@ def export_scan(ip, scan_id, ext):
 
 	export_field = f"{ext}_data"
 
-	if ext == 'json':
-		mime = "application/json"
-	else:
-		mime = "text/plain"
-
+	mime = "application/json" if ext == 'json' else "text/plain"
 	count, context = current_app.elastic.get_host_by_scan_id(scan_id)
 	if ext == 'json' and count > 0:
 		return jsonify(context)

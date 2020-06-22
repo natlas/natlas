@@ -89,7 +89,7 @@ def main():
 			raise SystemExit("[!] Failed to get valid services file from %s" % config.server)
 
 	# Start threads that will wait for items in queue and then scan them
-	for i in range(int(config.max_threads)):
+	for _ in range(int(config.max_threads)):
 		t = ThreadScan(q, config, autoScan, servicesSha)
 		t.setDaemon(True)
 		t.start()

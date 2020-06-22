@@ -125,13 +125,13 @@ class NatlasNetworkServices:
 			if serviceData["id"] == "None":
 				self.netlogger.error("%s doesn't have a service file for us" % self.config.server)
 				return False
-			if not hashlib.sha256(serviceData["services"].encode()).hexdigest() == serviceData["sha256"]:
+			if (hashlib.sha256(serviceData["services"].encode()).hexdigest() != serviceData["sha256"]):
 				self.netlogger.error("hash provided by %s doesn't match locally computed hash of services" % self.config.server)
 				return False
 			with open("tmp/natlas-services", "w") as f:
 				f.write(serviceData["services"])
 			with open("tmp/natlas-services", "r") as f:
-				if not hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() == serviceData["sha256"]:
+				if (hashlib.sha256(f.read().rstrip('\r\n').encode()).hexdigest() != serviceData["sha256"]):
 					self.netlogger.error("hash of local file doesn't match hash provided by server")
 					return False
 		else:
@@ -164,5 +164,9 @@ class NatlasNetworkServices:
 		else:
 			self.netlogger.info("Submitting results for %s" % results.result["ip"])
 
-		response = self.backoff_request(giveup=True, endpoint=self.api_endpoints["SUBMIT"], reqType="POST", postData=json.dumps(results.result))
-		return response
+		return self.backoff_request(
+			giveup=True,
+			endpoint=self.api_endpoints["SUBMIT"],
+			reqType="POST",
+			postData=json.dumps(results.result),
+		)

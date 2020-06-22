@@ -21,9 +21,9 @@ def importScope(file, blacklist, verbose):
 		for line in scope.readlines():
 			line = line.strip()
 			fail, exist, success = ScopeItem.importScope(line, blacklist)
-			failedImports = failedImports + fail
-			alreadyExists = alreadyExists + exist
-			successImports = successImports + success
+			failedImports += fail
+			alreadyExists += exist
+			successImports += success
 	db.session.commit()
 
 	summaryMessages = [
