@@ -14,9 +14,14 @@ Backing services in natlas-agent are defined via environment configs. They are a
 
 Production ready docker containers for natlas-agent are available on dockerhub. The current stable version is `0.6.10`.
 
+In order to take screenshots, you'll need to use a custom seccomp profile for the container. This [seccomp profile](https://github.com/jessfraz/dotfiles/blob/master/etc/docker/seccomp/chrome.json) was originally created by [Jess Frazelle](https://github.com/jessfraz) and has been mirrored into the natlas project for posterity.
+
+Before launching your docker container, create an `agent_env` file containing the relevant configurations from [the config table](#the-config).
+
 ```bash
+wget https://raw.githubusercontent.com/natlas/natlas/main/natlas-agent/chrome.json -O chrome.json
 docker pull natlas/agent:0.6.10
-docker run -d --restart=always --cap-add=NET_ADMIN -v $(pwd)/agent_env:/opt/natlas/natlas-agent/.env natlas/agent:0.6.10
+docker run -d --restart=always --security-opt seccomp=$(pwd)/chrome.json --cap-add=NET_ADMIN -v $(pwd)/agent_env:/opt/natlas/natlas-agent/.env natlas/agent:0.6.10
 ```
 
 ## Installation (Development)

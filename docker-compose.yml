@@ -60,6 +60,8 @@ services:
       - NATLAS_SCAN_LOCAL=true
     cap_add:
       - NET_ADMIN
+    security_opt:
+      - seccomp=./natlas-agent/chrome.json
     volumes:
       - ./natlas-agent:/opt/natlas/natlas-agent
     links:
