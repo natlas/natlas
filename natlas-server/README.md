@@ -62,7 +62,7 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `MAIL_USERNAME` | `None` | Username (if required) to connect to `MAIL_SERVER` |
 | `MAIL_PASSWORD` | `None` | Password (if required) to connect to `MAIL_SERVER` |
 | `MAIL_FROM` | `None` | Address to be used as the "From" address for outgoing mail. This is required if `MAIL_SERVER` is set. |
-| `SERVER_NAME` | `None` | This should be set to the domain and optional port that your service will be accessed on. E.g. `natlas.io` or `10.0.0.15:5000` |
+| `SERVER_NAME` | `None` | This should be set to the domain and optional port that your service will be accessed on. Do **NOT** include the scheme here. E.g. `example.com` or `10.0.0.15:5000` |
 | `PREFERRED_URL_SCHEME` | `https` | You can optionally set this value to `http` if you're not using ssl. This should be avoided for any production environments. |
 
 #### Example ENV
@@ -72,7 +72,7 @@ SECRET_KEY=Y91gWepML8Bq1IqDO7MFy9LDbtuPrS3Z9Ge6TX3a
 ELASTICSEARCH_URL=http://172.17.0.2:9200
 FLASK_ENV=production
 MAIL_SERVER=172.17.0.5
-MAIL_FROM=noreply@natlas.io
+MAIL_FROM=noreply@example.com
 ```
 
 ### Web Config
@@ -116,8 +116,8 @@ If you have a mail server configured, you can specify the email address and the 
 
 ```bash
 $ docker exec -it $(docker ps | grep natlas-server | cut -d' ' -f1) /bin/bash
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# ./add-user.py --email kate@actualcrimes.org --admin
-Sent kate@actualcrimes.org an invitation email via localhost
+root@5dd0d2d6ecdf:/opt/natlas/natlas-server# ./add-user.py --email example@example.com --admin
+Sent example@example.com an invitation email via localhost
 ```
 
 ### Without Email
@@ -127,7 +127,7 @@ Alternatively, you can create a new user invitation link that can be given to an
 ```bash
 $ docker exec -it $(docker ps | grep natlas-server | cut -d' ' -f1) /bin/bash
 root@5dd0d2d6ecdf:/opt/natlas/natlas-server# ./add-user.py --admin
-Accept invitation: http://natlas.io/auth/invite?token=bGhLlBPiOcXos2XrbWiqAzGAO_RMT-mT2VNSLklkXJ0
+Accept invitation: http://example.com/auth/invite?token=bGhLlBPiOcXos2XrbWiqAzGAO_RMT-mT2VNSLklkXJ0
 ```
 
 ## NGINX as a Reverse Proxy
