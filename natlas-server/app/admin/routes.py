@@ -1,18 +1,18 @@
+import ipaddress
+
 from flask import render_template, redirect, url_for, current_app, flash, Response, abort, request
 from flask_login import current_user
+
 from app import db
 from app.admin import bp
 from app.admin import forms
-from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag, ScopeLog
-from app.auth.email import send_auth_email
-from app.auth.wrappers import isAuthenticated, isAdmin
-import ipaddress
-import hashlib
+from app.models import User, ScopeItem, ConfigItem, NatlasServices, AgentConfig, AgentScript, Tag, ScopeLog, UserInvitation
+from app.auth.wrappers import is_authenticated, is_admin
 
 
 @bp.route('/', methods=['GET', 'POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def admin():
 	configForm = forms.ConfigForm()
 	configItems = current_app.config
@@ -29,30 +29,23 @@ def admin():
 
 
 @bp.route('/users', methods=['GET', 'POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def users():
 	users = User.query.all()
-	delForm = forms.UserDeleteForm()
-	editForm = forms.UserEditForm()
 	inviteForm = forms.InviteUserForm()
 	if inviteForm.validate_on_submit():
-		validemail = User.validate_email(inviteForm.email.data)
-		if not validemail:
-			flash(f"{inviteForm.email.data} does not appear to be a valid, deliverable email address.", "danger")
-			return redirect(request.referrer)
-		newUser = User(email=validemail)
-		db.session.add(newUser)
+		invitation = UserInvitation.new_invite(inviteForm.email.data)
+		msg = UserInvitation.deliver_invite(invitation)
+		flash(msg, "success")
 		db.session.commit()
-		send_auth_email(newUser, 'invite')
-		flash('Invitation Sent!', 'success')
 		return redirect(url_for('admin.users'))
-	return render_template("admin/users.html", users=users, delForm=delForm, editForm=editForm, inviteForm=inviteForm)
+	return render_template("admin/users.html", users=users, delForm=forms.UserDeleteForm(), editForm=forms.UserEditForm(), inviteForm=inviteForm)
 
 
 @bp.route('/users/<int:id>/delete', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def deleteUser(id):
 	delForm = forms.UserDeleteForm()
 	if delForm.validate_on_submit():
@@ -63,15 +56,15 @@ def deleteUser(id):
 		User.query.filter_by(id=id).delete()
 		db.session.commit()
 		flash('%s deleted!' % user.email, 'success')
-		return redirect(url_for('admin.users'))
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(url_for('admin.users'))
+
+	return redirect(url_for('admin.users'))
 
 
 @bp.route('/users/<int:id>/toggle', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def toggleUser(id):
 	editForm = forms.UserEditForm()
 	if editForm.validate_on_submit():
@@ -84,20 +77,19 @@ def toggleUser(id):
 			user.is_admin = False
 			db.session.commit()
 			flash('User demoted!', 'success')
-			return redirect(url_for('admin.users'))
 		else:
 			user.is_admin = True
 			db.session.commit()
 			flash('User promoted!', 'success')
-			return redirect(url_for('admin.users'))
 	else:
 		flash("Form couldn't validate!", 'danger')
-		return redirect(url_for('admin.users'))
+
+	return redirect(url_for('admin.users'))
 
 
 @bp.route('/scope', methods=['GET', 'POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def scope():
 	scope = ScopeItem.getScope()
 	scopeSize = current_app.ScopeManager.get_scope_size()
@@ -133,8 +125,8 @@ def scope():
 
 
 @bp.route('/blacklist', methods=['GET', 'POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def blacklist():
 	scope = ScopeItem.getBlacklist()
 	blacklistSize = current_app.ScopeManager.get_blacklist_size()
@@ -160,8 +152,8 @@ def blacklist():
 
 
 @bp.route('/import/<string:scopetype>', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def importScope(scopetype=''):
 	if scopetype == 'blacklist':
 		importBlacklist = True
@@ -179,16 +171,16 @@ def importScope(scopetype=''):
 		for item in newScopeItems:
 			item = item.strip()
 			fail, exist, success = ScopeItem.importScope(item, importBlacklist)
-			failedImports = failedImports + fail
-			alreadyExists = alreadyExists + exist
-			successImports = successImports + success
+			failedImports += fail
+			alreadyExists += exist
+			successImports += success
 		db.session.commit()
 		current_app.ScopeManager.update()
-		if len(successImports) > 0:
+		if successImports:
 			flash('%s targets added to %s!' % (len(successImports), scopetype), 'success')
-		if len(alreadyExists) > 0:
+		if alreadyExists:
 			flash('%s targets already existed!' % len(alreadyExists), 'info')
-		if len(failedImports) > 0:
+		if failedImports:
 			flash('%s targets failed to import!' % len(failedImports), 'danger')
 			for item in failedImports:
 				flash('%s' % item, 'danger')
@@ -200,8 +192,8 @@ def importScope(scopetype=''):
 
 
 @bp.route('/export/<string:scopetype>', methods=['GET'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def exportScope(scopetype=''):
 	if scopetype == 'blacklist':
 		exportBlacklist = True
@@ -214,8 +206,8 @@ def exportScope(scopetype=''):
 
 
 @bp.route('/scope/<int:id>/delete', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def deleteScopeItem(id):
 	delForm = forms.ScopeDeleteForm()
 	if delForm.validate_on_submit():
@@ -232,8 +224,8 @@ def deleteScopeItem(id):
 
 
 @bp.route('/scope/<int:id>/toggle', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def toggleScopeItem(id):
 	toggleForm = forms.ScopeToggleForm()
 	if toggleForm.validate_on_submit():
@@ -252,8 +244,8 @@ def toggleScopeItem(id):
 
 
 @bp.route('/scope/<int:id>/tag', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def tagScopeItem(id):
 	addTagForm = forms.TagScopeForm()
 	addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
@@ -269,8 +261,8 @@ def tagScopeItem(id):
 
 
 @bp.route('/scope/<int:id>/untag', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def untagScopeItem(id):
 	delTagForm = forms.TagScopeForm()
 	scope = ScopeItem.query.get(id)
@@ -286,21 +278,20 @@ def untagScopeItem(id):
 
 
 @bp.route('/services', methods=['GET', 'POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def services():
 	uploadForm = forms.ServicesUploadForm(prefix="upload-services")
 	addServiceForm = forms.AddServiceForm(prefix="add-service")
 	addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp", "UDP")]
 	if uploadForm.uploadFile.data and uploadForm.validate_on_submit():
 		newServicesContent = uploadForm.serviceFile.data.read().decode("utf-8").rstrip('\r\n')
-		newServicesSha = hashlib.sha256(newServicesContent.encode()).hexdigest()
-		if newServicesSha != current_app.current_services["sha256"]:
-			ns = NatlasServices(sha256=newServicesSha, services=newServicesContent)
-			db.session.add(ns)
+		new_services = NatlasServices(services=newServicesContent)
+		if not new_services.hash_equals(current_app.current_services["sha256"]):
+			db.session.add(new_services)
 			db.session.commit()
-			current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
-			flash("New services file with hash %s has been uploaded." % current_app.current_services["sha256"], "success")
+			current_app.current_services = new_services.as_dict()
+			flash(f'New services file with hash {current_app.current_services["sha256"]} has been uploaded.', "success")
 		else:
 			flash("That file is an exact match for our current services file!", "warning")
 		return redirect(url_for('admin.services'))
@@ -312,8 +303,7 @@ def services():
 			flash("A service with port %s already exists!" % newServicePort, "danger")
 		else:
 			newServices = current_app.current_services["services"] + "\n" + newServiceName + "\t" + newServicePort
-			newSha = hashlib.sha256(newServices.encode()).hexdigest()
-			ns = NatlasServices(sha256=newSha, services=newServices)
+			ns = NatlasServices(services=newServices)
 			db.session.add(ns)
 			db.session.commit()
 			current_app.current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
@@ -326,15 +316,15 @@ def services():
 
 
 @bp.route('/services/export', methods=['GET'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def exportServices():
 	return Response(str(current_app.current_services["services"]), mimetype='text/plain')
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def agentConfig():
 	agentConfig = AgentConfig.query.get(1)
 	# pass the model to the form to populate
@@ -354,8 +344,8 @@ def agentConfig():
 
 
 @bp.route('/agents/script/add', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def addScript():
 	addScriptForm = forms.AddScriptForm(prefix="add-script")
 
@@ -366,15 +356,15 @@ def addScript():
 		current_app.agentScripts = AgentScript.query.all()
 		current_app.agentScriptStr = AgentScript.getScriptsString(current_app.agentScripts)
 		flash("%s successfully added to scripts" % newscript.name, "success")
-		return redirect(request.referrer)
 	else:
 		flash("%s couldn't be added to scripts" % addScriptForm.scriptName.data, "danger")
-		return redirect(request.referrer)
+
+	return redirect(request.referrer)
 
 
 @bp.route('/agents/script/<string:name>/delete', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def deleteScript(name):
 	deleteForm = forms.DeleteForm()
 
@@ -392,8 +382,8 @@ def deleteScript(name):
 
 
 @bp.route('/scans/delete/<scan_id>', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def deleteScan(scan_id):
 	delForm = forms.DeleteForm()
 
@@ -418,8 +408,8 @@ def deleteScan(scan_id):
 
 
 @bp.route('/hosts/delete/<ip>', methods=['POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def deleteHost(ip):
 	delForm = forms.DeleteForm()
 
@@ -436,8 +426,8 @@ def deleteHost(ip):
 
 
 @bp.route('/tags', methods=['GET', 'POST'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def tags():
 	tags = Tag.query.all()
 
@@ -453,8 +443,8 @@ def tags():
 
 
 @bp.route('/logs', methods=['GET'])
-@isAuthenticated
-@isAdmin
+@is_authenticated
+@is_admin
 def logs():
 	scope_logs = ScopeLog.query.order_by(ScopeLog.created_at.desc()).all()
 	return render_template(

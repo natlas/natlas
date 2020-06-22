@@ -4,13 +4,13 @@ from app import db
 from app.user import bp
 from app.user.forms import ChangePasswordForm, DisplaySettingsForm, GenerateTokenForm, AgentNameForm
 from app.models import User, Agent
-from app.auth.wrappers import isAuthenticated
+from app.auth.wrappers import is_authenticated
 
 
 @bp.route('/', methods=['GET', 'POST'])
-@isAuthenticated
+@is_authenticated
 def profile():
-	# Handle this case because isAuthenticated only applies when LOGIN_REQUIRED is true
+	# Handle this case because is_authenticated only applies when LOGIN_REQUIRED is true
 	if current_user.is_anonymous:
 		flash("You must be a user to access %s" % request.path, "warning")
 		return redirect(url_for('main.index'))
@@ -53,7 +53,7 @@ def profile():
 
 
 @bp.route('/agent/<string:agent_id>/newToken', methods=['POST'])
-@isAuthenticated
+@is_authenticated
 def generateNewToken(agent_id):
 	generateTokenForm = GenerateTokenForm()
 
@@ -68,7 +68,7 @@ def generateNewToken(agent_id):
 
 
 @bp.route('/agent/<string:agent_id>/newName', methods=['POST'])
-@isAuthenticated
+@is_authenticated
 def changeAgentName(agent_id):
 	agentNameForm = AgentNameForm()
 
@@ -84,7 +84,7 @@ def changeAgentName(agent_id):
 
 
 @bp.route('/agent/newAgent', methods=['POST'])
-@isAuthenticated
+@is_authenticated
 def newAgent():
 	newAgentForm = AgentNameForm()
 

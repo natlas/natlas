@@ -1,7 +1,7 @@
 from app import db
 from app.util import utcnow_tz, generate_hex_16
 import string
-import random
+import secrets
 from app.models.dict_serializable import DictSerializable
 
 
@@ -19,10 +19,17 @@ class Agent(db.Model, DictSerializable):
 	# optional friendly name for viewing on user page
 	friendly_name = db.Column(db.String(32), default="")
 
-	def verify_token(self, token):
-		if self.token == token:
-			return True
-		return False
+	def verify_secret(self, secret):
+		return secrets.compare_digest(secret, self.token)
+
+	@staticmethod
+	def verify_agent(auth_header):
+		auth_list = auth_header.split()
+		if auth_list[0].lower() != "bearer":
+			return False
+		agent_id, agent_token = auth_list[1].split(':', 1)
+		agent = Agent.load_agent(agent_id)
+		return bool(agent and agent.verify_secret(agent_token))
 
 	@staticmethod
 	def load_agent(agentid):
@@ -31,7 +38,7 @@ class Agent(db.Model, DictSerializable):
 	@staticmethod
 	def generate_token():
 		tokencharset = string.ascii_uppercase + string.ascii_lowercase + string.digits
-		return ''.join(random.choice(tokencharset) for _ in range(32))
+		return ''.join(secrets.choice(tokencharset) for _ in range(32))
 
 	@staticmethod
 	def generate_agentid():

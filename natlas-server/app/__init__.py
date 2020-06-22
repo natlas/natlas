@@ -1,14 +1,15 @@
+import os
+
 from flask import Flask, flash, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
-from config import Config, populate_defaults, get_defaults
-from app.elastic import ElasticInterface
 from webpack_manifest import webpack_manifest
-import os
-import hashlib
+
+import config
+from app.elastic import ElasticInterface
 from .instrumentation import initialize_opencensus
 
 
@@ -39,13 +40,77 @@ def unauthorized():
 		return redirect(url_for('main.index'))
 
 
-def create_app(config_class=Config, load_config=False):
+def load_natlas_config(app):
+	if not db.engine.has_table("config_item"):
+		return
+
+	updated_items = 0
+	from app.models import ConfigItem
+	# Look to see if any new config items were added that aren't currently in db
+	default_configs = config.get_defaults()
+	for key, item in default_configs:
+		conf_item = ConfigItem.query.filter_by(name=key).first()
+		if not conf_item:
+			conf_item = ConfigItem(name=key, type=item['type'], value=item['default'])
+			db.session.add(conf_item)
+			updated_items += 1
+		app.config[conf_item.name] = config.casted_value(conf_item.type, conf_item.value)
+	if updated_items > 0:
+		db.session.commit()
+
+
+def load_natlas_services(app):
+	if not db.engine.has_table("natlas_services"):
+		return
+	from app.models import NatlasServices
+	current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
+	if not current_services:
+		# Let's populate server defaults
+		defaultServices = open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")).read().rstrip('\r\n')
+		current_services = NatlasServices(services=defaultServices)
+		db.session.add(current_services)
+		db.session.commit()
+		print("NatlasServices populated with defaults")
+	app.current_services = current_services.as_dict()
+
+
+def load_agent_config(app):
+	if not db.engine.has_table("agent_config"):
+		return
+	# Load the current agent config, otherwise create it.
+	from app.models import AgentConfig
+	agentConfig = AgentConfig.query.get(1) # the agent config is updated in place so only 1 record
+	if not agentConfig:
+		agentConfig = AgentConfig() # populate an agent config with database defaults
+		db.session.add(agentConfig)
+		db.session.commit()
+		print("AgentConfig populated with defaults")
+	app.agentConfig = agentConfig.as_dict()
+
+
+def load_agent_scripts(app):
+	if not db.engine.has_table("agent_script"):
+		return
+	# Load the current agent config, otherwise create it.
+	from app.models import AgentScript
+	agentScripts = AgentScript.query.all()
+	if not agentScripts:
+		defaultAgentScript = AgentScript(name="default")
+		db.session.add(defaultAgentScript)
+		db.session.commit()
+		print("AgentScript populated with default")
+		agentScripts = [defaultAgentScript]
+	app.agentScripts = agentScripts
+	app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
+
+
+def create_app(config_class=config.Config, load_config=False):
 	app = Flask(__name__)
 	initialize_opencensus(config_class, app)
 
 	app.config.from_object(config_class)
 	app.jinja_env.add_extension('jinja2.ext.do')
-
+	app.elastic = ElasticInterface(app.config['ELASTICSEARCH_URL'])
 	db.init_app(app)
 	migrate.init_app(app, db)
 	login.init_app(app)
@@ -59,90 +124,11 @@ def create_app(config_class=Config, load_config=False):
 		static_url='/static/',
 	)
 
-	if load_config:
-		print("Loading Config from database")
-		with app.app_context():
-			from app.models import ConfigItem
-			# This is gross but we need it because otherwise flask db operations won't work to create the ConfigItem table in the first place.
-			try:
-				# Look to see if any new config items were added that aren't currently in db
-				for item in get_defaults():
-					if not ConfigItem.query.filter_by(name=item[0]).first():
-						newConfItem = ConfigItem(name=item[0], type=item[1], value=item[2])
-						db.session.add(newConfItem)
-						db.session.commit()
-
-				conf = ConfigItem.query.all()
-				if not conf: # We'll hit this if the table exists but there's no data
-					populate_defaults(verbose=False)
-					conf = ConfigItem.query.all() # populate_defaults should populate data that we can query now
-					if not conf: # if it didn't, then we don't have config items that we need in order to run, so exit.
-						raise(SystemExit())
-
-				for item in conf:
-					if item.type == "int":
-						app.config[item.name] = int(item.value)
-					elif item.type == "bool":
-						if item.value == "True":
-							app.config[item.name] = True
-						else:
-							app.config[item.name] = False
-					elif item.type == "string":
-						app.config[item.name] = item.value
-					else:
-						print("Unsupported config type %s:%s:%s" % (item.name, item.type, item.value))
-			except Exception:
-				print("ConfigItem table doesn't exist yet. Ignore if flask db upgrade.")
-
-			from app.models import NatlasServices
-			try:
-				current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
-				if current_services:
-					app.current_services = current_services.as_dict()
-				else: # Let's populate server defaults
-					defaultServices = open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")).read().rstrip('\r\n')
-					defaultSha = hashlib.sha256(defaultServices.encode()).hexdigest()
-					current_services = NatlasServices(sha256=defaultSha, services=defaultServices) # default values until we load something
-					db.session.add(current_services)
-					db.session.commit()
-					print("NatlasServices populated with defaults from defaults/natlas-services")
-					app.current_services = current_services.as_dict()
-			except Exception:
-				print("NatlasServices table doesn't exist yet. Ignore if flask db upgrade.")
-
-			# Load the current agent config, otherwise create it.
-			from app.models import AgentConfig
-			try:
-				agentConfig = AgentConfig.query.get(1) # the agent config is updated in place so only 1 record
-				if agentConfig:
-					app.agentConfig = agentConfig.as_dict()
-				else:
-					newAgentConfig = AgentConfig() # populate an agent config with database defaults
-					db.session.add(newAgentConfig)
-					db.session.commit()
-					print("AgentConfig populated with defaults")
-					app.agentConfig = newAgentConfig.as_dict()
-			except Exception:
-				print("AgentConfig table doesn't exist yet. Ignore if flask db upgrade.")
-
-			# Load the current agent config, otherwise create it.
-			from app.models import AgentScript
-			try:
-				agentScripts = AgentScript.query.all()
-				if not agentScripts:
-					defaultAgentScript = AgentScript(name="default")
-					db.session.add(defaultAgentScript)
-					db.session.commit()
-					print("AgentScript populated with default")
-					agentScripts = AgentScript.query.all()
-				app.agentScripts = agentScripts
-				app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
-			except Exception:
-				print("AgentScript table doesn't exist yet. Ignore if flask db upgrade.")
-
-		# Grungy thing so we can use flask db and flask shell before the config items are initially populated
-		if "ELASTICSEARCH_URL" in app.config:
-			app.elastic = ElasticInterface(app.config['ELASTICSEARCH_URL'])
+	with app.app_context():
+		load_natlas_config(app)
+		load_natlas_services(app)
+		load_agent_config(app)
+		load_agent_scripts(app)
 
 	from app.scope import ScopeManager
 	app.ScopeManager = ScopeManager()

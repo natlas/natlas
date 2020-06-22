@@ -1,10 +1,12 @@
 from email_validator import validate_email, EmailNotValidError
-import random
-import string
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login, db
 from app.models.dict_serializable import DictSerializable
+from app.models.token_validation import validate_token
+import secrets
+from app.util import utcnow_tz
+from datetime import timedelta
 
 
 class User(UserMixin, db.Model, DictSerializable):
@@ -15,9 +17,16 @@ class User(UserMixin, db.Model, DictSerializable):
 	results_per_page = db.Column(db.Integer, default=100)
 	preview_length = db.Column(db.Integer, default=100)
 	result_format = db.Column(db.Integer, default=0)
+	password_reset_token = db.Column(db.String(32), unique=True)
+	password_reset_expiration = db.Column(db.DateTime)
+	creation_date = db.Column(db.DateTime, default=utcnow_tz)
+	is_active = db.Column(db.Boolean, default=False)
 	rescans = db.relationship('RescanTask', backref='submitter', lazy='select')
 	agents = db.relationship('Agent', backref='user', lazy=True)
-	tokens = db.relationship('EmailToken', backref='user', lazy=True)
+
+	# Tokens expire after 48 hours or upon use
+	expiration_duration = 60 * 60 * 24 * 2
+	token_length = 32
 
 	def __repr__(self):
 		return '<User {}>'.format(self.email)
@@ -32,12 +41,6 @@ class User(UserMixin, db.Model, DictSerializable):
 		except EmailNotValidError:
 			return False
 
-	# This is really only used by the add-user bootstrap script, but useful to contain it here.
-	@staticmethod
-	def generate_password(length):
-		passcharset = string.ascii_uppercase + string.ascii_lowercase + string.digits
-		return ''.join(random.SystemRandom().choice(passcharset) for _ in range(length))
-
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
 
@@ -46,18 +49,34 @@ class User(UserMixin, db.Model, DictSerializable):
 
 	@login.user_loader
 	def load_user(id):
-		return User.query.get(int(id))
+		return User.query.get(id)
 
-	def new_token(self, token_type):
-		from app.models import EmailToken
-		newToken = EmailToken.new_token(user_id=self.id, token_type=token_type)
-		return newToken.token
+	def new_reset_token(self):
+		self.password_reset_token = secrets.token_urlsafe(User.token_length)
+		self.password_reset_expiration = utcnow_tz() + timedelta(seconds=User.expiration_duration)
 
-	@staticmethod
-	def verify_token(token, token_type):
-		from app.models import EmailToken
-		myToken = EmailToken.get_token(token)
-		if myToken and myToken.verify_token(token_type):
-			return User.query.get(myToken.user_id)
+	def expire_reset_token(self):
+		self.password_reset_token = None
+		self.password_reset_expiration = None
+
+	def validate_reset_token(self):
+		now = utcnow_tz()
+		if self.password_reset_expiration > now:
+			return True
 		else:
 			return False
+
+	@staticmethod
+	def get_user_by_token(url_token):
+		record = User.query.filter_by(password_reset_token=url_token).first()
+		result = validate_token(record, url_token, record.password_reset_token, record.validate_reset_token)
+		return result
+
+	@staticmethod
+	def new_user_from_invite(invite, password, email=None):
+		user_email = email if email else invite.email
+		new_user = User(email=user_email, is_admin=invite.is_admin, is_active=True)
+		new_user.set_password(password)
+		invite.accept_invite()
+		db.session.add(new_user)
+		return new_user

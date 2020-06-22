@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-import random
+import secrets
 
 
 def utcnow_tz():
@@ -7,11 +7,13 @@ def utcnow_tz():
 
 
 def generate_hex_16():
-	return "%x" % random.randrange(16**16)
+	# 8 bytes converted to two hex digits each
+	return secrets.token_hex(8)
 
 
 def generate_hex_32():
-	return "%x" % random.randrange(16**32)
+	# 16 bytes converted to two hex digits each
+	return secrets.token_hex(16)
 
 
 def pretty_time_delta(delta):

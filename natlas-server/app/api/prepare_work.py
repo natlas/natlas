@@ -1,7 +1,6 @@
 from flask import current_app
 from ipaddress import ip_network
-import random
-import string
+import secrets
 from app.models import ScopeItem
 
 
@@ -19,7 +18,7 @@ def get_target_tags(target):
 def get_unique_scan_id():
 	scan_id = ''
 	while scan_id == '':
-		rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
+		rand = secrets.token_hex(16)
 		count, context = current_app.elastic.get_host_by_scan_id(rand)
 		if count == 0:
 			scan_id = rand

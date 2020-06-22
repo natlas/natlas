@@ -7,13 +7,13 @@ from app.host.forms import RescanForm
 from app.host.summarizers import hostinfo
 from app.host.migrators import determine_data_version
 from app.host import bp
-from app.auth.wrappers import isAuthenticated
+from app.auth.wrappers import is_authenticated
 from app import db
 
 
 @bp.route('/<ip>')
 @bp.route('/<ip>/')
-@isAuthenticated
+@is_authenticated
 def host(ip):
 	info, context = hostinfo(ip)
 	delForm = DeleteForm()
@@ -35,7 +35,7 @@ def host(ip):
 
 @bp.route('/<ip>/history')
 @bp.route('/<ip>/history/')
-@isAuthenticated
+@is_authenticated
 def host_history(ip):
 	info, context = hostinfo(ip)
 	page = int(request.args.get('p', 1))
@@ -68,7 +68,7 @@ def host_history(ip):
 
 
 @bp.route('/<ip>/<scan_id>')
-@isAuthenticated
+@is_authenticated
 def host_historical_result(ip, scan_id):
 	delForm = DeleteForm()
 	delHostForm = DeleteForm()
@@ -90,7 +90,7 @@ def host_historical_result(ip, scan_id):
 
 
 @bp.route('/<ip>/<scan_id>.<ext>')
-@isAuthenticated
+@is_authenticated
 def export_scan(ip, scan_id, ext):
 	if ext not in ['xml', 'nmap', 'gnmap', 'json']:
 		abort(404)
@@ -113,7 +113,7 @@ def export_scan(ip, scan_id, ext):
 
 @bp.route('/<ip>/screenshots')
 @bp.route('/<ip>/screenshots/')
-@isAuthenticated
+@is_authenticated
 def host_screenshots(ip):
 	page = int(request.args.get('p', 1))
 	searchOffset = current_user.results_per_page * (page - 1)
@@ -145,7 +145,7 @@ def host_screenshots(ip):
 
 @bp.route('/<ip>/rescan', methods=['POST'])
 # login_required ensures that an actual user is logged in to make the request
-# opposed to isAuthenticated checking site config to see if login is required first
+# opposed to is_authenticated checking site config to see if login is required first
 @login_required
 def rescan_host(ip):
 	rescanForm = RescanForm()
@@ -194,7 +194,7 @@ def rescan_host(ip):
 
 @bp.route("/random")
 @bp.route("/random/")
-@isAuthenticated
+@is_authenticated
 def random_host():
 	random_host = current_app.elastic.random_host()
 	# This would most likely occur when there are no hosts up in the index, so just throw a 404

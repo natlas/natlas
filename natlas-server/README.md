@@ -41,11 +41,11 @@ There are a number of config options that you can specify in the application env
 
 ### Environment Config
 
-Environment configs are loaded from the environment or a `.env` file and require an application restart to change.
+Environment configs are loaded from the environment or a `.env` file and require an application restart to change. Bind mounting a `.env` file to `/opt/natlas/natlas-server/.env` is *highly encouraged* so that passwords are not visible to the entire container.
 
 | Variable | Default | Explanation |
 |---|---|---|
-| `SECRET_KEY` | `you-should-set-a-secret-key` | Used for CSRF tokens and sessions. You should generate a unique value for this in `.env` |
+| `SECRET_KEY` | Randomly generated | Used for CSRF tokens and sessions. You should generate a unique value for this in `.env`, otherwise sessions will be invalidated whenever the app restarts. |
 | `SQLALCHEMY_DATABASE_URI` | `sqlite:///metadata.db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the database to store natlas metadata in |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
 | `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
@@ -56,6 +56,14 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `OPENCENSUS_ENABLE` | `false` | Enables OpenCensus instrumentation to help identify performance bottlenecks. |
 | `OPENCENSUS_SAMPLE_RATE` | `1.0` | Specifies the percentage of requests that are traced with OpenCensus. A number from 0 to 1. |
 | `OPENCENSUS_AGENT` | `127.0.0.1:55678` | An OpenCensus agent or collector that this instance will emit traffic to. |
+| `MAIL_SERVER` | `None` | Mail server to use for invitations, registrations, and password resets |
+| `MAIL_PORT` | `587` | Port that `MAIL_SERVER` is listening on |
+| `MAIL_USE_TLS` | `False` | Whether or not to connect to `MAIL_SERVER` with TLS|
+| `MAIL_USERNAME` | `None` | Username (if required) to connect to `MAIL_SERVER` |
+| `MAIL_PASSWORD` | `None` | Password (if required) to connect to `MAIL_SERVER` |
+| `MAIL_FROM` | `None` | Address to be used as the "From" address for outgoing mail. This is required if `MAIL_SERVER` is set. |
+| `SERVER_NAME` | `None` | This should be set to the domain and optional port that your service will be accessed on. Do **NOT** include the scheme here. E.g. `example.com` or `10.0.0.15:5000` |
+| `PREFERRED_URL_SCHEME` | `https` | You can optionally set this value to `http` if you're not using ssl. This should be avoided for any production environments. |
 
 #### Example ENV
 
@@ -63,6 +71,8 @@ Environment configs are loaded from the environment or a `.env` file and require
 SECRET_KEY=Y91gWepML8Bq1IqDO7MFy9LDbtuPrS3Z9Ge6TX3a
 ELASTICSEARCH_URL=http://172.17.0.2:9200
 FLASK_ENV=production
+MAIL_SERVER=172.17.0.5
+MAIL_FROM=noreply@example.com
 ```
 
 ### Web Config
@@ -72,14 +82,8 @@ Web configs are loaded from the SQL database and changeable from the web interfa
 | Variable | Default | Explanation |
 |---|---|---|
 | `LOGIN_REQUIRED` | `True` | Require login to browse results |
-| `REGISTER_ALLOWED` | `False` | Permit open registration (requires defined `MAIL_*` settings below) for new users |
+| `REGISTER_ALLOWED` | `False` | Permit open registration for new users |
 | `AGENT_AUTHENTICATION` | `True` | Optionally require agents to authenticate before being allowed to get or submit work |
-| `MAIL_SERVER` | `localhost` | Mail server to use for invitations, registrations, and password resets |
-| `MAIL_PORT` | `25` | Port that `MAIL_SERVER` is listening on |
-| `MAIL_USE_TLS` | `False` | Whether or not to connect to `MAIL_SERVER` with TLS|
-| `MAIL_USERNAME` | `""` | Username (if required) to connect to `MAIL_SERVER` |
-| `MAIL_PASSWORD` | `""` | Password (if required) to connect to `MAIL_SERVER` |
-| `MAIL_FROM` | `""` | Address to be used as the "From" address for outgoing mail |
 | `CUSTOM_BRAND` | `""` | Custom branding for the navigation bar to help distinguish different natlas installations from one another |
 
 ## Setting the Scope
@@ -98,16 +102,32 @@ In order to get started interacting with Natlas, you'll need an administrator ac
 
 * application config
 * the user list
-* the scope
-* the blacklist
+* scanning scope
+* scanning exclusions
 * services that agents scan for
 
-To create a new admin account, ensure that you're in the natlas server container and then run `python3 add-user.py --admin <email>`. If this email doesn't already exist in the User table, it will be created with admin privileges and a random password will be generated and spit out to the command line. If the email *does* already exist in the User table, it will be toggled to be an admin. This can be helpful if you accidentally remove yourself as an admin and can't get back into the admin interface.
+You can bootstrap your first admin account using the `add-user.py` script. This script supports creating invitations for users with or without an email address. Whether the user will be invited as an admin or not is handled by the `--admin` flag. If a supplied email already exists in the User table, it will be toggled to be an admin. This can be helpful if you accidentally remove yourself as an admin and can't get back into the admin interface.
+
+**NOTE:** This script **requires** setting the `SERVER_NAME` config option so that links can be generated correctly.
+
+### With Email
+
+If you have a mail server configured, you can specify the email address and the script will automatically send them an invitation email.
 
 ```bash
 $ docker exec -it $(docker ps | grep natlas-server | cut -d' ' -f1) /bin/bash
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python add-user.py --admin user@example.com
-User user@example.com has been created as an admin with password Wns6lwSlzRbzKV8P
+root@5dd0d2d6ecdf:/opt/natlas/natlas-server# ./add-user.py --email example@example.com --admin
+Sent example@example.com an invitation email via localhost
+```
+
+### Without Email
+
+Alternatively, you can create a new user invitation link that can be given to anyone.
+
+```bash
+$ docker exec -it $(docker ps | grep natlas-server | cut -d' ' -f1) /bin/bash
+root@5dd0d2d6ecdf:/opt/natlas/natlas-server# ./add-user.py --admin
+Accept invitation: http://example.com/auth/invite?token=bGhLlBPiOcXos2XrbWiqAzGAO_RMT-mT2VNSLklkXJ0
 ```
 
 ## NGINX as a Reverse Proxy

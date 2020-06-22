@@ -5,7 +5,7 @@ from app.models import User
 
 
 class LoginForm(FlaskForm):
-	email = StringField('Email', validators=[DataRequired()])
+	email = StringField('Email', validators=[DataRequired(), Email()])
 	password = PasswordField('Password', validators=[DataRequired()])
 	remember_me = BooleanField('Remember Me')
 	submit = SubmitField('Sign In')
@@ -34,7 +34,7 @@ class ResetPasswordForm(FlaskForm):
 	submit = SubmitField('Reset Password')
 
 
-class InviteConfirmForm(FlaskForm):
+class AcceptInviteForm(FlaskForm):
 	password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
 	password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-	submit = SubmitField('Set Password')
+	submit = SubmitField('Accept Invite')
