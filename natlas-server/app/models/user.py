@@ -61,16 +61,12 @@ class User(UserMixin, db.Model, DictSerializable):
 
 	def validate_reset_token(self):
 		now = utcnow_tz()
-		if self.password_reset_expiration > now:
-			return True
-		else:
-			return False
+		return self.password_reset_expiration > now
 
 	@staticmethod
 	def get_user_by_token(url_token):
 		record = User.query.filter_by(password_reset_token=url_token).first()
-		result = validate_token(record, url_token, record.password_reset_token, record.validate_reset_token)
-		return result
+		return validate_token(record, url_token, record.password_reset_token, record.validate_reset_token)
 
 	@staticmethod
 	def new_user_from_invite(invite, password, email=None):

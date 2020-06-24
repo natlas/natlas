@@ -13,30 +13,23 @@ def print_imports(msg, importList):
 		print('\n'.join(importList))
 
 
-def importScope(file, blacklist, verbose):
-	failedImports = []
-	alreadyExists = []
-	successImports = []
+def import_scope(file, blacklist, verbose):
 	with open(file, 'r') as scope:
-		for line in scope.readlines():
-			line = line.strip()
-			fail, exist, success = ScopeItem.importScope(line, blacklist)
-			failedImports = failedImports + fail
-			alreadyExists = alreadyExists + exist
-			successImports = successImports + success
+		addresses = scope.readlines()
+	fail, exist, success = ScopeItem.import_scope(addresses, blacklist)
 	db.session.commit()
 
 	summaryMessages = [
-		f"{len(successImports)} successfully imported.",
-		f"{len(alreadyExists)} already existed.",
-		f"{len(failedImports)} failed to import."
+		f"{len(success)} successfully imported.",
+		f"{len(exist)} already existed.",
+		f"{len(fail)} failed to import."
 	]
 
-	print('\n'.join(summaryMessages))
 	if verbose:
-		print_imports("\nSuccessful Imports:", successImports)
-		print_imports("\nAlready Existed:", alreadyExists)
-		print_imports("\nFailed Imports:", failedImports)
+		print_imports("\nSuccessful Imports:", success)
+		print_imports("\nAlready Existed:", exist)
+		print_imports("\nFailed Imports:", fail)
+	print('\n'.join(summaryMessages))
 
 
 def main():
@@ -51,10 +44,10 @@ def main():
 	args = parser.parse_args()
 
 	if args.scope:
-		importScope(args.scope, False, args.verbose)
+		import_scope(args.scope, False, args.verbose)
 
 	if args.blacklist:
-		importScope(args.blacklist, True, args.verbose)
+		import_scope(args.blacklist, True, args.verbose)
 
 
 if __name__ == "__main__":

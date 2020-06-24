@@ -26,8 +26,7 @@ def create_data_dir(scan_id):
 
 
 def get_data_dir(scan_id):
-	data_folder = f"data/natlas.{scan_id}"
-	return data_folder
+	return f"data/natlas.{scan_id}"
 
 
 def delete_files(scan_id):

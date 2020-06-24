@@ -21,7 +21,7 @@ def hostinfo(ip):
 		if context.get(hs):
 			if hs == "screenshots":
 				# 0.6.5 iterating screenshots instead of screenshot types
-				for item in context.get(hs):
+				for _ in context.get(hs):
 					screenshots += 1
 			else:
 				screenshots += 1

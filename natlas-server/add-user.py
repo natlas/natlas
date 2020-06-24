@@ -7,11 +7,11 @@ from app.models import User, UserInvitation
 def make_user_admin(user):
 	if user.is_admin:
 		print(f"User {user.email} is already an admin")
-		return
 	else:
 		user.is_admin = True
 		print(f"User {user.email} is now an admin")
-		return
+
+	return
 
 
 # Create a new invitation because no user with supplied email exists

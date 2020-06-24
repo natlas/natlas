@@ -13,7 +13,7 @@ LOGFILE = 'logs/cyclicprng.log'
 
 
 def modexp(b, e, m):
-	bits = [(e >> bit) & 1 for bit in range(0, e.bit_length())]
+	bits = [(e >> bit) & 1 for bit in range(e.bit_length())]
 	s = b
 	v = 1
 	for bit in bits:
@@ -66,10 +66,7 @@ class CyclicPRNG:
 
 	def init_cyclic_group(self):
 		def next_prime(num):
-			if (num % 2) == 0:
-				num = num + 1
-			else:
-				num = num + 2
+			num = num + 1 if (num % 2) == 0 else num + 2
 			while not sympy.isprime(num):
 				num = num + 2
 			return num
@@ -80,11 +77,9 @@ class CyclicPRNG:
 		found = False
 		while not found:
 			base = random.randint(2, self.Modulus - 1)
-			found = True
-			for factor in self.ModulusFactors:
-				if modexp(base, int((self.Modulus - 1) / factor), self.Modulus) == 1:
-					found = False
-					break
+			found = all(
+				modexp(base, int((self.Modulus - 1) / factor), self.Modulus) != 1
+				for factor in self.ModulusFactors)
 		self.G = base
 
 	def _cycle_until_in_range(self, element):
