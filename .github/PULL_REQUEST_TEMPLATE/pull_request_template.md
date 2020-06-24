@@ -1,3 +1,12 @@
+---
+name: Pull Request
+about: Submit changes to help us improve!
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 **Is this pull request related to an existing issue? What is the issue number?**
 
 E.g. #47 (Creation of docs folder / corresponding docs site)

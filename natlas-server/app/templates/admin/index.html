@@ -6,9 +6,9 @@
    <div class="row">
     <div class="col">
     <form class="form config-form" action="{{url_for('admin.admin')}}" method="post">
-    	<h3>General Settings</h3>
-    	{{ configForm.hidden_tag() }}
-    	<div class="form-check">
+        <h3>General Settings</h3>
+        {{ configForm.hidden_tag() }}
+        <div class="form-check">
             {{ configForm.login_required(checked=configItems["LOGIN_REQUIRED"], class="form-check-input", id="loginRequired") }}
             {{ configForm.login_required.label(class="form-check-label", for="loginRequired") }}
         </div>
@@ -24,7 +24,7 @@
             {{ configForm.custom_brand.label(class="control-label") }}
             {{ configForm.custom_brand(value=configItems["CUSTOM_BRAND"], class="form-control", placeholder="Natlas Internal") }}
         </div>
-    	{{ configForm.submit(class="btn btn-primary") }}
+        {{ configForm.submit(class="btn btn-primary") }}
     </form>
     </div>
     <div class="col">

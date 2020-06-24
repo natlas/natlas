@@ -2,14 +2,14 @@
 {% set title = "500 - Internal Server Error" %}
 {% block content %}
   <div class="row">
-  	<div class="col">
-  		<h2 class="sub-header">500: Internal Server Error</h2>
-  	</div>
+      <div class="col">
+          <h2 class="sub-header">500: Internal Server Error</h2>
+      </div>
   </div>
   <div class="row">
-  	<div class="col">
-    	<p>You can try to return to <a href="{{ url_for('main.index') }}">browse</a></p>
-    	<p>If you continue to see this message, please contact the administrator.</p>
+      <div class="col">
+        <p>You can try to return to <a href="{{ url_for('main.index') }}">browse</a></p>
+        <p>If you continue to see this message, please contact the administrator.</p>
     </div>
    </div>
 {% endblock %}

@@ -4,6 +4,6 @@
   </button>
   <div class="dropdown-menu" aria-labelledby="hostListButton">
     <a class="dropdown-item" href="{{ url_for('main.search', query=request.args.get('query'), page=request.args.get('page', 1), format='hostlist') }}">IP addresses</a>
-  	<a class="dropdown-item" href="{{ url_for('main.search', query=request.args.get('query'), page=request.args.get('page', 1), format='hostlist', includeScanIDs=True) }}">IP addresses, scan_id</a>
+      <a class="dropdown-item" href="{{ url_for('main.search', query=request.args.get('query'), page=request.args.get('page', 1), format='hostlist', includeScanIDs=True) }}">IP addresses, scan_id</a>
   </div>
 </div>

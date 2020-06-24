@@ -1,48 +1,48 @@
 {% extends "base.html" %}
 {% set title = "Screenshot Browser" %}
 {% block content %}
-	<div class="row search-header">
-		<div class="col">
-			<h2 class="sub-header">{{total_screenshots}} screenshots across {{total_hosts}} hosts</h2>
-		</div>
-		{% if total_hosts > current_user.results_per_page %}
-		<div class="col-xs-12 col-sm-1 text-center">
-		{% include 'includes/pagination.html' %}
-		</div>
-	  {% endif %}
-	</div>
+    <div class="row search-header">
+        <div class="col">
+            <h2 class="sub-header">{{total_screenshots}} screenshots across {{total_hosts}} hosts</h2>
+        </div>
+        {% if total_hosts > current_user.results_per_page %}
+        <div class="col-xs-12 col-sm-1 text-center">
+        {% include 'includes/pagination.html' %}
+        </div>
+      {% endif %}
+    </div>
     {% include 'host/_imagemodal.html' %}
-		<div class="row image-row">
-			{% for host in hosts %}
-				{% for screenshot in host.screenshots %}
-					{% if screenshot.hash %}
-				    <div class="col-xs-12 col-sm-3 mt-1">
-						<div class="image-browser">
-							<div class="thumbnail-hover d-flex flex-column justify-content-between">
-								<div class="image-browser-service p-2">{{ screenshot.service }}</div>
-								<div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
-							</div>
-							<img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != host.ip %} ({{host.ip}}){%endif%}">
-						</div>
-					</div>
-					{% endif %}
-					{% if screenshot.path %}
-				    <div class="col-xs-12 col-sm-3 my-3">
-						<div class="image-browser">
-							<div class="thumbnail-hover">
-								<div class="image-browser-service">{{ screenshot.service }}</div>
-								<div class="image-browser-host">{{ screenshot.host }}</div>
-								<div class="image-browser-port">{{ screenshot.port }}</div>
-							</div>
-							<img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/{{screenshot.thumb}}' alt="{{ host.ip }} - {{ screenshot.service }}">
-						</div>
-					</div>
-					{% endif %}
-				{% endfor %}
-			{% endfor %}
-		</div>
+        <div class="row image-row">
+            {% for host in hosts %}
+                {% for screenshot in host.screenshots %}
+                    {% if screenshot.hash %}
+                    <div class="col-xs-12 col-sm-3 mt-1">
+                        <div class="image-browser">
+                            <div class="thumbnail-hover d-flex flex-column justify-content-between">
+                                <div class="image-browser-service p-2">{{ screenshot.service }}</div>
+                                <div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
+                            </div>
+                            <img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != host.ip %} ({{host.ip}}){%endif%}">
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if screenshot.path %}
+                    <div class="col-xs-12 col-sm-3 my-3">
+                        <div class="image-browser">
+                            <div class="thumbnail-hover">
+                                <div class="image-browser-service">{{ screenshot.service }}</div>
+                                <div class="image-browser-host">{{ screenshot.host }}</div>
+                                <div class="image-browser-port">{{ screenshot.port }}</div>
+                            </div>
+                            <img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/{{screenshot.thumb}}' alt="{{ host.ip }} - {{ screenshot.service }}">
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
 
-	{% if total_hosts > current_user.results_per_page %}
+    {% if total_hosts > current_user.results_per_page %}
     <div class="row">
       <div class="col text-center my-2">
       {% include 'includes/pagination.html' %}

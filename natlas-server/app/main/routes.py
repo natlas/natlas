@@ -1,125 +1,153 @@
-from flask import redirect, url_for, render_template, \
-	Response, current_app, request, send_from_directory, jsonify
+from flask import (
+    redirect,
+    url_for,
+    render_template,
+    Response,
+    current_app,
+    request,
+    send_from_directory,
+    jsonify,
+)
 from app.main import bp
 from app.main.pagination import build_pagination_urls, results_offset
 from app.auth.wrappers import is_authenticated
 
 
-@bp.route('/')
+@bp.route("/")
 @is_authenticated
 def index():
-	return redirect(url_for('main.browse'))
+    return redirect(url_for("main.browse"))
 
 
 # Serve media files in case the front-end proxy doesn't do it
-@bp.route('/media/<path:filename>')
+@bp.route("/media/<path:filename>")
 @is_authenticated
 def send_media(filename):
-	# If you're looking at this function, wondering why your files aren't sending...
-	# It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
-	return send_from_directory(current_app.config['MEDIA_DIRECTORY'], filename)
+    # If you're looking at this function, wondering why your files aren't sending...
+    # It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
+    return send_from_directory(current_app.config["MEDIA_DIRECTORY"], filename)
 
 
-@bp.route('/browse')
+@bp.route("/browse")
 @is_authenticated
 def browse():
-	''' A simple browser that doesn't deal with queries at all '''
-	page = int(request.args.get('page', 1))
-	includeHistory = request.args.get('includeHistory', False)
+    """ A simple browser that doesn't deal with queries at all """
+    page = int(request.args.get("page", 1))
+    includeHistory = request.args.get("includeHistory", False)
 
-	results_per_page, search_offset = results_offset(page)
+    results_per_page, search_offset = results_offset(page)
 
-	searchIndex = "nmap_history" if includeHistory else "nmap"
+    searchIndex = "nmap_history" if includeHistory else "nmap"
 
-	count, hostdata = current_app.elastic.search(results_per_page, search_offset, searchIndex=searchIndex)
-	totalHosts = current_app.elastic.total_hosts()
+    count, hostdata = current_app.elastic.search(
+        results_per_page, search_offset, searchIndex=searchIndex
+    )
+    totalHosts = current_app.elastic.total_hosts()
 
-	if includeHistory:
-		next_url, prev_url = build_pagination_urls('main.browse', page, count, includeHistory=includeHistory)
-	else:
-		# By using the if/else we can avoid putting includeHistory=False into the url that gets constructed
-		next_url, prev_url = build_pagination_urls('main.browse', page, count)
+    if includeHistory:
+        next_url, prev_url = build_pagination_urls(
+            "main.browse", page, count, includeHistory=includeHistory
+        )
+    else:
+        # By using the if/else we can avoid putting includeHistory=False into the url that gets constructed
+        next_url, prev_url = build_pagination_urls("main.browse", page, count)
 
-	return render_template("main/browse.html", numresults=count, totalHosts=totalHosts, page=page, hosts=hostdata, next_url=next_url, prev_url=prev_url)
+    return render_template(
+        "main/browse.html",
+        numresults=count,
+        totalHosts=totalHosts,
+        page=page,
+        hosts=hostdata,
+        next_url=next_url,
+        prev_url=prev_url,
+    )
 
 
-@bp.route('/search')
+@bp.route("/search")
 @is_authenticated
 def search():
-	''' Return search results for a given query '''
-	query = request.args.get('query', '')
-	if query == '':
-		return redirect(url_for('main.browse'))
-	page = int(request.args.get('page', 1))
-	format = request.args.get('format', '')
-	scan_ids = request.args.get('includeScanIDs', '')
-	includeHistory = request.args.get('includeHistory', False)
+    """ Return search results for a given query """
+    query = request.args.get("query", "")
+    if query == "":
+        return redirect(url_for("main.browse"))
+    page = int(request.args.get("page", 1))
+    format = request.args.get("format", "")
+    scan_ids = request.args.get("includeScanIDs", "")
+    includeHistory = request.args.get("includeHistory", False)
 
-	results_per_page, search_offset = results_offset(page)
+    results_per_page, search_offset = results_offset(page)
 
-	searchIndex = "nmap_history" if includeHistory else "nmap"
+    searchIndex = "nmap_history" if includeHistory else "nmap"
 
-	count, context = current_app.elastic.search(results_per_page, search_offset, query=query, searchIndex=searchIndex)
-	totalHosts = current_app.elastic.total_hosts()
+    count, context = current_app.elastic.search(
+        results_per_page, search_offset, query=query, searchIndex=searchIndex
+    )
+    totalHosts = current_app.elastic.total_hosts()
 
-	if includeHistory:
-		next_url, prev_url = build_pagination_urls('main.search', page, count, query=query, includeHistory=includeHistory)
-	else:
-		next_url, prev_url = build_pagination_urls('main.search', page, count, query=query)
+    if includeHistory:
+        next_url, prev_url = build_pagination_urls(
+            "main.search", page, count, query=query, includeHistory=includeHistory
+        )
+    else:
+        next_url, prev_url = build_pagination_urls(
+            "main.search", page, count, query=query
+        )
 
-	# what kind of output are we looking for?
-	if format == 'hostlist':
-		hostlist = []
-		for host in context:
-			if scan_ids:
-				hostlist.append(str(host['ip']) + ',' + str(host['scan_id']))
-			else:
-				hostlist.append(str(host['ip']))
-		return Response('\n'.join(hostlist), mimetype='text/plain')
-	elif format == 'json':
-		return jsonify(list(context))
-	else:
-		return render_template(
-			"main/search.html",
-			query=query,
-			numresults=count,
-			totalHosts=totalHosts,
-			page=page,
-			hosts=context,
-			next_url=next_url,
-			prev_url=prev_url
-		)
+    # what kind of output are we looking for?
+    if format == "hostlist":
+        hostlist = []
+        for host in context:
+            if scan_ids:
+                hostlist.append(str(host["ip"]) + "," + str(host["scan_id"]))
+            else:
+                hostlist.append(str(host["ip"]))
+        return Response("\n".join(hostlist), mimetype="text/plain")
+    elif format == "json":
+        return jsonify(list(context))
+    else:
+        return render_template(
+            "main/search.html",
+            query=query,
+            numresults=count,
+            totalHosts=totalHosts,
+            page=page,
+            hosts=context,
+            next_url=next_url,
+            prev_url=prev_url,
+        )
 
 
-@bp.route('/searchmodal')
+@bp.route("/searchmodal")
 @is_authenticated
 def search_modal():
-	return render_template("includes/search_modal_content.html")
+    return render_template("includes/search_modal_content.html")
 
 
 @bp.route("/screenshots")
 @is_authenticated
 def screenshots():
-	page = int(request.args.get('page', 1))
+    page = int(request.args.get("page", 1))
 
-	results_per_page, search_offset = results_offset(page)
+    results_per_page, search_offset = results_offset(page)
 
-	total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(results_per_page, search_offset)
+    total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(
+        results_per_page, search_offset
+    )
 
-	next_url, prev_url = build_pagination_urls('main.screenshots', page, total_hosts)
+    next_url, prev_url = build_pagination_urls("main.screenshots", page, total_hosts)
 
-	return render_template(
-		"main/screenshots.html",
-		total_hosts=total_hosts,
-		total_screenshots=total_screenshots,
-		hosts=hosts,
-		next_url=next_url,
-		prev_url=prev_url
-	)
+    return render_template(
+        "main/screenshots.html",
+        total_hosts=total_hosts,
+        total_screenshots=total_screenshots,
+        hosts=hosts,
+        next_url=next_url,
+        prev_url=prev_url,
+    )
 
 
-@bp.route('/status')
+@bp.route("/status")
 @is_authenticated
 def status():
-	''' Simple html representation of the status api'''
-	return render_template('main/status.html')
+    """ Simple html representation of the status api"""
+    return render_template("main/status.html")

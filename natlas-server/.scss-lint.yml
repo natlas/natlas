@@ -93,8 +93,8 @@ linters:
   Indentation:
     enabled: true
     allow_non_nested_indentation: false
-    character: tab # or 'tab'
-    width: 1
+    character: space # or 'tab'
+    width: 4
 
   LeadingZero:
     enabled: false

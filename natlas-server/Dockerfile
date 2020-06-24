@@ -13,7 +13,7 @@ COPY Pipfile.lock .
 
 RUN pip install pipenv
 RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy \
-	&& rm -rf Pipfile Pipfile.lock
+    && rm -rf Pipfile Pipfile.lock
 
 WORKDIR /opt/natlas/natlas-server
 COPY . /opt/natlas/natlas-server

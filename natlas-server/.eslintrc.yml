@@ -15,9 +15,7 @@ extends:
   - plugin:import/warnings
   - plugin:import/typescript
 rules:
-  indent:
-  - error
-  - tab
+  indent: error
   semi: error
   camelcase: error
   no-unexpected-multiline: error

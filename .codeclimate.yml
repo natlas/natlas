@@ -19,13 +19,11 @@ plugins:
   pep8:
     enabled: true
     checks:
-      E261:
-        enabled: false
       E402:
         enabled: false
-      W191:
+      E203:
         enabled: false
-      E117:
+      W503:
         enabled: false
     exclude_patterns:
     # machine generated, duplication likely

@@ -24,13 +24,13 @@
 <div class="row">
   <ul class="nav nav-tabs host-nav">
     <li role="presentation" class="nav-item">
-    	<a id="summary" class="nav-link{{ ' active' if active_page == 'summary' }}" href="{{ url_for('host.host', ip=ip) }}">Summary</a>
+        <a id="summary" class="nav-link{{ ' active' if active_page == 'summary' }}" href="{{ url_for('host.host', ip=ip) }}">Summary</a>
     </li>
     <li role="presentation" class="nav-item">
-    	<a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('host.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
+        <a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('host.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
     </li>
     <li role="presentation" class="nav-item">
-    	<a id="headshots" class="nav-link{{ ' active' if active_page == 'screenshots' }}" href="{{ url_for('host.host_screenshots', ip=ip) }}">Screenshots {% if info.screenshot_count > 0%}<span class="badge badge-dark">{{ info.screenshot_count }}</span>{% endif %}</a>
+        <a id="headshots" class="nav-link{{ ' active' if active_page == 'screenshots' }}" href="{{ url_for('host.host_screenshots', ip=ip) }}">Screenshots {% if info.screenshot_count > 0%}<span class="badge badge-dark">{{ info.screenshot_count }}</span>{% endif %}</a>
     </li>
   </ul>
 </div>

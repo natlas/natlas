@@ -4,37 +4,37 @@
 {% block content %}
     {% include 'host/versions/0.6.7/_header.html' %}
     {% include 'host/versions/0.6.7/_imagemodal.html' %}
-	{% if numresults > current_user.results_per_page %}
-	    <div class="row">
-	      <div class="col text-center my-2">
-	      {% include 'includes/pagination.html' %}
-	      </div>
-	    </div>
-	  {% endif %}
-	{% for entry in historical_screenshots %}
-		<div class="row screenshot-header-row">
-			<h5 class="border-bottom">
-				<a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}"><time datetime={{ entry.ctime }} title="{{ entry.ctime|ctime(human=True) }}">{{ entry.ctime | ctime }}</time></a>
-			</h5>
-		</div>
-		<div class="row image-row">
-			{% for screenshot in entry.screenshots %}
-				{% if screenshot.hash %}
-			    <div class="col-xs-12 col-sm-3">
-					<strong class="mt-2">{{ screenshot.service }}</strong>
-					<div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
-				</div>
-				{% endif %}
-				{% if screenshot.path %}
-			    <div class="col-xs-12 col-sm-3">
-					<strong class="mt-2">{{ screenshot.service }}</strong>
-					<div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
-				</div>
-				{% endif %}
-			{% endfor %}
-		</div>
-	{% endfor %}
-	{% if numresults > current_user.results_per_page %}
+    {% if numresults > current_user.results_per_page %}
+        <div class="row">
+          <div class="col text-center my-2">
+          {% include 'includes/pagination.html' %}
+          </div>
+        </div>
+      {% endif %}
+    {% for entry in historical_screenshots %}
+        <div class="row screenshot-header-row">
+            <h5 class="border-bottom">
+                <a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}"><time datetime={{ entry.ctime }} title="{{ entry.ctime|ctime(human=True) }}">{{ entry.ctime | ctime }}</time></a>
+            </h5>
+        </div>
+        <div class="row image-row">
+            {% for screenshot in entry.screenshots %}
+                {% if screenshot.hash %}
+                <div class="col-xs-12 col-sm-3">
+                    <strong class="mt-2">{{ screenshot.service }}</strong>
+                    <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
+                </div>
+                {% endif %}
+                {% if screenshot.path %}
+                <div class="col-xs-12 col-sm-3">
+                    <strong class="mt-2">{{ screenshot.service }}</strong>
+                    <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    {% if numresults > current_user.results_per_page %}
     <div class="row">
       <div class="col text-center my-2">
       {% include 'includes/pagination.html' %}

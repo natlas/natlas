@@ -7,43 +7,59 @@ from functools import wraps
 
 
 def is_authenticated(f):
-	@wraps(f)
-	def decorated_function(*args, **kwargs):
-		if current_app.config['LOGIN_REQUIRED'] and not current_user.is_authenticated:
-			return lm.unauthorized()
-		return f(*args, **kwargs)
-	return decorated_function
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_app.config["LOGIN_REQUIRED"] and not current_user.is_authenticated:
+            return lm.unauthorized()
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 def is_not_authenticated(f):
-	@wraps(f)
-	def decorated_function(*args, **kwargs):
-		if current_user.is_authenticated:
-			flash("You're already logged in!", "warning")
-			return redirect(url_for('main.browse'))
-		return f(*args, **kwargs)
-	return decorated_function
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated:
+            flash("You're already logged in!", "warning")
+            return redirect(url_for("main.browse"))
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 def is_admin(f):
-	@wraps(f)
-	def decorated_function(*args, **kwargs):
-		if current_user.is_anonymous or not current_user.is_admin:
-			return lm.unauthorized()
-		return f(*args, **kwargs)
-	return decorated_function
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_anonymous or not current_user.is_admin:
+            return lm.unauthorized()
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 def is_agent_authenticated(f):
-	@wraps(f)
-	def decorated_function(*args, **kwargs):
-		# if we don't require agent authentication then don't bother
-		if not current_app.config['AGENT_AUTHENTICATION']:
-			return f(*args, **kwargs)
-		if not request.headers.get("Authorization", None) or not Agent.verify_agent(request.headers["Authorization"]):
-			status_code = 403
-			response_body = json.dumps({'status': status_code, 'message': 'Authorization is required to access this endpoint', 'retry': False})
-			response = Response(response=response_body, status=status_code, content_type='application/json')
-			return response
-		return f(*args, **kwargs)
-	return decorated_function
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # if we don't require agent authentication then don't bother
+        if not current_app.config["AGENT_AUTHENTICATION"]:
+            return f(*args, **kwargs)
+        if not (
+            request.headers.get("Authorization", None)
+            and Agent.verify_agent(request.headers["Authorization"])
+        ):
+            status_code = 403
+            response_body = json.dumps(
+                {
+                    "status": status_code,
+                    "message": "Authorization is required to access this endpoint",
+                    "retry": False,
+                }
+            )
+            return Response(
+                response=response_body,
+                status=status_code,
+                content_type="application/json",
+            )
+        return f(*args, **kwargs)
+
+    return decorated_function

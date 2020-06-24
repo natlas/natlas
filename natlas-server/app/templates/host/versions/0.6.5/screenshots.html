@@ -4,48 +4,48 @@
 {% block content %}
     {% include 'host/versions/0.6.5/_header.html' %}
     {% include 'host/versions/0.6.5/_imagemodal.html' %}
-	{% if numresults > current_user.results_per_page %}
-	    <div class="row">
-	      <div class="col text-center my-2">
-	      {% include 'includes/pagination.html' %}
-	      </div>
-	    </div>
-	  {% endif %}
-	{% for entry in historical_screenshots %}
-		<div class="row screenshot-header-row">
-			<h5 class="border-bottom">
-				<a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}">{{ entry.ctime | ctime }}</a>
-			</h5>
-		</div>
-		<div class="row image-row">
-			{% for screenshot in entry.screenshots %}
-				{% if screenshot.path %}
-			    <div class="col-xs-12 col-sm-3">
-					<strong class="mt-2">{{ screenshot.service }}</strong>
-					<div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
-				</div>
-				{% endif %}
-			{% endfor %}
-		</div>
-	{% endfor %}
+    {% if numresults > current_user.results_per_page %}
+        <div class="row">
+          <div class="col text-center my-2">
+          {% include 'includes/pagination.html' %}
+          </div>
+        </div>
+      {% endif %}
+    {% for entry in historical_screenshots %}
+        <div class="row screenshot-header-row">
+            <h5 class="border-bottom">
+                <a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}">{{ entry.ctime | ctime }}</a>
+            </h5>
+        </div>
+        <div class="row image-row">
+            {% for screenshot in entry.screenshots %}
+                {% if screenshot.path %}
+                <div class="col-xs-12 col-sm-3">
+                    <strong class="mt-2">{{ screenshot.service }}</strong>
+                    <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
 
-	{% if headshot %}
-	  <h3 class="headshot-header">Unknown Headshot</h3>
-	  <img src="data:image/jpeg;base64,{{ headshot }}" alt="Unknown Screenshot" class="host-headshot">
-	{% endif %}
-	{% if vncheadshot %}
-	  <h3 class="headshot-header">VNC</h3>
-	  <img src="data:image/jpeg;base64,{{ vncheadshot }}" alt="VNC Screenshot" class="host-headshot">
-	{% endif %}
-	{% if httpheadshot %}
-	  <h3 class="headshot-header">HTTP</h3>
-	  <img src="data:image/jpeg;base64,{{ httpheadshot }}" alt="HTTP Screenshot" class="host-headshot">
-	{% endif %}
-	{% if httpsheadshot %}
-	  <h3 class="headshot-header">HTTPS</h3>
-	  <img src="data:image/jpeg;base64,{{ httpsheadshot }}" alt="HTTPS Screenshot" class="host-headshot">
-	{% endif %}
-	{% if numresults > current_user.results_per_page %}
+    {% if headshot %}
+      <h3 class="headshot-header">Unknown Headshot</h3>
+      <img src="data:image/jpeg;base64,{{ headshot }}" alt="Unknown Screenshot" class="host-headshot">
+    {% endif %}
+    {% if vncheadshot %}
+      <h3 class="headshot-header">VNC</h3>
+      <img src="data:image/jpeg;base64,{{ vncheadshot }}" alt="VNC Screenshot" class="host-headshot">
+    {% endif %}
+    {% if httpheadshot %}
+      <h3 class="headshot-header">HTTP</h3>
+      <img src="data:image/jpeg;base64,{{ httpheadshot }}" alt="HTTP Screenshot" class="host-headshot">
+    {% endif %}
+    {% if httpsheadshot %}
+      <h3 class="headshot-header">HTTPS</h3>
+      <img src="data:image/jpeg;base64,{{ httpsheadshot }}" alt="HTTPS Screenshot" class="host-headshot">
+    {% endif %}
+    {% if numresults > current_user.results_per_page %}
     <div class="row">
       <div class="col text-center my-2">
       {% include 'includes/pagination.html' %}

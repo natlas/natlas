@@ -3,20 +3,20 @@
 {% set active_page = "screenshots" %}
 {% block content %}
     {% include 'host/versions/0.6.4/_header.html' %}
-	{% if headshot %}
-	  <h3 class="headshot-header">Unknown Screenshot</h3>
-	  <img src="data:image/jpeg;base64,{{ headshot }}" alt="Unknown Screenshot" class="host-headshot">
-	{% endif %}
-	{% if vncheadshot %}
-	  <h3 class="headshot-header">VNC</h3>
-	  <img src="data:image/jpeg;base64,{{ vncheadshot }}" alt="VNC Screenshot" class="host-headshot">
-	{% endif %}
-	{% if httpheadshot %}
-	  <h3 class="headshot-header">HTTP</h3>
-	  <img src="data:image/jpeg;base64,{{ httpheadshot }}" alt="HTTP Screenshot" class="host-headshot">
-	{% endif %}
-	{% if httpsheadshot %}
-	  <h3 class="headshot-header">HTTPS</h3>
-	  <img src="data:image/jpeg;base64,{{ httpsheadshot }}" alt="HTTPS Screenshot" class="host-headshot">
-	{% endif %}
+    {% if headshot %}
+      <h3 class="headshot-header">Unknown Screenshot</h3>
+      <img src="data:image/jpeg;base64,{{ headshot }}" alt="Unknown Screenshot" class="host-headshot">
+    {% endif %}
+    {% if vncheadshot %}
+      <h3 class="headshot-header">VNC</h3>
+      <img src="data:image/jpeg;base64,{{ vncheadshot }}" alt="VNC Screenshot" class="host-headshot">
+    {% endif %}
+    {% if httpheadshot %}
+      <h3 class="headshot-header">HTTP</h3>
+      <img src="data:image/jpeg;base64,{{ httpheadshot }}" alt="HTTP Screenshot" class="host-headshot">
+    {% endif %}
+    {% if httpsheadshot %}
+      <h3 class="headshot-header">HTTPS</h3>
+      <img src="data:image/jpeg;base64,{{ httpsheadshot }}" alt="HTTPS Screenshot" class="host-headshot">
+    {% endif %}
 {% endblock %}

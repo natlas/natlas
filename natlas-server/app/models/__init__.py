@@ -11,15 +11,15 @@ from app.models.user_invitation import UserInvitation
 from app.models.scope_log import ScopeLog
 
 __all__ = [
-	'Agent',
-	'AgentConfig',
-	'AgentScript',
-	'ConfigItem',
-	'NatlasServices',
-	'RescanTask',
-	'ScopeItem',
-	'ScopeLog',
-	'Tag',
-	'User',
-	'UserInvitation'
+    "Agent",
+    "AgentConfig",
+    "AgentScript",
+    "ConfigItem",
+    "NatlasServices",
+    "RescanTask",
+    "ScopeItem",
+    "ScopeLog",
+    "Tag",
+    "User",
+    "UserInvitation",
 ]
