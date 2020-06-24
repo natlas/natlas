@@ -48,12 +48,12 @@
   <div class="row">
     <div class="col">
       <h3>Import Blacklist</h3>
-      <form method="POST" action="{{ url_for('admin.importScope', scopetype='blacklist') }}">
+      <form method="POST" action="{{ url_for('admin.import_scope', scopetype='blacklist') }}">
         {{ importForm.hidden_tag() }}
         {{ importForm.scope(rows='10', cols='30') }}
         <br />
         {{ importForm.submit(class="btn btn-primary", id="import-submit") }}
-        <a href="{{ url_for('admin.exportScope', scopetype='blacklist') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Blacklist</a>
+        <a href="{{ url_for('admin.export_scope', scopetype='blacklist') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Blacklist</a>
       </form>
     </div>
   </div>

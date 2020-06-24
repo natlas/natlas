@@ -75,8 +75,7 @@ class ElasticInterface:
         result = self.client.execute_search(
             index="nmap_history", body=searchBody, size=0, track_scores=False
         )
-        num_screenshots = int(result["aggregations"]["screenshot_count"]["value"])
-        return num_screenshots
+        return int(result["aggregations"]["screenshot_count"]["value"])
 
     def get_host_screenshots(self, ip, limit, offset):
         """ Gets screenshots and minimal context for a given host """

@@ -195,7 +195,7 @@ def blacklist():
 @bp.route("/import/<string:scopetype>", methods=["POST"])
 @is_authenticated
 @is_admin
-def importScope(scopetype=""):
+def import_scope(scopetype=""):
     if scopetype == "blacklist":
         importBlacklist = True
         importForm = forms.ImportBlacklistForm()
@@ -227,7 +227,7 @@ def importScope(scopetype=""):
 @bp.route("/export/<string:scopetype>", methods=["GET"])
 @is_authenticated
 @is_admin
-def exportScope(scopetype=""):
+def export_scope(scopetype=""):
     if scopetype == "blacklist":
         exportBlacklist = True
     elif scopetype == "scope":

@@ -73,15 +73,14 @@ class ElasticClient:
         """ Attempt to reconnect if we haven't tried to reconnect too recently """
         now = datetime.utcnow()
         delta = now - self.lastReconnectAttempt
-        if delta.seconds < 30:
-            return self.status
-        else:
+        if delta.seconds >= 30:
             self.status = self._ping()
-            return self.status
+
+        return self.status
 
     def _check_status(self):
         """ If we're in a known bad state, try to reconnect """
-        if not self.status and not self._attempt_reconnect():
+        if not (self.status or self._attempt_reconnect()):
             raise elasticsearch.ConnectionError
         return self.status
 
@@ -136,8 +135,7 @@ class ElasticClient:
     def execute_index(self, **kwargs):
         """ Executes an arbitrary index. """
         with self._new_trace_span(operation="index", **kwargs):
-            results = self._execute_raw_query(self.es.index, doc_type="_doc", **kwargs)
-            return results
+            return self._execute_raw_query(self.es.index, doc_type="_doc", **kwargs)
 
     # Inner-most query executor. All queries route through here.
     def _execute_raw_query(self, func, **kwargs):
