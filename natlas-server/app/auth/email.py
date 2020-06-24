@@ -1,5 +1,17 @@
-from flask import render_template, current_app
+from flask import render_template, current_app, flash
 from app.email import send_email
+from app.models import User
+
+
+def validate_email(addr):
+    validemail = User.validate_email(addr)
+    if not validemail:
+        flash(
+            f"{addr} does not appear to be a valid, deliverable email address.",
+            "danger",
+        )
+        return None
+    return validemail
 
 
 def send_auth_email(email, token, token_type):
