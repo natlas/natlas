@@ -1,18 +1,18 @@
 {
-	"LOGIN_REQUIRED": {
-		"type": "bool",
-		"default": "True"
-	},
-	"REGISTER_ALLOWED": {
-		"type": "bool",
-		"default": "False"
-	},
-	"AGENT_AUTHENTICATION": {
-		"type": "bool",
-		"default": "True"
-	},
-	"CUSTOM_BRAND": {
-		"type": "string",
-		"default": ""
-	}
+    "LOGIN_REQUIRED": {
+        "type": "bool",
+        "default": "True"
+    },
+    "REGISTER_ALLOWED": {
+        "type": "bool",
+        "default": "False"
+    },
+    "AGENT_AUTHENTICATION": {
+        "type": "bool",
+        "default": "True"
+    },
+    "CUSTOM_BRAND": {
+        "type": "string",
+        "default": ""
+    }
 }

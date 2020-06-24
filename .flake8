@@ -1,17 +1,17 @@
 [flake8]
-# W191 - Tabs over spaces
-# E261 - Two spaces before comments
-# E117 - Indention levels
+# W503 - line break before binary operator
 # E402 - module level import not at top of file
+# E203 - whitespace before ':'
 
-ignore = W191, E261, E117, E402
+ignore = E402, W503, E203
 max-line-length = 160
 exclude =
-	# Ignore contents of pycache directories
-	__pycache__,
-	# Ignore dependencies in virtual environments
-	venv,
-	# Ignore migrations as they are mostly auto-generated
-	migrations,
-	# Ignore node_modules for local dev testing
-	node_modules
+    # Ignore contents of pycache directories
+    __pycache__,
+    # Ignore dependencies in virtual environments
+    venv,
+    .venv,
+    # Ignore migrations as they are mostly auto-generated
+    migrations,
+    # Ignore node_modules for local dev testing
+    node_modules

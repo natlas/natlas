@@ -3,35 +3,35 @@
 {% set active_page = "profile" %}
 {% block content %}
         {% include 'user/_header.html' %}
-    	<div class="row">
-	    	<div class="col-xs-12 col-sm-6 col-md-4">
-	    		<h3>Change Password</h3>
-		    	<form class="form-horizontal pwchange-form" action="{{url_for('user.profile')}}" method="post">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <h3>Change Password</h3>
+                <form class="form-horizontal pwchange-form" action="{{url_for('user.profile')}}" method="post">
                     {{ changePasswordForm.hidden_tag() }}
-			    	<div class="form-group">
-			    		{{ changePasswordForm.old_password.label(class="control-label") }}
-			    		{{ changePasswordForm.old_password(class="form-control") }}
-			    		{% for error in changePasswordForm.old_password.errors %}
-		                <span style="color: red;">{{ error }}</span>
-		                {% endfor %}
-			    	</div>
-			    	<div class="form-group">
-			    		{{ changePasswordForm.password.label(class="control-label") }}
-			    		{{ changePasswordForm.password(class="form-control") }}
-			    		{% for error in changePasswordForm.password.errors %}
-		                <span style="color: red;">{{ error }}</span>
-		                {% endfor %}
-			    	</div>
-			    	<div class="form-group">
-			    		{{ changePasswordForm.password2.label(class="control-label") }}
-			    		{{ changePasswordForm.password2(class="form-control") }}
-			    		{% for error in changePasswordForm.password2.errors %}
-		                <span style="color: red;">{{ error }}</span>
-		                {% endfor %}
-			    	</div>
-			    	<div>{{ changePasswordForm.changePassword(class="btn btn-primary") }}</div>
-		    	</form>
-		    </div>
+                    <div class="form-group">
+                        {{ changePasswordForm.old_password.label(class="control-label") }}
+                        {{ changePasswordForm.old_password(class="form-control") }}
+                        {% for error in changePasswordForm.old_password.errors %}
+                        <span style="color: red;">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ changePasswordForm.password.label(class="control-label") }}
+                        {{ changePasswordForm.password(class="form-control") }}
+                        {% for error in changePasswordForm.password.errors %}
+                        <span style="color: red;">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ changePasswordForm.password2.label(class="control-label") }}
+                        {{ changePasswordForm.password2(class="form-control") }}
+                        {% for error in changePasswordForm.password2.errors %}
+                        <span style="color: red;">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div>{{ changePasswordForm.changePassword(class="btn btn-primary") }}</div>
+                </form>
+            </div>
             <div class="col-xs-12 col-sm-5 col-sm-offset-1 col-md-3 col-md-offset-1">
                 <h3>Display Settings</h3>
                 <form class="form-horizontal display-form" action="{{url_for('user.profile')}}" method="post">
@@ -51,7 +51,7 @@
                     <div>{{ displaySettingsForm.updateDisplaySettings(class="btn btn-primary") }}</div>
                 </form>
             </div>
-		</div>
+        </div>
         <div class="row">
             <div class="col-12 my-3 border-bottom d-flex justify-content-between">
                 <h2 class="d-inline-block">My Agents</h2>

@@ -2,13 +2,13 @@
 {% set title = "404 - Not Found" %}
 {% block content %}
   <div class="row">
-  	<div class="col">
-  		<h2 class="sub-header">404: Page Not Found</h2>
-  	</div>
+      <div class="col">
+          <h2 class="sub-header">404: Page Not Found</h2>
+      </div>
   </div>
   <div class="row">
-  	<div class="col">
-		<p>Looks like we couldn't find what you're looking for. Maybe you'd prefer to go on <a href="{{url_for('host.random_host')}}">an adventure</a>? Or maybe you'd like to <a href="{{ url_for('main.index') }}">return to browse</a>.</p>
-	</div>
+      <div class="col">
+        <p>Looks like we couldn't find what you're looking for. Maybe you'd prefer to go on <a href="{{url_for('host.random_host')}}">an adventure</a>? Or maybe you'd like to <a href="{{ url_for('main.index') }}">return to browse</a>.</p>
+    </div>
   </div>
 {% endblock %}

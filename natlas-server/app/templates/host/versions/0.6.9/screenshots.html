@@ -4,42 +4,42 @@
 {% block content %}
     {% include 'host/versions/0.6.9/_header.html' %}
     {% include 'host/versions/0.6.9/_imagemodal.html' %}
-	{% if numresults > current_user.results_per_page %}
-	    <div class="row">
-	      <div class="col text-center my-2">
-	      {% include 'includes/pagination.html' %}
-	      </div>
-	    </div>
-	  {% endif %}
-	{% for entry in historical_screenshots %}
-		<div class="row screenshot-header-row mt-2">
-			<h5 class="border-bottom">
-				<a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}"><time datetime={{ entry.ctime }} title="{{ entry.ctime|ctime(human=True) }}">{{ entry.ctime | ctime }}</time></a>
-			</h5>
-		</div>
-		<div class="row image-row">
-			{% for screenshot in entry.screenshots %}
-				{% if screenshot.hash %}
-			    <div class="col-xs-12 col-sm-3">
-					<div class="image-browser">
-						<div class="thumbnail-hover d-flex flex-column justify-content-between">
-							<div class="image-browser-service p-2">{{ screenshot.service }}</div>
-							<div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
-						</div>
-						<img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{ip}}' data-scan_id='{{entry.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != ip %} ({{ip}}){%endif%}">
-					</div>
-				</div>
-				{% endif %}
-				{% if screenshot.path %}
-			    <div class="col-xs-12 col-sm-3">
-					<strong class="mt-2">{{ screenshot.service }}</strong>
-					<div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
-				</div>
-				{% endif %}
-			{% endfor %}
-		</div>
-	{% endfor %}
-	{% if numresults > current_user.results_per_page %}
+    {% if numresults > current_user.results_per_page %}
+        <div class="row">
+          <div class="col text-center my-2">
+          {% include 'includes/pagination.html' %}
+          </div>
+        </div>
+      {% endif %}
+    {% for entry in historical_screenshots %}
+        <div class="row screenshot-header-row mt-2">
+            <h5 class="border-bottom">
+                <a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}"><time datetime={{ entry.ctime }} title="{{ entry.ctime|ctime(human=True) }}">{{ entry.ctime | ctime }}</time></a>
+            </h5>
+        </div>
+        <div class="row image-row">
+            {% for screenshot in entry.screenshots %}
+                {% if screenshot.hash %}
+                <div class="col-xs-12 col-sm-3">
+                    <div class="image-browser">
+                        <div class="thumbnail-hover d-flex flex-column justify-content-between">
+                            <div class="image-browser-service p-2">{{ screenshot.service }}</div>
+                            <div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
+                        </div>
+                        <img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{ip}}' data-scan_id='{{entry.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != ip %} ({{ip}}){%endif%}">
+                    </div>
+                </div>
+                {% endif %}
+                {% if screenshot.path %}
+                <div class="col-xs-12 col-sm-3">
+                    <strong class="mt-2">{{ screenshot.service }}</strong>
+                    <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/{{screenshot.path}}' src='/media/{{screenshot.thumb}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    {% if numresults > current_user.results_per_page %}
     <div class="row">
       <div class="col text-center my-2">
       {% include 'includes/pagination.html' %}

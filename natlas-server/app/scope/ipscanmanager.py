@@ -3,86 +3,91 @@ from .cyclicprng import CyclicPRNG
 
 
 class IPScanManager:
-	networks = []
-	total = 0
-	rng = None
+    networks = []
+    total = 0
+    rng = None
 
-	def __init__(self, whitelist, blacklist):
-		self.networks = []
-		self.total = 0
-		self.rng = None
+    def __init__(self, whitelist, blacklist):
+        self.networks = []
+        self.total = 0
+        self.rng = None
 
-		self.set_whitelist(whitelist)
-		self.set_blacklist(blacklist)
-		self.initialize_manager()
+        self.set_whitelist(whitelist)
+        self.set_blacklist(blacklist)
+        self.initialize_manager()
 
-	def set_whitelist(self, whitelist):
-		self.whitelist = IPSet([])
-		for block in whitelist:
-			self.whitelist.add(IPNetwork(block))
-			# Remove invalid broadcast and network addresses
-			if block.broadcast is not None:
-				self.whitelist.remove(IPNetwork(block.broadcast))
-			if block.size > 2:
-				self.whitelist.remove(IPNetwork(block.network))
+    def set_whitelist(self, whitelist):
+        self.whitelist = IPSet([])
+        for block in whitelist:
+            self.whitelist.add(IPNetwork(block))
+            # Remove invalid broadcast and network addresses
+            if block.broadcast is not None:
+                self.whitelist.remove(IPNetwork(block.broadcast))
+            if block.size > 2:
+                self.whitelist.remove(IPNetwork(block.network))
 
-	def set_blacklist(self, blacklist):
-		self.blacklist = IPSet([])
-		for block in blacklist:
-			self.blacklist.add(IPNetwork(block))
+    def set_blacklist(self, blacklist):
+        self.blacklist = IPSet([])
+        for block in blacklist:
+            self.blacklist.add(IPNetwork(block))
 
-	def initialize_manager(self):
-		self.networks = []
-		self.ipset = self.whitelist - self.blacklist
+    def initialize_manager(self):
+        self.networks = []
+        self.ipset = self.whitelist - self.blacklist
 
-		for block in self.ipset.iter_cidrs():
-			self.total += block.size
-			self.networks.append({"network": block, "size": block.size, "start": block[0], "index": 0})
+        for block in self.ipset.iter_cidrs():
+            self.total += block.size
+            self.networks.append(
+                {"network": block, "size": block.size, "start": block[0], "index": 0}
+            )
 
-		if self.total < 1:
-			raise Exception("IPScanManager can not be started with an empty target scope")
+        if self.total < 1:
+            raise Exception(
+                "IPScanManager can not be started with an empty target scope"
+            )
 
-		self.rng = CyclicPRNG(self.total)
+        self.rng = CyclicPRNG(self.total)
 
-		def blockcomp(b):
-			return b["start"]
+        def blockcomp(b):
+            return b["start"]
 
-		self.networks.sort(key=blockcomp)
+        self.networks.sort(key=blockcomp)
 
-		start = 1
-		for i in range(0, len(self.networks)):
-			self.networks[i]["index"] = start
-			start += self.networks[i]["size"]
+        start = 1
+        for i in range(0, len(self.networks)):
+            self.networks[i]["index"] = start
+            start += self.networks[i]["size"]
 
-		self.initialized = True
+        self.initialized = True
 
-	def in_whitelist(self, ip):
-		return ip in self.whitelist
+    def in_whitelist(self, ip):
+        return ip in self.whitelist
 
-	def in_blacklist(self, ip):
-		return ip in self.blacklist
+    def in_blacklist(self, ip):
+        return ip in self.blacklist
 
-	def get_total(self):
-		return self.total
+    def get_total(self):
+        return self.total
 
-	def get_ready(self):
-		return self.rng and self.total > 0 and self.initialized
+    def get_ready(self):
+        return self.rng and self.total > 0 and self.initialized
 
-	def get_next_ip(self):
-		if self.rng:
-			index = self.rng.get_random()
-			return self.get_ip(index)
-		else:
-			return None
+    def get_next_ip(self):
+        if self.rng:
+            index = self.rng.get_random()
+            return self.get_ip(index)
+        else:
+            return None
 
-	def get_ip(self, index):
-		def binarysearch(networks, i):
-			middle = int(len(networks) / 2)
-			network = networks[middle]
-			if i < network["index"]:
-				return binarysearch(networks[:middle], i)
-			elif i >= (network["index"] + network["size"]):
-				return binarysearch(networks[middle + 1:], i)
-			else:
-				return network["network"][i - network["index"]]
-		return binarysearch(self.networks, index)
+    def get_ip(self, index):
+        def binarysearch(networks, i):
+            middle = int(len(networks) / 2)
+            network = networks[middle]
+            if i < network["index"]:
+                return binarysearch(networks[:middle], i)
+            elif i >= (network["index"] + network["size"]):
+                return binarysearch(networks[middle + 1 :], i)
+            else:
+                return network["network"][i - network["index"]]
+
+        return binarysearch(self.networks, index)

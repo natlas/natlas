@@ -5,36 +5,42 @@ from app.models import User
 
 
 class LoginForm(FlaskForm):
-	email = StringField('Email', validators=[DataRequired(), Email()])
-	password = PasswordField('Password', validators=[DataRequired()])
-	remember_me = BooleanField('Remember Me')
-	submit = SubmitField('Sign In')
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    remember_me = BooleanField("Remember Me")
+    submit = SubmitField("Sign In")
 
 
 class RegistrationForm(FlaskForm):
-	email = StringField('Email', validators=[DataRequired(), Email()])
-	password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
-	password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-	submit = SubmitField('Register')
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
+    password2 = PasswordField(
+        "Repeat Password", validators=[DataRequired(), EqualTo("password")]
+    )
+    submit = SubmitField("Register")
 
-	def validate_email(self, email):
-		user = User.query.filter_by(email=email.data.lower()).first()
-		if user is not None:
-			raise ValidationError('Email already exists!')
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data.lower()).first()
+        if user is not None:
+            raise ValidationError("Email already exists!")
 
 
 class ResetPasswordRequestForm(FlaskForm):
-	email = StringField('Email', validators=[DataRequired(), Email()])
-	submit = SubmitField('Request Password Reset')
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Request Password Reset")
 
 
 class ResetPasswordForm(FlaskForm):
-	password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
-	password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-	submit = SubmitField('Reset Password')
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
+    password2 = PasswordField(
+        "Repeat Password", validators=[DataRequired(), EqualTo("password")]
+    )
+    submit = SubmitField("Reset Password")
 
 
 class AcceptInviteForm(FlaskForm):
-	password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
-	password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-	submit = SubmitField('Accept Invite')
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
+    password2 = PasswordField(
+        "Repeat Password", validators=[DataRequired(), EqualTo("password")]
+    )
+    submit = SubmitField("Accept Invite")

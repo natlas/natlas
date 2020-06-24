@@ -1,25 +1,25 @@
 .statusbar {
-	height: 2rem;
+    height: 2rem;
 }
 
 .statusbar-content {
-	font-size: 1.25rem;
-	height: 2rem;
-	line-height: 2rem;
+    font-size: 1.25rem;
+    height: 2rem;
+    line-height: 2rem;
 }
 
 #cycle_status_overlay {
-	display: flex;
+    display: flex;
 }
 
 #progbarbg:hover #cycle_status_overlay {
-	display: none;
+    display: none;
 }
 
 #cycle_status_overlay_exact {
-	display: none;
+    display: none;
 }
 
 #progbarbg:hover #cycle_status_overlay_exact {
-	display: flex;
+    display: flex;
 }
