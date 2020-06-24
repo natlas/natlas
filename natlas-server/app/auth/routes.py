@@ -9,7 +9,7 @@ from app.auth.forms import (
     AcceptInviteForm,
 )
 from app.models import User, UserInvitation
-from app.auth.email import send_auth_email
+from app.auth.email import send_auth_email, validate_email
 from app.auth import bp
 from app.auth.wrappers import is_not_authenticated, is_authenticated
 from werkzeug.urls import url_parse
@@ -50,12 +50,8 @@ def register():
         return redirect(url_for("auth.login"))
     form = RegistrationForm()
     if form.validate_on_submit():
-        validemail = User.validate_email(form.email.data)
+        validemail = validate_email(form.email.data)
         if not validemail:
-            flash(
-                f"{form.email.data} does not appear to be a valid, deliverable email address.",
-                "danger",
-            )
             return redirect(url_for("auth.register"))
         user = User(email=validemail)
         user.set_password(form.password.data)
@@ -71,12 +67,8 @@ def register():
 def reset_password_request():
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        validemail = User.validate_email(form.email.data)
+        validemail = validate_email(form.email.data)
         if not validemail:
-            flash(
-                f"{form.email.data} does not appear to be a valid, deliverable email address.",
-                "danger",
-            )
             return redirect(url_for("auth.reset_password_request"))
         user = User.query.filter_by(email=validemail).first()
         if user:
