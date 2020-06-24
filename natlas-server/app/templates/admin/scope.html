@@ -51,12 +51,12 @@
   <div class="row">
     <div class="col">
       <h3>Import Scope</h3>
-      <form method="POST" action="{{ url_for('admin.importScope', scopetype='scope') }}">
+      <form method="POST" action="{{ url_for('admin.import_scope', scopetype='scope') }}">
         {{ importForm.hidden_tag() }}
         {{ importForm.scope(rows='10', cols='30') }}
         <br />
         {{ importForm.submit(class="btn btn-primary", id="submit-import") }}
-        <a href="{{ url_for('admin.exportScope', scopetype='scope') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Scope</a>
+        <a href="{{ url_for('admin.export_scope', scopetype='scope') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Scope</a>
       </form>
     </div>
   </div>

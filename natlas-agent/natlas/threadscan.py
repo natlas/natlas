@@ -120,26 +120,25 @@ def scan(target_data, config):
         for item in screens:
             result.add_screenshot(item)
 
-    if agentConfig["vncScreenshots"] and shutil.which("vncsnapshot") is not None:
-        if "5900/tcp" in result.result["nmap_data"]:
-            if (
-                screenshots.get_vnc_screenshots(
-                    target, scan_id, agentConfig["vncScreenshotTimeout"]
-                )
-                is True
-            ):
+    if (
+        agentConfig["vncScreenshots"]
+        and "5900/tcp" in result.result["nmap_data"]
+        and screenshots.get_vnc_screenshots(
+            target, scan_id, agentConfig["vncScreenshotTimeout"]
+        )
+    ):
 
-                screenshotPath = f"{data_dir}/vncsnapshot.{scan_id}.jpg"
-                if os.path.isfile(screenshotPath):
-                    result.add_screenshot(
-                        {
-                            "host": target,
-                            "port": 5900,
-                            "service": "VNC",
-                            "data": screenshots.base64_image(screenshotPath),
-                        }
-                    )
-                    logger.info(f"VNC screenshot acquired for {result.result['ip']}")
+        screenshotPath = f"{data_dir}/vncsnapshot.{scan_id}.jpg"
+        if os.path.isfile(screenshotPath):
+            result.add_screenshot(
+                {
+                    "host": target,
+                    "port": 5900,
+                    "service": "VNC",
+                    "data": screenshots.base64_image(screenshotPath),
+                }
+            )
+            logger.info(f"VNC screenshot acquired for {result.result['ip']}")
 
     # submit result
 
