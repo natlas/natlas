@@ -37,8 +37,8 @@
             <th scope="row">{{ user.id }}</th>
             <td>{{ user.email }}</td>
             <td>{{ user.is_admin }}</td>
-            <td><form method="POST" action="{{ url_for('admin.deleteUser', id=user.id) }}">{{ delForm.hidden_tag() }} <button class="btn btn-danger" id="deleteUser-{{user.id}}" name="deleteUser" title="Delete User" onclick="return confirm('Are you sure you want to delete {{ user.email }}?')" type="submit"><i class="fas fa-user-slash mr-2"></i>Delete</button></form></td>
-            <td><form method="POST" action="{{ url_for('admin.toggleUser', id=user.id) }}">{{ editForm.hidden_tag() }}
+            <td><form method="POST" action="{{ url_for('admin.delete_user', id=user.id) }}">{{ delForm.hidden_tag() }} <button class="btn btn-danger" id="deleteUser-{{user.id}}" name="deleteUser" title="Delete User" onclick="return confirm('Are you sure you want to delete {{ user.email }}?')" type="submit"><i class="fas fa-user-slash mr-2"></i>Delete</button></form></td>
+            <td><form method="POST" action="{{ url_for('admin.toggle_user', id=user.id) }}">{{ editForm.hidden_tag() }}
               {% if user.is_admin %}
               <button class="btn btn-warning" id="editUser-{{user.id}}" name="editUser" title="Demote User" onclick="return confirm('Are you sure you want to demote {{ user.email }}?')" type="submit"><i class="fas fa-arrow-circle-down mr-2"></i>Demote</button>
               {% else %}

@@ -12,9 +12,9 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="deleteGroup">
                 {% if host %}
-                    <form method="POST" class="dropdown-item" action="{{ url_for('admin.deleteScan', scan_id=host.scan_id) }}">{{ delForm.hidden_tag() }} <button class="dropdown-item" id="deleteScan" name="deleteScan" title="Delete Scan" aria-hidden="true" onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')" type="submit" ><i class="fas fa-trash-alt text-danger"></i> Delete Scan</button></form>
+                    <form method="POST" class="dropdown-item" action="{{ url_for('admin.delete_scan', scan_id=host.scan_id) }}">{{ delForm.hidden_tag() }} <button class="dropdown-item" id="deleteScan" name="deleteScan" title="Delete Scan" aria-hidden="true" onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')" type="submit" ><i class="fas fa-trash-alt text-danger"></i> Delete Scan</button></form>
                 {% endif %}
-                  <form method="POST" class="dropdown-item" action="{{ url_for('admin.deleteHost', ip=ip) }}">{{ delHostForm.hidden_tag() }} <button class="dropdown-item" id="deleteHost" name="deleteHost" title="Delete Host" aria-hidden="true" onclick="return confirm('Are you sure you want to delete host: {{ ip }}')" type="submit" ><i class="fas fa-dumpster-fire text-danger"></i> Delete Host</button></form>
+                  <form method="POST" class="dropdown-item" action="{{ url_for('admin.delete_host', ip=ip) }}">{{ delHostForm.hidden_tag() }} <button class="dropdown-item" id="deleteHost" name="deleteHost" title="Delete Host" aria-hidden="true" onclick="return confirm('Are you sure you want to delete host: {{ ip }}')" type="submit" ><i class="fas fa-dumpster-fire text-danger"></i> Delete Host</button></form>
                 </div> <!-- End delete dropdown-->
             {% endif %}
         </div>

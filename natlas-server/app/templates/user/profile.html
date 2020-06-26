@@ -101,7 +101,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form method="POST" action="{{url_for('user.newAgent')}}" id="agentNameForm">
+      <form method="POST" action="{{url_for('user.new_agent')}}" id="agentNameForm">
       <div class="modal-body">
           {{ agentNameForm.hidden_tag() }}
           {{ agentNameForm.agent_name(size=32, class="form-control", placeholder="Agent 1") }}

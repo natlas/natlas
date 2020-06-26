@@ -3,7 +3,7 @@
       <i class="fas fa-ellipsis-v"></i>
     </button>
     <div class="dropdown-menu" aria-labelledby="adminMenu-{{loop.index}}">
-        <form method="POST" action="{{ url_for('user.generateNewToken', agent_id=agent.agentid) }}">{{ generateTokenForm.hidden_tag() }} <button class="btn inline-submit" id="refreshToken-{{loop.index}}" name="generateToken" title="Refresh Token" onclick="return confirm('Are you sure you want to generate a new token for {{ agent.agentid }}? This will invalidate any existing agents using this token.')" type="submit" ><i class="fas fa-sync-alt text-info mr-1"></i>Refresh Token</button></form>
+        <form method="POST" action="{{ url_for('user.generate_new_token', agent_id=agent.agentid) }}">{{ generateTokenForm.hidden_tag() }} <button class="btn inline-submit" id="refreshToken-{{loop.index}}" name="generateToken" title="Refresh Token" onclick="return confirm('Are you sure you want to generate a new token for {{ agent.agentid }}? This will invalidate any existing agents using this token.')" type="submit" ><i class="fas fa-sync-alt text-info mr-1"></i>Refresh Token</button></form>
       <button class="btn" id="agentName-{{loop.index}}" name="changename" title="Change Agent Name" data-toggle="modal" data-target="#agentmodal" data-agentid="{{agent.agentid}}" data-agentname="{{agent.friendly_name}}" data-action="changename" type="button"><i class="fas fa-pencil-alt text-info mr-1"></i>Change Name</button>
     </div>
 </div>

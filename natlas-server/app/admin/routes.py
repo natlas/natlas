@@ -8,7 +8,6 @@ from flask import (
     flash,
     Response,
     abort,
-    request,
 )
 from flask_login import current_user, login_required
 
@@ -73,7 +72,7 @@ def users():
 @bp.route("/users/<int:id>/delete", methods=["POST"])
 @login_required
 @is_admin
-def deleteUser(id):
+def delete_user(id):
     delForm = forms.UserDeleteForm()
     if delForm.validate_on_submit():
         if current_user.id == id:
@@ -92,22 +91,16 @@ def deleteUser(id):
 @bp.route("/users/<int:id>/toggle", methods=["POST"])
 @login_required
 @is_admin
-def toggleUser(id):
+def toggle_user(id):
     editForm = forms.UserEditForm()
     if editForm.validate_on_submit():
         user = User.query.filter_by(id=id).first()
-        if user.is_admin:
-            admins = User.query.filter_by(is_admin=True).all()
-            if len(admins) == 1:
-                flash("Can't delete the last admin!", "danger")
-                return redirect(url_for("admin.users"))
-            user.is_admin = False
-            db.session.commit()
-            flash("User demoted!", "success")
-        else:
-            user.is_admin = True
-            db.session.commit()
-            flash("User promoted!", "success")
+        if user.id == current_user.id:
+            flash("Can't demote yourself!", "danger")
+            return redirect(url_for("admin.users"))
+        user.is_admin = not user.is_admin
+        db.session.commit()
+        flash("User status toggled!", "success")
     else:
         flash("Form couldn't validate!", "danger")
 
@@ -243,7 +236,7 @@ def export_scope(scopetype=""):
 @bp.route("/<string:scopetype>/<int:id>/delete", methods=["POST"])
 @login_required
 @is_admin
-def deleteScopeItem(scopetype, id):
+def delete_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
         abort(404)
     delForm = forms.ScopeDeleteForm()
@@ -263,18 +256,14 @@ def deleteScopeItem(scopetype, id):
 @bp.route("/<string:scopetype>/<int:id>/toggle", methods=["POST"])
 @login_required
 @is_admin
-def toggleScopeItem(scopetype, id):
+def toggle_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
         abort(404)
     toggleForm = forms.ScopeToggleForm()
     if toggleForm.validate_on_submit():
         item = ScopeItem.query.filter_by(id=id).first()
-        if item.blacklist:
-            item.blacklist = False
-            flash(f"{item.target} removed from blacklist!", "success")
-        else:
-            item.blacklist = True
-            flash(f"{item.target} blacklisted!", "success")
+        item.blacklist = not item.blacklist
+        flash(f"Toggled scope status for {item.target}!", "success")
         db.session.commit()
         current_app.ScopeManager.update()
     else:
@@ -285,7 +274,7 @@ def toggleScopeItem(scopetype, id):
 @bp.route("/<string:scopetype>/<int:id>/tag", methods=["POST"])
 @login_required
 @is_admin
-def tagScopeItem(scopetype, id):
+def tag_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
         abort(404)
     addTagForm = forms.TagScopeForm()
@@ -304,7 +293,7 @@ def tagScopeItem(scopetype, id):
 @bp.route("/<string:scopetype>/<int:id>/untag", methods=["POST"])
 @login_required
 @is_admin
-def untagScopeItem(scopetype, id):
+def untag_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
         abort(404)
     delTagForm = forms.TagScopeForm()
@@ -389,7 +378,7 @@ def services():
 @bp.route("/services/export", methods=["GET"])
 @login_required
 @is_admin
-def exportServices():
+def export_services():
     return Response(
         str(current_app.current_services["services"]), mimetype="text/plain"
     )
@@ -398,7 +387,7 @@ def exportServices():
 @bp.route("/agents", methods=["GET", "POST"])
 @login_required
 @is_admin
-def agentConfig():
+def agent_config():
     agentConfig = AgentConfig.query.get(1)
     # pass the model to the form to populate
     agentForm = forms.AgentConfigForm(obj=agentConfig)
@@ -423,7 +412,7 @@ def agentConfig():
 @bp.route("/agents/script/add", methods=["POST"])
 @login_required
 @is_admin
-def addScript():
+def add_script():
     addScriptForm = forms.AddScriptForm(prefix="add-script")
 
     if addScriptForm.validate_on_submit():
@@ -444,7 +433,7 @@ def addScript():
 @bp.route("/agents/script/<string:name>/delete", methods=["POST"])
 @login_required
 @is_admin
-def deleteScript(name):
+def delete_script(name):
     deleteForm = forms.DeleteForm()
 
     if deleteForm.validate_on_submit():
@@ -465,18 +454,16 @@ def deleteScript(name):
 @bp.route("/scans/delete/<scan_id>", methods=["POST"])
 @login_required
 @is_admin
-def deleteScan(scan_id):
+def delete_scan(scan_id):
     delForm = forms.DeleteForm()
     redirectLoc = url_for("main.browse")
 
     if delForm.validate_on_submit():
         deleted = current_app.elastic.delete_scan(scan_id)
-        if deleted in [1, 2]:
-            flash(f"Successfully deleted scan {scan_id}.", "success")
-            if request.referrer and scan_id in request.referrer:
-                redirectLoc = request.referrer.rsplit(scan_id)[0]
+        if deleted not in [1, 2]:
+            flash(f"Couldn't delete scan {scan_id}", "danger")
         else:
-            flash(f"Could not delete scan {scan_id}.", "danger")
+            flash(f"Successfully deleted scan {scan_id}.", "success")
     else:
         flash("Couldn't validate form!")
 
@@ -486,7 +473,7 @@ def deleteScan(scan_id):
 @bp.route("/hosts/delete/<ip>", methods=["POST"])
 @login_required
 @is_admin
-def deleteHost(ip):
+def delete_host(ip):
     delForm = forms.DeleteForm()
     redirectLoc = url_for("main.browse")
 

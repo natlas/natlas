@@ -70,7 +70,7 @@ def profile():
 
 @bp.route("/agent/<string:agent_id>/newToken", methods=["POST"])
 @login_required
-def generateNewToken(agent_id):
+def generate_new_token(agent_id):
     generateTokenForm = GenerateTokenForm()
 
     if generateTokenForm.validate_on_submit():
@@ -85,7 +85,7 @@ def generateNewToken(agent_id):
 
 @bp.route("/agent/<string:agent_id>/newName", methods=["POST"])
 @login_required
-def changeAgentName(agent_id):
+def change_agent_name(agent_id):
     agentNameForm = AgentNameForm()
 
     if agentNameForm.validate_on_submit():
@@ -103,7 +103,7 @@ def changeAgentName(agent_id):
 
 @bp.route("/agent/newAgent", methods=["POST"])
 @login_required
-def newAgent():
+def new_agent():
     newAgentForm = AgentNameForm()
 
     if newAgentForm.validate_on_submit():
