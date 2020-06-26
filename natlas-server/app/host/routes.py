@@ -158,8 +158,6 @@ def host_screenshots(ip):
 
 
 @bp.route("/<ip>/rescan", methods=["POST"])
-# login_required ensures that an actual user is logged in to make the request
-# opposed to is_authenticated checking site config to see if login is required first
 @login_required
 def rescan_host(ip):
     rescanForm = RescanForm()
