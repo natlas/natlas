@@ -8,6 +8,7 @@ import os
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from natlas import logging
+from natlas import utils
 
 
 class NatlasNetworkServices:
@@ -158,6 +159,7 @@ class NatlasNetworkServices:
 
     def get_services_file(self):
         self.netlogger.info(f"Fetching natlas-services file from {self.config.server}")
+        services_path = utils.get_services_path()
         response = self.backoff_request(endpoint=self.api_endpoints["GETSERVICES"])
         if response:
             serviceData = response.json()
@@ -175,9 +177,9 @@ class NatlasNetworkServices:
                     % self.config.server
                 )
                 return False
-            with open("tmp/natlas-services", "w") as f:
+            with open(services_path, "w") as f:
                 f.write(serviceData["services"])
-            with open("tmp/natlas-services", "r") as f:
+            with open(services_path, "r") as f:
                 if (
                     hashlib.sha256(f.read().rstrip("\r\n").encode()).hexdigest()
                     != serviceData["sha256"]

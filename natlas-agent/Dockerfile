@@ -22,8 +22,6 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy \
 COPY . /opt/natlas/natlas-agent
 
 WORKDIR /opt/natlas/natlas-agent
-RUN mkdir logs data tmp \
-	&& chown www-data:www-data logs data tmp
 
 RUN python3 -m compileall .
 
@@ -39,6 +37,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY --from=build /tmp/dumb-init /usr/bin/dumb-init
 COPY --from=build /tmp/aquatone/aquatone /usr/bin/aquatone
 COPY --from=build /opt/natlas /opt/natlas
+
+RUN bash -c 'mkdir -p /data/{scans,conf,logs} \
+	&& chown -R www-data:www-data /data'
 
 # We have to copy packages like this because the python directory is different between python images and ubuntu images
 # So the /.venv/bin/python3 symlink ends point pointing to something that doesn't exist

@@ -7,8 +7,9 @@ import argparse
 import hashlib
 import ipaddress
 import queue
+from pathlib import Path
 
-from natlas import logging, error_reporting
+from natlas import logging, error_reporting, utils
 from config import Config
 from natlas.threadscan import ThreadScan
 from natlas.net import NatlasNetworkServices
@@ -85,10 +86,10 @@ def main():
         global_logger.critical(msg)
         raise SystemExit(f"[!] {msg}")
 
-    required_dirs = ["data", "logs", "tmp"]
+    required_dirs = ["scans", "logs", "conf"]
     for directory in required_dirs:
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
+        req_dir = os.path.join(config.data_dir, directory)
+        Path(req_dir).mkdir(parents=True, exist_ok=True)
 
     autoScan = True
     if args.target or args.tfile:
@@ -99,8 +100,7 @@ def main():
     q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
     servicesSha = ""
-    BASEDIR = os.path.abspath(os.path.dirname(__file__))
-    SERVICESPATH = os.path.join(BASEDIR, "tmp", "natlas-services")
+    SERVICESPATH = utils.get_services_path()
     if os.path.isfile(SERVICESPATH):
         servicesSha = hashlib.sha256(
             open(SERVICESPATH, "r").read().rstrip("\r\n").encode()

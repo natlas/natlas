@@ -21,8 +21,8 @@ def base64_image(path):
 
 
 def get_web_screenshots(target, scan_id, xml_data, proctimeout):
-    data_dir = utils.get_data_dir(scan_id)
-    outFiles = f"{data_dir}/aquatone.{scan_id}"
+    scan_dir = utils.get_scan_dir(scan_id)
+    outFiles = os.path.join(scan_dir, f"aquatone.{scan_id}")
     output = []
     logger.info(f"Attempting to take screenshots for {target}")
 
@@ -83,8 +83,8 @@ def get_vnc_screenshots(target, scan_id, proctimeout):
     if "DISPLAY" not in os.environ:
         return False
 
-    data_dir = utils.get_data_dir(scan_id)
-    outFile = f"{data_dir}/vncsnapshot.{scan_id}.jpg"
+    scan_dir = utils.get_scan_dir(scan_id)
+    outFile = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")
 
     logger.info(f"Attempting to take VNC screenshot for {target}")
 
