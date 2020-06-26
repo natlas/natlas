@@ -4,7 +4,7 @@
 {% block content %}
 
 {% include 'admin/_header.html' %}
-  <form class="form" action="{{url_for('admin.agentConfig')}}" method="post">
+  <form class="form" action="{{url_for('admin.agent_config')}}" method="post">
   <div class="row">
     <div class="col-xs-12 col-md-3">
       <h3>Nmap Config</h3>
@@ -99,11 +99,11 @@
         {% if scripts %}
           <ul class="script-list">
           {% for script in scripts %}
-            <li>{{ script.name }} <form class="d-inline" method="POST" action="{{ url_for('admin.deleteScript', name=script.name) }}">{{ delScriptForm.hidden_tag() }} <button class="btn d-inline btn-trash" id="deleteScript-{{loop.index}}" name="deleteScript" title='Delete Script "{{ script.name }}"' onclick="return confirm('Are you sure you want to stop running {{ script.name }}?')" type="submit" ><i class="fas fa-times mx-2 my-1 text-danger"></i></button></form></li>
+            <li>{{ script.name }} <form class="d-inline" method="POST" action="{{ url_for('admin.delete_script', name=script.name) }}">{{ delScriptForm.hidden_tag() }} <button class="btn d-inline btn-trash" id="deleteScript-{{loop.index}}" name="deleteScript" title='Delete Script "{{ script.name }}"' onclick="return confirm('Are you sure you want to stop running {{ script.name }}?')" type="submit" ><i class="fas fa-times mx-2 my-1 text-danger"></i></button></form></li>
           {% endfor %}
         </ul>
         {% endif %}
-        <form method="post" action="{{ url_for('admin.addScript') }}" name="addScriptForm" id="addScriptForm" class="form-inline">
+        <form method="post" action="{{ url_for('admin.add_script') }}" name="addScriptForm" id="addScriptForm" class="form-inline">
           {{ addScriptForm.hidden_tag() }}
           {{ addScriptForm.scriptName(class="form-control", placeholder="default") }}
           <button id="addScript" name="addScript" title="Add Script" aria-hidden="true" type="submit" class="inline-submit btn-trash text-success ml-2"><i class="fas fa-plus-circle"></i></button>
