@@ -11,20 +11,23 @@ from natlas import logging
 from natlas.net import NatlasNetworkServices
 from natlas.scanresult import ScanResult
 from natlas import utils
+from config import Config
 
 
 logger = logging.get_logger("AgentThread")
+conf = Config()
 
 
 def command_builder(scan_id, agentConfig, target):
-    outFiles = utils.get_data_dir(scan_id) + f"/nmap.{scan_id}"
+    outFiles = os.path.join(utils.get_scan_dir(scan_id), f"nmap.{scan_id}")
+    servicepath = utils.get_services_path()
     command = [
         "nmap",
         "--privileged",
         "-oA",
         outFiles,
         "--servicedb",
-        "./tmp/natlas-services",
+        servicepath,
     ]
 
     commandDict = {
@@ -58,7 +61,7 @@ def scan(target_data, config):
     agentConfig = target_data["agent_config"]
 
     command = command_builder(scan_id, agentConfig, target)
-    data_dir = utils.get_data_dir(scan_id)
+    scan_dir = utils.get_scan_dir(scan_id)
 
     result = ScanResult(target_data, config)
 
@@ -77,7 +80,7 @@ def scan(target_data, config):
     logger.info(f"Nmap {target} ({scan_id}) complete")
 
     for ext in "nmap", "gnmap", "xml":
-        path = f"{data_dir}/nmap.{scan_id}.{ext}"
+        path = os.path.join(scan_dir, f"nmap.{scan_id}.{ext}")
         try:
             result.add_item(ext + "_data", open(path).read())
         except Exception:
@@ -128,7 +131,7 @@ def scan(target_data, config):
         )
     ):
 
-        screenshotPath = f"{data_dir}/vncsnapshot.{scan_id}.jpg"
+        screenshotPath = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")
         if os.path.isfile(screenshotPath):
             result.add_screenshot(
                 {
@@ -174,7 +177,7 @@ class ThreadScan(threading.Thread):
 
     def execute_scan(self, work_item):
         target_data = work_item.target_data
-        utils.create_data_dir(target_data["scan_id"])
+        utils.create_scan_dir(target_data["scan_id"])
         # setting this here ensures the finally block won't error if we don't submit data
         response = False
         try:

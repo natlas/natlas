@@ -28,6 +28,9 @@ class Config:
         # url of server to get/submit work from/to
         self.server = os.environ.get("NATLAS_SERVER_ADDRESS") or "http://127.0.0.1:5000"
 
+        # Location of data directory
+        self.data_dir = os.environ.get("NATLAS_DATA_DIR", "/data")
+
         # ignore warnings about SSL connections
         # you shouldn't ignore ssl warnings, but I'll give you the option
         # Instead, you should put the trusted CA certificate bundle on the agent and use the REQUESTS_CA_BUNDLE env variable
