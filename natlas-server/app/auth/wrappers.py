@@ -6,6 +6,7 @@ import json
 from functools import wraps
 
 
+# This can be used in lieu of @login_required for pages that don't require a user account
 def is_authenticated(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -16,6 +17,7 @@ def is_authenticated(f):
     return decorated_function
 
 
+# An explicit wrapper to make a route only available if a request is not authenticated
 def is_not_authenticated(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -27,6 +29,7 @@ def is_not_authenticated(f):
     return decorated_function
 
 
+# Ensure current user is an admin
 def is_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -37,6 +40,7 @@ def is_admin(f):
     return decorated_function
 
 
+# Validate agent authentication if required
 def is_agent_authenticated(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):

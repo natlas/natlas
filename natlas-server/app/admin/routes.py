@@ -10,7 +10,7 @@ from flask import (
     abort,
     request,
 )
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app import db
 from app.admin import bp
@@ -26,11 +26,11 @@ from app.models import (
     ScopeLog,
     UserInvitation,
 )
-from app.auth.wrappers import is_authenticated, is_admin
+from app.auth.wrappers import is_admin
 
 
 @bp.route("/", methods=["GET", "POST"])
-@is_authenticated
+@login_required
 @is_admin
 def admin():
     configForm = forms.ConfigForm()
@@ -50,7 +50,7 @@ def admin():
 
 
 @bp.route("/users", methods=["GET", "POST"])
-@is_authenticated
+@login_required
 @is_admin
 def users():
     users = User.query.all()
@@ -71,7 +71,7 @@ def users():
 
 
 @bp.route("/users/<int:id>/delete", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def deleteUser(id):
     delForm = forms.UserDeleteForm()
@@ -90,7 +90,7 @@ def deleteUser(id):
 
 
 @bp.route("/users/<int:id>/toggle", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def toggleUser(id):
     editForm = forms.UserEditForm()
@@ -115,7 +115,7 @@ def toggleUser(id):
 
 
 @bp.route("/scope", methods=["GET", "POST"])
-@is_authenticated
+@login_required
 @is_admin
 def scope():
     scope = ScopeItem.getScope()
@@ -159,7 +159,7 @@ def scope():
 
 
 @bp.route("/blacklist", methods=["GET", "POST"])
-@is_authenticated
+@login_required
 @is_admin
 def blacklist():
     scope = ScopeItem.getBlacklist()
@@ -193,7 +193,7 @@ def blacklist():
 
 
 @bp.route("/import/<string:scopetype>", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def import_scope(scopetype=""):
     if scopetype == "blacklist":
@@ -225,7 +225,7 @@ def import_scope(scopetype=""):
 
 
 @bp.route("/export/<string:scopetype>", methods=["GET"])
-@is_authenticated
+@login_required
 @is_admin
 def export_scope(scopetype=""):
     if scopetype == "blacklist":
@@ -241,7 +241,7 @@ def export_scope(scopetype=""):
 
 
 @bp.route("/scope/<int:id>/delete", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def deleteScopeItem(id):
     delForm = forms.ScopeDeleteForm()
@@ -259,7 +259,7 @@ def deleteScopeItem(id):
 
 
 @bp.route("/scope/<int:id>/toggle", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def toggleScopeItem(id):
     toggleForm = forms.ScopeToggleForm()
@@ -279,7 +279,7 @@ def toggleScopeItem(id):
 
 
 @bp.route("/scope/<int:id>/tag", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def tagScopeItem(id):
     addTagForm = forms.TagScopeForm()
@@ -296,7 +296,7 @@ def tagScopeItem(id):
 
 
 @bp.route("/scope/<int:id>/untag", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def untagScopeItem(id):
     delTagForm = forms.TagScopeForm()
@@ -313,7 +313,7 @@ def untagScopeItem(id):
 
 
 @bp.route("/services", methods=["GET", "POST"])
-@is_authenticated
+@login_required
 @is_admin
 def services():
     uploadForm = forms.ServicesUploadForm(prefix="upload-services")
@@ -379,7 +379,7 @@ def services():
 
 
 @bp.route("/services/export", methods=["GET"])
-@is_authenticated
+@login_required
 @is_admin
 def exportServices():
     return Response(
@@ -388,7 +388,7 @@ def exportServices():
 
 
 @bp.route("/agents", methods=["GET", "POST"])
-@is_authenticated
+@login_required
 @is_admin
 def agentConfig():
     agentConfig = AgentConfig.query.get(1)
@@ -413,7 +413,7 @@ def agentConfig():
 
 
 @bp.route("/agents/script/add", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def addScript():
     addScriptForm = forms.AddScriptForm(prefix="add-script")
@@ -434,7 +434,7 @@ def addScript():
 
 
 @bp.route("/agents/script/<string:name>/delete", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def deleteScript(name):
     deleteForm = forms.DeleteForm()
@@ -455,7 +455,7 @@ def deleteScript(name):
 
 
 @bp.route("/scans/delete/<scan_id>", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def deleteScan(scan_id):
     delForm = forms.DeleteForm()
@@ -481,7 +481,7 @@ def deleteScan(scan_id):
 
 
 @bp.route("/hosts/delete/<ip>", methods=["POST"])
-@is_authenticated
+@login_required
 @is_admin
 def deleteHost(ip):
     delForm = forms.DeleteForm()
@@ -502,7 +502,7 @@ def deleteHost(ip):
 
 
 @bp.route("/tags", methods=["GET", "POST"])
-@is_authenticated
+@login_required
 @is_admin
 def tags():
     tags = Tag.query.all()
@@ -519,7 +519,7 @@ def tags():
 
 
 @bp.route("/logs", methods=["GET"])
-@is_authenticated
+@login_required
 @is_admin
 def logs():
     scope_logs = ScopeLog.query.order_by(ScopeLog.created_at.desc()).all()
