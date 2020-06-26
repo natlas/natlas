@@ -1,4 +1,4 @@
-from flask import render_template, redirect, flash, request
+from flask import render_template, redirect, flash, url_for
 from flask_login import current_user, login_required
 from app import db
 from app.user import bp
@@ -80,7 +80,7 @@ def generateNewToken(agent_id):
         flash(f"Agent {myAgent.agentid} has a new key of: {myAgent.token}", "success")
     else:
         flash("Couldn't generate new token", "danger")
-    return redirect(request.referrer)
+    return redirect(url_for("user.profile"))
 
 
 @bp.route("/agent/<string:agent_id>/newName", methods=["POST"])
@@ -98,7 +98,7 @@ def changeAgentName(agent_id):
         )
     else:
         flash("Couldn't change agent name", "danger")
-    return redirect(request.referrer)
+    return redirect(url_for("user.profile"))
 
 
 @bp.route("/agent/newAgent", methods=["POST"])
@@ -121,4 +121,4 @@ def newAgent():
         )
     else:
         flash("Couldn't create new agent", "danger")
-    return redirect(request.referrer)
+    return redirect(url_for("user.profile"))
