@@ -164,12 +164,12 @@ def rescan_host(ip):
 
     if not rescanForm.validate_on_submit():
         flash("Form failed to validate", "danger")
-        return redirect(request.referrer)
+        return redirect(url_for("host.host", ip=ip))
 
     if not current_app.ScopeManager.is_acceptable_target(ip):
         # Someone is requesting we scan an ip that isn't allowed
         flash(f"We're not allowed to scan {ip}", "danger")
-        return redirect(request.referrer)
+        return redirect(url_for("main.browse"))
 
     incompleteScans = current_app.ScopeManager.get_incomplete_scans()
 
@@ -189,11 +189,11 @@ def rescan_host(ip):
                 current_app.ScopeManager.update_pending_rescans()
                 current_app.ScopeManager.update_dispatched_rescans()
                 flash(f"Refreshed existing rescan request for {ip}", "success")
-                return redirect(request.referrer)
+                return redirect(url_for("host.host", ip=ip))
         else:
             status = "pending"
         flash(f"There's already a {status} rescan request for {ip}", "warning")
-        return redirect(request.referrer)
+        return redirect(url_for("host.host", ip=ip))
 
     rescan = RescanTask(user_id=current_user.id, target=ip)
     db.session.add(rescan)
@@ -201,7 +201,7 @@ def rescan_host(ip):
     current_app.ScopeManager.update_pending_rescans()
     current_app.ScopeManager.update_dispatched_rescans()
     flash(f"Requested rescan of {ip}", "success")
-    return redirect(request.referrer)
+    return redirect(url_for("host.host", ip=ip))
 
 
 @bp.route("/random")
