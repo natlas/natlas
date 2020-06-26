@@ -7,7 +7,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 RUN export AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.7.0/aquatone_linux_amd64_1.7.0.zip' \
 	&& wget $AQUATONEURL -O /tmp/aquatone.zip -q \
-	&& unzip /tmp/aquatone.zip -d /tmp/aquatone
+	&& unzip /tmp/aquatone.zip -d /tmp/aquatone \
+	&& export DUMBINITURL='https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64' \
+	&& wget -O /tmp/dumb-init $DUMBINITURL \
+	&& chmod +x /tmp/dumb-init
 
 COPY Pipfile .
 COPY Pipfile.lock .
@@ -33,6 +36,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap \
 	&& rm -rf /var/cache/* /root /var/lib/apt/info/* /var/lib/apt/lists/* /var/lib/ghc /var/lib/dpkg /var/lib/log/*
 
+COPY --from=build /tmp/dumb-init /usr/bin/dumb-init
 COPY --from=build /tmp/aquatone/aquatone /usr/bin/aquatone
 COPY --from=build /opt/natlas /opt/natlas
 
@@ -42,5 +46,6 @@ COPY --from=build /.venv/lib/python3.6/site-packages /usr/local/lib/python3.6/di
 WORKDIR /opt/natlas/natlas-agent
 USER www-data
 ENV LC_ALL='C.UTF-8'
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["python3", "/opt/natlas/natlas-agent/natlas-agent.py"]
