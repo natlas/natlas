@@ -34,7 +34,7 @@ def get_web_screenshots(target, scan_id, xml_data, proctimeout):
     p1.stdout.close()
 
     try:
-        out, err = process.communicate(timeout=proctimeout)
+        process.communicate(timeout=proctimeout)
         if process.returncode == 0:
             time.sleep(
                 0.5
@@ -94,7 +94,7 @@ def get_vnc_screenshots(target, scan_id, proctimeout):
         stderr=subprocess.DEVNULL,
     )  # nosec
     try:
-        out, err = process.communicate(timeout=proctimeout)
+        process.communicate(timeout=proctimeout)
         if process.returncode == 0:
             return True
     except Exception:
