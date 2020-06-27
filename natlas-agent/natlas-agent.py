@@ -17,9 +17,7 @@ from natlas.net import NatlasNetworkServices
 ERR = {"INVALIDTARGET": 1, "SCANTIMEOUT": 2, "DATANOTFOUND": 3, "INVALIDDATA": 4}
 
 config = Config()
-MAX_QUEUE_SIZE = int(
-    config.max_threads
-)  # only queue enough work for each of our active threads
+MAX_QUEUE_SIZE = config.max_threads  # only queue enough work for each of our active threads
 
 global_logger = logging.get_logger("MainThread")
 netsrv = NatlasNetworkServices(config)
@@ -113,7 +111,10 @@ def main():
             )
 
     # Start threads that will wait for items in queue and then scan them
-    for _ in range(int(config.max_threads)):
+    for i in range(config.max_threads):
+        # Stagger thread init in batches of 10 to more evenly distribute startup load
+        if i and not i % 10:
+            time.sleep(5)
         t = ThreadScan(q, config, autoScan, servicesSha)
         t.setDaemon(True)
         t.start()
