@@ -33,7 +33,7 @@ jobs:
       - restore_cache:
           name: Restore pipenv cache
           keys:
-            - pipenv-v1-{{ checksum "Pipfile.lock" }}
+            - pipenv-v0-{{ checksum "Pipfile.lock" }}
       - run:
           name: Install Pipenv
           command: |
@@ -41,11 +41,9 @@ jobs:
             pipenv install --dev
       - save_cache:
           name: Save pipenv cache
-          key: pipenv-v1-{{ checksum "Pipfile.lock" }}
+          key: pipenv-v0-{{ checksum "Pipfile.lock" }}
           paths:
             - ".venv"
-            - "/usr/local/bin"
-            - "/usr/local/lib/python3.8/site-packages"
       - run:
           name: Run tests
           command: |
