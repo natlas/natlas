@@ -4,7 +4,7 @@ orbs:
 jobs:
   general-analysis:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.8
     working_directory: ~/repo
     steps:
       - checkout:
@@ -14,8 +14,45 @@ jobs:
           wd: ~/repo
       - flake8/flake8_errors:
           wd: ~/repo
+  server-tests:
+    docker:
+      - image: circleci/python:3.8
+        environment:
+          PIPENV_VENV_IN_PROJECT: true
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+        environment:
+          - cluster.name: elasticsearch
+          - xpack.security.enabled: false
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - discovery.type: single-node
+    working_directory: ~/repo/natlas-server
+    steps:
+      - checkout:
+          path: ~/repo
+      - restore_cache:
+          name: Restore pipenv cache
+          keys:
+            - pipenv-v1-{{ checksum "Pipfile.lock" }}
+      - run:
+          name: Install Pipenv
+          command: |
+            pip install pipenv
+            pipenv install --dev
+      - save_cache:
+          name: Save pipenv cache
+          key: pipenv-v1-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".venv"
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.8/site-packages"
+      - run:
+          name: Run tests
+          command: |
+            pipenv run python -m pytest tests
 workflows:
   version: 2
   normal-build:
     jobs:
       - general-analysis
+      - server-tests

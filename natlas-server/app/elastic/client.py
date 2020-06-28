@@ -52,7 +52,7 @@ class ElasticClient:
         time.sleep(2)
 
         for index in self.natlasIndices:
-            if self.esversion.match(">=7.0.0"):
+            if self.esversion.match("<7.0.0"):
                 self.es.indices.put_mapping(
                     index=index,
                     doc_type="_doc",
@@ -61,7 +61,8 @@ class ElasticClient:
                 )
             else:
                 self.es.indices.put_mapping(
-                    index=index, doc_type="_doc", body=self.mapping
+                    index=index,
+                    body=self.mapping
                 )
 
     def _ping(self):
