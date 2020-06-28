@@ -38,7 +38,7 @@ jobs:
           name: Install Pipenv
           command: |
             pip install pipenv
-            pipenv install --dev
+            pipenv sync --dev
       - save_cache:
           name: Save pipenv cache
           key: pipenv-v0-{{ checksum "Pipfile.lock" }}
