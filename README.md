@@ -2,14 +2,15 @@
 
 [![Release](https://img.shields.io/github/release/natlas/natlas.svg)](https://github.com/natlas/natlas/releases/latest)
 ![Last Commit](https://img.shields.io/github/last-commit/natlas/natlas.svg)
-![Total Downloads](https://img.shields.io/github/downloads/natlas/natlas/total.svg)
-![Code Size](https://img.shields.io/github/languages/code-size/natlas/natlas.svg)
 [![Contributors](https://img.shields.io/github/contributors/natlas/natlas.svg)](https://github.com/natlas/natlas/graphs/contributors)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat)](LICENSE)
 [![Discord](https://img.shields.io/discord/638428906612850709?label=discord)](https://discord.gg/VMbyMMT)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/321141e5cf7426874cd7/maintainability)](https://codeclimate.com/github/natlas/natlas/maintainability)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/natlas/natlas.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/natlas/natlas/alerts/)
+
+[![Server downloads](https://img.shields.io/docker/pulls/natlas/server?label=server%20downloads&logo=docker)](https://hub.docker.com/repository/docker/natlas/server)
+[![Agent downloads](https://img.shields.io/docker/pulls/natlas/agent?label=agent%20downloads&logo=docker)](https://hub.docker.com/repository/docker/natlas/agent)
 
 # Summary
 
@@ -64,17 +65,19 @@ For further inquiry about licensing, please see the respective projects' license
 
 # License
 
->Copyright 2020 0xdade
->Copyright 2016-2018 Intel Corporation
->
->Licensed under the Apache License, Version 2.0 (the "License");
->you may not use this file except in compliance with the License.
->You may obtain a copy of the License at
->
->   http://www.apache.org/licenses/LICENSE-2.0
->
->Unless required by applicable law or agreed to in writing, software
->distributed under the License is distributed on an "AS IS" BASIS,
->WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
->See the License for the specific language governing permissions and
->limitations under the License.
+```text
+Copyright 2020 0xdade
+Copyright 2016-2018 Intel Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
