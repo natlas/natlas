@@ -42,12 +42,15 @@ jobs:
       - run:
           name: Run tests
           command: |
-            pipenv run python -m pytest tests
+            mkdir test-results
+            pipenv run python -m pytest tests --junitxml=test-results/junit.xml
       - save_cache:
           name: Save pipenv cache
           key: pipenv-v2-{{ checksum "Pipfile.lock" }}
           paths:
             - ".venv"
+      - store_test_results:
+          path: test-results
 workflows:
   version: 2
   normal-build:
