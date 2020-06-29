@@ -33,21 +33,21 @@ jobs:
       - restore_cache:
           name: Restore pipenv cache
           keys:
-            - pipenv-v0-{{ checksum "Pipfile.lock" }}
+            - pipenv-v2-{{ checksum "Pipfile.lock" }}
       - run:
           name: Install Pipenv
           command: |
             pip install pipenv
             pipenv sync --dev
-      - save_cache:
-          name: Save pipenv cache
-          key: pipenv-v0-{{ checksum "Pipfile.lock" }}
-          paths:
-            - ".venv"
       - run:
           name: Run tests
           command: |
             pipenv run python -m pytest tests
+      - save_cache:
+          name: Save pipenv cache
+          key: pipenv-v2-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".venv"
 workflows:
   version: 2
   normal-build:
