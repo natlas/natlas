@@ -4,9 +4,12 @@ Dockerfile
 deployment/
 setup-agent.sh
 .dockerignore
+.gitignore
 Dockerfile
-chrome.jason
+chrome.json
 .python-version
+docs/
+tests/
 
 # Dev Environment
 .env
