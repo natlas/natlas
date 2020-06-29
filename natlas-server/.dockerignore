@@ -1,18 +1,24 @@
 # Ships with source
 deployment/
-setup-elastic.sh
-setup-server.sh
 elastic-snapshot.py
 *.md
 .dockerignore
 Dockerfile
-.eslintrc
-node_modules/
+tests/
+docs/
+.scss-lint.yml
+tslint.json
+.eslintrc.yml
+.python-version
 
 # Dev Environment
+__pycache__/
 .env
+.venv/
 venv/
 tmp/
 logs/
+data/
 *.db
 *.log
+node_modules/
