@@ -60,10 +60,7 @@ class ElasticClient:
                     include_type_name=True,
                 )
             else:
-                self.es.indices.put_mapping(
-                    index=index,
-                    body=self.mapping
-                )
+                self.es.indices.put_mapping(index=index, body=self.mapping)
 
     def _ping(self):
         """ Returns True if the cluster is up, False otherwise"""

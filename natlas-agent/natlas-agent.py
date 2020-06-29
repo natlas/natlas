@@ -17,7 +17,9 @@ from natlas.net import NatlasNetworkServices
 ERR = {"INVALIDTARGET": 1, "SCANTIMEOUT": 2, "DATANOTFOUND": 3, "INVALIDDATA": 4}
 
 config = Config()
-MAX_QUEUE_SIZE = config.max_threads  # only queue enough work for each of our active threads
+MAX_QUEUE_SIZE = (
+    config.max_threads
+)  # only queue enough work for each of our active threads
 
 global_logger = logging.get_logger("MainThread")
 netsrv = NatlasNetworkServices(config)
@@ -47,7 +49,7 @@ def main():
         description=PARSER_DESC, epilog=PARSER_EPILOG, prog="natlas-agent"
     )
     parser.add_argument(
-        "--version", action="version", version=f"%(prog)s {config.NATLAS_VERSION}",
+        "--version", action="version", version=f"%(prog)s {config.NATLAS_VERSION}"
     )
     mutually_exclusive = parser.add_mutually_exclusive_group()
     mutually_exclusive.add_argument(

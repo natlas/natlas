@@ -26,7 +26,7 @@ def upgrade():
         sa.Column("date_created", sa.DateTime(), nullable=False),
         sa.Column("token", sa.String(length=32), nullable=True),
         sa.Column("friendly_name", sa.String(length=32), nullable=True),
-        sa.ForeignKeyConstraint(["user_id"], ["user.id"],),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_agent_agentid"), "agent", ["agentid"], unique=True)

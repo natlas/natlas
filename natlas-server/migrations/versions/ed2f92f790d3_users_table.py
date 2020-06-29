@@ -1,7 +1,7 @@
 """users table
 
 Revision ID: ed2f92f790d3
-Revises: 
+Revises:
 Create Date: 2018-06-04 17:20:43.773268
 
 """

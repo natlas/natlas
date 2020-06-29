@@ -67,7 +67,7 @@ def downgrade():
         sa.Column("user_id", sa.INTEGER(), nullable=False),
         sa.Column("token_type", sa.VARCHAR(length=8), nullable=False),
         sa.Column("token_expiration", sa.DATETIME(), nullable=False),
-        sa.ForeignKeyConstraint(["user_id"], ["user.id"],),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("token"),
     )

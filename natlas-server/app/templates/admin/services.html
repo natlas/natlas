@@ -7,7 +7,7 @@
     <div class="col-xs-12 col-sm-6 col-md-4">
       <h3>Upload Services File</h3>
       <form class="form-inline" action="{{url_for('admin.services')}}" name="uploadForm" method="post" enctype="multipart/form-data">
-      {{ uploadForm.hidden_tag() }} 
+      {{ uploadForm.hidden_tag() }}
       <div class="input-group">
           {{ uploadForm.serviceFile(class="btn btn-default")}}
           {{ uploadForm.uploadFile(class="btn btn-primary", style="margin-top:1em;", onclick="return confirm('Are you sure you upload a whole new services file? This will change all the services you're scanning for.)") }}
@@ -18,8 +18,8 @@
         <h3>Current Service Information</h3>
         <h5>Version:
           <small>{{ current_services.id }}</small>
-        </h5> 
-        
+        </h5>
+
         <h5>SHA256:
           <small>
             <abbr style="cursor:default;" title="{{ current_services.sha256 }}" id="sha256">{{ current_services.sha256|truncate(32) }}</abbr>

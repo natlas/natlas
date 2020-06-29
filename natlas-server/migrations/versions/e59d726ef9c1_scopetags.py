@@ -29,8 +29,8 @@ def upgrade():
         "scopetags",
         sa.Column("scope_id", sa.Integer(), nullable=False),
         sa.Column("tag_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["scope_id"], ["scope_item.id"],),
-        sa.ForeignKeyConstraint(["tag_id"], ["tag.id"],),
+        sa.ForeignKeyConstraint(["scope_id"], ["scope_item.id"]),
+        sa.ForeignKeyConstraint(["tag_id"], ["tag.id"]),
         sa.PrimaryKeyConstraint("scope_id", "tag_id"),
     )
     # ### end Alembic commands ###

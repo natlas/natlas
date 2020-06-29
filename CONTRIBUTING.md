@@ -102,11 +102,11 @@ Then in your terminal:
 This should setup the environment necessary to develop and test code for both the `natlas-server` and the `natlas-agent`.
 
 If you prefer to run this in a isolated local docker dev environment:
-* Download and install docker desktop. 
+* Download and install docker desktop.
   * [Windows](https://docs.docker.com/docker-for-windows/install/)
   * [Mac](https://docs.docker.com/docker-for-mac/install/)
   * [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-* Install docker-compose 
+* Install docker-compose
   * [All Operating Systems](https://docs.docker.com/compose/install/)
 * Read [Getting started with Docker](https://docs.docker.com/get-started/)
 * Modify the code
