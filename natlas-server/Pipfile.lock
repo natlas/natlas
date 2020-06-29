@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "32d7678c1cf14aa3759661910b0e0c72ee40e6233809e1aab1e0b4f2ebef558d"
+            "sha256": "c2ee05ceba2686d75e65a1a57d352801b1876409fa996f9bf0f942a36571aba1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -308,6 +308,14 @@
             ],
             "version": "==1.1.0"
         },
+        "natlas-libnmap": {
+            "hashes": [
+                "sha256:30099b8d8556b64df8ffeaa66b8f79103422297264e6a3c05acafbe92e31fb00",
+                "sha256:52195fa1bf56e7b23d5c5a9a1164d5b1e58a9be6dc980cdfc37aefb8c6d1fdd6"
+            ],
+            "index": "pypi",
+            "version": "==0.7.1"
+        },
         "netaddr": {
             "hashes": [
                 "sha256:7a9c8f58d048b820df1882439bb04fb2de13c03ec8af3112a1099822b0a2a4b8",
@@ -478,11 +486,6 @@
                 "sha256:ea87e17f6ec459e780e4221f295411462e0d0810858e055fc514684350a2f522"
             ],
             "version": "==1.0.4"
-        },
-        "python-libnmap": {
-            "editable": false,
-            "git": "https://github.com/natlas/python-libnmap.git",
-            "ref": "e1ce4328123f184d4390f94b708cca165ebf1dd9"
         },
         "pytz": {
             "hashes": [
