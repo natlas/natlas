@@ -30,9 +30,10 @@ jobs:
             pipenv run pre-commit run --all-files
       - save_cache:
           name: Save pipenv cache
-          key: pipenv-v2-{{ checksum "Pipfile.lock" }}
+          key: pipenv-v0-{{ checksum "Pipfile.lock" }}
           paths:
             - "$HOME/.cache/pre-commit"
+            - ${HOME}/.venv/
   server-tests:
     docker:
       - image: circleci/python:3.8
