@@ -19,7 +19,6 @@ services:
       - 9200:9200
     networks:
       - backend
-    restart: on-failure
 
   webpack-server:
     image: node:12-stretch
@@ -46,7 +45,6 @@ services:
       - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
       - html_assets:/opt/natlas/natlas-server/static/dist
-    restart: on-failure
     links:
       - elastic
 

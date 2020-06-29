@@ -52,7 +52,7 @@ class ElasticClient:
         time.sleep(2)
 
         for index in self.natlasIndices:
-            if self.esversion.match(">=7.0.0"):
+            if self.esversion.match("<7.0.0"):
                 self.es.indices.put_mapping(
                     index=index,
                     doc_type="_doc",
@@ -61,7 +61,8 @@ class ElasticClient:
                 )
             else:
                 self.es.indices.put_mapping(
-                    index=index, doc_type="_doc", body=self.mapping
+                    index=index,
+                    body=self.mapping
                 )
 
     def _ping(self):
@@ -125,11 +126,10 @@ class ElasticClient:
 
     def execute_delete_by_query(self, **kwargs):
         """ Executes an arbitrary delete_by_query."""
-        with self._new_trace_span(operation="delete_by", **kwargs) as span:
+        with self._new_trace_span(operation="delete_by", **kwargs):
             results = self._execute_raw_query(
                 self.es.delete_by_query, doc_type="_doc", **kwargs
             )
-            self._attach_shard_span_attrs(span, results)
             return results
 
     def execute_index(self, **kwargs):
