@@ -8,7 +8,7 @@ flake8 = "*"
 
 [packages]
 python-dotenv = "~=0.13.0"
-python-libnmap = "~=0.7.0"
+python-libnmap = {editable = false, git = "https://github.com/natlas/python-libnmap.git"}
 requests = "~=2.23.0"
 sentry-sdk = "~=0.14.4"
 
