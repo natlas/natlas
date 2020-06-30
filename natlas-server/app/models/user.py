@@ -66,6 +66,15 @@ class User(UserMixin, db.Model, DictSerializable):
         return self.password_reset_expiration > now
 
     @staticmethod
+    def get_reset_token(email):
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return None
+        if not user.validate_reset_token():
+            user.new_reset_token()
+        return user
+
+    @staticmethod
     def get_user_by_token(url_token):
         record = User.query.filter_by(password_reset_token=url_token).first()
         return validate_token(
