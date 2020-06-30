@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 flake8 = "*"
 pytest = "*"
+pytest-flask = "*"
 
 [packages]
 contextvars = "~=2.4"
