@@ -427,7 +427,7 @@ def add_script():
     else:
         flash(f"{addScriptForm.scriptName.data} couldn't be added to scripts", "danger")
 
-    return redirect(url_for("admin.agents"))
+    return redirect(url_for("admin.agent_config"))
 
 
 @bp.route("/agents/script/<string:name>/delete", methods=["POST"])
@@ -448,7 +448,7 @@ def delete_script(name):
             flash(f"{name} successfully deleted.", "success")
         else:
             flash(f"{name} doesn't exist", "danger")
-        return redirect(url_for("admin.agents"))
+        return redirect(url_for("admin.agent_config"))
 
 
 @bp.route("/scans/delete/<scan_id>", methods=["POST"])
