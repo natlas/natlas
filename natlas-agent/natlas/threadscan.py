@@ -21,14 +21,7 @@ conf = Config()
 def command_builder(scan_id, agentConfig, target):
     outFiles = os.path.join(utils.get_scan_dir(scan_id), f"nmap.{scan_id}")
     servicepath = utils.get_services_path()
-    command = [
-        "nmap",
-        "--privileged",
-        "-oA",
-        outFiles,
-        "--servicedb",
-        servicepath,
-    ]
+    command = ["nmap", "--privileged", "-oA", outFiles, "--servicedb", servicepath]
 
     commandDict = {
         "versionDetection": "-sV",

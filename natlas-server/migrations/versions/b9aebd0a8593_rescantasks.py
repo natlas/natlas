@@ -29,7 +29,7 @@ def upgrade():
         sa.Column("complete", sa.Boolean(), nullable=True),
         sa.Column("date_completed", sa.DateTime(), nullable=True),
         sa.Column("scan_id", sa.String(), nullable=True),
-        sa.ForeignKeyConstraint(["user_id"], ["user.id"],),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(

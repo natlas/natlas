@@ -189,7 +189,9 @@ class NatlasNetworkServices:
                     )
                     return False
         else:
-            return False  # return false if we were unable to get a response from the server
+            return (
+                False
+            )  # return false if we were unable to get a response from the server
         return serviceData[
             "sha256"
         ]  # return True if we got a response and everything checks out

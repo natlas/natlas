@@ -1,6 +1,6 @@
 # Contributing
 
-## How do I... <a name="toc"></a>
+## Table of Contents
 
 * [Use This Guide](#introduction)?
 * Ask or Say Something?
@@ -23,10 +23,9 @@
   * [Join the Project Team](#join-the-project-team)
 * Add a Guide Like This One [To My Project](#attribution)?
 
-
 ## Introduction
 
-Thank you for your interest in contributing! All types of contributions are encouraged and valued. See the [table of contents](#toc) for different ways to help and details about how this project handles them.
+Thank you for your interest in contributing! All types of contributions are encouraged and valued. See the [table of contents](#table-of-contents) for different ways to help and details about how this project handles them.
 
 Please make sure to read the relevant section before making your contribution. It will make it a lot easier for project maintainers to make the most of it and smooth out the experience for all involved.
 
@@ -36,7 +35,7 @@ The [Project Team](#join-the-project-team) looks forward to your contributions.
 
 If you have a question about this project, how to use it, or just need clarification about something:
 
-* Open an Issue at https://github.com/natlas/natlas/issues
+* [Open an Issue](https://github.com/natlas/natlas/issues)
 * Provide as much context as you can about what you're running into
 * Provide project and platform versions (NATLAS_VERSION, OS version, etc), depending on what seems relevant. If not, please be prepared to provide this information upon further inquiry.
 
@@ -50,7 +49,7 @@ Once the issue is filed:
 
 If you run into an error or bug with the project:
 
-* Open an Issue at https://github.com/natlas/natlas/issues
+* [Open an Issue](https://github.com/natlas/natlas/issues)
 * Provide *reproduction steps* that someone else can follow to recreate the bug or error on their own.
 * Provide project and platform versions (NATLAS_VERSION, OS version, commit hash, etc), depending on what seems relevant. If not, please be prepared to provide this information when asked for it.
 
@@ -65,7 +64,7 @@ Once the issue is filed:
 
 If the project doesn't do something you need or want it to do:
 
-* Open an Issue at https://github.com/natlas/natlas/issues
+* [Open an Issue](https://github.com/natlas/natlas/issues)
 * Provide as much context as you can about what you'd like it to do.
 * Please try and be clear about why existing features and alternatives would not work for you.
 
@@ -91,26 +90,28 @@ If you want to go the usual route and run the project locally, though:
 
 * Be using an ubuntu-based development environment
 * [Fork the project](https://guides.github.com/activities/forking/#fork)
-
-Then in your terminal:
-* `cd path/to/clone/natlas-server`
-* `sudo ./setup-server.sh`
-* `sudo ./setup-elastich.sh`
-* `cd ../natlas-agent`
-* `sudo ./setup-agent.sh`
-
-This should setup the environment necessary to develop and test code for both the `natlas-server` and the `natlas-agent`.
-
-If you prefer to run this in a isolated local docker dev environment:
-* Download and install docker desktop. 
+* Download and install docker desktop.
   * [Windows](https://docs.docker.com/docker-for-windows/install/)
   * [Mac](https://docs.docker.com/docker-for-mac/install/)
   * [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-* Install docker-compose 
+* Install docker-compose
   * [All Operating Systems](https://docs.docker.com/compose/install/)
 * Read [Getting started with Docker](https://docs.docker.com/get-started/)
 * Modify the code
-* Run ` docker-compose up -d `
+* Run `docker-compose up -d`
+* Before you're ready to commit, install the prerequisite pre-commit hooks.
+  * From the root of the natlas repository, `pipenv install` to install dev dependencies
+  * `pipenv run pre-commit install` to install the precommit hooks into your .git directory
+  * `pipenv run pre-commit run --all-files` to ensure that the hooks work correctly before committing
+* If your code passes the pre-commit hooks, you're ready to commit!
+* Commit and push to your fork and then [open a pull request](#submitting-a-pull-request)
+* A series of checks will automatically run against your pull request. These must all pass in order for your PR to be accepted.
+
+### Coding Conventions
+
+* Code must be `black` formatted
+* Code must pass `flake8` using the supplied `.flake8` file
+* Code must pass all supplied `pre-commit` hooks
 
 ## Contribute Documentation
 
@@ -125,7 +126,7 @@ To contribute documentation:
 * Make sure your changes are formatted correctly and consistently with the rest of the documentation.
 * Re-read what you wrote, and run a spellchecker on it to make sure you didn't miss anything.
 * Write clear, concise commit message(s).
-* Go to https://github.com/natlas/natlas/pulls and open a [new pull request](#submitting-a-pull-request) with your changes.
+* Open a [new pull request](#submitting-a-pull-request) with your changes.
 * If your PR is connected to an open issue, add a line in your PR's description that says `Fixes: #123`, where `#123` is the number of the issue you're fixing.
 
 Once you've filed the PR:
@@ -148,7 +149,7 @@ To contribute code:
 * Include any [additional documentation](#contribute-documentation) the changes might need.
 * Write or show tests that verify that your contribution works as expected.
 * Write clear, concise commit message(s).
-* Go to https://github.com/natlas/natlas/pulls and open a [new pull request](#submitting-a-pull-request) with your changes.
+* Open a [new pull request](#submitting-a-pull-request) with your changes.
 * If your PR is connected to an open issue, add a line in your PR's description that says `Fixes: #123`, where `#123` is the number of the issue you're fixing.
 
 Once you've filed the PR:
@@ -224,7 +225,7 @@ To clean up issues and PRs:
   * not marked as `starter` or `help wanted` (these might stick around for a while, in general, as they're intended to be available)
   * no explicit messages in the comments asking for it to be left open
   * does not belong to a milestone
-* Leave a message when closing saying "Cleaning up stale issue. Please reopen or ping us if and when you're ready to resume this. See https://github.com/natlas/natlas/blob/main/CONTRIBUTING.md#clean-up-issues-and-prs for more details."
+* Leave a message when closing saying "Cleaning up stale issue. Please reopen or ping us if and when you're ready to resume this. See [Cleaning up Issues](https://github.com/natlas/natlas/blob/main/CONTRIBUTING.md#clean-up-issues-and-prs) for more details."
 
 ## Review Pull Requests
 
