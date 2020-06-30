@@ -5,6 +5,7 @@
         "module": "es6",
         "target": "es5",
         "allowJs": true,
+        "moduleResolution": "Node",
         "lib": [
             "es2017",
             "dom"

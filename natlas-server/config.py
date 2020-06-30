@@ -76,6 +76,7 @@ class Config(object):
 
     # Instrumentation isn't directly used by the flask app context so does not need to be ALL_CAPS
     sentry_dsn = os.environ.get("SENTRY_DSN", None)
+    SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN", None)
     opencensus_enable = casted_bool(os.environ.get("OPENCENSUS_ENABLE", False))
     opencensus_sample_rate = float(os.environ.get("OPENCENSUS_SAMPLE_RATE", 1))
     opencensus_agent = os.environ.get("OPENCENSUS_AGENT", "127.0.0.1:55678")

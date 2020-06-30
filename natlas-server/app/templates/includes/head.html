@@ -2,6 +2,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% if config['SENTRY_JS_DSN'] %}
+    <meta name="sentry-dsn" content="{{ config['SENTRY_JS_DSN'] }}" />
+    {% endif %}
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="Natlas is an open source project designed to provide scalable network scanning and an interface to search through the results. For more information, visit github.com/natlas/natlas">
     <meta name="author" content="Natlas Authors">
@@ -21,4 +24,4 @@
     {% endif %}
     {% include 'includes/styles.html' %}
     {% include 'includes/scripts.html' %}
-  </head>
+</head>
