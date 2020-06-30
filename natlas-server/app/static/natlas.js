@@ -1,3 +1,4 @@
+import './util/error-tracking';
 import $ from 'jquery';
 import dataTable from 'datatables.net-bs4'; // TODO: Switch to a NPM native
 

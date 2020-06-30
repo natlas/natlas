@@ -8,12 +8,12 @@ interface GithubReleases {
 }
 
 class UpdateCheckResult {
-    constructor(private isNewerAvailable: boolean, private downloadUrl: string, private version: string) {
+    constructor(public isNewerAvailable: boolean, public downloadUrl: string, public version: string) {
     }
 }
 
 // Not ideal. We should pack this into the bundle instead
-function thisVersion(): string {
+export function thisVersion(): string {
     return document.getElementById('natlasVersion').innerText;
 }
 
