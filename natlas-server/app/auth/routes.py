@@ -72,7 +72,10 @@ def reset_password_request():
             return redirect(url_for("auth.reset_password_request"))
         user = User.query.filter_by(email=validemail).first()
         if user:
-            send_auth_email(user, "reset")
+            if not user.validate_reset_token():
+                user.new_reset_token()
+                db.session.commit()
+            send_auth_email(user, user.password_reset_token, "reset")
         flash("Check your email for the instructions to reset your password", "info")
         return redirect(url_for("auth.login"))
     return render_template(
