@@ -58,10 +58,11 @@ class UserInvitation(db.Model, DictSerializable):
             msg = f"Share this link: {invite_url}"
         return msg
 
-    # Get invite from database in (roughly) constant time
     @staticmethod
     def get_invite(url_token):
         record = UserInvitation.query.filter_by(token=url_token).first()
+        if not record:
+            return False
         return validate_token(record, url_token, record.token, record.validate_invite)
 
     def accept_invite(self):
