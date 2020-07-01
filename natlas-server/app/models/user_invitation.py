@@ -1,5 +1,4 @@
 from app import db
-from app.util import utcnow_tz
 import secrets
 from datetime import timedelta, datetime
 from app.models.dict_serializable import DictSerializable
@@ -10,7 +9,7 @@ class UserInvitation(db.Model, DictSerializable):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), unique=True)
     token = db.Column(db.String(32), unique=True, nullable=False)
-    creation_date = db.Column(db.DateTime, default=utcnow_tz)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     expiration_date = db.Column(db.DateTime, nullable=False)
     accepted_date = db.Column(db.DateTime)
     is_expired = db.Column(db.Boolean, default=False)

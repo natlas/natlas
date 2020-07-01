@@ -5,8 +5,7 @@ from app import login, db
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 import secrets
-from app.util import utcnow_tz
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 class User(UserMixin, db.Model, DictSerializable):
@@ -19,7 +18,7 @@ class User(UserMixin, db.Model, DictSerializable):
     result_format = db.Column(db.Integer, default=0)
     password_reset_token = db.Column(db.String(32), unique=True)
     password_reset_expiration = db.Column(db.DateTime)
-    creation_date = db.Column(db.DateTime, default=utcnow_tz)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=False)
     rescans = db.relationship("RescanTask", backref="submitter", lazy="select")
     agents = db.relationship("Agent", backref="user", lazy=True)
@@ -53,7 +52,7 @@ class User(UserMixin, db.Model, DictSerializable):
 
     def new_reset_token(self):
         self.password_reset_token = secrets.token_urlsafe(User.token_length)
-        self.password_reset_expiration = utcnow_tz() + timedelta(
+        self.password_reset_expiration = datetime.utcnow() + timedelta(
             seconds=User.expiration_duration
         )
 
@@ -64,7 +63,7 @@ class User(UserMixin, db.Model, DictSerializable):
     def validate_reset_token(self):
         if not (self.password_reset_token and self.password_reset_expiration):
             return False
-        return self.password_reset_expiration > utcnow_tz()
+        return self.password_reset_expiration > datetime.utcnow()
 
     @staticmethod
     def get_reset_token(email):
