@@ -3,6 +3,7 @@ import secrets
 from datetime import timedelta, datetime
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
+from app.models import User
 
 
 class UserInvitation(db.Model, DictSerializable):
@@ -23,6 +24,8 @@ class UserInvitation(db.Model, DictSerializable):
     # Build a new invitation
     @staticmethod
     def new_invite(email=None, is_admin=False):
+        if email and User.query.filter_by(email=email).first():
+            return False
         now = datetime.utcnow()
         expiration_date = now + timedelta(seconds=UserInvitation.expiration_duration)
         new_token = secrets.token_urlsafe(UserInvitation.token_length)

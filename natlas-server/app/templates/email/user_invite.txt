@@ -1,4 +1,4 @@
-You've been invited to Natlas! Use the link below to set a password. This link will expire in 48 hours. If you are unable to accept this invite before it expires, you can simply use the "Forgot your password?" link on the login page to set your password.
+You've been invited to Natlas! Use the link below to set a password. This link will expire in 48 hours.
 
 {{ url_for('auth.invite_user', token=token, _external=True, _scheme='https') }}
 
