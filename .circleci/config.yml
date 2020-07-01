@@ -60,6 +60,11 @@ jobs:
             pip install pipenv
             pipenv sync --dev
       - run:
+          name: Copy Mock Webpack Manifest
+          command: |
+            mkdir -p ~/repo/natlas-server/app/static/dist/
+            cp ~/repo/natlas-server/tests/mock_webpack_manifest.json ~/repo/natlas-server/app/static/dist/webpack_manifest.json
+      - run:
           name: Run tests
           command: |
             mkdir test-results
