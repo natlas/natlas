@@ -8,9 +8,9 @@ flake8 = "*"
 
 [packages]
 python-dotenv = "~=0.13.0"
-python-libnmap = "~=0.7.0"
 requests = "~=2.23.0"
 sentry-sdk = "~=0.14.4"
+natlas-libnmap = "*"
 
 [requires]
 python_version = "3.6"
