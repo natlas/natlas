@@ -62,7 +62,7 @@ def register():
     return render_template("auth/register.html", title="Register", form=form)
 
 
-@bp.route("/reset_password", methods=["GET", "POST"])
+@bp.route("/reset_password_request", methods=["GET", "POST"])
 @is_not_authenticated
 def reset_password_request():
     form = ResetPasswordRequestForm()
@@ -72,7 +72,7 @@ def reset_password_request():
             return redirect(url_for("auth.reset_password_request"))
         user = User.get_reset_token(validemail)
         if user:
-            send_auth_email(user, user.password_reset_token, "reset")
+            send_auth_email(user.email, user.password_reset_token, "reset")
         db.session.commit()
         flash("Check your email for the instructions to reset your password", "info")
         return redirect(url_for("auth.login"))

@@ -1,6 +1,6 @@
 from app import db
-from app.util import utcnow_tz
 from app.models.dict_serializable import DictSerializable
+from datetime import datetime
 
 
 # Rescan Queue
@@ -8,7 +8,9 @@ from app.models.dict_serializable import DictSerializable
 # Tracks when it was dispatched, when it was completed, and the scan id of the complete scan.
 class RescanTask(db.Model, DictSerializable):
     id = db.Column(db.Integer, primary_key=True)
-    date_added = db.Column(db.DateTime, index=True, default=utcnow_tz, nullable=False)
+    date_added = db.Column(
+        db.DateTime, index=True, default=datetime.utcnow, nullable=False
+    )
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     target = db.Column(db.String, index=True, nullable=False)
     dispatched = db.Column(db.Boolean, default=False, index=True)
@@ -19,12 +21,12 @@ class RescanTask(db.Model, DictSerializable):
 
     def dispatchTask(self):
         self.dispatched = True
-        self.date_dispatched = utcnow_tz()
+        self.date_dispatched = datetime.utcnow()
 
     def completeTask(self, scan_id):
         self.scan_id = scan_id
         self.complete = True
-        self.date_completed = utcnow_tz()
+        self.date_completed = datetime.utcnow()
 
     @staticmethod
     def getPendingTasks():

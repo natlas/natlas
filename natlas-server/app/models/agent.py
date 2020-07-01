@@ -1,8 +1,9 @@
 from app import db
-from app.util import utcnow_tz, generate_hex_16
+from app.util import generate_hex_16
 import string
 import secrets
 from app.models.dict_serializable import DictSerializable
+from datetime import datetime
 
 
 # Agent registration
@@ -13,7 +14,7 @@ class Agent(db.Model, DictSerializable):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     # agent identification string for storing in reports
     agentid = db.Column(db.String(16), index=True, unique=True, nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False, default=utcnow_tz)
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     # auth token
     token = db.Column(db.String(32), index=True, unique=True)
     # optional friendly name for viewing on user page
