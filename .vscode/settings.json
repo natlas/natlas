@@ -1,3 +1,7 @@
 {
-    "editor.insertSpaces": true
+    "editor.insertSpaces": true,
+    "python.analysis.extraPaths": [
+        "natlas-server/",
+        "natlas-agent/"
+    ]
 }
