@@ -1,0 +1,10 @@
+{
+    "status": "built",
+    "errors": null,
+    "files": {
+      "main": [
+        "dist/main.css",
+        "dist/main.js"
+      ]
+    }
+  }
