@@ -62,8 +62,9 @@ class User(UserMixin, db.Model, DictSerializable):
         self.password_reset_expiration = None
 
     def validate_reset_token(self):
-        now = utcnow_tz()
-        return self.password_reset_expiration > now
+        if not (self.password_reset_token and self.password_reset_expiration):
+            return False
+        return self.password_reset_expiration > utcnow_tz()
 
     @staticmethod
     def get_reset_token(email):
@@ -77,6 +78,8 @@ class User(UserMixin, db.Model, DictSerializable):
     @staticmethod
     def get_user_by_token(url_token):
         record = User.query.filter_by(password_reset_token=url_token).first()
+        if not record:
+            return False
         return validate_token(
             record, url_token, record.password_reset_token, record.validate_reset_token
         )
