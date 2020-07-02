@@ -98,7 +98,7 @@ class ElasticClient:
         return results["hits"]["total"], results["hits"]["hits"][0]["_source"]
 
     def collate_source(self, documents):
-        return map(lambda doc: doc["_source"], documents)
+        return list(map(lambda doc: doc["_source"], documents))
 
     # Mid-level query executor abstraction.
     def execute_search(self, **kwargs):
