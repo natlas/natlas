@@ -31,13 +31,15 @@ def send_media(filename):
 @bp.route("/browse")
 @is_authenticated
 def browse():
-    """ A simple browser that doesn't deal with queries at all """
+    """
+        A simple browser that doesn't deal with queries at all
+    """
     page = int(request.args.get("page", 1))
     includeHistory = request.args.get("includeHistory", False)
 
     results_per_page, search_offset = results_offset(page)
 
-    searchIndex = "nmap_history" if includeHistory else "nmap"
+    searchIndex = "history" if includeHistory else "latest"
 
     count, hostdata = current_app.elastic.search(
         results_per_page, search_offset, searchIndex=searchIndex
@@ -66,7 +68,9 @@ def browse():
 @bp.route("/search")
 @is_authenticated
 def search():
-    """ Return search results for a given query """
+    """
+        Return search results for a given query
+    """
     query = request.args.get("query", "")
     if query == "":
         return redirect(url_for("main.browse"))
@@ -77,7 +81,7 @@ def search():
 
     results_per_page, search_offset = results_offset(page)
 
-    searchIndex = "nmap_history" if includeHistory else "nmap"
+    searchIndex = "history" if includeHistory else "latest"
 
     count, context = current_app.elastic.search(
         results_per_page, search_offset, query=query, searchIndex=searchIndex
@@ -149,5 +153,7 @@ def screenshots():
 @bp.route("/status")
 @is_authenticated
 def status():
-    """ Simple html representation of the status api"""
+    """
+        Simple html representation of the status api
+    """
     return render_template("main/status.html")

@@ -19,10 +19,11 @@ class ElasticClient:
     logger = logging.getLogger("elasticsearch")
     logger.setLevel("ERROR")
 
-    def __init__(self, elasticURL):
+    def __init__(self, elasticURL, indices=natlasIndices):
         # Elastic is initialized outside an application context so we have to instatiate Config ourselves to get BASEDIR
         with open(Config().BASEDIR + "/defaults/elastic/mapping.json") as mapfile:
             self.mapping = json.loads(mapfile.read())
+        self.natlasIndices = indices
         try:
             self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
             self.status = self._ping()
@@ -43,7 +44,9 @@ class ElasticClient:
         return
 
     def _initialize_indices(self):
-        """ Check each required index and make sure it exists, if it doesn't then create it """
+        """
+            Check each required index and make sure it exists, if it doesn't then create it
+        """
         for index in self.natlasIndices:
             if not self.es.indices.exists(index):
                 self.es.indices.create(index)
@@ -63,12 +66,16 @@ class ElasticClient:
                 self.es.indices.put_mapping(index=index, body=self.mapping)
 
     def _ping(self):
-        """ Returns True if the cluster is up, False otherwise"""
+        """
+            Returns True if the cluster is up, False otherwise
+        """
         with self._new_trace_span(operation="ping"):
             return self.es.ping()
 
     def _attempt_reconnect(self):
-        """ Attempt to reconnect if we haven't tried to reconnect too recently """
+        """
+            Attempt to reconnect if we haven't tried to reconnect too recently
+        """
         now = datetime.utcnow()
         delta = now - self.lastReconnectAttempt
         if delta.seconds >= 30:
@@ -77,13 +84,17 @@ class ElasticClient:
         return self.status
 
     def _check_status(self):
-        """ If we're in a known bad state, try to reconnect """
+        """
+            If we're in a known bad state, try to reconnect
+        """
         if not (self.status or self._attempt_reconnect()):
             raise elasticsearch.ConnectionError
         return self.status
 
     def get_collection(self, **kwargs):
-        """ Execute a search and return a collection of results """
+        """
+            Execute a search and return a collection of results
+        """
         results = self.execute_search(**kwargs)
         if not results:
             return 0, []
@@ -91,7 +102,9 @@ class ElasticClient:
         return results["hits"]["total"], docsources
 
     def get_single_host(self, **kwargs):
-        """ Execute a search and return a single result """
+        """
+            Execute a search and return a single result
+        """
         results = self.execute_search(**kwargs)
         if not results or results["hits"]["total"] == 0:
             return 0, None
@@ -102,7 +115,9 @@ class ElasticClient:
 
     # Mid-level query executor abstraction.
     def execute_search(self, **kwargs):
-        """ Execute an arbitrary search."""
+        """
+            Execute an arbitrary search.
+        """
         with self._new_trace_span(operation="search", **kwargs) as span:
             results = self._execute_raw_query(
                 self.es.search, doc_type="_doc", rest_total_hits_as_int=True, **kwargs
@@ -112,7 +127,9 @@ class ElasticClient:
             return results
 
     def execute_count(self, **kwargs):
-        """ Executes an arbitrary count."""
+        """
+            Executes an arbitrary count.
+        """
         results = None
         with self._new_trace_span(operation="count", **kwargs) as span:
             results = self._execute_raw_query(self.es.count, doc_type="_doc", **kwargs)
@@ -122,21 +139,26 @@ class ElasticClient:
         return results
 
     def execute_delete_by_query(self, **kwargs):
-        """ Executes an arbitrary delete_by_query."""
+        """
+            Executes an arbitrary delete_by_query.
+        """
         with self._new_trace_span(operation="delete_by", **kwargs):
-            results = self._execute_raw_query(
+            return self._execute_raw_query(
                 self.es.delete_by_query, doc_type="_doc", **kwargs
             )
-            return results
 
     def execute_index(self, **kwargs):
-        """ Executes an arbitrary index. """
+        """
+            Executes an arbitrary index.
+        """
         with self._new_trace_span(operation="index", **kwargs):
             return self._execute_raw_query(self.es.index, doc_type="_doc", **kwargs)
 
     # Inner-most query executor. All queries route through here.
     def _execute_raw_query(self, func, **kwargs):
-        """ Wraps the es client to make sure that ConnectionErrors are handled uniformly """
+        """
+            Wraps the es client to make sure that ConnectionErrors are handled uniformly
+        """
         self._check_status()
         try:
             return func(**kwargs)
