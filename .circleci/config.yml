@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  flake8: arrai/flake8@5.0.0
 jobs:
   general-analysis:
     docker:
@@ -15,10 +13,6 @@ jobs:
           name: Restore pipenv cache
           keys:
             - pipenv-v0-{{ checksum "Pipfile.lock" }}
-      - flake8/setup_flake8:
-          wd: ~/repo
-      - flake8/flake8_errors:
-          wd: ~/repo
       - run:
           name: Install pipenv
           command: |
