@@ -75,7 +75,8 @@ def scan(target_data, config):
     for ext in "nmap", "gnmap", "xml":
         path = os.path.join(scan_dir, f"nmap.{scan_id}.{ext}")
         try:
-            result.add_item(ext + "_data", open(path).read())
+            with open(path, "r") as f:
+                result.add_item(ext + "_data", f.read())
         except Exception:
             logger.warning(f"Couldn't read {path}")
             return False

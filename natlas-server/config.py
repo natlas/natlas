@@ -3,8 +3,8 @@ import secrets
 import json
 from dotenv import load_dotenv
 
-# NAME, TYPE, DEFAULT
-defaultConfig = json.load(open("defaults/db_configs.json", "r"))
+with open("defaults/db_configs.json", "r") as f:
+    defaultConfig = json.load(f)
 
 
 def get_defaults():

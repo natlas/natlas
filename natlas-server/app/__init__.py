@@ -72,11 +72,8 @@ def load_natlas_services(app):
     current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
     if not current_services:
         # Let's populate server defaults
-        defaultServices = (
-            open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services"))
-            .read()
-            .rstrip("\r\n")
-        )
+        with open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")) as f:
+            defaultServices = f.read().rstrip("\r\n")
         current_services = NatlasServices(services=defaultServices)
         db.session.add(current_services)
         db.session.commit()
