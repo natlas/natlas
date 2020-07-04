@@ -9,9 +9,9 @@ class ElasticInterface:
     client = None
     indices = None
 
-    def __init__(self, elasticUrl: str, context: str = "prod"):
+    def __init__(self, elasticUrl: str, basename: str = "nmap"):
         self.client = ElasticClient(elasticUrl)
-        self.indices = ElasticIndices(context, self.client)
+        self.indices = ElasticIndices(self.client, basename)
 
     def search(
         self, limit: int, offset: int, query: str = "nmap", searchIndex: str = "latest"

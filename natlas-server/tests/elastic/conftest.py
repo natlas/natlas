@@ -13,7 +13,7 @@ def reset_indices(indices):
 
 @pytest.fixture(scope="module")
 def esinterface():
-    esi = ElasticInterface(conf.ELASTICSEARCH_URL, "test")
+    esi = ElasticInterface(conf.ELASTICSEARCH_URL, "natlas_test")
     yield esi
     reset_indices(esi.indices)
 
