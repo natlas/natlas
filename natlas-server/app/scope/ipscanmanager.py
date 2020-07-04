@@ -6,11 +6,13 @@ class IPScanManager:
     networks = []
     total = 0
     rng = None
+    consistent = None
 
-    def __init__(self, whitelist, blacklist):
+    def __init__(self, whitelist, blacklist, consistent: bool):
         self.networks = []
         self.total = 0
         self.rng = None
+        self.consistent = consistent
 
         self.set_whitelist(whitelist)
         self.set_blacklist(blacklist)
@@ -46,7 +48,7 @@ class IPScanManager:
                 "IPScanManager can not be started with an empty target scope"
             )
 
-        self.rng = CyclicPRNG(self.total)
+        self.rng = CyclicPRNG(self.total, self.consistent)
 
         def blockcomp(b):
             return b["start"]

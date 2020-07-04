@@ -36,35 +36,34 @@ def log(message):
 
 
 class CyclicPRNG:
-    N = 0
+    size = 0
     Modulus = 0
     ModulusFactors = {}
-    G = 0
+    generator = 0
     start = 0
     end = 0
     current = 0
     cycle_start_time = None
     completed_cycle_count = 0
+    consistent = False
 
-    def __init__(self, N):
-        self.N = N
-        if N > 1:
+    def __init__(self, N: int, consistent: bool = False):
+        """
+            Initialize PRNG that restarts after N calls
+        """
+        self.size = N
+        if self.size > 1:
             self.init_cyclic_group()
             self.init_generator()
             self.init_permutation()
             self.cycle_start_time = datetime.utcnow()
-        if N < 1:
+            self.consistent = consistent
+        if self.size < 1:
             raise Exception(
                 "Random Number Generator must be given a positive non-zero integer"
             )
 
         log("PRNG Starting Up")
-
-    def get_n(self):
-        return self.N
-
-    def get_modulus(self):
-        return self.Modulus
 
     def init_cyclic_group(self):
         def next_prime(num):
@@ -73,10 +72,13 @@ class CyclicPRNG:
                 num = num + 2
             return num
 
-        self.Modulus = next_prime(self.N)
+        self.Modulus = next_prime(self.size)
         self.ModulusFactors = sympy.factorint(self.Modulus - 1)
 
     def init_generator(self):
+        """
+            I honestly don't understand this function at all
+        """
         found = False
         while not found:
             base = random.randint(2, self.Modulus - 1)
@@ -84,33 +86,52 @@ class CyclicPRNG:
                 modexp(base, int((self.Modulus - 1) / factor), self.Modulus) != 1
                 for factor in self.ModulusFactors
             )
-        self.G = base
+        self.generator = base
 
     def _cycle_until_in_range(self, element):
-        """ Cycle the element until it is self.N or less """
-        while element > self.N:
-            element = (element * self.G) % self.Modulus
+        """
+            Cycle the element until it is self.size or less
+        """
+        while element > self.size:
+            element = (element * self.generator) % self.Modulus
         return element
 
     def init_permutation(self):
+        """
+            Create a new permutation of the scope
+        """
         exp = random.randint(2, self.Modulus - 1)
-        self.end = self._cycle_until_in_range(modexp(self.G, exp, self.Modulus))
-        self.start = self._cycle_until_in_range((self.end * self.G) % self.Modulus)
+        self.end = self._cycle_until_in_range(modexp(self.generator, exp, self.Modulus))
+        self.start = self._cycle_until_in_range(
+            (self.end * self.generator) % self.Modulus
+        )
         self.current = self.start
 
+    def restart_cycle(self):
+        """
+            Restart PRNG Cycle
+        """
+        if self.consistent:
+            self.current = self.start
+        else:
+            self.init_generator()
+            self.init_permutation()
+        self.cycle_start_time = datetime.utcnow()
+        self.completed_cycle_count += 1
+        log("PRNG Cycle Restarted")
+
     def get_random(self):
-        if self.N <= 1:
+        """
+            Gets the next random number from the permutation
+        """
+        if self.size <= 1:
             return 1
         mutex.acquire()
         value = self.current
         self.current = self._cycle_until_in_range(
-            (self.current * self.G) % self.Modulus
+            (self.current * self.generator) % self.Modulus
         )
         if value == self.end:
-            log("PRNG Cycle Restarted")
-            self.init_generator()
-            self.init_permutation()
-            self.cycle_start_time = datetime.utcnow()
-            self.completed_cycle_count += 1
+            self.restart_cycle()
         mutex.release()
         return value

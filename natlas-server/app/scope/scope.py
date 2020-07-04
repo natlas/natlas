@@ -4,11 +4,12 @@ from netaddr.core import AddrFormatError
 from .ipscanmanager import IPScanManager
 from datetime import datetime
 import os
+from flask import current_app
 
 LOGFILE = "logs/scopemanager.log"
 
 
-def log(message, printm=False):
+def log(message: str, printm: bool = False):
     if not os.path.isdir("logs"):
         os.makedirs("logs", exist_ok=True)
     with open(LOGFILE, "a") as f:
@@ -111,7 +112,9 @@ class ScopeManager:
         try:
             scanrange = [IPNetwork(n.target) for n in ScopeItem.getScope()]
             blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
-            self.scanmanager = IPScanManager(scanrange, blacklistrange)
+            self.scanmanager = IPScanManager(
+                scanrange, blacklistrange, current_app.config["CONSISTENT_SCAN_CYCLE"]
+            )
         except Exception as e:
             if self.scanmanager is None or self.scanmanager.get_total() == 0:
                 log(
@@ -130,7 +133,7 @@ class ScopeManager:
         self.update_scan_manager()
         log("ScopeManager Updated")
 
-    def is_acceptable_target(self, target):
+    def is_acceptable_target(self, target: str):
         # Ensure it's a valid IPv4Address
         try:
             # TODO this eventually needs to be upgraded to support IPv6
