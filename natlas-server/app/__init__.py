@@ -38,6 +38,8 @@ def unauthorized():
     if not current_user.is_admin:
         flash(f"You must be an admin to access {request.path}.", "warning")
         return redirect(url_for("main.index"))
+    flash("Unauthorized", "warning")
+    return redirect(url_for("auth.login"))
 
 
 def load_natlas_config(app):

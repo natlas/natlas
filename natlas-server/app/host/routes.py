@@ -58,7 +58,7 @@ def host_history(ip):
         ip, current_user.results_per_page, searchOffset
     )
     if count == 0:
-        abort(404)
+        return abort(404)
     next_url = (
         url_for("host.host_history", ip=ip, p=page + 1)
         if count > page * current_user.results_per_page
@@ -107,7 +107,7 @@ def host_historical_result(ip, scan_id):
 @is_authenticated
 def export_scan(ip, scan_id, ext):
     if ext not in ["xml", "nmap", "gnmap", "json"]:
-        abort(404)
+        return abort(404)
 
     export_field = f"{ext}_data"
 
@@ -118,7 +118,7 @@ def export_scan(ip, scan_id, ext):
     elif count > 0 and export_field in context:
         return Response(context[export_field], mimetype=mime)
     else:
-        abort(404)
+        return abort(404)
 
 
 @bp.route("/<ip>/screenshots")
@@ -207,7 +207,7 @@ def random_host():
     random_host = current_app.elastic.random_host()
     # This would most likely occur when there are no hosts up in the index, so just throw a 404
     if not random_host:
-        abort(404)
+        return abort(404)
     ip = random_host["ip"]
     info, context = hostinfo(ip)
     delForm = DeleteForm()

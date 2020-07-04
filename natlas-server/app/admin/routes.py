@@ -196,7 +196,7 @@ def import_scope(scopetype=""):
         importBlacklist = False
         importForm = forms.ImportScopeForm()
     else:
-        abort(404)
+        return abort(404)
     if importForm.validate_on_submit():
         newScopeItems = importForm.scope.data.split("\n")
         fail, exist, success = ScopeItem.import_scope(newScopeItems, importBlacklist)
@@ -226,7 +226,7 @@ def export_scope(scopetype=""):
     elif scopetype == "scope":
         exportBlacklist = False
     else:
-        abort(404)
+        return abort(404)
     items = ScopeItem.query.filter_by(blacklist=exportBlacklist).all()
     return Response(
         "\n".join(str(item.target) for item in items), mimetype="text/plain"
@@ -238,7 +238,7 @@ def export_scope(scopetype=""):
 @is_admin
 def delete_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
-        abort(404)
+        return abort(404)
     delForm = forms.ScopeDeleteForm()
     if delForm.validate_on_submit():
         item = ScopeItem.query.filter_by(id=id).first()
@@ -258,7 +258,7 @@ def delete_scope(scopetype, id):
 @is_admin
 def toggle_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
-        abort(404)
+        return abort(404)
     toggleForm = forms.ScopeToggleForm()
     if toggleForm.validate_on_submit():
         item = ScopeItem.query.filter_by(id=id).first()
@@ -276,7 +276,7 @@ def toggle_scope(scopetype, id):
 @is_admin
 def tag_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
-        abort(404)
+        return abort(404)
     addTagForm = forms.TagScopeForm()
     addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
     if addTagForm.validate_on_submit():
@@ -295,7 +295,7 @@ def tag_scope(scopetype, id):
 @is_admin
 def untag_scope(scopetype, id):
     if scopetype not in ["scope", "blacklist"]:
-        abort(404)
+        return abort(404)
     delTagForm = forms.TagScopeForm()
     scope = ScopeItem.query.get(id)
     delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags.all()]
