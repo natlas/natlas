@@ -83,6 +83,12 @@ class ElasticClient:
         if self.es.indices.exists(index):
             self.es.indices.delete(index)
 
+    def index_exists(self, index: str):
+        """
+            Check if index exists
+        """
+        return self.es.indices.exists(index)
+
     def get_collection(self, **kwargs):
         """
             Execute a search and return a collection of results
