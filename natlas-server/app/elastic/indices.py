@@ -7,18 +7,15 @@ from app.elastic.client import ElasticClient
 
 class ElasticIndices:
 
-    context = None
-    indices = {
-        "prod": {"latest": "nmap", "history": "nmap_history"},
-        "test": {"latest": "natlas_test", "history": "natlas_test_history"},
-    }
-
+    basename = None
+    indices = None
     logger = logging.getLogger("elasticsearch")
     logger.setLevel("ERROR")
 
-    def __init__(self, context: str, client: ElasticClient):
-        self.context = context
+    def __init__(self, client: ElasticClient, basename: str):
+        self.basename = basename
         self.client = client
+        self.indices = {"latest": basename, "history": f"{basename}_history"}
         self._initialize_indices()
 
     def _initialize_indices(self):
@@ -29,7 +26,7 @@ class ElasticIndices:
             mapping = json.loads(mapfile.read())
         for index in self.all_indices():
             self.client.initialize_index(index, mapping)
-        self.logger.info(f"Initialized Elasticsearch {self.context} indices")
+        self.logger.info(f"Initialized Elasticsearch {self.basename} indices")
 
     def _delete_indices(self):
         """
@@ -37,19 +34,19 @@ class ElasticIndices:
         """
         for index in self.all_indices():
             self.client.delete_index(index)
-        self.logger.info(f"Deleted Elasticsearch {self.context} indices")
+        self.logger.info(f"Deleted Elasticsearch {self.basename} indices")
 
     def name(self, alias: str):
         """
             Get the name of an index based on the current context
         """
-        return self.indices[self.context][alias]
+        return self.indices[alias]
 
     def all_indices(self):
         """
             Return a list of indices in the current context
         """
-        return [v for _, v in self.indices[self.context].items()]
+        return [v for _, v in self.indices.items()]
 
     def str_indices(self):
         """
