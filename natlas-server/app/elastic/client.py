@@ -1,5 +1,3 @@
-import json
-from config import Config
 import elasticsearch
 import time
 from datetime import datetime
@@ -13,17 +11,12 @@ class ElasticClient:
     es = None
     lastReconnectAttempt = None
     mapping = {}
-    natlasIndices = ["nmap", "nmap_history"]
     status = False
     # Quiets the elasticsearch logger because otherwise connection errors print tracebacks to the WARNING level, even when the exception is handled.
     logger = logging.getLogger("elasticsearch")
     logger.setLevel("ERROR")
 
-    def __init__(self, elasticURL, indices=natlasIndices):
-        # Elastic is initialized outside an application context so we have to instatiate Config ourselves to get BASEDIR
-        with open(Config().BASEDIR + "/defaults/elastic/mapping.json") as mapfile:
-            self.mapping = json.loads(mapfile.read())
-        self.natlasIndices = indices
+    def __init__(self, elasticURL: str):
         try:
             self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
             self.status = self._ping()
@@ -32,9 +25,6 @@ class ElasticClient:
                     self.es.info()["version"]["number"]
                 )
                 self.logger.info("Elastic Version: " + str(self.esversion))
-
-                self._initialize_indices()
-                self.logger.info("Initialized Elasticsearch indices")
         except Exception:
             self.status = False
             raise
@@ -42,28 +32,6 @@ class ElasticClient:
             # Set the lastReconnectAttempt to the timestamp after initialization
             self.lastReconnectAttempt = datetime.utcnow()
         return
-
-    def _initialize_indices(self):
-        """
-            Check each required index and make sure it exists, if it doesn't then create it
-        """
-        for index in self.natlasIndices:
-            if not self.es.indices.exists(index):
-                self.es.indices.create(index)
-
-        # Avoid a race condition
-        time.sleep(2)
-
-        for index in self.natlasIndices:
-            if self.esversion.match("<7.0.0"):
-                self.es.indices.put_mapping(
-                    index=index,
-                    doc_type="_doc",
-                    body=self.mapping,
-                    include_type_name=True,
-                )
-            else:
-                self.es.indices.put_mapping(index=index, body=self.mapping)
 
     def _ping(self):
         """
@@ -90,6 +58,30 @@ class ElasticClient:
         if not (self.status or self._attempt_reconnect()):
             raise elasticsearch.ConnectionError
         return self.status
+
+    def initialize_index(self, index: str, mapping: dict):
+        """
+            Check each required index and make sure it exists, if it doesn't then create it
+        """
+        with self._new_trace_span(operation="initialize_index"):
+            if not self.es.indices.exists(index):
+                self.es.indices.create(index)
+
+            time.sleep(1)
+
+            if self.esversion.match("<7.0.0"):
+                self.es.indices.put_mapping(
+                    index=index, doc_type="_doc", body=mapping, include_type_name=True
+                )
+            else:
+                self.es.indices.put_mapping(index=index, body=mapping)
+
+    def delete_index(self, index: str):
+        """
+            Delete an existing index
+        """
+        if self.es.indices.exists(index):
+            self.es.indices.delete(index)
 
     def get_collection(self, **kwargs):
         """
@@ -155,7 +147,7 @@ class ElasticClient:
             return self._execute_raw_query(self.es.index, doc_type="_doc", **kwargs)
 
     # Inner-most query executor. All queries route through here.
-    def _execute_raw_query(self, func, **kwargs):
+    def _execute_raw_query(self, func: callable, **kwargs):
         """
             Wraps the es client to make sure that ConnectionErrors are handled uniformly
         """
@@ -167,7 +159,7 @@ class ElasticClient:
             raise elasticsearch.ConnectionError
 
     # Tracing methods
-    def _new_trace_span(self, operation, **kwargs):
+    def _new_trace_span(self, operation: str, **kwargs):
         tracer = execution_context.get_opencensus_tracer()
         span_name = "elasticsearch"
         if "index" in kwargs:
@@ -180,6 +172,6 @@ class ElasticClient:
             span.add_attribute("es.query", kwargs["body"])
         return span
 
-    def _attach_shard_span_attrs(self, span, results):
+    def _attach_shard_span_attrs(self, span, results: dict):
         span.add_attribute("es.shards.total", results["_shards"]["total"])
         span.add_attribute("es.shards.successful", results["_shards"]["successful"])

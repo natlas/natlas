@@ -3,20 +3,19 @@ import pytest
 from app.elastic import ElasticInterface
 from tests.config import TestConfig
 
-test_indices = {"latest": "test", "history": "test_history"}
+conf = TestConfig()
 
 
-def reset_indices(esclient):
-    for index in esclient.natlasIndices:
-        esclient.es.indices.delete(index)
-    esclient._initialize_indices()
+def reset_indices(indices):
+    indices._delete_indices()
+    indices._initialize_indices()
 
 
 @pytest.fixture(scope="module")
 def esinterface():
-    esi = ElasticInterface(TestConfig().ELASTICSEARCH_URL, test_indices)
+    esi = ElasticInterface(conf.ELASTICSEARCH_URL, "test")
     yield esi
-    reset_indices(esi.client)
+    reset_indices(esi.indices)
 
 
 @pytest.fixture(scope="module")
