@@ -102,9 +102,8 @@ def main():
     servicesSha = ""
     SERVICESPATH = utils.get_services_path()
     if os.path.isfile(SERVICESPATH):
-        servicesSha = hashlib.sha256(
-            open(SERVICESPATH, "r").read().rstrip("\r\n").encode()
-        ).hexdigest()
+        with open(SERVICESPATH, "r") as f:
+            servicesSha = hashlib.sha256(f.read().rstrip("\r\n").encode()).hexdigest()
     else:
         servicesSha = netsrv.get_services_file()
         if not servicesSha:
@@ -130,8 +129,9 @@ def main():
 
     elif args.tfile:
         global_logger.info(f"Reading scope from file: {args.tfile}")
-        for target in open(args.tfile, "r"):
-            add_targets_to_queue(target, q)
+        with open(args.tfile, "r") as f:
+            for target in f:
+                add_targets_to_queue(target, q)
         q.join()
         global_logger.info(f"Finished scanning the target file {args.tfile}")
         return
