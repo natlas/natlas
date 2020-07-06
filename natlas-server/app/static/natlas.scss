@@ -3,20 +3,14 @@
 * Really needs to be organized
 *
 */
+
 @import '~@fortawesome/fontawesome-free/css/fontawesome.css';
 @import '~@fortawesome/fontawesome-free/css/solid.css';
 @import '~bootstrap/dist/css/bootstrap.css';
 @import '~datatables.net-bs4/css/dataTables.bootstrap4.css';
+@import 'css/colors';
 @import 'css/status-page';
-
-$green: #008000;
-$natlas-blue: #0b59bd;
-$natlas-pink: #ed1e79;
-$natlas-purple: #620ee1;
-$natlas-soft-blue: #0064b7;
-$off-white: #f1f1f1;
-$red: #f00;
-$white: #fff;
+@import 'css/landing-page';
 
 .natlas-pink {
     color: $natlas-pink;
@@ -34,6 +28,129 @@ $white: #fff;
     color: $natlas-soft-blue;
 }
 
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: $off-white;
+        color: $off-black;
+    }
+
+    a {
+        color: $off-black;
+    }
+
+    .landing-input,
+    .landing-input:focus {
+        background-color: $off-white-darker;
+        color: $off-black;
+    }
+
+    .host-row:nth-child(odd) {
+        background-color: $light-content-bg;
+        border-top-color: $off-white;
+    }
+
+    .host-row:nth-child(even) {
+        background-color: $light-content-bg-alt;
+        border-top-color: $off-white;
+    }
+
+    .showtoken {
+        color: $off-black;
+    }
+
+    .showtoken:hover {
+        color: $off-black-lightest;
+    }
+
+    .table {
+        color: $off-black;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: $off-black;
+        color: $off-white;
+    }
+
+    a {
+        color: $off-white;
+    }
+
+    .landing-input,
+    .landing-input:focus {
+        background-color: $off-black-lighter;
+        color: $off-white-darkest;
+    }
+
+    .host-row:nth-child(odd) {
+        background-color: $dark-content-bg;
+        border-top-color: $off-black;
+        color: $off-white;
+
+        pre {
+            color: $off-white;
+        }
+    }
+
+    .host-row:nth-child(even) {
+        background-color: $dark-content-bg-alt;
+        border-top-color: $off-black;
+        color: $off-white;
+
+        pre {
+            color: $off-white;
+        }
+    }
+
+    .thumbnail-hover {
+        color: $off-white;
+    }
+
+    .showtoken {
+        color: $off-white;
+    }
+
+    .showtoken:hover {
+        color: $off-white-darkest !important;
+    }
+
+    .table {
+        color: $off-white;
+    }
+
+    .card {
+        background-color: $dark-content-bg;
+    }
+
+    .progress {
+        background-color: $dark-content-bg;
+    }
+
+    .btn {
+        color: $off-white;
+    }
+
+    .dropdown-menu {
+        background-color: $dark-content-bg-alt;
+        color: $off-white;
+
+        .dropdown-item {
+            color: $off-white;
+        }
+
+        .dropdown-item:hover {
+            background-color: $dark-content-bg;
+            color: $off-white-darkest;
+        }
+    }
+
+    .modal-content {
+        background-color: $dark-content-bg-alt;
+        color: $off-white;
+    }
+}
+
 html {
     box-sizing: border-box;
     height: 100%;
@@ -46,9 +163,13 @@ html {
 }
 
 body {
-    background-color: $off-white;
+    margin: 0;
     min-height: 100%;
     position: relative;
+}
+
+canvas {
+    display: block;
 }
 
 .main-content {
@@ -59,9 +180,6 @@ body {
 /*
  * Global add-ons
  */
-.search-header {
-    border-bottom: 1px solid #eee;
-}
 
 .pagenav {
     display: inline-block;
@@ -223,24 +341,10 @@ form.pwchange-form > div {
     max-height: 20;
 }
 
-.host-row:first-of-type {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-}
-
-.host-row:last-of-type {
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-}
-
-.host-row:nth-child(odd) {
-    background-color: #f9f9f9;
-    border-top: 1px solid #f0f0f0;
-}
-
-.host-row:nth-child(even) {
-    background-color: #ececec;
-    border-top: 1px solid #f0f0f0;
+.host-row {
+    border-radius: 15px;
+    margin-bottom: 0.33em;
+    margin-top: 0.33em;
 }
 
 .host-header-date {
@@ -342,14 +446,6 @@ a > .badge-tag {
     display: none;
 }
 
-.showtoken {
-    color: #777 !important;
-}
-
-.showtoken:hover {
-    color: #111 !important;
-}
-
 .github-corner:hover .octo-arm {
     animation: octocat-wave 560ms ease-in-out;
 }
@@ -372,19 +468,19 @@ a > .badge-tag {
 }
 
 @media (max-width: 500px) {
-    .github-corner:hover .octo-arm {
-        animation: none;
-    }
-
     .github-corner .octo-arm {
         animation: octocat-wave 560ms ease-in-out;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: none;
     }
 }
 
 #backtotop {
     border-radius: 4px;
     bottom: 5px;
-    color: #ed1e79;
+    color: $natlas-pink;
     display: inline-block;
     font-size: 2em;
     margin: 5px;
@@ -398,12 +494,12 @@ a > .badge-tag {
 }
 
 #backtotop:hover {
-    color: #620ee1;
+    color: $natlas-purple;
     cursor: pointer;
 }
 
 #backtotop:active {
-    color: #ed1e79;
+    color: $natlas-pink;
 }
 
 #backtotop.show {
@@ -417,6 +513,8 @@ button.check-update {
 }
 
 .image-browser {
+    margin-bottom: 0.33em;
+    margin-top: 0.33em;
     position: relative;
     width: 100%;
 
@@ -432,12 +530,7 @@ button.check-update {
     opacity: 0.15;
 }
 
-.image-browser:hover .thumbnail-hover {
-    opacity: 1;
-}
-
 .thumbnail-hover {
-    color: #000;
     font-weight: bolder;
     left: 50%;
     opacity: 0;
@@ -446,4 +539,63 @@ button.check-update {
     top: 50%;
     transform: translate(-50%, -50%);
     transition: 0.3s;
+}
+
+.image-browser:hover .thumbnail-hover {
+    opacity: 1;
+}
+
+.landing-content {
+    margin: 0 auto;
+    text-align: center;
+    width: 75%;
+}
+
+.landing-label {
+    display: block;
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+.landing-input {
+    border: 0;
+    border-radius: 0.5em;
+    line-height: 3em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    pointer-events: all;
+    width: 100%;
+}
+
+.landing-button {
+    width: 100%;
+}
+
+.capture-pointer {
+    pointer-events: all;
+}
+
+.login-links {
+    justify-content: space-between;
+    width: 100%;
+}
+
+#particles-js {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+}
+
+#searchlayer {
+    width: 700px;
+    z-index: 100;
+}
+
+.aligner {
+    align-items: start;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    pointer-events: none;
 }

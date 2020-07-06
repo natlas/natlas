@@ -42,10 +42,6 @@
         </div>
         <img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != host.ip %} ({{host.ip}}){%endif%}">
       </div>
-      <!--<h5 class="mt-2">Port {{ screenshot.port }}</h5>
-      <small>Host: {{screenshot.host}}</small>
-      <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ host.ip }} - {{ screenshot.service }} Screenshot"></div>
-      -->
       {% endif %}
     {% endfor %}
   </div><!--meta column-->
