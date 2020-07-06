@@ -2,14 +2,11 @@ from threading import Lock
 import random
 import sympy
 from datetime import datetime
-import os
 
 from app import db
 from app.models import ScopeLog
 
 mutex = Lock()
-
-LOGFILE = "logs/cyclicprng.log"
 
 
 def modexp(b, e, m):
@@ -26,16 +23,20 @@ def modexp(b, e, m):
 
 
 def log(message):
-    if not os.path.isdir("logs"):
-        os.makedirs("logs", exist_ok=True)
-    with open(LOGFILE, "a") as f:
-        f.write(f"{str(datetime.utcnow())} - {message}\n")
     db_log = ScopeLog(message)
     db.session.add(db_log)
     db.session.commit()
 
 
 class CyclicPRNG:
+    """
+        For more information about the existence of this class and why it does what it does,
+        see https://github.com/natlas/natlas/wiki/Host-Coverage-Scanning-Strategy
+        Edge case behavior:
+            size = 1 -> Always return 1
+            size = 2 -> The generator is always 2
+    """
+
     size = 0
     Modulus = 0
     ModulusFactors = {}
@@ -47,11 +48,11 @@ class CyclicPRNG:
     completed_cycle_count = 0
     consistent = False
 
-    def __init__(self, N: int, consistent: bool = False):
+    def __init__(self, cycle_size: int, consistent: bool = False):
         """
-            Initialize PRNG that restarts after N calls
+            Initialize PRNG that restarts after cycle_size calls
         """
-        self.size = N
+        self.size = cycle_size
         if self.size > 1:
             self.init_cyclic_group()
             self.init_generator()
@@ -77,12 +78,20 @@ class CyclicPRNG:
 
     def init_generator(self):
         """
-            I honestly don't understand this function at all
+            Find a generator for the whole cyclic group.
         """
         found = False
+        base = 0
+        """
+            If Modulus is 3 then the only generator we can use is 2.
+            Otherwise we infinite loop because always self.generator == base
+        """
+        if self.Modulus == 3:
+            self.generator = 2
+            return
         while not found:
             base = random.randint(2, self.Modulus - 1)
-            found = all(
+            found = self.generator != base and all(
                 modexp(base, int((self.Modulus - 1) / factor), self.Modulus) != 1
                 for factor in self.ModulusFactors
             )
@@ -96,7 +105,7 @@ class CyclicPRNG:
             element = (element * self.generator) % self.Modulus
         return element
 
-    def init_permutation(self):
+    def init_permutation(self):  # sourcery skip: use-assigned-variable
         """
             Create a new permutation of the scope
         """
