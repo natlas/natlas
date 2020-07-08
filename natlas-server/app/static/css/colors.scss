@@ -1,6 +1,10 @@
+$green: #008000;
+$red: #f00;
+$white: #fff;
+$dark-content-bg-alpha: rgba(60, 60, 60, .75);
 $dark-content-bg-alt: #3c3c3c;
 $dark-content-bg: #191919;
-$green: #008000;
+$light-content-bg-alpha: rgba(225, 225, 225, .75);
 $light-content-bg-alt: #ececec;
 $light-content-bg: #f9f9f9;
 $natlas-blue: #0b59bd;
@@ -13,5 +17,84 @@ $off-black: #111;
 $off-white-darker: #e1e1e1;
 $off-white-darkest: #d1d1d1;
 $off-white: #f1f1f1;
-$red: #f00;
-$white: #fff;
+$muted: #6c757d;
+
+@mixin page-bg {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        background-color: $off-white;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: $off-black;
+    }
+}
+
+@mixin content-bg {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        background-color: $light-content-bg;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: $dark-content-bg;
+    }
+}
+
+@mixin content-bg-alt {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        background-color: $light-content-bg-alt;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: $dark-content-bg-alt;
+    }
+}
+
+@mixin input-bg {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        background-color: $off-white-darker;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: $off-black-lighter;
+    }
+}
+
+@mixin text-primary {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        color: $off-black;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        color: $off-white;
+    }
+}
+
+@mixin text-secondary {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        color: lighten($off-black, 20);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        color: darken($off-white, 20);
+    }
+}
+
+@mixin text-secondary-important {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        color: lighten($off-black, 20) !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        color: darken($off-white, 20) !important;
+    }
+}
+
+@mixin translucent-bg {
+    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
+        background-color: $light-content-bg-alpha;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: $dark-content-bg-alpha;
+    }
+}

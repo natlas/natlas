@@ -28,127 +28,81 @@
     color: $natlas-soft-blue;
 }
 
-@media (prefers-color-scheme: light) {
-    body {
-        background-color: $off-white;
-        color: $off-black;
+.text-muted {
+    @include text-secondary-important;
+}
+
+.landing-input,
+.landing-input:focus {
+    @include input-bg;
+    @include text-primary;
+}
+
+.host-row:nth-child(odd) {
+    @include content-bg;
+}
+
+.host-row:nth-child(even) {
+    @include content-bg-alt;
+}
+
+.showtoken {
+    @include text-primary;
+}
+
+.showtoken:hover {
+    @include text-secondary;
+}
+
+.table {
+    @include text-primary;
+}
+
+.thumbnail-hover {
+    @include text-primary;
+}
+
+.showtoken {
+    @include text-primary;
+}
+
+.showtoken:hover {
+    @include text-secondary-important;
+}
+
+.table {
+    @include text-primary;
+}
+
+.card {
+    @include content-bg;
+}
+
+.progress {
+    @include content-bg;
+}
+
+.btn {
+    color: $off-white;
+}
+
+.dropdown-menu {
+    @include content-bg-alt;
+    @include text-primary;
+
+    .dropdown-item {
+        @include text-primary;
     }
 
-    a {
-        color: $off-black;
-    }
-
-    .landing-input,
-    .landing-input:focus {
-        background-color: $off-white-darker;
-        color: $off-black;
-    }
-
-    .host-row:nth-child(odd) {
-        background-color: $light-content-bg;
-        border-top-color: $off-white;
-    }
-
-    .host-row:nth-child(even) {
-        background-color: $light-content-bg-alt;
-        border-top-color: $off-white;
-    }
-
-    .showtoken {
-        color: $off-black;
-    }
-
-    .showtoken:hover {
-        color: $off-black-lightest;
-    }
-
-    .table {
-        color: $off-black;
+    .dropdown-item:hover {
+        @include content-bg;
+        @include text-secondary;
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: $off-black;
-        color: $off-white;
-    }
-
-    a {
-        color: $off-white;
-    }
-
-    .landing-input,
-    .landing-input:focus {
-        background-color: $off-black-lighter;
-        color: $off-white-darkest;
-    }
-
-    .host-row:nth-child(odd) {
-        background-color: $dark-content-bg;
-        border-top-color: $off-black;
-        color: $off-white;
-
-        pre {
-            color: $off-white;
-        }
-    }
-
-    .host-row:nth-child(even) {
-        background-color: $dark-content-bg-alt;
-        border-top-color: $off-black;
-        color: $off-white;
-
-        pre {
-            color: $off-white;
-        }
-    }
-
-    .thumbnail-hover {
-        color: $off-white;
-    }
-
-    .showtoken {
-        color: $off-white;
-    }
-
-    .showtoken:hover {
-        color: $off-white-darkest !important;
-    }
-
-    .table {
-        color: $off-white;
-    }
-
-    .card {
-        background-color: $dark-content-bg;
-    }
-
-    .progress {
-        background-color: $dark-content-bg;
-    }
-
-    .btn {
-        color: $off-white;
-    }
-
-    .dropdown-menu {
-        background-color: $dark-content-bg-alt;
-        color: $off-white;
-
-        .dropdown-item {
-            color: $off-white;
-        }
-
-        .dropdown-item:hover {
-            background-color: $dark-content-bg;
-            color: $off-white-darkest;
-        }
-    }
-
-    .modal-content {
-        background-color: $dark-content-bg-alt;
-        color: $off-white;
-    }
+.modal-content {
+    @include content-bg-alt;
+    @include text-primary;
 }
 
 html {
@@ -163,6 +117,9 @@ html {
 }
 
 body {
+    @include page-bg;
+    @include text-primary;
+
     margin: 0;
     min-height: 100%;
     position: relative;
@@ -170,6 +127,14 @@ body {
 
 canvas {
     display: block;
+}
+
+a {
+    color: $natlas-pink;
+}
+
+pre {
+    @include text-primary;
 }
 
 .main-content {
@@ -556,11 +521,15 @@ button.check-update {
     font-size: 1.5em;
     margin-bottom: 0.5em;
     margin-top: 0.5em;
+    user-select: none;
 }
 
 .landing-input {
     border: 0;
-    border-radius: 0.5em;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     line-height: 3em;
     padding-left: 0.5em;
     padding-right: 0.5em;
@@ -576,7 +545,11 @@ button.check-update {
     pointer-events: all;
 }
 
-.login-links {
+.landing-links {
+    @include translucent-bg;
+
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
     justify-content: space-between;
     width: 100%;
 }
