@@ -2,6 +2,7 @@ import 'particles.js';
 
 import { particlesStatic } from '../conf/particles-static';
 import { particlesActive } from '../conf/particles-active';
+import { getReducedMotion } from '../util/media-queries';
 
 declare var particlesJS: any;
 
@@ -15,7 +16,7 @@ function setMotion(e: MediaQueryList | MediaQueryListEvent) {
 
 export function registerParticleEvents(): void {
     if (document.getElementById('particles-js')) {
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const reducedMotion = getReducedMotion();
         reducedMotion.addListener(setMotion);
         setMotion(reducedMotion);
     }

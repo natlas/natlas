@@ -7,6 +7,7 @@ import { initializeStatusUpdates } from './util/system-status';
 import { registerTagModalEvents } from './controls/natlas-tagging';
 import { registerAgentEvents } from './controls/user-profile';
 import { registerParticleEvents } from './pages/login';
+import { getReducedMotion } from './util/media-queries';
 import 'natlas.scss';
 import 'bootstrap';
 
@@ -92,7 +93,11 @@ $(document).ready(function() {
 
     btn.on('click', function(e) {
         e.preventDefault();
-        $('html, body').animate({scrollTop:0}, '300');
+        if (getReducedMotion().matches) {
+            window.scroll(0, 0);
+        } else {
+            $('html, body').animate({scrollTop:0}, '300');
+        }
     });
 });
 
