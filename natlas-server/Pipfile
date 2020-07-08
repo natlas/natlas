@@ -30,6 +30,7 @@ sentry-sdk = "~=0.14.4"
 sympy = "~=1.6"
 webpack-manifest = "~=2.1.1"
 natlas-libnmap = "*"
+cyclicprng = "*"
 
 [requires]
 python_version = "3.8"
