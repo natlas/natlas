@@ -21,9 +21,9 @@ def index():
     reg_form = None
     if current_user.is_anonymous:
         if current_app.config["LOGIN_REQUIRED"]:
-            login_form = LoginForm()
+            login_form = LoginForm(prefix="login")
         if current_app.config["REGISTER_ALLOWED"]:
-            reg_form = RegistrationForm()
+            reg_form = RegistrationForm(prefix="register")
     return render_template("main/index.html", login_form=login_form, reg_form=reg_form)
 
 

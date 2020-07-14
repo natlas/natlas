@@ -18,7 +18,7 @@ from werkzeug.urls import url_parse
 @bp.route("/login", methods=["GET", "POST"])
 @is_not_authenticated
 def login():
-    form = LoginForm()
+    form = LoginForm(prefix="login")
     if form.validate_on_submit():
         user = User.query.filter_by(email=User.validate_email(form.email.data)).first()
         if user is None or not user.check_password(form.password.data):
@@ -48,17 +48,18 @@ def register():
             "warning",
         )
         return redirect(url_for("auth.login"))
-    form = RegistrationForm()
+    form = RegistrationForm(prefix="register")
     if form.validate_on_submit():
         validemail = validate_email(form.email.data)
         if not validemail:
             return redirect(url_for("auth.register"))
-        user = User(email=validemail)
+        user = User(email=validemail, is_active=True)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        login_user(user)
         flash("Congratulations, you are now a registered user!", "success")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("main.browse"))
     return render_template("auth/register.html", title="Register", form=form)
 
 
