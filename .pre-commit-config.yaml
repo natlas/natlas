@@ -20,3 +20,8 @@ repos:
     rev: 3.8.3
     hooks:
     -   id: flake8
+-   repo: https://github.com/awebdeveloper/pre-commit-stylelint
+    rev: 8f63da497580898a7e0ceef6bf9e72cc0af07828
+    hooks:
+    -   id: stylelint
+        additional_dependencies: ['stylelint', 'stylelint-config-standard', 'stylelint-scss']

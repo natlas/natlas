@@ -12,15 +12,19 @@ from flask_login import current_user
 from app.main import bp
 from app.main.pagination import build_pagination_urls, results_offset
 from app.auth.wrappers import is_authenticated
-from app.auth.forms import LoginForm
+from app.auth.forms import LoginForm, RegistrationForm
 
 
 @bp.route("/")
 def index():
-    form = None
-    if current_app.config["LOGIN_REQUIRED"] and not current_user.is_authenticated:
-        form = LoginForm()
-    return render_template("main/index.html", form=form)
+    login_form = None
+    reg_form = None
+    if current_user.is_anonymous:
+        if current_app.config["LOGIN_REQUIRED"]:
+            login_form = LoginForm()
+        if current_app.config["REGISTER_ALLOWED"]:
+            reg_form = RegistrationForm()
+    return render_template("main/index.html", login_form=login_form, reg_form=reg_form)
 
 
 # Serve media files in case the front-end proxy doesn't do it

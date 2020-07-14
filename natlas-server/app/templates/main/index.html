@@ -7,7 +7,7 @@
     <div id="searchlayer">
         {% include 'includes/natlas-landing-logo.svg' %}
         <div class="landing-content">
-            {% if form %}
+            {% if current_user.is_anonymous and config["LOGIN_REQUIRED"] %}
                 {% include 'main/_landing_login.html' %}
             {% else %}
                 <form class="form" action="{{ url_for('main.search') }}" name="search">

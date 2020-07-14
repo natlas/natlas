@@ -1,0 +1,38 @@
+.natlas-name {
+    height: 100%;
+    max-height: 32px;
+}
+
+.global-footer {
+    background-color: #222;
+    bottom: 0;
+    color: #99979c;
+    left: 0;
+    margin-top: 100px;
+    padding: 1rem;
+    position: absolute;
+    right: 0;
+    text-align: left;
+}
+
+.footer-links {
+    margin-bottom: 0;
+    padding-left: 0;
+
+    li {
+        display: inline-block;
+        margin-left: 3em;
+    }
+
+    li:first-child {
+        margin-left: 0;
+    }
+
+    a {
+        color: $white;
+    }
+}
+
+.version-string a {
+    color: #99979c;
+}

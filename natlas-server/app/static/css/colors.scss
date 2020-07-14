@@ -1,10 +1,10 @@
 $green: #008000;
 $red: #f00;
 $white: #fff;
-$dark-content-bg-alpha: rgba(60, 60, 60, .75);
+$dark-content-bg-alpha: rgba(60, 60, 60, 0.75);
 $dark-content-bg-alt: #3c3c3c;
 $dark-content-bg: #191919;
-$light-content-bg-alpha: rgba(225, 225, 225, .75);
+$light-content-bg-alpha: rgba(225, 225, 225, 0.75);
 $light-content-bg-alt: #ececec;
 $light-content-bg: #f9f9f9;
 $natlas-blue: #0b59bd;
@@ -19,82 +19,58 @@ $off-white-darkest: #d1d1d1;
 $off-white: #f1f1f1;
 $muted: #6c757d;
 
-@mixin page-bg {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        background-color: $off-white;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        background-color: $off-black;
-    }
-}
-
-@mixin content-bg {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        background-color: $light-content-bg;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        background-color: $dark-content-bg;
+@mixin light-mode {
+    :root {
+        #{--page-bg}: $off-white;
+        #{--content-bg}: $light-content-bg;
+        #{--content-bg-alt}: $light-content-bg-alt;
+        #{--translucent-bg}: $light-content-bg-alpha;
+        #{--input-bg}: $off-white-darker;
+        #{--text-primary}: $off-black;
+        #{--text-secondary}: lighten($off-black, 20);
     }
 }
 
-@mixin content-bg-alt {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        background-color: $light-content-bg-alt;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        background-color: $dark-content-bg-alt;
-    }
-}
-
-@mixin input-bg {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        background-color: $off-white-darker;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        background-color: $off-black-lighter;
+@mixin dark-mode {
+    :root {
+        #{--page-bg}: $off-black;
+        #{--content-bg}: $dark-content-bg;
+        #{--content-bg-alt}: $dark-content-bg-alt;
+        #{--translucent-bg}: $dark-content-bg-alpha;
+        #{--input-bg}: $off-black-lighter;
+        #{--text-primary}: $off-white;
+        #{--text-secondary}: darken($off-white, 20);
     }
 }
 
-@mixin text-primary {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        color: $off-black;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        color: $off-white;
-    }
+@media (prefers-color-scheme: light) {
+    @include light-mode;
 }
 
-@mixin text-secondary {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        color: lighten($off-black, 20);
-    }
-
-    @media (prefers-color-scheme: dark) {
-        color: darken($off-white, 20);
-    }
+@media (prefers-color-scheme: dark) {
+    @include dark-mode;
 }
 
-@mixin text-secondary-important {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        color: lighten($off-black, 20) !important;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        color: darken($off-white, 20) !important;
-    }
+.natlas-pink {
+    color: $natlas-pink;
 }
 
-@mixin translucent-bg {
-    @media (prefers-color-scheme: light), (prefers-color-scheme: no-preference) {
-        background-color: $light-content-bg-alpha;
-    }
+.natlas-purple {
+    color: $natlas-purple;
+}
 
-    @media (prefers-color-scheme: dark) {
-        background-color: $dark-content-bg-alpha;
-    }
+.natlas-blue {
+    color: $natlas-blue;
+}
+
+.natlas-soft-blue {
+    color: $natlas-soft-blue;
+}
+
+.green {
+    color: $green;
+}
+
+.red {
+    color: $red;
 }
