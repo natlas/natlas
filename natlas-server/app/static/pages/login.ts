@@ -20,19 +20,23 @@ export function authFormSwitcher(): void {
     const regBtn = document.querySelector('#register-button');
     const regDiv = document.querySelector('#register-div');
 
-    loginBtn.addEventListener('click', () => {
-        loginBtn.classList.add('active');
-        regBtn.classList.remove('active');
-        loginDiv.classList.remove('d-none');
-        regDiv.classList.add('d-none');
-    });
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            loginBtn.classList.add('active');
+            regBtn.classList.remove('active');
+            loginDiv.classList.remove('d-none');
+            regDiv.classList.add('d-none');
+        });
+    }
 
-    regBtn.addEventListener('click', () => {
-        regBtn.classList.add('active');
-        loginBtn.classList.remove('active');
-        loginDiv.classList.add('d-none');
-        regDiv.classList.remove('d-none');
-    });
+    if (regBtn) {
+        regBtn.addEventListener('click', () => {
+            regBtn.classList.add('active');
+            loginBtn.classList.remove('active');
+            loginDiv.classList.add('d-none');
+            regDiv.classList.remove('d-none');
+        });
+    }
 }
 
 export function registerParticleEvents(): void {
