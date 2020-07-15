@@ -58,7 +58,7 @@
 }
 
 .landing-links {
-    background-color: var(--translucent-bg);
+    background-color: var(--content-bg);
     border-bottom-left-radius: 0.5em;
     border-bottom-right-radius: 0.5em;
     justify-content: space-between;
@@ -85,7 +85,9 @@
 }
 
 .landing-nav {
-    background-color: var(--translucent-bg);
+    background-color: var(--content-bg-alt);
+    border: 1px solid $natlas-pink !important;
+    font-weight: bolder;
 }
 
 .landing-nav.active {
