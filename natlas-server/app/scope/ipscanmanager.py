@@ -25,7 +25,7 @@ class IPScanManager:
             "restart": "PRNG Cycle Restarted",
             "default": "Unknown PRNG Event",
         }
-        db_log = ScopeLog(log_messages[message])
+        db_log = ScopeLog(log_messages.get(message, "default"))
         db.session.add(db_log)
         db.session.commit()
 
