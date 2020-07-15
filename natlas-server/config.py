@@ -66,6 +66,9 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", None)
     MAIL_FROM = os.environ.get("MAIL_FROM", None)
 
+    # Scan Cycle option(s)
+    CONSISTENT_SCAN_CYCLE = casted_bool(os.environ.get("CONSISTENT_SCAN_CYCLE", False))
+
     # Allow version overrides for local development
     # Necessary to test versioned host data templates before release
     version_override = os.environ.get("NATLAS_VERSION_OVERRIDE", None)

@@ -65,6 +65,7 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `MAIL_FROM` | `None` | Address to be used as the "From" address for outgoing mail. This is required if `MAIL_SERVER` is set. |
 | `SERVER_NAME` | `None` | This should be set to the domain and optional port that your service will be accessed on. Do **NOT** include the scheme here. E.g. `example.com` or `10.0.0.15:5000` |
 | `PREFERRED_URL_SCHEME` | `https` | You can optionally set this value to `http` if you're not using ssl. This should be avoided for any production environments. |
+| `CONSISTENT_SCAN_CYCLE` | `False` | Setting this to `True` will cause the random scan order to persist between scan cycles. This will produce more consistent deltas between an individual host being scanned. **Note**: Changes to the scope will still change the scan order, resulting in one cycle of less consistent timing. |
 
 #### Example ENV
 
