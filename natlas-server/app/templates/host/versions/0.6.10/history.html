@@ -3,13 +3,13 @@
 {% set active_page = "history" %}
 {% set pagetype = 'multi' %}
 {% block content %}
-  {% include 'host/versions/0.6.9/_header.html' %}
+  {% include 'host/versions/0.6.10/_header.html' %}
   <div class="host-rows">
   {% for host in hosts %}
-    {% include 'host/versions/0.6.9/_host-row-history.html' %}
+    {% include 'host/versions/0.6.10/_host-row-history.html' %}
   {% endfor %}
   </div>
-  {% include 'host/versions/0.6.9/_imagemodal.html' %}
+  {% include 'host/versions/0.6.10/_imagemodal.html' %}
   {% if numresults > current_user.results_per_page %}
     <div class="row">
       <div class="col text-center my-2">

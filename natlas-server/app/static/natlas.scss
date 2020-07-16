@@ -107,6 +107,10 @@ button.check-update {
     pointer-events: all;
 }
 
+.no-select {
+    user-select: none;
+}
+
 .text-muted {
     color: var(--text-secondary) !important;
 }

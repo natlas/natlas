@@ -129,8 +129,10 @@ a:hover.preview_link {
     font-size: 0.85rem;
 }
 
-.host-export > button {
-    font-size: 0.85rem;
+.host-export {
+    button {
+        font-size: 0.85rem;
+    }
 }
 
 .export-group {

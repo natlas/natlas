@@ -1,16 +1,15 @@
 import 'particles.js';
 
-import { particlesStatic } from '../conf/particles-static';
-import { particlesActive } from '../conf/particles-active';
+import { particlesConfig } from '../conf/particles';
 import { getReducedMotion } from '../util/media-queries';
 
 declare var particlesJS: any;
 
 function setMotion(e: MediaQueryList | MediaQueryListEvent) {
     if (e.matches) {
-        particlesJS('particles-js', particlesStatic);
+        particlesJS('particles-js', particlesConfig(false));
     } else {
-        particlesJS('particles-js', particlesActive);
+        particlesJS('particles-js', particlesConfig(true));
     }
 }
 

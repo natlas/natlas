@@ -20,8 +20,10 @@ div.expand-img {
     }
 }
 
-.image-browser:hover > img {
-    opacity: 0.15;
+.image-browser:hover {
+    img {
+        opacity: 0.15;
+    }
 }
 
 .thumbnail-hover {
