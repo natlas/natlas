@@ -1,15 +1,15 @@
-import 'particles.js';
+import { tsParticles } from 'tsparticles';
 
 import { particlesConfig } from '../conf/particles';
 import { getReducedMotion } from '../util/media-queries';
 
-declare var particlesJS: any;
-
 function setMotion(e: MediaQueryList | MediaQueryListEvent) {
+    tsParticles.init();
+
     if (e.matches) {
-        particlesJS('particles-js', particlesConfig(false));
+        tsParticles.load('tsparticles', particlesConfig(false));
     } else {
-        particlesJS('particles-js', particlesConfig(true));
+        tsParticles.load('tsparticles', particlesConfig(true));
     }
 }
 
@@ -39,7 +39,7 @@ export function authFormSwitcher(): void {
 }
 
 export function registerParticleEvents(): void {
-    if (document.getElementById('particles-js')) {
+    if (document.getElementById('tsparticles')) {
         const reducedMotion = getReducedMotion();
         reducedMotion.addListener(setMotion);
         setMotion(reducedMotion);
