@@ -1,5 +1,5 @@
-import { IOptions } from "tsparticles/dist/Options/Interfaces/IOptions";
-import { RecursivePartial } from "tsparticles/dist/Types/RecursivePartial";
+import { IOptions } from 'tsparticles/dist/Options/Interfaces/IOptions';
+import { RecursivePartial } from 'tsparticles/dist/Types/RecursivePartial';
 
 export function particlesConfig(active: boolean): RecursivePartial<IOptions> {
 
