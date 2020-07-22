@@ -8,15 +8,23 @@ from flask import (
     send_from_directory,
     jsonify,
 )
+from flask_login import current_user
 from app.main import bp
 from app.main.pagination import build_pagination_urls, results_offset
 from app.auth.wrappers import is_authenticated
+from app.auth.forms import LoginForm, RegistrationForm
 
 
 @bp.route("/")
-@is_authenticated
 def index():
-    return redirect(url_for("main.browse"))
+    login_form = None
+    reg_form = None
+    if current_user.is_anonymous:
+        if current_app.config["LOGIN_REQUIRED"]:
+            login_form = LoginForm(prefix="login")
+        if current_app.config["REGISTER_ALLOWED"]:
+            reg_form = RegistrationForm(prefix="register")
+    return render_template("main/index.html", login_form=login_form, reg_form=reg_form)
 
 
 # Serve media files in case the front-end proxy doesn't do it

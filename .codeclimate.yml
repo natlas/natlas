@@ -8,14 +8,9 @@ plugins:
   tslint:
       enabled: true
       config: ./natlas-server/tslint.json
-  scss-lint:
+  stylelint:
     enabled: true
-    config: ./natlas-server/.scss-lint.yml
-    checks:
-      Comment:
-        enabled: false
-      LeadingZero:
-        enabled: false
+    config: ./natlas-server/.stylelintrc.yml
   pep8:
     enabled: true
     checks:
@@ -35,8 +30,6 @@ plugins:
   shellcheck:
     enabled: true
   sonar-python:
-    enabled: true
-  stylelint:
     enabled: true
   duplication:
     enabled: true

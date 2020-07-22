@@ -1,7 +1,7 @@
 <div class="row host-row py-1 no-gutters">
     <div class="col col-xs-6 col-sm-4 vert-flex-mid">
       <span class="host-row-text pl-2">
-        {% include 'host/versions/0.6.9/_host-status.html' %}
+        {% include 'host/versions/0.6.10/_host-status.html' %}
         <a href="{{ url_for('host.host_historical_result', ip=host.ip, scan_id=host.scan_id) }}">
           <time datetime={{ host.ctime }} title="{{ host.ctime|ctime(human=True) }}">{{ host.ctime | ctime }}</time>
         </a>
@@ -37,7 +37,7 @@
 
     <div class="col col-sm-4 col-md-1 d-none d-sm-flex vert-flex-mid">
       {% if host.nmap_data or host.xml_data or host.gnmap_data %}
-       {% include 'host/versions/0.6.9/_host-export.html' %}
+       {% include 'host/versions/0.6.10/_host-export.html' %}
     {% else %}
       <div class="btn-group host-history-export" role="group">
         <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" disabled data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="No data available to export">

@@ -1,0 +1,43 @@
+div.expand-img {
+    cursor: zoom-in;
+}
+
+.imagetitle {
+    display: inline;
+}
+
+.image-browser {
+    margin-bottom: 0.33em;
+    margin-top: 0.33em;
+    position: relative;
+    width: 100%;
+
+    img {
+        backface-visibility: hidden;
+        display: block;
+        opacity: 1;
+        transition: 0.3s;
+    }
+}
+
+.image-browser:hover {
+    img {
+        opacity: 0.15;
+    }
+}
+
+.thumbnail-hover {
+    color: var(--text-primary);
+    font-weight: bolder;
+    left: 50%;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.3s;
+}
+
+.image-browser:hover .thumbnail-hover {
+    opacity: 1;
+}

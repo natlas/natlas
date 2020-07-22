@@ -1,0 +1,97 @@
+.fill-page {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+
+    canvas {
+        display: block;
+    }
+}
+
+.aligner {
+    align-items: start;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    pointer-events: none;
+
+    #searchlayer {
+        width: 700px;
+        z-index: 100;
+    }
+}
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+#natlas-logo-inner-ring {
+    animation: spin 30s linear infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #natlas-logo-inner-ring {
+        animation: none;
+    }
+}
+
+.landing-content {
+    margin: 0 auto;
+    text-align: center;
+    width: 75%;
+}
+
+.landing-label {
+    display: block;
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+.landing-input {
+    background-color: var(--input-bg);
+    border: 0;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    color: var(--text-primary);
+    line-height: 3em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    pointer-events: all;
+    width: 100%;
+}
+
+.landing-input:focus {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.landing-button {
+    width: 100%;
+}
+
+.landing-links {
+    background-color: var(--content-bg);
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.landing-nav {
+    background-color: var(--content-bg-alt);
+    border: 1px solid $natlas-pink !important;
+    font-weight: bolder;
+}
+
+.landing-nav.active {
+    background-color: var(--content-bg) !important;
+    color: var(--text-primary) !important;
+}

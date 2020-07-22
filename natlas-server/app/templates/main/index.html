@@ -1,0 +1,23 @@
+{% extends "full.html" %}
+{% set title = "Natlas" %}
+
+{% block content %}
+    <div class="fill-page" id="particles-js"></div>
+    <div class="aligner">
+        <div id="searchlayer">
+            {% include 'includes/natlas-landing-logo.svg' %}
+            <div class="landing-content">
+                {% if current_user.is_anonymous and config["LOGIN_REQUIRED"] %}
+                    {% include 'main/_landing_login.html' %}
+                {% else %}
+                    <form class="form" action="{{ url_for('main.search') }}" name="search">
+                        <input type="text" class="form-control landing-input" aria-label="Search" value="{{query}}" required name="query" id="textInput" contenteditable="true" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Enter NQL query..." />
+                    </form>
+                    <div class="d-flex landing-links py-1 px-3">
+                        <a class="capture-pointer" href="{{ url_for('main.browse') }}">Explore</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+  </div>
+{% endblock %}

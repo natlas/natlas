@@ -1,6 +1,6 @@
 <div class="row page-header">
     <div class="col-xs-12 col-sm">
-        <h1>{% if host %}{% include 'host/versions/0.6.9/_host-status.html' %}{% endif %}{{ ip }}{% if host %}<small class="text-muted host-header-date"> - <time datetime="{{host.ctime}}">{{ host.ctime | ctime }}</time></small>{% endif %}</h1>
+        <h1>{% if host %}{% include 'host/versions/0.6.10/_host-status.html' %}{% endif %}{{ ip }}{% if host %}<small class="text-muted host-header-date"> - <time datetime="{{host.ctime}}">{{ host.ctime | ctime }}</time></small>{% endif %}</h1>
     </div>
     {% if current_user.is_authenticated %}
     <div class="col-xs-12 col-sm-2" style="text-align:right;">

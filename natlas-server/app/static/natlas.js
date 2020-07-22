@@ -6,6 +6,8 @@ import { isNewerVersionAvailable } from './util/version-check';
 import { initializeStatusUpdates } from './util/system-status';
 import { registerTagModalEvents } from './controls/natlas-tagging';
 import { registerAgentEvents } from './controls/user-profile';
+import { registerParticleEvents, authFormSwitcher } from './pages/login';
+import { getReducedMotion } from './util/media-queries';
 import 'natlas.scss';
 import 'bootstrap';
 
@@ -38,7 +40,7 @@ window.loadModalContent = function() {
         return;
     }
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/searchmodal");
+    xhr.open('GET', '/searchmodal');
     xhr.send();
     xhr.onload = function() {
         $('#searchHelpContent').html(xhr.response);
@@ -59,8 +61,8 @@ $(document).ready(function() {
                     };
                 } else {
                     params = {
-                        content: "No Updates Found!",
-                        trigger: "focus"
+                        content: 'No Updates Found!',
+                        trigger: 'focus'
                     };
                 }
                 btn.popover(params).popover('show');
@@ -71,8 +73,8 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     $('.dataTable').DataTable({
-        "columnDefs": [
-            { "orderable": false, "targets": 'table-controls' }
+        'columnDefs': [
+            { 'orderable': false, 'targets': 'table-controls' }
         ]
     });
     $('[data-toggle="popover"]').popover();
@@ -91,7 +93,11 @@ $(document).ready(function() {
 
     btn.on('click', function(e) {
         e.preventDefault();
-        $('html, body').animate({scrollTop:0}, '300');
+        if (getReducedMotion().matches) {
+            window.scroll(0, 0);
+        } else {
+            $('html, body').animate({scrollTop:0}, '300');
+        }
     });
 });
 
@@ -113,3 +119,5 @@ $(document).ready(function() {
 registerTagModalEvents();
 registerAgentEvents();
 initializeStatusUpdates();
+registerParticleEvents();
+authFormSwitcher();

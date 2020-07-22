@@ -1,0 +1,67 @@
+{% if config["REGISTER_ALLOWED"] %}
+<div class="container">
+    <ul class="nav nav-tabs nav-fill capture-pointer">
+        <li class="nav-item">
+            <a id="login-button" class="nav-link landing-nav active no-select" href="#login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a id="register-button" class="nav-link landing-nav no-select" href="#register">Register</a>
+        </li>
+    </ul>
+</div>
+{% endif %}
+<div class="container" id="login-div">
+    <form action="{{url_for('auth.login')}}" method="post">
+        {{ login_form.hidden_tag() }}
+        <div class="form-group">
+            {{ login_form.email.label(class="control-label landing-label no-select") }}
+            {{ login_form.email(size=32, placeholder="user@example.com", class="form-control landing-input rounded") }}
+            {% for error in login_form.email.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ login_form.password.label(class="control-label landing-label no-select") }}
+            {{ login_form.password(size=32, class="form-control landing-input rounded") }}
+            {% for error in login_form.password.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+            <div class="d-flex landing-links py-1 px-3">
+                    <a class="capture-pointer" href="{{ url_for('auth.reset_password_request') }}">Forgot Your Password?</a>
+            </div>
+        </div>
+
+        {{ login_form.submit(class="btn btn-primary mt-3 capture-pointer landing-button") }}
+    </form>
+</div>
+
+{% if config["REGISTER_ALLOWED"] %}
+<div class="container d-none" id="register-div">
+    <form action="{{url_for('auth.register')}}" method="post">
+        {{ reg_form.hidden_tag() }}
+        <div class="form-group">
+            {{ reg_form.email.label(class="control-label landing-label") }}
+            {{ reg_form.email(size=32, placeholder="user@example.com", class="form-control landing-input rounded") }}
+            {% for error in reg_form.email.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ reg_form.password.label(class="control-label landing-label") }}
+            {{ reg_form.password(size=32, class="form-control landing-input rounded") }}
+            {% for error in reg_form.password.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ reg_form.password2.label(class="control-label landing-label") }}
+            {{ reg_form.password2(size=32, class="form-control landing-input rounded") }}
+            {% for error in reg_form.password.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        {{ reg_form.submit(class="btn btn-primary mt-3 capture-pointer landing-button") }}
+    </form>
+</div>
+{% endif %}

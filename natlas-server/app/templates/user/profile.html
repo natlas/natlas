@@ -78,7 +78,7 @@
                         <td class="text-monospace">{{ agent.agentid }}</td>
                         <td>{{ agent.friendly_name }}</td>
                         <td id="agenttoken-{{loop.index}}" class="text-monospace">
-                            <div id="showtokenwrapper-{{loop.index}}"><a id="showtoken-{{loop.index}}" class="showtoken" style="cursor:pointer;">Show API Key</a>{% if loop.index == 1%}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}</div>
+                            <div id="showtokenwrapper-{{loop.index}}"><a id="showtoken-{{loop.index}}" class="showtoken" style="cursor:pointer;">Show API Key</a></div>
                             <div class="tokenval" id="tokenval-{{loop.index}}" style="display:none;">{{ agent.token }}</div>
                         </td>
                         <td style="text-align:center;">

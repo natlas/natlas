@@ -1,0 +1,140 @@
+/*
+ * Row container
+ */
+
+.host-row {
+    border-radius: 15px;
+    margin-bottom: 0.33em;
+    margin-top: 0.33em;
+}
+
+.host-row:nth-child(odd) {
+    background-color: var(--content-bg);
+}
+
+.host-row:nth-child(even) {
+    background-color: var(--content-bg-alt);
+}
+
+/*
+ * Legacy
+ */
+
+.host-headshot {
+    max-width: 100%;
+}
+
+.headshot-header {
+    border-bottom: 1px solid #cfcfcf;
+}
+
+.nmap_data {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    font-size: 75%;
+}
+
+.preview_nmap {
+    background-color: rgba(0, 0, 0, 0.75);
+    color: $white;
+    line-height: 2em;
+    margin-top: -1em;
+    text-align: center;
+}
+
+.preview_nmap:hover {
+    background-color: rgba(0, 0, 0, 1);
+}
+
+a.preview_link,
+a:hover.preview_link {
+    color: $white;
+    display: block;
+}
+
+/*
+ * Row contents
+ */
+
+.script-id {
+    font-size: 0.9rem;
+}
+
+.script-output {
+    font-size: 0.75rem;
+}
+
+.port-row {
+    border-bottom: 1px solid #d6d6d6;
+}
+
+.port-summary {
+    text-align: center;
+}
+
+.port-number {
+    background-color: #36978d;
+    border-top-left-radius: 10px;
+    color: $white;
+    float: left;
+    width: 50%;
+}
+
+.port-protocol {
+    background-color: #62a9e3;
+    border-top-right-radius: 10px;
+    color: $white;
+    float: left;
+    width: 50%;
+}
+
+.port-service {
+    background-color: #2b2d33;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    color: $white;
+}
+
+.port-link {
+    background-color: #79d65e;
+    border-radius: 10px;
+    margin-top: 0.75rem;
+
+    a {
+        color: $white;
+    }
+}
+
+.service-header {
+    border-bottom: 1px dotted #e3e3e3;
+}
+
+.service-version {
+    font-size: 0.95rem;
+}
+
+.service-extrainfo {
+    font-size: 0.7rem;
+}
+
+.date-submitted {
+    font-size: 0.75rem;
+}
+
+.port-str {
+    font-size: 0.85rem;
+}
+
+.host-hostname {
+    font-size: 0.85rem;
+}
+
+.host-export {
+    button {
+        font-size: 0.85rem;
+    }
+}
+
+.export-group {
+    display: block;
+}

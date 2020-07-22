@@ -1,0 +1,76 @@
+$green: #008000;
+$red: #f00;
+$white: #fff;
+$dark-content-bg-alpha: rgba(60, 60, 60, 0.75);
+$dark-content-bg-alt: #3c3c3c;
+$dark-content-bg: #191919;
+$light-content-bg-alpha: rgba(225, 225, 225, 0.75);
+$light-content-bg-alt: #ececec;
+$light-content-bg: #f9f9f9;
+$natlas-blue: #0b59bd;
+$natlas-pink: #ed1e79;
+$natlas-purple: #620ee1;
+$natlas-soft-blue: #0064b7;
+$off-black-lighter: #222;
+$off-black-lightest: #333;
+$off-black: #111;
+$off-white-darker: #e1e1e1;
+$off-white-darkest: #d1d1d1;
+$off-white: #f1f1f1;
+$muted: #6c757d;
+
+@mixin light-mode {
+    :root {
+        #{--page-bg}: $off-white;
+        #{--content-bg}: $light-content-bg;
+        #{--content-bg-alt}: $light-content-bg-alt;
+        #{--translucent-bg}: $light-content-bg-alpha;
+        #{--input-bg}: $off-white-darker;
+        #{--text-primary}: $off-black;
+        #{--text-secondary}: lighten($off-black, 20);
+    }
+}
+
+@mixin dark-mode {
+    :root {
+        #{--page-bg}: $off-black;
+        #{--content-bg}: $dark-content-bg;
+        #{--content-bg-alt}: $dark-content-bg-alt;
+        #{--translucent-bg}: $dark-content-bg-alpha;
+        #{--input-bg}: $off-black-lighter;
+        #{--text-primary}: $off-white;
+        #{--text-secondary}: darken($off-white, 20);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    @include light-mode;
+}
+
+@media (prefers-color-scheme: dark) {
+    @include dark-mode;
+}
+
+.natlas-pink {
+    color: $natlas-pink;
+}
+
+.natlas-purple {
+    color: $natlas-purple;
+}
+
+.natlas-blue {
+    color: $natlas-blue;
+}
+
+.natlas-soft-blue {
+    color: $natlas-soft-blue;
+}
+
+.green {
+    color: $green;
+}
+
+.red {
+    color: $red;
+}
