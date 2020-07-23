@@ -117,10 +117,10 @@ button.check-update {
 
 .showtoken {
     color: var(--text-primary);
-}
 
-.showtoken:hover {
-    color: var(--text-secondary) !important;
+    &:hover {
+        color: var(--text-secondary) !important;
+    }
 }
 
 .table {
@@ -145,11 +145,19 @@ button.check-update {
 
     .dropdown-item {
         color: var(--text-primary);
-    }
 
-    .dropdown-item:hover {
+        &:hover {
+            background-color: var(--content-bg);
+            color: var(--text-secondary);
+        }
+    }
+}
+
+.dropdown-btn {
+    color: var(--text-primary);
+
+    &:hover {
         background-color: var(--content-bg);
-        color: var(--text-secondary);
     }
 }
 

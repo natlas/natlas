@@ -300,7 +300,7 @@ def untag_scope(scopetype, id):
         return abort(404)
     delTagForm = forms.TagScopeForm()
     scope = ScopeItem.query.get(id)
-    delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags.all()]
+    delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags]
     if delTagForm.validate_on_submit():
         mytag = Tag.query.filter_by(name=delTagForm.tagname.data).first()
         scope.delTag(mytag)
