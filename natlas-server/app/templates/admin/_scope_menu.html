@@ -1,17 +1,17 @@
 <div class="btn-group dropright">
     <button class="btn btn-lg dropdown-toggle dropdown-no-arrow" type="button" id="adminMenu-{{item.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <i class="fas fa-ellipsis-v"></i>
+      <i class="fas fa-ellipsis-v natlas-pink"></i>
     </button>
     <div class="dropdown-menu" aria-labelledby="adminMenu-{{item.id}}">
-      <form method="POST" action="{{ url_for('admin.delete_scope', scopetype=active_page, id=item.id) }}">{{ delForm.hidden_tag() }} <button class="btn inline-submit" id="deleteScopeItem-{{item.id}}" name="deleteScopeItem" title="Delete Scope Item" onclick="return confirm('Are you sure you want to remove {{ item.target }} from scope?')" type="submit" ><i class="fas fa-trash-alt text-danger mr-1"></i>Delete</button></form>
+      <form method="POST" action="{{ url_for('admin.delete_scope', scopetype=active_page, id=item.id) }}">{{ delForm.hidden_tag() }} <button class="btn inline-submit dropdown-btn" id="deleteScopeItem-{{item.id}}" name="deleteScopeItem" title="Delete Scope Item" onclick="return confirm('Are you sure you want to remove {{ item.target }} from scope?')" type="submit" ><i class="fas fa-trash-alt text-danger mr-1"></i>Delete</button></form>
       {% if active_page == "scope" %}
-      <form method="POST" action="{{ url_for('admin.toggle_scope', scopetype=active_page, id=item.id) }}">{{ editForm.hidden_tag() }}<button class="btn inline-submit" id="toggleScopeItem-{{item.id}}" name="toggleScopeItem" title="Disable Scope Item" onclick="return confirm('Are you sure you want to disable scanning of {{ item.target }}?')" type="submit" ><i class="fas fa-ban text-danger mr-1"></i>Disable</button></form>
+      <form method="POST" action="{{ url_for('admin.toggle_scope', scopetype=active_page, id=item.id) }}">{{ editForm.hidden_tag() }}<button class="btn inline-submit dropdown-btn" id="toggleScopeItem-{{item.id}}" name="toggleScopeItem" title="Disable Scope Item" onclick="return confirm('Are you sure you want to disable scanning of {{ item.target }}?')" type="submit" ><i class="fas fa-ban text-danger mr-1"></i>Disable</button></form>
       {% else %}
-      <form method="POST" action="{{ url_for('admin.toggle_scope', scopetype=active_page, id=item.id) }}">{{ editForm.hidden_tag() }}<button class="btn inline-submit" id="toggleScopeItem-{{item.id}}" name="toggleScopeItem" title="Enable Scope Item" onclick="return confirm('Are you sure you want to enable scanning of {{ item.target }}?')" type="submit" ><i class="fas fa-check-circle text-success mr-1"></i>Enable</button></form>
+      <form method="POST" action="{{ url_for('admin.toggle_scope', scopetype=active_page, id=item.id) }}">{{ editForm.hidden_tag() }}<button class="btn inline-submit dropdown-btn" id="toggleScopeItem-{{item.id}}" name="toggleScopeItem" title="Enable Scope Item" onclick="return confirm('Are you sure you want to enable scanning of {{ item.target }}?')" type="submit" ><i class="fas fa-check-circle text-success mr-1"></i>Enable</button></form>
       {% endif %}
-      <button class="btn" id="addTagItem-{{item.id}}" name="addtag" title="Add Tag to Scope" data-toggle="modal" data-target="#tagmodal" data-scopeid="{{item.id}}" data-scopetarget="{{item.target}}" data-action="add"><i class="fas fa-tags"></i>Tag</button>
-      {% if item.tags.all() | length > 0 %}
-      <button class="btn" id="delTagItem-{{item.id}}" name="addtag" title="Remove tag from Scope" data-toggle="modal" data-target="#tagmodal" data-scopeid="{{item.id}}" data-scopetarget="{{item.target}}" data-action="remove"><i class="fas fa-tag"></i>Untag</button>
+      <button class="btn dropdown-btn" id="addTagItem-{{item.id}}" name="addtag" title="Add Tag to Scope" data-toggle="modal" data-target="#tagmodal" data-scopeid="{{item.id}}" data-scopetarget="{{item.target}}" data-action="add"><i class="fas fa-tags"></i>Tag</button>
+      {% if item.tags | length > 0 %}
+      <button class="btn dropdown-btn" id="delTagItem-{{item.id}}" name="addtag" title="Remove tag from Scope" data-toggle="modal" data-target="#tagmodal" data-scopeid="{{item.id}}" data-scopetarget="{{item.target}}" data-action="remove"><i class="fas fa-tag"></i>Untag</button>
       {% endif %}
     </div>
 </div>

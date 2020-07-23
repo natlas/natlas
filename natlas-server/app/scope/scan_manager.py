@@ -1,4 +1,4 @@
-from netaddr import IPSet, IPNetwork
+from netaddr import IPSet
 from cyclicprng import CyclicPRNG
 from app import db
 from app.models import ScopeLog
@@ -10,16 +10,16 @@ class IPScanManager:
     rng = None
     consistent = None
 
-    def __init__(self, whitelist, blacklist, consistent: bool):
+    def __init__(self, whitelist: IPSet, blacklist: IPSet, consistent: bool):
         self.networks = []
         self.total = 0
         self.rng = None
         self.consistent = consistent
-        self.set_whitelist(whitelist)
-        self.set_blacklist(blacklist)
+        self.whitelist = whitelist
+        self.blacklist = blacklist
         self.initialize_manager()
 
-    def log_to_db(self, message):
+    def log_to_db(self, message: str):
         log_messages = {
             "init": "PRNG Starting Up",
             "restart": "PRNG Cycle Restarted",
@@ -28,21 +28,6 @@ class IPScanManager:
         db_log = ScopeLog(log_messages.get(message, "default"))
         db.session.add(db_log)
         db.session.commit()
-
-    def set_whitelist(self, whitelist):
-        self.whitelist = IPSet([])
-        for block in whitelist:
-            self.whitelist.add(IPNetwork(block))
-            # Remove invalid broadcast and network addresses
-            if block.broadcast is not None:
-                self.whitelist.remove(IPNetwork(block.broadcast))
-            if block.size > 2:
-                self.whitelist.remove(IPNetwork(block.network))
-
-    def set_blacklist(self, blacklist):
-        self.blacklist = IPSet([])
-        for block in blacklist:
-            self.blacklist.add(IPNetwork(block))
 
     def initialize_manager(self):
         self.networks = []
@@ -74,12 +59,6 @@ class IPScanManager:
             start += self.networks[i]["size"]
 
         self.initialized = True
-
-    def in_whitelist(self, ip):
-        return ip in self.whitelist
-
-    def in_blacklist(self, ip):
-        return ip in self.blacklist
 
     def get_total(self):
         return self.total

@@ -1,15 +1,15 @@
 from flask import current_app
-from ipaddress import ip_network
+from netaddr import IPNetwork
 import secrets
 from app.models import ScopeItem
 
 
 def get_target_tags(target):
-    targetnet = ip_network(target)
+    targetnet = IPNetwork(target)
     tags = []
     for scope in current_app.ScopeManager.get_scope():
-        if scope.overlaps(targetnet):
-            scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags.all()
+        if targetnet in scope:
+            scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags
             for tag in scopetags:
                 tags.append(tag.name)
     return list(

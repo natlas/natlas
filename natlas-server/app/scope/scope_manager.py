@@ -1,21 +1,8 @@
-import ipaddress
 from netaddr import IPNetwork, IPAddress, IPSet
 from netaddr.core import AddrFormatError
-from .ipscanmanager import IPScanManager
+from .scan_manager import IPScanManager
 from datetime import datetime
-import os
 from flask import current_app
-
-LOGFILE = "logs/scopemanager.log"
-
-
-def log(message: str, printm: bool = False):
-    if not os.path.isdir("logs"):
-        os.makedirs("logs", exist_ok=True)
-    with open(LOGFILE, "a") as f:
-        f.write(f"{str(datetime.utcnow())} - {message}\n")
-    if printm:
-        print(f"{str(datetime.utcnow())} - {message}\n")
 
 
 class ScopeManager:
@@ -80,47 +67,32 @@ class ScopeManager:
     def update_scope(self):
         from app.models import ScopeItem
 
-        newScope = []
-        newScopeSet = IPSet()
-        for item in ScopeItem.getScope():
-            newItem = ipaddress.ip_network(item.target, False)
-            newSetItem = IPNetwork(item.target, False)
-            newScope.append(newItem)
-            newScopeSet.add(newSetItem)
-        self.scope = newScope
-        self.scope_set = newScopeSet
+        self.scope = [IPNetwork(item.target, False) for item in ScopeItem.getScope()]
+        self.scope_set = IPSet(self.scope)
         self.scopeSize = len(self.scope_set)
 
     def update_blacklist(self):
         from app.models import ScopeItem
 
-        newBlacklist = []
-        newBlacklistSet = IPSet()
-        for item in ScopeItem.getBlacklist():
-            newItem = ipaddress.ip_network(item.target, False)
-            newSetItem = IPNetwork(item.target, False)
-            newBlacklist.append(newItem)
-            newBlacklistSet.add(newSetItem)
-        self.blacklist = newBlacklist
-        self.blacklist_set = newBlacklistSet
+        self.blacklist = [
+            IPNetwork(item.target, False) for item in ScopeItem.getBlacklist()
+        ]
+        self.blacklist_set = IPSet(self.blacklist)
         self.blacklistSize = len(self.blacklist_set)
 
     def update_scan_manager(self):
-        from app.models import ScopeItem
 
         self.scanmanager = None
         try:
-            scanrange = [IPNetwork(n.target) for n in ScopeItem.getScope()]
-            blacklistrange = [IPNetwork(n.target) for n in ScopeItem.getBlacklist()]
             self.scanmanager = IPScanManager(
-                scanrange, blacklistrange, current_app.config["CONSISTENT_SCAN_CYCLE"]
+                self.scope_set,
+                self.blacklist_set,
+                current_app.config["CONSISTENT_SCAN_CYCLE"],
             )
         except Exception as e:
             if self.scanmanager is None or self.scanmanager.get_total() == 0:
-                log(
-                    "Scan manager could not be instantiated because there was no scope configured.",
-                    printm=True,
-                )
+                errmsg = "Scan manager could not be instantiated because there was no scope configured."
+                current_app.logger.warn(f"{str(datetime.utcnow())} - {errmsg}\n")
             else:
                 raise e
 
@@ -131,12 +103,11 @@ class ScopeManager:
         self.update_scope()
         self.update_blacklist()
         self.update_scan_manager()
-        log("ScopeManager Updated")
+        current_app.logger.info(f"{str(datetime.utcnow())} - ScopeManager Updated\n")
 
     def is_acceptable_target(self, target: str):
         # Ensure it's a valid IPv4Address
         try:
-            # TODO this eventually needs to be upgraded to support IPv6
             IPAddress(target)
         except AddrFormatError:
             return False
@@ -145,14 +116,7 @@ class ScopeManager:
         if self.get_scope_size() == 0:
             self.update()
 
-        # There is no scan manager
-        if self.scanmanager is None:
-            return False
-
-        # Address doesn't fall in scope ranges or address falls in blacklist ranges
-        if not self.scanmanager.in_whitelist(target) or self.scanmanager.in_blacklist(
-            target
-        ):
+        if target in self.blacklist_set or target not in self.scope_set:
             return False
 
         # Address is in scope and not blacklisted

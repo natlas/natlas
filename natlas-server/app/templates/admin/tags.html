@@ -34,7 +34,7 @@
           <tr>
             <th scope="row">{{ tag.id }}</th>
             <td><a href="{{ url_for('main.search', query="tags:" + tag.name)}}">{{ tag.name }}</a></td>
-            <td>{% for i in tag.scope.all()%}{{ i.target }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+            <td>{% for i in tag.scope %}{{ i.target }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
           </tr>
           {% endfor %}
         </tbody>
