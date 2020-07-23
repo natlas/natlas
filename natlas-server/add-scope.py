@@ -16,7 +16,7 @@ def print_imports(msg, importList):
 def import_scope(file, blacklist, verbose):
     with open(file, "r") as scope:
         addresses = scope.readlines()
-    fail, exist, success = ScopeItem.import_scope(addresses, blacklist)
+    fail, exist, success = ScopeItem.import_scope_list(addresses, blacklist)
     db.session.commit()
 
     summaryMessages = [
