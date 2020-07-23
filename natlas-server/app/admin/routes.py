@@ -199,7 +199,9 @@ def import_scope(scopetype=""):
         return abort(404)
     if importForm.validate_on_submit():
         newScopeItems = importForm.scope.data.split("\n")
-        fail, exist, success = ScopeItem.import_scope(newScopeItems, importBlacklist)
+        fail, exist, success = ScopeItem.import_scope_list(
+            newScopeItems, importBlacklist
+        )
         db.session.commit()
         current_app.ScopeManager.update()
         if success:
