@@ -1,6 +1,10 @@
-export function particlesConfig(active: boolean): object {
+import { IOptions } from 'tsparticles/dist/Options/Interfaces/IOptions';
+import { RecursivePartial } from 'tsparticles/dist/Types/RecursivePartial';
+
+export function particlesConfig(active: boolean): RecursivePartial<IOptions> {
 
     return {
+        'fpsLimit': 60,
         'particles': {
             'number': {
                 'value': 100,
@@ -85,8 +89,7 @@ export function particlesConfig(active: boolean): object {
                     'distance': 400,
                     'size': 40,
                     'duration': 2,
-                    'opacity': 8,
-                    'speed': 3
+                    'opacity': 8
                 },
                 'repulse': {
                     'distance': 100,

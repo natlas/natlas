@@ -19,3 +19,4 @@ natlas-server/logs
 natlas-agent/logs
 tmp
 natlas-server/node_modules
+.DS_Store
