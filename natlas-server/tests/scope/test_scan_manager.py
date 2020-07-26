@@ -10,7 +10,7 @@ def test_new_scan_manager(app):
     assert mgr.get_ready()
 
 
-def test_next_ip(app):
+def test_scan_cycle_complete_coverage(app):
     scope = IPSet(["10.0.0.0/24"])
     blacklist = IPSet()
     mgr = IPScanManager(scope, blacklist, False)

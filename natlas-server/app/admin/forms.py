@@ -53,15 +53,13 @@ class NewScopeForm(FlaskForm):
     submit = SubmitField("Add Target")
 
     def validate_target(self, target):
-        if "/" not in target.data:
-            target.data = target.data + "/32"
         try:
             isValid = ipaddress.ip_network(target.data, False)
             item = ScopeItem.query.filter_by(target=isValid.with_prefixlen).first()
             if item is not None:
                 raise ValidationError(f"Target {item.target} already exists!")
-        except ipaddress.AddressValueError:
-            raise ValidationError(f"Target {target.data} couldn't be validated")
+        except ipaddress.AddressValueError as e:
+            raise ValidationError(e)
 
 
 class ImportScopeForm(FlaskForm):

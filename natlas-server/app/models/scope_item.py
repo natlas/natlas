@@ -62,8 +62,6 @@ class ScopeItem(db.Model, DictSerializable):
             ip = line
             tags = []
 
-        if "/" not in ip:
-            ip = ip + "/32"
         ip = ScopeItem.validate_ip(ip)
         return ip, tags
 
