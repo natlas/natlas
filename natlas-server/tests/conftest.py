@@ -1,4 +1,4 @@
-from app import create_app, db, ScopeManager
+from app import create_app, db
 
 from tests.config import TestConfig
 
@@ -11,5 +11,4 @@ def app():
     app_context = app.app_context()
     app_context.push()
     db.create_all()
-    ScopeManager.update()
     return app

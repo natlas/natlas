@@ -1,17 +1,16 @@
 from netaddr import IPNetwork, IPSet
 
 
-class ScopeGroup:
+class ScopeCollection:
     list = []
     set = IPSet()
     size = 0
 
-    def __init__(self, name: str, scope_source: callable):
+    def __init__(self, scope_source: callable):
         """
             name: A name for this collection of scopes
             scope_source: A callable that returns a collection of ScopeItem
         """
-        self.name = name
         self.scope_source = scope_source
 
     def update(self):
