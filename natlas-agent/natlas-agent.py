@@ -26,15 +26,15 @@ netsrv = NatlasNetworkServices(config)
 
 
 def add_targets_to_queue(target, q):
-    targetNetwork = ipaddress.ip_interface(target.strip())
-    if targetNetwork.with_prefixlen.endswith("/32"):
-        target_data = netsrv.get_work(target=str(targetNetwork.ip))
+    targetNetwork = ipaddress.ip_network(target.strip())
+    if targetNetwork.num_addresses == 1:
+        target_data = netsrv.get_work(target=str(targetNetwork.network_address))
         if not target_data:
             return
         q.put(target_data)
     else:
         # Iterate over usable hosts in target, queue.put will block until a queue slot is available
-        for t in targetNetwork.network.hosts():
+        for t in targetNetwork.hosts():
             target_data = netsrv.get_work(target=str(t))
             if not target_data:
                 continue
@@ -55,13 +55,13 @@ def main():
     mutually_exclusive.add_argument(
         "--target",
         metavar="IPADDR",
-        help="An IPv4 address or CIDR range to scan. e.g. 192.168.0.1, 192.168.0.1/24",
+        help="An IP address or CIDR range to scan. e.g. 192.168.0.1, 192.168.0.1/24, 2001:db8:dead:dade:fade:cafe:babe:beef/128",
         dest="target",
     )
     mutually_exclusive.add_argument(
         "--target-file",
         metavar="FILENAME",
-        help="A file of line separated target IPv4 addresses or CIDR ranges",
+        help="A file of line separated target IP addresses or CIDR ranges",
         dest="tfile",
     )
     args = parser.parse_args()

@@ -38,7 +38,7 @@ class ScopeManager:
         return self.blacklist
 
     def get_effective_scope_size(self):
-        return len(self.scope_set - self.blacklist_set)
+        return (self.scope_set - self.blacklist_set).size
 
     def get_pending_rescans(self):
         return self.pendingRescans
@@ -69,7 +69,7 @@ class ScopeManager:
 
         self.scope = [IPNetwork(item.target, False) for item in ScopeItem.getScope()]
         self.scope_set = IPSet(self.scope)
-        self.scopeSize = len(self.scope_set)
+        self.scopeSize = self.scope_set.size
 
     def update_blacklist(self):
         from app.models import ScopeItem
@@ -78,7 +78,7 @@ class ScopeManager:
             IPNetwork(item.target, False) for item in ScopeItem.getBlacklist()
         ]
         self.blacklist_set = IPSet(self.blacklist)
-        self.blacklistSize = len(self.blacklist_set)
+        self.blacklistSize = self.blacklist_set.size
 
     def update_scan_manager(self):
 
@@ -106,7 +106,6 @@ class ScopeManager:
         current_app.logger.info(f"{str(datetime.utcnow())} - ScopeManager Updated\n")
 
     def is_acceptable_target(self, target: str):
-        # Ensure it's a valid IPv4Address
         try:
             IPAddress(target)
         except AddrFormatError:

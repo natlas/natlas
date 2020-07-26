@@ -2,6 +2,7 @@ import subprocess
 import threading
 import shutil
 import os
+import ipaddress
 
 from libnmap.parser import NmapParser, NmapParserException
 from sentry_sdk import capture_exception
@@ -38,7 +39,8 @@ def command_builder(scan_id, agentConfig, target):
     for k, v in agentConfig.items():
         if agentConfig[k] and k in commandDict:
             command.append(commandDict[k].format(**agentConfig))
-
+    if ipaddress.ip_network(target).version == 6:
+        command.append("-6")
     command.append(target)
     return command
 
