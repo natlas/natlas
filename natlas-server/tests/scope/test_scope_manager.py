@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from flask import current_app
-from netaddr import IPSet
 
 from app.scope import ScopeManager
 from app import db
@@ -12,10 +11,8 @@ network_lengths = {"/0": 4294967296, "/8": 16777216, "/16": 65536, "/24": 256, "
 
 def test_new_scopemanager(app):
     sm = ScopeManager()
-    assert sm.scope == []
-    assert sm.blacklist == []
-    assert sm.scope_set == IPSet()
-    assert sm.blacklist_set == IPSet()
+    assert sm.get_scope() == []
+    assert sm.get_blacklist() == []
     assert sm.scanmanager is None
     assert datetime.utcnow() > sm.init_time
 
