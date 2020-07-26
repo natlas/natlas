@@ -129,8 +129,6 @@ def scope():
     addTagForm = forms.TagScopeForm()
     addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
     if newForm.validate_on_submit():
-        if "/" not in newForm.target.data:
-            newForm.target.data = newForm.target.data + "/32"
         target = ipaddress.ip_network(newForm.target.data, False)
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=False)
         db.session.add(newTarget)
@@ -164,8 +162,6 @@ def blacklist():
     addTagForm = forms.TagScopeForm()
     addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
     if newForm.validate_on_submit():
-        if "/" not in newForm.target.data:
-            newForm.target.data = newForm.target.data + "/32"
         target = ipaddress.ip_network(newForm.target.data, False)
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=True)
         db.session.add(newTarget)
