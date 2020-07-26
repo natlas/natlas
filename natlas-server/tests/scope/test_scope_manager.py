@@ -11,6 +11,7 @@ network_lengths = {"/0": 4294967296, "/8": 16777216, "/16": 65536, "/24": 256, "
 
 def test_new_scopemanager(app):
     sm = ScopeManager()
+    sm.init_app(app)
     assert sm.get_scope() == []
     assert sm.get_blacklist() == []
     assert sm.scanmanager is None

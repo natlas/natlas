@@ -1,4 +1,4 @@
-from app import create_app, db
+from app import create_app, db, ScopeManager
 from app.models import (
     User,
     ScopeItem,
@@ -21,6 +21,8 @@ config = Config()
 initialize_sentryio(config)
 try:
     app = create_app(config_class=config, load_config=True)
+    with app.app_context():
+        ScopeManager.update()
 except Exception as e:
     capture_exception(e)
     raise e

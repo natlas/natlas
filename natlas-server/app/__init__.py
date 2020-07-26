@@ -11,6 +11,7 @@ from webpack_manifest import webpack_manifest
 import config
 from app.elastic import ElasticInterface
 from .instrumentation import initialize_opencensus
+from app.scope import ScopeManager
 
 
 class AnonUser(AnonymousUserMixin):
@@ -28,6 +29,7 @@ mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
 csrf = CSRFProtect()
+ScopeManager = ScopeManager()
 
 
 @login.unauthorized_handler
@@ -127,6 +129,7 @@ def create_app(config_class=config.Config, load_config=False):
     login.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
+    ScopeManager.init_app(app)
     app.config["webpack"] = webpack_manifest.load(
         # An absolute path to a manifest file
         path=os.path.join(
@@ -141,10 +144,6 @@ def create_app(config_class=config.Config, load_config=False):
         load_natlas_services(app)
         load_agent_config(app)
         load_agent_scripts(app)
-
-    from app.scope import ScopeManager
-
-    app.ScopeManager = ScopeManager()
 
     from app.errors import bp as errors_bp
 
