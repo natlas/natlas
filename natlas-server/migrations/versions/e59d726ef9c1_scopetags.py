@@ -21,7 +21,7 @@ def upgrade():
     op.create_table(
         "tag",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(), nullable=False),
+        sa.Column("name", sa.String(length=128), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_tag_name"), "tag", ["name"], unique=True)

@@ -22,10 +22,10 @@ def upgrade():
         "agent",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("agentid", sa.String(length=16), nullable=False),
+        sa.Column("agentid", sa.String(length=128), nullable=False),
         sa.Column("date_created", sa.DateTime(), nullable=False),
-        sa.Column("token", sa.String(length=32), nullable=True),
-        sa.Column("friendly_name", sa.String(length=32), nullable=True),
+        sa.Column("token", sa.String(length=128), nullable=True),
+        sa.Column("friendly_name", sa.String(length=128), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"]),
         sa.PrimaryKeyConstraint("id"),
     )

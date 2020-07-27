@@ -31,6 +31,7 @@ sympy = "~=1.6"
 webpack-manifest = "~=2.1.1"
 natlas-libnmap = "*"
 cyclicprng = "*"
+mysqlclient = "*"
 
 [requires]
 python_version = "3.8"

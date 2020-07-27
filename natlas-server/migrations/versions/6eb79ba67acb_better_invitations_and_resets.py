@@ -21,8 +21,8 @@ def upgrade():
     op.create_table(
         "user_invitation",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("email", sa.String(length=128), nullable=True),
-        sa.Column("token", sa.String(length=32), nullable=False),
+        sa.Column("email", sa.String(length=320), nullable=True),
+        sa.Column("token", sa.String(length=256), nullable=False),
         sa.Column("creation_date", sa.DateTime(), nullable=True),
         sa.Column("expiration_date", sa.DateTime(), nullable=False),
         sa.Column("accepted_date", sa.DateTime(), nullable=True),

@@ -21,7 +21,7 @@ def upgrade():
     op.create_table(
         "scope_item",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("target", sa.String(), nullable=True),
+        sa.Column("target", sa.String(length=128), nullable=True),
         sa.Column("blacklist", sa.Boolean(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("target"),
