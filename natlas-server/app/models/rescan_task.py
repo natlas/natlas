@@ -12,12 +12,12 @@ class RescanTask(db.Model, DictSerializable):
         db.DateTime, index=True, default=datetime.utcnow, nullable=False
     )
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    target = db.Column(db.String, index=True, nullable=False)
+    target = db.Column(db.String(128), index=True, nullable=False)
     dispatched = db.Column(db.Boolean, default=False, index=True)
     date_dispatched = db.Column(db.DateTime, index=True)
     complete = db.Column(db.Boolean, default=False, index=True)
     date_completed = db.Column(db.DateTime, index=True)
-    scan_id = db.Column(db.String, index=True, unique=True)
+    scan_id = db.Column(db.String(256), index=True, unique=True)
 
     def dispatchTask(self):
         self.dispatched = True

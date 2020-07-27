@@ -13,7 +13,7 @@ scopetags = db.Table(
 
 class ScopeItem(db.Model, DictSerializable):
     id = db.Column(db.Integer, primary_key=True)
-    target = db.Column(db.String, index=True, unique=True)
+    target = db.Column(db.String(128), index=True, unique=True)
     blacklist = db.Column(db.Boolean, index=True)
     tags = db.relationship(
         "Tag",

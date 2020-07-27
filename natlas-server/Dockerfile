@@ -22,19 +22,19 @@ COPY . /opt/natlas/natlas-server
 COPY --from=webpack /app/app/static/dist app/static/dist
 
 RUN python3 -m compileall .
-RUN mkdir logs \
-  && chown www-data logs
 
 # Build final image
 FROM python:3.8-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libmariadb3 \
+    && rm -rf /var/cache/* /root /var/lib/apt/info/* /var/lib/apt/lists/* /var/lib/ghc /var/lib/dpkg /var/lib/log/*
 
 COPY --from=build /.venv /.venv
 COPY --from=build /opt/natlas /opt/natlas
 
 WORKDIR /opt/natlas/natlas-server/
 VOLUME ["/data"]
-ENV SQLALCHEMY_DATABASE_URI="sqlite:////data/db/metadata.db"
-ENV MEDIA_DIRECTORY="/data/media/"
 ENV FLASK_APP=./natlas-server.py
 ENV FLASK_ENV=production
 ENV LC_ALL=C.UTF-8

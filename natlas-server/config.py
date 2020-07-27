@@ -32,6 +32,8 @@ class Config(object):
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     load_dotenv(os.path.join(BASEDIR, ".env"))
 
+    DATA_DIR = os.environ.get("DATA_DIR", "/data")
+
     # Leaving this empty will work fine for requests but scripts won't be able to generate links
     # Examples: localhost:5000, natlas.io
     SERVER_NAME = os.environ.get("SERVER_NAME", None)
@@ -45,7 +47,8 @@ class Config(object):
 
     # This isn't in the database because this is where we find the database.
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "SQLALCHEMY_DATABASE_URI", "sqlite:///" + os.path.join(BASEDIR, "metadata.db")
+        "SQLALCHEMY_DATABASE_URI",
+        "sqlite:///" + os.path.join(DATA_DIR, "db", "metadata.db"),
     )
 
     # This isn't in the database because we'll never want to change it
@@ -53,7 +56,9 @@ class Config(object):
 
     # This isn't in the database because it really shouldn't be changing on-the-fly
     # Also make sure that you're using an absolute path if you're serving your app directly via flask
-    MEDIA_DIRECTORY = os.environ.get("MEDIA_DIRECTORY", os.path.join(BASEDIR, "media/"))
+    MEDIA_DIRECTORY = os.environ.get(
+        "MEDIA_DIRECTORY", os.path.join(DATA_DIR, "media/")
+    )
 
     # Elasticsearch only gets loaded from environment
     ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200")

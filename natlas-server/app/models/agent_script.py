@@ -9,7 +9,7 @@ from app.models.dict_serializable import DictSerializable
 # https://nmap.org/book/nse-usage.html#nse-categories
 class AgentScript(db.Model, DictSerializable):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, index=True, unique=True)
+    name = db.Column(db.String(128), index=True, unique=True)
 
     @staticmethod
     def getScriptsString(scriptList=None):

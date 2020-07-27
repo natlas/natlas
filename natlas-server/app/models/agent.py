@@ -13,12 +13,12 @@ class Agent(db.Model, DictSerializable):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     # agent identification string for storing in reports
-    agentid = db.Column(db.String(16), index=True, unique=True, nullable=False)
+    agentid = db.Column(db.String(128), index=True, unique=True, nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     # auth token
-    token = db.Column(db.String(32), index=True, unique=True)
+    token = db.Column(db.String(128), index=True, unique=True)
     # optional friendly name for viewing on user page
-    friendly_name = db.Column(db.String(32), default="")
+    friendly_name = db.Column(db.String(128), default="")
 
     def verify_secret(self, secret):
         return secrets.compare_digest(secret, self.token)
