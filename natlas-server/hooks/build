@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set +e
+set +x
+
+NATLAS_VERSION=${DOCKER_TAG:?Specify DOCKER_TAG}
+
+if [ "$DOCKER_TAG" == "latest" ]
+then
+  NATLAS_VERSION=$SOURCE_COMMIT
+fi
+
+exec docker build -t "$IMAGE_NAME" --build-arg "NATLAS_VERSION=$NATLAS_VERSION" .
