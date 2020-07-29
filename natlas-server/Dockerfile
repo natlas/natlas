@@ -1,7 +1,9 @@
 FROM node:12-stretch as webpack
+ARG NATLAS_VERSION=unknown
 
 WORKDIR /app
 COPY ["package.json", "yarn.lock", "/app/"]
+ENV NATLAS_VERSION=$NATLAS_VERSION
 RUN yarn --no-progress --frozen-lockfile --non-interactive
 COPY . /app
 RUN yarn run webpack --mode production
