@@ -22,7 +22,7 @@
                 {% if screenshot.hash %}
                 <div class="col-xs-12 col-sm-3">
                     <strong class="mt-2">{{ screenshot.service }}</strong>
-                    <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
+                    <div class="expand-img"><img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|get_screenshot_path(screenshot.service)}}' src='/media/thumbs/{{screenshot.thumb_hash|get_screenshot_path(screenshot.service)}}' alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}"></div>
                 </div>
                 {% endif %}
                 {% if screenshot.path %}
