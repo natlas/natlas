@@ -15,39 +15,49 @@
 
 # Summary
 
-You've got a lot of maps and they are getting pretty unruly. What do you do? You put them in a book and call it an atlas. This is like that, except it's a website and it's a collection of nmaps. The Natlas server doubles as a task manager for the agents to get work, allowing you to control the scanning scope in one centralized place.
+You've got a lot of maps and they are getting pretty unruly. What do you do? You put them in a book and call it an atlas. This is like that, except it's a website and it's a collection of nmaps. Natlas' objective is to make it easy to perform continuous scanning and review collected data.
+
+The goal of Natlas is not to identify a bunch of vulnerabilities, necessarily, but rather to identify exposure. Perhaps you want to make sure that no one is running ssh with password auth enabled. Or perhaps you want to look for any exposed nfs, smb, or rsync shares. Maybe you want to look for expiring or expired ssl certificates, or weak ssl ciphers being used. Since Natlas uses the popular [nmap](https://nmap.org) port scanner, you can easily use any default nmap scripts in your scans.
 
 # Getting Started
 
-To get started with your own deployment of Natlas, you're going to need a minimum of one server and one agent. The quickest way to accomplish this is to run an agent on the same host as the server. Installation instructions for the server and the agent are linked below in their associated readmes.
+To get started with your own deployment of Natlas, you're going to need a minimum of one elasticsearch node, one Natlas server and one Natlas agent. The quickest way to accomplish this is to run all three of these containers on the same server. Installation instructions for the server and the agent are linked below in their associated readmes.
 
-As of June 15, 2020, natlas has moved to a docker-only deployment model. Instructions for downloading and running the docker containers can be found in the corresponding component README files linked below.
+The required deployment order is as follows:
 
-To get started with development, please see [Project Setup](CONTRIBUTING.md#project-setup).
+1) [Elasticsearch](#Elasticsearch)
+2) [Natlas Server](#Natlas-server)
+3) [Natlas Agent(s)](#Natlas-agent)
 
-## natlas-server
+**Note:** As of June 15, 2020, Natlas has moved to a docker-only deployment model.
 
-The natlas-server is where the data gets stored and the web interface exists so that you can search through the data.
+## Elasticsearch
 
-You can read more about setting up and running the server on the [natlas-server/README.md](natlas-server/README.md)
+Because the Natlas server requires a connection to Elasticsearch in order to launch correctly, you should make sure you have an Elasticsearch node available before continuing with the next step. If you've never used Elasticsearch before, follow [Elastic's instructions](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html) for setting up a single node cluster with docker. Make sure to pay attention to the section on persisting the elastic data.
 
-## natlas-agent
+## Natlas Server
 
-The natlas-agent is what fetches work from the server and actually performs the scans.
+The Natlas server controls agent orchestration, scan configuration, and provides search and browse for the data stored in Elastic.
 
-You can read more about setting up and running the agent on the [natlas-agent/README.md](natlas-agent/README.md)
+See the [Natlas Server README](natlas-server#installation-production) for instructions on installing the Natlas server.
+
+## Natlas Agent
+
+The Natlas agent is what fetches work from the server and actually performs the scans.
+
+See the [Natlas Agent README](natlas-agent#installation-production) for instructions on installing the Natlas agent.
 
 # Contributing
 
-Please review [CONTRIBUTING](CONTRIBUTING.md) for guidelines on how to contribute to natlas.
+Please review our [contribution guidelines](CONTRIBUTING.md) for information on how to contribute to Natlas. To get started with development, please see [Project Setup](CONTRIBUTING.md#project-setup).
 
 # Code Of Conduct
 
-This project strives to adhere to the code of conduct outlined in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Please review the code of conduct before contributing.
+This project strives to adhere to the code of conduct outlined in our [code of conduct](CODE_OF_CONDUCT.md). Please review the code of conduct before contributing.
 
 # Security
 
-Information about this project's security reporting guidelines as well as security related functionality are outlined in [SECURITY.md](SECURITY.md)
+Information about this project's security reporting guidelines as well as security related functionality are outlined in our [Security guidelines](SECURITY.md).
 
 # Acknowledgements
 
@@ -56,7 +66,7 @@ Information about this project's security reporting guidelines as well as securi
 * [Topher Timzen](https://github.com/tophertimzen) - Testing, feedback, automation support.
 * [Adam Jacques](https://github.com/ajacques) - Helping with Elasticsearch theory and just generally helping improve code quality
 * [Ross Snider](https://github.com/rosswsnider) - Writing Cyclic PRNG for target selection
-* [Everyone who has contributed.](https://github.com/natlas/natlas/graphs/contributors)
+* [Everyone who has contributed](https://github.com/natlas/natlas/graphs/contributors)
 
 # Disclaimer
 
