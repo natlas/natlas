@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, url_for, request
+from flask import Flask, flash, redirect, url_for, request, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
@@ -77,7 +77,7 @@ def load_natlas_services(app):
         current_services = NatlasServices(services=defaultServices)
         db.session.add(current_services)
         db.session.commit()
-        print("NatlasServices populated with defaults")
+        current_app.logger.info("NatlasServices populated with defaults")
     app.current_services = current_services.as_dict()
 
 
@@ -94,7 +94,7 @@ def load_agent_config(app):
         agentConfig = AgentConfig()  # populate an agent config with database defaults
         db.session.add(agentConfig)
         db.session.commit()
-        print("AgentConfig populated with defaults")
+        current_app.logger.info("AgentConfig populated with defaults")
     app.agentConfig = agentConfig.as_dict()
 
 
@@ -109,7 +109,7 @@ def load_agent_scripts(app):
         defaultAgentScript = AgentScript(name="default")
         db.session.add(defaultAgentScript)
         db.session.commit()
-        print("AgentScript populated with default")
+        current_app.logger.info("AgentScript populated with default")
         agentScripts = [defaultAgentScript]
     app.agentScripts = agentScripts
     app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
