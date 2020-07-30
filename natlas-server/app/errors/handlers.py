@@ -23,5 +23,10 @@ def internal_server_error(e):
 
 @bp.app_errorhandler(elasticsearch.ConnectionError)
 def elastic_unavailable(e):
+    """
+        This capture_exception happens here but not in others because
+        the others use Flask's exception handling already. Since we are handling
+        a specific exception class, we have to capture it explicitly.
+    """
     sentry_sdk.capture_exception(e)
     return render_template("errors/503.html"), 503
