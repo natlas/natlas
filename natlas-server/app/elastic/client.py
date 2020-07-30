@@ -31,7 +31,6 @@ class ElasticClient:
         finally:
             # Set the lastReconnectAttempt to the timestamp after initialization
             self.lastReconnectAttempt = datetime.utcnow()
-        return
 
     def _ping(self):
         """
@@ -48,6 +47,7 @@ class ElasticClient:
         delta = now - self.lastReconnectAttempt
         if delta.seconds >= 30:
             self.status = self._ping()
+            self.lastReconnectAttempt = now
 
         return self.status
 
@@ -56,7 +56,7 @@ class ElasticClient:
             If we're in a known bad state, try to reconnect
         """
         if not (self.status or self._attempt_reconnect()):
-            raise elasticsearch.ConnectionError
+            raise elasticsearch.ConnectionError("Could not connect to Elasticsearch")
         return self.status
 
     def initialize_index(self, index: str, mapping: dict):
@@ -162,7 +162,7 @@ class ElasticClient:
             return func(**kwargs)
         except elasticsearch.ConnectionError:
             self.status = False
-            raise elasticsearch.ConnectionError
+            raise
 
     # Tracing methods
     def _new_trace_span(self, operation: str, **kwargs):
