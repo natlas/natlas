@@ -173,10 +173,12 @@
               }
             },
             "notAfter": {
-              "type": "date"
+              "type": "date",
+              "ignore_malformed": true
             },
             "notBefore": {
-              "type": "date"
+              "type": "date",
+              "ignore_malformed": true
             },
             "pem": {
               "type": "text",
