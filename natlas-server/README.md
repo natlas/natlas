@@ -119,12 +119,12 @@ Web configs are loaded from the SQL database and changeable from the web interfa
 
 ## Setting the Scope
 
-The scope and blacklist can be set server side without using the admin interface by running the `flask scope` command from within the natlas container with the `--scope` and `--blacklist` arguments, respectively. These each take a file name to read scope from, which means you need to put them in a volume that is mounted in your container. You may run the command with one or both of them, however at least one is required.
+The scope and blacklist can be set server side without using the admin interface by running the `flask scope import` command from within the natlas container with the `--scope` and `--blacklist` arguments, respectively. If neither option is supplied, `--scope` is assumed.
 
-You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the scope. If you're importing a lot of items, it is recommended that you redirect the results to a file.
+You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the database. If you're importing a lot of items, it is recommended that you redirect the results to a file.
 
 ```bash
-docker exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask scope import --scope /data/bootstrap/myscopefile.txt --blacklist /data/bootstrap/myblacklistfile.txt --verbose > /data/bootstrap/import_results.json
+docker exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask scope import --verbose /data/bootstrap/myscopefile.txt > /data/bootstrap/import_results.json
 ```
 
 A scope is **REQUIRED** for agents to do any work, however a blacklist is optional.
@@ -149,7 +149,7 @@ If you have a mail server configured, you can specify the email address and the 
 
 ```bash
 $ docker exec -e SERVER_NAME=example.com -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask user new --email example@example.com --admin
-Sent example@example.com an invitation email via localhost
+Email sent to example@example.com via localhost
 ```
 
 ### Without Email
@@ -157,7 +157,7 @@ Sent example@example.com an invitation email via localhost
 Alternatively, you can create a new user invitation link that can be given to anyone.
 
 ```bash
-$ docker -e SERVER_NAME=example.com exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask user new --admin
+$ docker exec -e SERVER_NAME=example.com -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask user new --admin
 Accept invitation: http://example.com/auth/invite?token=this-is-an-invalid-example-token
 ```
 

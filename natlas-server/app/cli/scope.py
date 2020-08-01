@@ -10,11 +10,13 @@ from app.models import ScopeItem
 
 cli_group = AppGroup("scope")
 
-import_helptext = "A file containing line-separated IPs and CIDR ranges to be added to the {}. \
+import_helptext = "Import scope/blacklist from a file containing line-separated IPs and CIDR ranges. \
 Optionally, each line can contain a comma separated list of tags to apply to that target. e.g. 127.0.0.1,local,private,test"
 
 
 def import_scope(scope: typing.TextIO, blacklist: bool):
+    if not scope:
+        return {"failed": 0, "existed": 0, "successful": 0}
     addresses = scope.readlines()
     fail, exist, success = ScopeItem.import_scope_list(addresses, blacklist)
     db.session.commit()
@@ -32,36 +34,33 @@ def summarize_import_results(results: dict):
     }
 
 
-@cli_group.command("import")
-@click.option("--scope", type=click.File("r"), help=import_helptext.format("scope"))
+def print_import_output(results: dict, verbose: bool):
+    if verbose:
+        print(json.dumps(results, indent=2))
+    else:
+        print(json.dumps(results["summary"], indent=2))
+
+
+@cli_group.command("import", help=import_helptext)
+@click.argument("file", type=click.File("r"))
 @click.option(
-    "--blacklist", type=click.File("r"), help=import_helptext.format("blacklist")
+    "--scope/--blacklist",
+    default=True,
+    help="Should this file be considered in scope or blacklisted?",
 )
 @click.option(
     "--verbose/--summarize",
     default=False,
     help="Print status of all addresses / ranges instead of only the summary.",
 )
-def import_items(scope: str, blacklist: str, verbose: bool):
-    if not (scope or blacklist):
-        raise click.UsageError("--scope or --blacklist is required.")
-    results = {"summary": {}, "scope": {}, "blacklist": {}}
-    if scope:
-        results["scope"] = import_scope(scope, False)
-
-    if blacklist:
-        results["blacklist"] = import_scope(blacklist, True)
-
+def import_items(file: str, scope: bool, verbose: bool):
+    import_name = "scope" if scope else "blacklist"
+    results = {import_name: import_scope(file, scope)}
     results["summary"] = {
         "timestamp": datetime.utcnow().isoformat(),
-        "scope": summarize_import_results(results["scope"]),
-        "blacklist": summarize_import_results(results["blacklist"]),
+        import_name: summarize_import_results(results[import_name]),
     }
-
-    if verbose:
-        print(json.dumps(results, indent=2))
-    else:
-        print(json.dumps(results["summary"], indent=2))
+    print_import_output(results, verbose)
 
 
 @cli_group.command("export")

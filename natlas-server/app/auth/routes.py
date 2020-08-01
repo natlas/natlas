@@ -9,7 +9,7 @@ from app.auth.forms import (
     AcceptInviteForm,
 )
 from app.models import User, UserInvitation
-from app.auth.email import send_auth_email, validate_email
+from app.auth.email import deliver_auth_link, validate_email, email_configured
 from app.auth import bp
 from app.auth.wrappers import is_not_authenticated, is_authenticated
 from werkzeug.urls import url_parse
@@ -66,6 +66,12 @@ def register():
 @bp.route("/reset_password_request", methods=["GET", "POST"])
 @is_not_authenticated
 def reset_password_request():
+    if not email_configured():
+        flash(
+            "Sorry, self-service password resets are not currently available. Please contact an administrator for assistance.",
+            "warning",
+        )
+        return redirect(url_for("auth.login"))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         validemail = validate_email(form.email.data)
@@ -73,7 +79,7 @@ def reset_password_request():
             return redirect(url_for("auth.reset_password_request"))
         user = User.get_reset_token(validemail)
         if user:
-            send_auth_email(user.email, user.password_reset_token, "reset")
+            deliver_auth_link(user.email, user.password_reset_token, "reset")
         db.session.commit()
         flash("Check your email for the instructions to reset your password", "info")
         return redirect(url_for("auth.login"))
