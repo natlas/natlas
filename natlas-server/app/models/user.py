@@ -1,11 +1,13 @@
+import secrets
+from datetime import datetime, timedelta
+
 from email_validator import validate_email, EmailNotValidError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+
 from app import login, db
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
-import secrets
-from datetime import datetime, timedelta
 
 
 class User(UserMixin, db.Model, DictSerializable):
@@ -29,6 +31,10 @@ class User(UserMixin, db.Model, DictSerializable):
 
     def __repr__(self):
         return f"<User {self.email}>"
+
+    @staticmethod
+    def exists(email):
+        return User.query.filter_by(email=email).first() is not None
 
     # https://github.com/JoshData/python-email-validator
     @staticmethod

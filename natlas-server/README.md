@@ -14,11 +14,11 @@ Backing services in the Natlas server are defined via environment configs. They 
 
 Production-ready Natlas docker containers are [available on dockerhub](https://hub.docker.com/r/natlas/server).
 
-Before you launch your Natlas server, ensure that you've already setup an [Elasticsearch](../#Elasticsearch) cluster that your container will be able to reach. You'll then need to create your environment config file to mount into your container. Finally, choose whether you want to store media on the local filesystem in a mounted directory or if you want to use a docker volume. For simplicity, I'll be using a local filesystem mount.
+Before you launch your Natlas server, ensure that you've already setup an [Elasticsearch](/README.md#Elasticsearch) cluster that your container will be able to reach. You'll then need to create your environment config file to mount into your container. Finally, choose whether you want to store media on the local filesystem in a mounted directory or if you want to use a docker volume. For simplicity, I'll be using a local filesystem mount.
 
-### Example natlas_env File
+### Example ENV
 
-The following is an example ENV file that assumes your elasticsearch cluster is accessible at `172.17.0.2:9200` and that your mail server is accessible without authentication at `172.17.0.4`. If you do not have a mail server, remove `MAIL_` settings. A complete list of configuration options is [available below](#the-config).
+The following is an example ENV file that assumes your elasticsearch cluster is accessible at `172.17.0.2:9200` and that your mail server is accessible with authentication at `172.17.0.4`. If you do not have a mail server, remove `MAIL_` settings. A complete list of configuration options is [available below](#the-config).
 
 ```bash
 #####
@@ -43,7 +43,7 @@ ELASTICSEARCH_URL=http://172.17.0.2:9200
 #####
 MAIL_SERVER=172.17.0.4
 MAIL_USERNAME=dade.murphy
-MAIL_PASSWORD=examplepassword
+MAIL_PASSWORD=this-is-an-invalid-password
 MAIL_FROM=noreply@example.com
 
 #####
@@ -69,7 +69,7 @@ The Natlas server depends on the following:
 
 ## Installation (Development)
 
-To setup for development, you'll want to fork this repository and then clone it from your fork. See our [contributing guidelines](https://github.com/natlas/natlas/blob/main/CONTRIBUTING.md) for more information.
+To setup for development, you'll want to fork this repository and then clone it from your fork. See our [contributing guidelines](/CONTRIBUTING.md) for more information.
 
 Development makes use of docker through the `docker-compose.yml` file at the root of the repository. You can modify the desired environment variables and run `docker-compose up -d natlas-server`. You can also run the complete stack by running ` docker-compose up -d `. **This method is only suggested for a development environment.**
 
@@ -119,13 +119,15 @@ Web configs are loaded from the SQL database and changeable from the web interfa
 
 ## Setting the Scope
 
-The scope and blacklist can be set server side without using the admin interface by running the `add-scope.py` script from within the Natlas server container with the `--scope` and `--blacklist` arguments, respectively. These each take a file name to read scope from, which means you need to put them in a volume that is mounted in your container. You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the scope. A scope is **REQUIRED** for agents to do any work, however a blacklist is optional.
+The scope and blacklist can be set server side without using the admin interface by running the `flask scope` command from within the natlas container with the `--scope` and `--blacklist` arguments, respectively. These each take a file name to read scope from, which means you need to put them in a volume that is mounted in your container. You may run the command with one or both of them, however at least one is required.
+
+You may optionally specify `--verbose` to see exactly which scope items succeeded to import, failed to import, or already existed in the scope. If you're importing a lot of items, it is recommended that you redirect the results to a file.
 
 ```bash
-$ docker exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) /bin/bash
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python add-scope.py --scope /data/bootstrap/myscopefile.txt
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# python add-scope.py --blacklist /data/bootstrap/myblacklistfile.txt
+docker exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask scope import --scope /data/bootstrap/myscopefile.txt --blacklist /data/bootstrap/myblacklistfile.txt --verbose > /data/bootstrap/import_results.json
 ```
+
+A scope is **REQUIRED** for agents to do any work, however a blacklist is optional.
 
 ## Creating Your First User
 
@@ -137,17 +139,16 @@ In order to get started interacting with Natlas, you'll need an administrator ac
 * scanning exclusions
 * services that agents scan for
 
-You can bootstrap your first admin account using the `add-user.py` script. This script supports creating invitations for users with or without an email address. Whether the user will be invited as an admin or not is handled by the `--admin` flag. If a supplied email already exists in the User table, it will be toggled to be an admin. This can be helpful if you accidentally remove yourself as an admin and can't get back into the admin interface.
+You can bootstrap your first admin account using the `flask user new` command. This command supports creating invitations for users with or without an email address. Whether the user will be invited as an admin or not is handled by the `--admin` flag.
 
-**NOTE:** This script **requires** the `SERVER_NAME` environment option so that links can be generated correctly. This should be set to whatever you want the link to generate with(e.g. `SERVER_NAME=localhost:5000` will generate `https://localhost:5000/auth/invite?token=blahblahblah`)
+**NOTE:** This script **requires** the `SERVER_NAME` environment option so that links can be generated correctly. This should be set to whatever you want the link to generate with(e.g. `SERVER_NAME=localhost:5000` will generate `https://localhost:5000/auth/invite?token=this-is-an-invalid-example-token`)
 
 ### With Email
 
 If you have a mail server configured, you can specify the email address and the script will automatically send them an invitation email.
 
 ```bash
-$ docker exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) /bin/bash
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# SERVER_NAME=localhost:5000 ./add-user.py --email example@example.com --admin
+$ docker exec -e SERVER_NAME=example.com -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask user new --email example@example.com --admin
 Sent example@example.com an invitation email via localhost
 ```
 
@@ -156,8 +157,7 @@ Sent example@example.com an invitation email via localhost
 Alternatively, you can create a new user invitation link that can be given to anyone.
 
 ```bash
-$ docker exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) /bin/bash
-root@5dd0d2d6ecdf:/opt/natlas/natlas-server# SERVER_NAME=example.com ./add-user.py --admin
+$ docker -e SERVER_NAME=example.com exec -it $(docker ps | grep natlas/server | cut -d' ' -f1) flask user new --admin
 Accept invitation: http://example.com/auth/invite?token=this-is-an-invalid-example-token
 ```
 
