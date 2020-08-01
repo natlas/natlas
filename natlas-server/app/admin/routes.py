@@ -111,74 +111,57 @@ def toggle_user(id):
 @login_required
 @is_admin
 def scope():
-    scope = ScopeItem.getScope()
-    scopeSize = current_app.ScopeManager.get_scope_size()
+    render = {
+        "scope": ScopeItem.getScope(),
+        "scopeSize": current_app.ScopeManager.get_scope_size(),
+        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),
+        "newForm": forms.NewScopeForm(),
+        "delForm": forms.ScopeDeleteForm(),
+        "editForm": forms.ScopeToggleForm(),
+        "importForm": forms.ImportScopeForm(),
+        "addTagForm": forms.TagScopeForm(),
+    }
 
-    # if it's zero, let's make sure the ScopeManager is up to date
-    if scopeSize == 0:
-        current_app.ScopeManager.update()
-        scopeSize = current_app.ScopeManager.get_scope_size()
-        # if it's zero again that's fine, we just had to check
-
-    effectiveScopeSize = current_app.ScopeManager.get_effective_scope_size()
-
-    newForm = forms.NewScopeForm()
-    delForm = forms.ScopeDeleteForm()
-    editForm = forms.ScopeToggleForm()
-    importForm = forms.ImportScopeForm()
-    addTagForm = forms.TagScopeForm()
-    addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
-    if newForm.validate_on_submit():
-        target = ipaddress.ip_network(newForm.target.data, False)
+    render["addTagForm"].tagname.choices = [
+        (row.name, row.name) for row in Tag.query.all()
+    ]
+    if render["newForm"].validate_on_submit():
+        target = ipaddress.ip_network(render["newForm"].target.data, False)
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=False)
         db.session.add(newTarget)
         db.session.commit()
         current_app.ScopeManager.update()
         flash(f"{newTarget.target} added!", "success")
         return redirect(url_for("admin.scope"))
-    return render_template(
-        "admin/scope.html",
-        scope=scope,
-        scopeSize=scopeSize,
-        delForm=delForm,
-        editForm=editForm,
-        newForm=newForm,
-        importForm=importForm,
-        addTagForm=addTagForm,
-        effectiveScopeSize=effectiveScopeSize,
-    )
+    return render_template("admin/scope.html", **render)
 
 
 @bp.route("/blacklist", methods=["GET", "POST"])
 @login_required
 @is_admin
 def blacklist():
-    scope = ScopeItem.getBlacklist()
-    blacklistSize = current_app.ScopeManager.get_blacklist_size()
-    newForm = forms.NewScopeForm()
-    delForm = forms.ScopeDeleteForm()
-    editForm = forms.ScopeToggleForm()
-    importForm = forms.ImportBlacklistForm()
-    addTagForm = forms.TagScopeForm()
-    addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
-    if newForm.validate_on_submit():
-        target = ipaddress.ip_network(newForm.target.data, False)
+    render = {
+        "scope": ScopeItem.getBlacklist(),
+        "blacklistSize": current_app.ScopeManager.get_blacklist_size(),
+        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),
+        "newForm": forms.NewScopeForm(),
+        "delForm": forms.ScopeDeleteForm(),
+        "editForm": forms.ScopeToggleForm(),
+        "importForm": forms.ImportScopeForm(),
+        "addTagForm": forms.TagScopeForm(),
+    }
+    render["addTagForm"].tagname.choices = [
+        (row.name, row.name) for row in Tag.query.all()
+    ]
+    if render["newForm"].validate_on_submit():
+        target = ipaddress.ip_network(render["newForm"].target.data, False)
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=True)
         db.session.add(newTarget)
         db.session.commit()
         current_app.ScopeManager.update()
         flash(f"{newTarget.target} blacklisted!", "success")
         return redirect(url_for("admin.blacklist"))
-    return render_template(
-        "admin/blacklist.html",
-        scope=scope,
-        blacklistSize=blacklistSize,
-        delForm=delForm,
-        editForm=editForm,
-        newForm=newForm,
-        importForm=importForm,
-        addTagForm=addTagForm,
-    )
+    return render_template("admin/blacklist.html", **render)
 
 
 @bp.route("/import/<string:scopetype>", methods=["POST"])

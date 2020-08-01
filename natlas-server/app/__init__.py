@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, url_for, request
+from flask import Flask, flash, redirect, url_for, request, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
@@ -11,6 +11,7 @@ from webpack_manifest import webpack_manifest
 import config
 from app.elastic import ElasticInterface
 from .instrumentation import initialize_opencensus
+from app.scope import ScopeManager
 
 
 class AnonUser(AnonymousUserMixin):
@@ -28,6 +29,7 @@ mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
 csrf = CSRFProtect()
+ScopeManager = ScopeManager()
 
 
 @login.unauthorized_handler
@@ -77,7 +79,7 @@ def load_natlas_services(app):
         current_services = NatlasServices(services=defaultServices)
         db.session.add(current_services)
         db.session.commit()
-        print("NatlasServices populated with defaults")
+        current_app.logger.info("NatlasServices populated with defaults")
     app.current_services = current_services.as_dict()
 
 
@@ -94,7 +96,7 @@ def load_agent_config(app):
         agentConfig = AgentConfig()  # populate an agent config with database defaults
         db.session.add(agentConfig)
         db.session.commit()
-        print("AgentConfig populated with defaults")
+        current_app.logger.info("AgentConfig populated with defaults")
     app.agentConfig = agentConfig.as_dict()
 
 
@@ -109,7 +111,7 @@ def load_agent_scripts(app):
         defaultAgentScript = AgentScript(name="default")
         db.session.add(defaultAgentScript)
         db.session.commit()
-        print("AgentScript populated with default")
+        current_app.logger.info("AgentScript populated with default")
         agentScripts = [defaultAgentScript]
     app.agentScripts = agentScripts
     app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
@@ -127,6 +129,7 @@ def create_app(config_class=config.Config, load_config=False):
     login.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
+    ScopeManager.init_app(app)
     app.config["webpack"] = webpack_manifest.load(
         # An absolute path to a manifest file
         path=os.path.join(
@@ -141,10 +144,8 @@ def create_app(config_class=config.Config, load_config=False):
         load_natlas_services(app)
         load_agent_config(app)
         load_agent_scripts(app)
-
-    from app.scope import ScopeManager
-
-    app.ScopeManager = ScopeManager()
+        if db.engine.has_table("scope_item"):
+            ScopeManager.load_all_groups()
 
     from app.errors import bp as errors_bp
 

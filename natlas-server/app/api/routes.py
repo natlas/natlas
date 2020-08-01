@@ -61,9 +61,6 @@ def getwork():
 
     if len(rescans) == 0:  # if we don't have rescans, use the ScanManager
         scanmanager = current_app.ScopeManager.get_scan_manager()
-        if not scanmanager:
-            current_app.ScopeManager.update()
-            scanmanager = current_app.ScopeManager.get_scan_manager()
 
         if not scanmanager:
             response_body = json.dumps(

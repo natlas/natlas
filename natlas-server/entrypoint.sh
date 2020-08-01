@@ -1,8 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 set +x
 
-mkdir -p /data/{db,media,logs}
-ln -s /data/logs logs
+mkdir -p /data/{db,media}
 
 flask db upgrade
 chown -R www-data:www-data /data

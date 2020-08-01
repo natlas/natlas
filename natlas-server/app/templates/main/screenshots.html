@@ -22,7 +22,7 @@
                                 <div class="image-browser-service p-2">{{ screenshot.service }}</div>
                                 <div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
                             </div>
-                            <img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|hashpath}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|hashpath}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != host.ip %} ({{host.ip}}){%endif%}">
+                            <img class="img-responsive img-thumbnail" data-path='/media/original/{{screenshot.hash|get_screenshot_path(screenshot.service)}}' data-ip='{{host.ip}}' data-scan_id='{{host.scan_id}}' src='/media/thumbs/{{screenshot.thumb_hash|get_screenshot_path(screenshot.service)}}' alt="{{ screenshot.host }} - {{ screenshot.port }}{%if screenshot.host != host.ip %} ({{host.ip}}){%endif%}">
                         </div>
                     </div>
                     {% endif %}

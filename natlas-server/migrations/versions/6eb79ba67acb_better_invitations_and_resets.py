@@ -21,8 +21,8 @@ def upgrade():
     op.create_table(
         "user_invitation",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("email", sa.String(length=128), nullable=True),
-        sa.Column("token", sa.String(length=32), nullable=False),
+        sa.Column("email", sa.String(length=254), nullable=True),
+        sa.Column("token", sa.String(length=256), nullable=False),
         sa.Column("creation_date", sa.DateTime(), nullable=True),
         sa.Column("expiration_date", sa.DateTime(), nullable=False),
         sa.Column("accepted_date", sa.DateTime(), nullable=True),
@@ -43,7 +43,7 @@ def upgrade():
             sa.Column("password_reset_expiration", sa.DateTime(), nullable=True)
         )
         batch_op.add_column(
-            sa.Column("password_reset_token", sa.String(length=32), nullable=True)
+            sa.Column("password_reset_token", sa.String(length=256), nullable=True)
         )
         batch_op.create_unique_constraint("uq_pw_reset_token", ["password_reset_token"])
 

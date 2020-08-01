@@ -80,8 +80,6 @@ def get_web_screenshots(target, scan_id, xml_data, proctimeout):
 
 
 def get_vnc_screenshots(target, scan_id, proctimeout):
-    if "DISPLAY" not in os.environ:
-        return False
 
     scan_dir = utils.get_scan_dir(scan_id)
     outFile = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")

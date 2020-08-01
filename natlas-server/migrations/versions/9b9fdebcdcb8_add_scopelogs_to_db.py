@@ -21,7 +21,7 @@ def upgrade():
     op.create_table(
         "scope_log",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("msg", sa.String(), nullable=True),
+        sa.Column("msg", sa.String(length=256), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )

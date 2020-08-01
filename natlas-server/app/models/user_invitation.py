@@ -8,8 +8,8 @@ from app.models import User
 
 class UserInvitation(db.Model, DictSerializable):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128), unique=True)
-    token = db.Column(db.String(32), unique=True, nullable=False)
+    email = db.Column(db.String(254), unique=True)
+    token = db.Column(db.String(256), unique=True, nullable=False)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     expiration_date = db.Column(db.DateTime, nullable=False)
     accepted_date = db.Column(db.DateTime)

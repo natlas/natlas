@@ -7,11 +7,11 @@
     "repository": "github:natlas/natlas",
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.13.0",
-        "@sentry/browser": "^5.18.1",
+        "@sentry/browser": "^5.20.1",
         "bootstrap": "^4.4.1",
         "datatables.net-bs4": "^1.10.20",
         "jquery": "^3.4.1",
-        "tsparticles": "^1.17.2",
+        "tsparticles": "^1.17.5",
         "popper.js": "^1.16.0",
         "tslint": "^6.1.2"
     },
@@ -29,7 +29,7 @@
         "stylelint": "^13.6.1",
         "stylelint-config-standard": "^20.0.0",
         "stylelint-scss": "^3.18.0",
-        "ts-loader": "^7.0.1",
+        "ts-loader": "^8.0.1",
         "typescript": "^3.8.3",
         "webpack": "4.43.0",
         "webpack-cli": "^3.3.11",

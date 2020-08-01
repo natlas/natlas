@@ -1,7 +1,5 @@
 from netaddr import IPSet
 from cyclicprng import CyclicPRNG
-from app import db
-from app.models import ScopeLog
 
 
 class IPScanManager:
@@ -20,6 +18,9 @@ class IPScanManager:
         self.initialize_manager()
 
     def log_to_db(self, message: str):
+        from app import db
+        from app.models import ScopeLog
+
         log_messages = {
             "init": "PRNG Starting Up",
             "restart": "PRNG Cycle Restarted",
