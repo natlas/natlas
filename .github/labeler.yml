@@ -1,0 +1,14 @@
+agent:
+- natlas-agent/*
+
+server:
+- natlas-server/*
+
+dependencies:
+- '*/Dockerfile'
+- '*/Pipfile*'
+- natlas-server/package.json
+- natlas-server/yarn.lock
+
+testing:
+  - '*/tests/*'
