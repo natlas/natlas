@@ -1,0 +1,13 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Hello @${{ github.actor }}, thank you for opening this issue! It looks like this is your first issue in this repository, so welcome to the Natlas community! Please remember to view our [contributing guidelines](https://github.com/natlas/natlas/blob/main/CONTRIBUTING.md) and ensure that your issue is as detailed as possible so that we can better assist you.'
+        pr-message: 'Hello @${{ github.actor }}, thank you for submitting a pull request! It looks like this is your first pull request in this repository, so welcome to the Natlas community! Please remember to review our [contributing guidelines](https://github.com/natlas/natlas/blob/main/CONTRIBUTING.md#submitting-a-pull-request) for submitting a pull request. The long and short of it is that your pull request must pass all of the automatic checks before a member of the project team will review it.'
