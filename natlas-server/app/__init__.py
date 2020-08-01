@@ -144,8 +144,17 @@ def create_app(config_class=config.Config, load_config=False):
         load_natlas_services(app)
         load_agent_config(app)
         load_agent_scripts(app)
+
         if db.engine.has_table("scope_item"):
             ScopeManager.load_all_groups()
+
+    from app.cli.user import cli_group as user_cli
+
+    app.cli.add_command(user_cli)
+
+    from app.cli.scope import cli_group as scope_cli
+
+    app.cli.add_command(scope_cli)
 
     from app.errors import bp as errors_bp
 
