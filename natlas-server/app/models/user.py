@@ -10,13 +10,13 @@ from datetime import datetime, timedelta
 
 class User(UserMixin, db.Model, DictSerializable):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128), index=True, unique=True)
+    email = db.Column(db.String(254), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, default=False)
     results_per_page = db.Column(db.Integer, default=100)
     preview_length = db.Column(db.Integer, default=100)
     result_format = db.Column(db.Integer, default=0)
-    password_reset_token = db.Column(db.String(32), unique=True)
+    password_reset_token = db.Column(db.String(256), unique=True)
     password_reset_expiration = db.Column(db.DateTime)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=False)
