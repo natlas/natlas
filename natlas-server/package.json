@@ -7,7 +7,7 @@
     "repository": "github:natlas/natlas",
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.13.0",
-        "@sentry/browser": "^5.18.1",
+        "@sentry/browser": "^5.20.1",
         "bootstrap": "^4.4.1",
         "datatables.net-bs4": "^1.10.20",
         "jquery": "^3.4.1",
