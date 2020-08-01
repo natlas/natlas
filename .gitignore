@@ -7,6 +7,7 @@ data
 metadata.db
 .env
 *.bak
+.python_version
 natlas-agent/natlas-services
 natlas-agent/data
 natlas-agent/LICENSE
