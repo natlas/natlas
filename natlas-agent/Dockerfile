@@ -26,7 +26,7 @@ WORKDIR /opt/natlas/natlas-agent
 RUN python3 -m compileall .
 
 # Build final image
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
