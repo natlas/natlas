@@ -45,21 +45,9 @@ class UserInvitation(db.Model, DictSerializable):
 
     @staticmethod
     def deliver_invite(invite):
-        from flask import current_app, url_for
-        from app.auth.email import send_auth_email
+        from app.auth.email import deliver_auth_link
 
-        if current_app.config.get("MAIL_SERVER", None) and invite.email:
-            send_auth_email(invite.email, invite.token, "invite")
-            msg = f"Invitation Sent to {invite.email}!"
-        else:
-            invite_url = url_for(
-                "auth.invite_user",
-                token=invite.token,
-                _external=True,
-                _scheme=current_app.config["PREFERRED_URL_SCHEME"],
-            )
-            msg = f"Share this link: {invite_url}"
-        return msg
+        return deliver_auth_link(invite.email, invite.token, "invite")
 
     @staticmethod
     def get_invite(url_token):

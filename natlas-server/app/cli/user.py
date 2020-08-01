@@ -1,6 +1,6 @@
-from app.auth.email import send_auth_email
+from app.auth.email import deliver_auth_link
 import click
-from flask import current_app, url_for
+from flask import current_app
 from flask.cli import AppGroup
 
 from app import db
@@ -52,24 +52,17 @@ def new_user(email, admin):
     print(msg)
 
 
-@cli_group.command("promote")
+@cli_group.command("role")
 @click.argument("email", callback=validate_email)
-def promote_user(email):
+@click.option("--promote/--demote", default=False)
+def promote_user(email, promote):
     user = get_user(email)
-    msg = f"{email} is {'now' if not user.is_admin else 'already'} an admin"
-    user.is_admin = True
+    if user.is_admin == promote:
+        print(f"{email} is already{' not ' if not promote else ' '}an admin")
+        return
+    user.is_admin = promote
     db.session.commit()
-    print(msg)
-
-
-@cli_group.command("demote")
-@click.argument("email", callback=validate_email)
-def demote_user(email):
-    user = get_user(email)
-    msg = f"{email} is {'not' if not user.is_admin else 'no longer'} an admin"
-    user.is_admin = False
-    db.session.commit()
-    print(msg)
+    print(f"{email} is {'now' if user.is_admin else 'no longer'} an admin")
 
 
 @cli_group.command("reset-password")
@@ -79,16 +72,6 @@ def reset_password(email):
     user = User.get_reset_token(email)
     if not user:
         raise click.BadParameter(err_msgs["no_such_user"].format(email))
-    if current_app.config.get("MAIL_SERVER", None):
-        send_auth_email(user.email, user.password_reset_token, "invite")
-        msg = f"Invitation Sent to {user.email}!"
-    else:
-        reset_url = url_for(
-            "auth.reset_password",
-            token=user.password_reset_token,
-            _external=True,
-            _scheme=current_app.config["PREFERRED_URL_SCHEME"],
-        )
-        msg = f"Share this link: {reset_url}"
+    msg = deliver_auth_link(user.email, user.password_reset_token, "reset")
     db.session.commit()
     print(msg)
