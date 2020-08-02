@@ -1,8 +1,8 @@
 agent:
-- natlas-agent/*
+- natlas-agent/**/*
 
 server:
-- natlas-server/*
+- natlas-server/**/*
 
 dependencies:
 - '*/Dockerfile'
