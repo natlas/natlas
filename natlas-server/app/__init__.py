@@ -14,6 +14,7 @@ from .instrumentation import initialize_opencensus
 from .config_loader import load_config_from_db
 from app.scope import ScopeManager
 from app.url_converters import register_converters
+from migrations.migrator import migration_needed, handle_db_migration
 
 
 class AnonUser(AnonymousUserMixin):
@@ -46,15 +47,23 @@ def unauthorized():
     return redirect(url_for("auth.login"))
 
 
-def create_app(config_class=config.Config, load_config=False):
+def create_app(config_class=config.Config):
     app = Flask(__name__)
-    initialize_opencensus(config_class, app)
+    initialize_opencensus(config, app)
 
-    app.config.from_object(config_class)
-    app.jinja_env.add_extension("jinja2.ext.do")
-    app.elastic = ElasticInterface(app.config["ELASTICSEARCH_URL"])
+    app.config.from_object(config)
     db.init_app(app)
     migrate.init_app(app, db)
+    if migration_needed(
+        app.config["SQLALCHEMY_DATABASE_URI"]
+    ) and not handle_db_migration(app):
+        raise SystemExit(
+            "[!] Database migration required and DB_AUTO_MIGRATE is not enabled"
+        )
+
+    app.jinja_env.add_extension("jinja2.ext.do")
+    app.elastic = ElasticInterface(app.config["ELASTICSEARCH_URL"])
+
     login.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)

@@ -50,6 +50,7 @@ MAIL_FROM=noreply@example.com
 # Natlas Specific Settings
 #####
 CONSISTENT_SCAN_CYCLE=True
+DB_AUTO_MIGRATE=True
 ```
 
 ### Launching Natlas Server
@@ -86,6 +87,7 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `SECRET_KEY` | Randomly generated | Used for CSRF tokens and sessions. You should generate a unique value for this in `.env`, otherwise sessions will be invalidated whenever the app restarts. |
 | `DATA_DIR` | `/data` | Path to store any data that should be persisted. Sqlite database, any log files, and media files all go in subdirectories of this directory. |
 | `SQLALCHEMY_DATABASE_URI` | `sqlite:///$DATA_DIR/db/metadata.db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the database to store natlas metadata in. Supported types by natlas-server are: `sqlite:`, `mysql:` |
+| `DB_AUTO_MIGRATE` | `False` | Automatically perform necessary data migrations when upgrading to a new version of natlas. Not recommended for multi-node deployments. |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
 | `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|

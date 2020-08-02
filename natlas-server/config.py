@@ -54,6 +54,9 @@ class Config(object):
     # This isn't in the database because we'll never want to change it
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Automatically perform any required migrations on app init
+    DB_AUTO_MIGRATE = casted_bool(os.environ.get("DB_AUTO_MIGRATE", False))
+
     # This isn't in the database because it really shouldn't be changing on-the-fly
     # Also make sure that you're using an absolute path if you're serving your app directly via flask
     MEDIA_DIRECTORY = os.environ.get(
