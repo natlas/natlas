@@ -1,6 +1,6 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Feature Request (Agent)
+about: Suggest an idea for the Natlas Agent
 title: ''
 labels: enhancement, agent
 assignees: ''
