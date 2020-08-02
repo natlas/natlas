@@ -1,6 +1,6 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Feature Request (Server)
+about: Suggest an idea for the Natlas Server
 title: ''
 labels: enhancement, server
 assignees: ''
