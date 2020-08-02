@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, url_for, request, current_app
+from flask import Flask, flash, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, AnonymousUserMixin, current_user
@@ -11,6 +11,7 @@ from webpack_manifest import webpack_manifest
 import config
 from app.elastic import ElasticInterface
 from .instrumentation import initialize_opencensus
+from .config_loader import load_config_from_db
 from app.scope import ScopeManager
 
 
@@ -44,79 +45,6 @@ def unauthorized():
     return redirect(url_for("auth.login"))
 
 
-def load_natlas_config(app):
-    if not db.engine.has_table("config_item"):
-        return
-
-    updated_items = 0
-    from app.models import ConfigItem
-
-    # Look to see if any new config items were added that aren't currently in db
-    default_configs = config.get_defaults()
-    for key, item in default_configs:
-        conf_item = ConfigItem.query.filter_by(name=key).first()
-        if not conf_item:
-            conf_item = ConfigItem(name=key, type=item["type"], value=item["default"])
-            db.session.add(conf_item)
-            updated_items += 1
-        app.config[conf_item.name] = config.casted_value(
-            conf_item.type, conf_item.value
-        )
-    if updated_items > 0:
-        db.session.commit()
-
-
-def load_natlas_services(app):
-    if not db.engine.has_table("natlas_services"):
-        return
-    from app.models import NatlasServices
-
-    current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
-    if not current_services:
-        # Let's populate server defaults
-        with open(os.path.join(app.config["BASEDIR"], "defaults/natlas-services")) as f:
-            defaultServices = f.read().rstrip("\r\n")
-        current_services = NatlasServices(services=defaultServices)
-        db.session.add(current_services)
-        db.session.commit()
-        current_app.logger.info("NatlasServices populated with defaults")
-    app.current_services = current_services.as_dict()
-
-
-def load_agent_config(app):
-    if not db.engine.has_table("agent_config"):
-        return
-    # Load the current agent config, otherwise create it.
-    from app.models import AgentConfig
-
-    agentConfig = AgentConfig.query.get(
-        1
-    )  # the agent config is updated in place so only 1 record
-    if not agentConfig:
-        agentConfig = AgentConfig()  # populate an agent config with database defaults
-        db.session.add(agentConfig)
-        db.session.commit()
-        current_app.logger.info("AgentConfig populated with defaults")
-    app.agentConfig = agentConfig.as_dict()
-
-
-def load_agent_scripts(app):
-    if not db.engine.has_table("agent_script"):
-        return
-    # Load the current agent config, otherwise create it.
-    from app.models import AgentScript
-
-    agentScripts = AgentScript.query.all()
-    if not agentScripts:
-        defaultAgentScript = AgentScript(name="default")
-        db.session.add(defaultAgentScript)
-        db.session.commit()
-        current_app.logger.info("AgentScript populated with default")
-        agentScripts = [defaultAgentScript]
-    app.agentScripts = agentScripts
-    app.agentScriptStr = AgentScript.getScriptsString(scriptList=agentScripts)
-
-
 def create_app(config_class=config.Config, load_config=False):
     app = Flask(__name__)
     initialize_opencensus(config_class, app)
@@ -140,11 +68,7 @@ def create_app(config_class=config.Config, load_config=False):
     )
 
     with app.app_context():
-        load_natlas_config(app)
-        load_natlas_services(app)
-        load_agent_config(app)
-        load_agent_scripts(app)
-
+        load_config_from_db(app, db)
         if db.engine.has_table("scope_item"):
             ScopeManager.load_all_groups()
 
