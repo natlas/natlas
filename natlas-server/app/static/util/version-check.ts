@@ -1,4 +1,3 @@
-/* globals process */
 import makeXhrCall from './xhr';
 
 const updateURL = 'https://api.github.com/repos/natlas/natlas/releases/latest';
@@ -13,10 +12,8 @@ class UpdateCheckResult {
     }
 }
 
-declare const NATLAS_VERSION: string;
-
 export function thisVersion(): string {
-    return NATLAS_VERSION;
+    return process.env.NATLAS_VERSION;
 }
 
 function extractVersion(result: GithubReleases): string {
