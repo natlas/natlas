@@ -2,10 +2,22 @@ from config import Config
 
 
 class TestConfig(Config):
+
+    # MAIL_FROM and MAIL_SERVER are required checks for delivering mail
     MAIL_FROM = "Test Mail <noreply@example.com>"
     MAIL_SERVER = "localhost"
+
+    # Tell Flask that it's in testing mode
     TESTING = True
-    # This uses an in-memory database
+
+    # This uses an in-memory database.
+    # It will not work with database migrations.
+    # But will work if you just want an app instance with
+    # an empty database via db.create_all()
     SQLALCHEMY_DATABASE_URI = "sqlite://"
-    DB_AUTO_MIGRATE = True
+
+    # By enabling this, we can test migrations automatically whenever the app is used
+    DB_AUTO_UPGRADE = True
+
+    # Assume that the test environment has access to elastic via localhost:9200
     ELASTICSEARCH_URL = "http://localhost:9200"
