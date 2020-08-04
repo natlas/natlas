@@ -14,7 +14,7 @@ from .instrumentation import initialize_opencensus
 from .config_loader import load_config_from_db
 from app.scope import ScopeManager
 from app.url_converters import register_converters
-from migrations.migrator import migration_needed, handle_db_migration
+from migrations.migrator import migration_needed, handle_db_upgrade
 
 
 class AnonUser(AnonymousUserMixin):
@@ -47,18 +47,24 @@ def unauthorized():
     return redirect(url_for("auth.login"))
 
 
-def create_app(config_class=config.Config):
+def create_app(config_class=config.Config, migrating=False):
     app = Flask(__name__)
-    initialize_opencensus(config, app)
+    initialize_opencensus(config_class, app)
 
-    app.config.from_object(config)
+    app.config.from_object(config_class)
     db.init_app(app)
     migrate.init_app(app, db)
+
+    # If we're being called with migrating=True then return early to allow the migration
+    if migrating:
+        return app
+
+    # If a migration is needed, try to automatically handle it, otherwise bail out
     if migration_needed(
         app.config["SQLALCHEMY_DATABASE_URI"]
-    ) and not handle_db_migration(app):
-        raise SystemExit(
-            "[!] Database migration required and DB_AUTO_MIGRATE is not enabled"
+    ) and not handle_db_upgrade(app):
+        raise RuntimeError(
+            "[!] Database migration required and DB_AUTO_UPGRADE is not enabled"
         )
 
     app.jinja_env.add_extension("jinja2.ext.do")
@@ -79,8 +85,7 @@ def create_app(config_class=config.Config):
 
     with app.app_context():
         load_config_from_db(app, db)
-        if db.engine.has_table("scope_item"):
-            ScopeManager.load_all_groups()
+        ScopeManager.load_all_groups()
 
     register_converters(app)
 

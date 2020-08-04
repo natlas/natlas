@@ -55,7 +55,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Automatically perform any required migrations on app init
-    DB_AUTO_MIGRATE = casted_bool(os.environ.get("DB_AUTO_MIGRATE", False))
+    DB_AUTO_UPGRADE = casted_bool(os.environ.get("DB_AUTO_UPGRADE", False))
 
     # This isn't in the database because it really shouldn't be changing on-the-fly
     # Also make sure that you're using an absolute path if you're serving your app directly via flask

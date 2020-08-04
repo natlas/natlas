@@ -22,7 +22,7 @@ try:
     app = create_app(config)
 except Exception as e:
     capture_exception(e)
-    raise e
+    raise
 
 
 @app.shell_context_processor

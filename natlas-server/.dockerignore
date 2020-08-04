@@ -1,15 +1,14 @@
 # Ships with source
 deployment/
-elastic-snapshot.py
 *.md
 .dockerignore
 Dockerfile
 tests/
 docs/
-.scss-lint.yml
 tslint.json
 .eslintrc.yml
-.python-version
+.stylelintrc.yml
+natlas-migrate.py
 
 # Dev Environment
 __pycache__/

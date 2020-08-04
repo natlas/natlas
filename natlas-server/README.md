@@ -12,13 +12,27 @@ Backing services in the Natlas server are defined via environment configs. They 
 
 ## Installation (Production)
 
-Production-ready Natlas docker containers are [available on dockerhub](https://hub.docker.com/r/natlas/server).
-
 Before you launch your Natlas server, ensure that you've already setup an [Elasticsearch](/README.md#Elasticsearch) cluster that your container will be able to reach. You'll then need to create your environment config file to mount into your container. Finally, choose whether you want to store media on the local filesystem in a mounted directory or if you want to use a docker volume. For simplicity, I'll be using a local filesystem mount.
+
+### Downloading Natlas Server
+
+Production-ready Natlas docker containers are [available on dockerhub](https://hub.docker.com/r/natlas/server). If you'd like to grab the latest build based on the `main` git branch, it's as simple as this:
+
+```bash
+docker pull natlas/server
+```
+
+### Launch Prerequisites
+
+The Natlas server depends on the following in order to function:
+
+* An `env` file that gets bind mounted to `/opt/natlas/natlas-server/.env`. This is automatically read by the Natlas server config and contains some subset of the values specified in [The Config](#the-config) table below. An [example](#example-ENV) is also provided in the next step.
+* Persistent storage mounted to the `/data` directory. This is where screenshots and the sqlite database get stored.
+* The `env` file needs to point `ELASTICSEARCH_URL` to the address of an Elasticsearch node.
 
 ### Example ENV
 
-The following is an example ENV file that assumes your elasticsearch cluster is accessible at `172.17.0.2:9200` and that your mail server is accessible with authentication at `172.17.0.4`. If you do not have a mail server, remove `MAIL_` settings. A complete list of configuration options is [available below](#the-config).
+The following is an example ENV file that assumes your Elasticsearch cluster is accessible at `172.17.0.2:9200` and that your mail server is accessible with authentication at `172.17.0.4`. If you do not have a mail server, remove `MAIL_` settings. A complete list of configuration options is [available below](#the-config).
 
 ```bash
 #####
@@ -42,6 +56,7 @@ ELASTICSEARCH_URL=http://172.17.0.2:9200
 # Mail settings
 #####
 MAIL_SERVER=172.17.0.4
+MAIL_USE_TLS=True
 MAIL_USERNAME=dade.murphy
 MAIL_PASSWORD=this-is-an-invalid-password
 MAIL_FROM=noreply@example.com
@@ -50,21 +65,31 @@ MAIL_FROM=noreply@example.com
 # Natlas Specific Settings
 #####
 CONSISTENT_SCAN_CYCLE=True
-DB_AUTO_MIGRATE=True
+DB_AUTO_UPGRADE=True
+```
+
+### Preparing the Database
+
+The database stores many configuration options, as well as certain logs and user information. The Natlas server talks to it via the `SQLALCHEMY_DATABASE_URI` environment variable. This value defaults to `/data/db/metadata.db`, which should be fine if you're running a single-node instance.
+
+* If you're using SQLite, ensure that the file path is in persistent storage (the default will work fine if you follow these instructions).
+* If you're using MySQL, make sure that you've created a natlas user and a natlas database that match your URI.
+
+If you've set `DB_AUTO_UPGRADE` to True in your env file, you can [go to the next step](#launching-natlas-server). Otherwise, if you want to have more control over when the database migration happens, such as when you're running a multi-node natlas server deployment, then you'll need to manually perform database migrations. A simple wrapper script has been provided.
+
+```bash
+docker run -v /mnt/natlas_data:/data:rw -v /path/to/your/natlas_env:/opt/natlas/natlas-server/.env natlas/server python natlas-db.py --upgrade
 ```
 
 ### Launching Natlas Server
 
+By this point, you've either set `DB_AUTO_UPGRADE=True` or you've manually run the `python natlas-db.py --upgrade` script. Now it's time to start the server. If `DB_AUTO_UPGRADE` is set to true, it'll automatically run through the database migrations and set any initial values that the application requires and then launch the web server for you. If not, it'll check to ensure that you've done the previous step before launching the web server.
+
 ```bash
-docker pull natlas/server
 docker run -d -p 5000:5000 --name natlas_server --restart=always -v /mnt/natlas_data:/data:rw -v /path/to/your/natlas_env:/opt/natlas/natlas-server/.env natlas/server
 ```
 
-The Natlas server depends on the following:
-
-* An `env` file that gets bind mounted to `/opt/natlas/natlas-server/.env`. This is automatically read by the natlas-server config and contains some subset of the values specified in [The Config](#the-config) table below. An [example](#example-ENV) is also provided.
-* The `/data` directory which is where, by default, screenshots and the sqlite config database get stored.
-* The `env` file needs to point `ELASTICSEARCH_URL` to the address of an elasticsearch node.
+Assuming you've been following directions, you should now have a server running on localhost. You can `curl localhost:5000` to ensure that the Natlas server is running and reachable. If it hasn't worked, ensure that each of the previous requirements have been satisfied. If you're still having trouble, consider opening a [support request](https://github.com/natlas/natlas/issues/new?assignees=&labels=support&template=support_request.md&title=).
 
 **NOTE:** If you used Natlas 0.6.10 or before, you may be used to running a `setup-server.sh` script. This has been removed in favor of the docker workflow. Docker makes the builds much more reliable and significantly easier to support than the janky setup script.
 
@@ -87,7 +112,7 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `SECRET_KEY` | Randomly generated | Used for CSRF tokens and sessions. You should generate a unique value for this in `.env`, otherwise sessions will be invalidated whenever the app restarts. |
 | `DATA_DIR` | `/data` | Path to store any data that should be persisted. Sqlite database, any log files, and media files all go in subdirectories of this directory. |
 | `SQLALCHEMY_DATABASE_URI` | `sqlite:///$DATA_DIR/db/metadata.db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the database to store natlas metadata in. Supported types by natlas-server are: `sqlite:`, `mysql:` |
-| `DB_AUTO_MIGRATE` | `False` | Automatically perform necessary data migrations when upgrading to a new version of natlas. Not recommended for multi-node deployments. |
+| `DB_AUTO_UPGRADE` | `False` | Automatically perform necessary data migrations when upgrading to a new version of natlas. Not recommended for multi-node deployments. |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
 | `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
