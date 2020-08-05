@@ -98,7 +98,8 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `OPENCENSUS_AGENT` | `127.0.0.1:55678` | An OpenCensus agent or collector that this instance will emit traffic to. |
 | `MAIL_SERVER` | `None` | Mail server to use for invitations, registrations, and password resets |
 | `MAIL_PORT` | `587` | Port that `MAIL_SERVER` is listening on |
-| `MAIL_USE_TLS` | `False` | Whether or not to connect to `MAIL_SERVER` with TLS |
+| `MAIL_USE_TLS` | `True` | Whether or not to connect to `MAIL_SERVER` with STARTTLS |
+| `MAIL_USE_SSL` | `False` | Whether or not to connect to `MAIL_SERVER` with SSL (E.g. Port 465) |
 | `MAIL_USERNAME` | `None` | Username (if required) to connect to `MAIL_SERVER` |
 | `MAIL_PASSWORD` | `None` | Password (if required) to connect to `MAIL_SERVER` |
 | `MAIL_FROM` | `None` | Address to be used as the "From" address for outgoing mail. This is required if `MAIL_SERVER` is set. |
