@@ -347,12 +347,15 @@ def services():
             )
         return redirect(url_for("admin.services"))
 
+    current_services = (
+        NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
+    )
     return render_template(
         "admin/services.html",
         uploadForm=uploadForm,
         addServiceForm=addServiceForm,
-        current_services=current_app.current_services,
-        servlist=current_app.current_services["as_list"],
+        current_services=current_services,
+        servlist=current_services["as_list"],
     )
 
 
@@ -360,9 +363,10 @@ def services():
 @login_required
 @is_admin
 def export_services():
-    return Response(
-        str(current_app.current_services["services"]), mimetype="text/plain"
+    current_services = (
+        NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
     )
+    return Response(str(current_services["services"]), mimetype="text/plain")
 
 
 @bp.route("/agents", methods=["GET", "POST"])
@@ -370,6 +374,7 @@ def export_services():
 @is_admin
 def agent_config():
     agentConfig = AgentConfig.query.get(1)
+    agent_scripts = AgentScript.query.all()
     # pass the model to the form to populate
     agentForm = forms.AgentConfigForm(obj=agentConfig)
     addScriptForm = forms.AddScriptForm(prefix="add-script")
@@ -384,7 +389,7 @@ def agent_config():
     return render_template(
         "admin/agents.html",
         agentForm=agentForm,
-        scripts=current_app.agentScripts,
+        scripts=agent_scripts,
         addScriptForm=addScriptForm,
         delScriptForm=delScriptForm,
     )
