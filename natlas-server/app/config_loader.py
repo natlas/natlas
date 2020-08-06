@@ -16,8 +16,7 @@ def load_natlas_services(app, db):
         return
     from app.models import NatlasServices
 
-    current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
-    app.current_services = current_services.as_dict()
+    app.current_services = NatlasServices.get_latest_services()
 
 
 def load_agent_config(app, db):

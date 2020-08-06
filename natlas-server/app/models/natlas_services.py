@@ -14,6 +14,10 @@ class NatlasServices(db.Model):
         self.services = services
         self.sha256 = hashlib.sha256(self.services.encode()).hexdigest()
 
+    @staticmethod
+    def get_latest_services():
+        return NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
+
     def hash_equals(self, hash):
         return self.sha256 == hash
 

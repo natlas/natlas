@@ -336,20 +336,14 @@ def services():
             ns = NatlasServices(services=newServices)
             db.session.add(ns)
             db.session.commit()
-            current_app.current_services = (
-                NatlasServices.query.order_by(NatlasServices.id.desc())
-                .first()
-                .as_dict()
-            )
+            current_app.current_services = NatlasServices.get_latest_services()
             flash(
                 f"New service {newServiceName} on port {newServicePort} has been added.",
                 "success",
             )
         return redirect(url_for("admin.services"))
 
-    current_services = (
-        NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
-    )
+    current_services = NatlasServices.get_latest_services()
     return render_template(
         "admin/services.html",
         uploadForm=uploadForm,
@@ -363,9 +357,7 @@ def services():
 @login_required
 @is_admin
 def export_services():
-    current_services = (
-        NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
-    )
+    current_services = NatlasServices.get_latest_services()
     return Response(str(current_services["services"]), mimetype="text/plain")
 
 
