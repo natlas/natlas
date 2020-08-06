@@ -397,10 +397,7 @@ def add_script():
         newscript = AgentScript(name=addScriptForm.scriptName.data)
         db.session.add(newscript)
         db.session.commit()
-        current_app.agentScripts = AgentScript.query.all()
-        current_app.agentScriptStr = AgentScript.getScriptsString(
-            current_app.agentScripts
-        )
+        current_app.agent_scripts = AgentScript.get_scripts_string()
         flash(f"{newscript.name} successfully added to scripts", "success")
     else:
         flash(f"{addScriptForm.scriptName.data} couldn't be added to scripts", "danger")
@@ -419,10 +416,7 @@ def delete_script(name):
         if delScript:
             db.session.delete(delScript)
             db.session.commit()
-            current_app.agentScripts = AgentScript.query.all()
-            current_app.agentScriptStr = AgentScript.getScriptsString(
-                current_app.agentScripts
-            )
+            current_app.agent_scripts = AgentScript.get_scripts_string()
             flash(f"{name} successfully deleted.", "success")
         else:
             flash(f"{name} doesn't exist", "danger")

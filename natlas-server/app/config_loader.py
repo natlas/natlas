@@ -35,8 +35,7 @@ def load_agent_scripts(app, db):
 
     from app.models import AgentScript
 
-    app.agentScripts = AgentScript.query.all()
-    app.agentScriptStr = AgentScript.getScriptsString(scriptList=app.agentScripts)
+    app.agent_scripts = AgentScript.get_scripts_string()
 
 
 def load_config_from_db(app, db):
