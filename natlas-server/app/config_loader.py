@@ -16,8 +16,7 @@ def load_natlas_services(app, db):
         return
     from app.models import NatlasServices
 
-    current_services = NatlasServices.query.order_by(NatlasServices.id.desc()).first()
-    app.current_services = current_services.as_dict()
+    app.current_services = NatlasServices.get_latest_services()
 
 
 def load_agent_config(app, db):
@@ -36,8 +35,7 @@ def load_agent_scripts(app, db):
 
     from app.models import AgentScript
 
-    app.agentScripts = AgentScript.query.all()
-    app.agentScriptStr = AgentScript.getScriptsString(scriptList=app.agentScripts)
+    app.agent_scripts = AgentScript.get_scripts_string()
 
 
 def load_config_from_db(app, db):

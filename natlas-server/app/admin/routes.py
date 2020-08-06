@@ -336,23 +336,20 @@ def services():
             ns = NatlasServices(services=newServices)
             db.session.add(ns)
             db.session.commit()
-            current_app.current_services = (
-                NatlasServices.query.order_by(NatlasServices.id.desc())
-                .first()
-                .as_dict()
-            )
+            current_app.current_services = NatlasServices.get_latest_services()
             flash(
                 f"New service {newServiceName} on port {newServicePort} has been added.",
                 "success",
             )
         return redirect(url_for("admin.services"))
 
+    current_services = NatlasServices.get_latest_services()
     return render_template(
         "admin/services.html",
         uploadForm=uploadForm,
         addServiceForm=addServiceForm,
-        current_services=current_app.current_services,
-        servlist=current_app.current_services["as_list"],
+        current_services=current_services,
+        servlist=current_services["as_list"],
     )
 
 
@@ -360,9 +357,8 @@ def services():
 @login_required
 @is_admin
 def export_services():
-    return Response(
-        str(current_app.current_services["services"]), mimetype="text/plain"
-    )
+    current_services = NatlasServices.get_latest_services()
+    return Response(str(current_services["services"]), mimetype="text/plain")
 
 
 @bp.route("/agents", methods=["GET", "POST"])
@@ -370,6 +366,7 @@ def export_services():
 @is_admin
 def agent_config():
     agentConfig = AgentConfig.query.get(1)
+    agent_scripts = AgentScript.query.all()
     # pass the model to the form to populate
     agentForm = forms.AgentConfigForm(obj=agentConfig)
     addScriptForm = forms.AddScriptForm(prefix="add-script")
@@ -384,7 +381,7 @@ def agent_config():
     return render_template(
         "admin/agents.html",
         agentForm=agentForm,
-        scripts=current_app.agentScripts,
+        scripts=agent_scripts,
         addScriptForm=addScriptForm,
         delScriptForm=delScriptForm,
     )
@@ -400,10 +397,7 @@ def add_script():
         newscript = AgentScript(name=addScriptForm.scriptName.data)
         db.session.add(newscript)
         db.session.commit()
-        current_app.agentScripts = AgentScript.query.all()
-        current_app.agentScriptStr = AgentScript.getScriptsString(
-            current_app.agentScripts
-        )
+        current_app.agent_scripts = AgentScript.get_scripts_string()
         flash(f"{newscript.name} successfully added to scripts", "success")
     else:
         flash(f"{addScriptForm.scriptName.data} couldn't be added to scripts", "danger")
@@ -422,10 +416,7 @@ def delete_script(name):
         if delScript:
             db.session.delete(delScript)
             db.session.commit()
-            current_app.agentScripts = AgentScript.query.all()
-            current_app.agentScriptStr = AgentScript.getScriptsString(
-                current_app.agentScripts
-            )
+            current_app.agent_scripts = AgentScript.get_scripts_string()
             flash(f"{name} successfully deleted.", "success")
         else:
             flash(f"{name} doesn't exist", "danger")

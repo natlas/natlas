@@ -12,7 +12,5 @@ class AgentScript(db.Model, DictSerializable):
     name = db.Column(db.String(128), index=True, unique=True)
 
     @staticmethod
-    def getScriptsString(scriptList=None):
-        if scriptList:  # optionally pass in existing query and convert to string
-            return ",".join(s.name for s in scriptList)
+    def get_scripts_string():
         return ",".join(s.name for s in AgentScript.query.all())

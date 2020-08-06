@@ -31,7 +31,7 @@ def prepare_work(work):
     work["tags"] = get_target_tags(work["target"])
     work["type"] = "nmap"
     work["agent_config"] = current_app.agentConfig
-    work["agent_config"]["scripts"] = current_app.agentScriptStr
+    work["agent_config"]["scripts"] = current_app.agent_scripts
     work["services_hash"] = current_app.current_services["sha256"]
     work["scan_id"] = get_unique_scan_id()
     work["status"] = 200
