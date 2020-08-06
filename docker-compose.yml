@@ -1,3 +1,7 @@
+##################################
+#      DEVELOPMENT USE ONLY      #
+# DO NOT USE THIS IN PRODUCTION! #
+##################################
 version: "3.7"
 services:
   elastic:
@@ -20,8 +24,32 @@ services:
     networks:
       - backend
 
+  mysql:
+    image: mysql:8.0.21
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=natlas-dev-password-do-not-use
+      - MYSQL_DATABASE=natlas
+    networks:
+      - backend
+
+  zipkin-server:
+    image: openzipkin/zipkin-slim:2.21.6
+    ports:
+      - 9411:9411
+    networks:
+      - backend
+
+  opencensus-agent:
+    image: omnition/opencensus-agent:0.1.11
+    command: --config=/conf/opencensus-dev.yml
+    volumes:
+      - ./.opencensus-dev.yml:/conf/opencensus-dev.yml:ro
+    networks:
+      - backend
+
   webpack-server:
-    image: node:12-stretch
+    image: node:14-stretch
     command: /bin/bash -c '/usr/local/bin/yarn install && /usr/local/bin/yarn run webpack --mode development --watch'
     networks:
       - backend
@@ -41,6 +69,7 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
       - FLASK_ENV=development
+      - OPENCENSUS_AGENT=opencensus-agent:55678
     volumes:
       - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
@@ -52,7 +81,6 @@ services:
     build: natlas-agent
     networks:
       - backend
-    restart: on-failure
     environment:
       - NATLAS_SERVER_ADDRESS=http://natlas-server:5000
       - NATLAS_SCAN_LOCAL=true

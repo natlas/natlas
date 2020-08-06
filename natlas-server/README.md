@@ -71,7 +71,7 @@ The Natlas server depends on the following:
 
 To setup for development, you'll want to fork this repository and then clone it from your fork. See our [contributing guidelines](/CONTRIBUTING.md) for more information.
 
-Development makes use of docker through the `docker-compose.yml` file at the root of the repository. You can modify the desired environment variables and run `docker-compose up -d natlas-server`. You can also run the complete stack by running ` docker-compose up -d `. **This method is only suggested for a development environment.**
+Development makes use of docker through the `docker-compose.yml` file at the root of the repository. You can modify the desired environment variables and run `docker-compose up -d natlas-server`. You can also run the complete stack by running ` docker-compose up -d `. **This method should ONLY be used for a development environment.**
 
 ## The Config
 
