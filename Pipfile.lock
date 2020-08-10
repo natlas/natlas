@@ -75,11 +75,11 @@
         },
         "flynt": {
             "hashes": [
-                "sha256:be3b1bff310983e121ecc5f1608b25ed5891b78a0ad2071499a003b2b6a12cae",
-                "sha256:fecc26be43f3bc405d19cbfefcefc37b65a6f4ec8f9a8b0ec5c47387762fe3c6"
+                "sha256:e151bab9f72d8d2cfca2d7cb6f20f53f9bb8deeebde69a3458814a1ac1f93e7c",
+                "sha256:f68d4f9732cf28547dad5ccb61233766b1f67d8a80c1a8d21ae4d9bd24a02fcc"
             ],
             "index": "pypi",
-            "version": "==0.48.1"
+            "version": "==0.50"
         },
         "identify": {
             "hashes": [
@@ -193,10 +193,10 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:8aa9c37b082664dbce2236fa420759c02d64109d8e6013593ad13914718a30fd",
-                "sha256:f14a0a98ea4397f0d926cff950361766b6a73cd5975ae7eb259d12919f819a25"
+                "sha256:7b54fd606a1b85f83de49ad8d80dbec08e983a2d2f96685045b262ebc7481ee5",
+                "sha256:8cd7b2a4850b003a11be2fc213e206419efab41115cc14bca20e69654f2ac08e"
             ],
-            "version": "==20.0.29"
+            "version": "==20.0.30"
         }
     },
     "develop": {}
