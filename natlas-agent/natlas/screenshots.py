@@ -20,18 +20,18 @@ def base64_image(path):
     return str(base64.b64encode(img))[2:-1]
 
 
-def get_web_screenshots(target, scan_id, xml_data, proctimeout):
+def get_web_screenshots(target, scan_id, proctimeout):
     scan_dir = utils.get_scan_dir(scan_id)
+    xml_file = os.path.join(scan_dir, f"nmap.{scan_id}.xml")
     outFiles = os.path.join(scan_dir, f"aquatone.{scan_id}")
     output = []
     logger.info(f"Attempting to take screenshots for {target}")
 
-    p1 = subprocess.Popen(["echo", xml_data], stdout=subprocess.PIPE)  # nosec
     aquatoneArgs = ["aquatone", "-nmap", "-scan-timeout", "2500", "-out", outFiles]
-    process = subprocess.Popen(
-        aquatoneArgs, stdin=p1.stdout, stdout=subprocess.DEVNULL
-    )  # nosec
-    p1.stdout.close()
+    with open(xml_file, "r") as f:
+        process = subprocess.Popen(
+            aquatoneArgs, stdin=f, stdout=subprocess.DEVNULL
+        )  # nosec
 
     try:
         process.communicate(timeout=proctimeout)
