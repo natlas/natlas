@@ -111,10 +111,7 @@ def scan(target_data, config):
 
     if agentConfig["webScreenshots"] and shutil.which("aquatone") is not None:
         screens = screenshots.get_web_screenshots(
-            target,
-            scan_id,
-            result.result["xml_data"],
-            agentConfig["webScreenshotTimeout"],
+            target, scan_id, agentConfig["webScreenshotTimeout"]
         )
         for item in screens:
             result.add_screenshot(item)
