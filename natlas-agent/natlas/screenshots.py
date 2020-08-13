@@ -7,27 +7,86 @@ import json
 import base64
 from urllib.parse import urlparse
 
+from PIL import Image, UnidentifiedImageError
+
 from natlas import logging
 from natlas import utils
 
 logger = logging.get_logger("ScreenshotUtils")
 
 
-def base64_image(path):
-    img = None
+def base64_file(path: str) -> str:
     with open(path, "rb") as f:
-        img = f.read()
-    return str(base64.b64encode(img))[2:-1]
+        return base64.b64encode(f.read()).decode("ascii")
+
+
+def is_valid_image(path: str) -> bool:
+    try:
+        Image.open(path)
+        return True
+    except (FileNotFoundError, UnidentifiedImageError):
+        return False
+
+
+def parse_url(url: str) -> tuple:
+    urlp = urlparse(url)
+    if not urlp.port:
+        port = 80 if urlp.scheme == "http" else 443
+    else:
+        port = urlp.port
+
+    return urlp.scheme.upper(), port
+
+
+def parse_aquatone_page(page: dict, file_path: str) -> dict:
+    if not (page["hasScreenshot"] and is_valid_image(file_path)):
+        return {}
+    scheme, port = parse_url(page["url"])
+    logger.info(f"{scheme} screenshot acquired for {page['hostname']} on port {port}")
+    return {
+        "host": page["hostname"],
+        "port": port,
+        "service": scheme,
+        "data": base64_file(file_path),
+    }
+
+
+def get_aquatone_session(base_dir: str) -> dict:
+    session_path = os.path.join(base_dir, "aquatone_session.json")
+    output = {}
+    if not os.path.isfile(session_path):
+        return output
+
+    with open(session_path) as f:
+        session = json.load(f)
+
+    if session["stats"]["screenshotSuccessful"] == 0:
+        return output
+    return session
+
+
+def parse_aquatone_session(base_dir: str) -> list:
+    session = get_aquatone_session(base_dir)
+    output = []
+    if not session:
+        return output
+    for _, page in session["pages"].items():
+        fqScreenshotPath = os.path.join(base_dir, page["screenshotPath"])
+        parsed_page = parse_aquatone_page(page, fqScreenshotPath)
+        if not parsed_page:
+            continue
+        output.append(parsed_page)
+
+    return output
 
 
 def get_web_screenshots(target, scan_id, proctimeout):
     scan_dir = utils.get_scan_dir(scan_id)
     xml_file = os.path.join(scan_dir, f"nmap.{scan_id}.xml")
-    outFiles = os.path.join(scan_dir, f"aquatone.{scan_id}")
-    output = []
+    output_dir = os.path.join(scan_dir, f"aquatone.{scan_id}")
     logger.info(f"Attempting to take screenshots for {target}")
 
-    aquatoneArgs = ["aquatone", "-nmap", "-scan-timeout", "2500", "-out", outFiles]
+    aquatoneArgs = ["aquatone", "-nmap", "-scan-timeout", "2500", "-out", output_dir]
     with open(xml_file, "r") as f:
         process = subprocess.Popen(
             aquatoneArgs, stdin=f, stdout=subprocess.DEVNULL
@@ -43,64 +102,41 @@ def get_web_screenshots(target, scan_id, proctimeout):
         logger.warning(f"TIMEOUT: Killing aquatone against {target}")
         process.kill()
 
-    session_path = os.path.join(outFiles, "aquatone_session.json")
-    if not os.path.isfile(session_path):
-        return output
-
-    with open(session_path) as f:
-        session = json.load(f)
-
-    if session["stats"]["screenshotSuccessful"] > 0:
-        logger.info(
-            f"{target} - Success: {session['stats']['screenshotSuccessful']}, Fail: {session['stats']['screenshotFailed']}"
-        )
-
-        for k, page in session["pages"].items():
-            fqScreenshotPath = os.path.join(outFiles, page["screenshotPath"])
-            if page["hasScreenshot"] and os.path.isfile(fqScreenshotPath):
-                urlp = urlparse(page["url"])
-                if not urlp.port and urlp.scheme == "http":
-                    port = 80
-                elif not urlp.port and urlp.scheme == "https":
-                    port = 443
-                else:
-                    port = urlp.port
-                logger.info(
-                    f"{urlp.scheme.upper()} screenshot acquired for {page['hostname']} on port {port}"
-                )
-                output.append(
-                    {
-                        "host": page["hostname"],
-                        "port": port,
-                        "service": urlp.scheme.upper(),
-                        "data": base64_image(fqScreenshotPath),
-                    }
-                )
-    return output
+    return parse_aquatone_session(output_dir)
 
 
 def get_vnc_screenshots(target, scan_id, proctimeout):
 
     scan_dir = utils.get_scan_dir(scan_id)
-    outFile = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")
+    output_file = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")
 
     logger.info(f"Attempting to take VNC screenshot for {target}")
 
+    vncsnapshot_args = [
+        "xvfb-run",
+        "vncsnapshot",
+        "-quality",
+        "50",
+        target,
+        output_file,
+    ]
+
     process = subprocess.Popen(
-        ["xvfb-run", "vncsnapshot", "-quality", "50", target, outFile],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        vncsnapshot_args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )  # nosec
     try:
         process.communicate(timeout=proctimeout)
-        if process.returncode == 0:
-            return True
-    except Exception:
-        try:
-            logger.warning(f"TIMEOUT: Killing vncsnapshot against {target}")
-            process.kill()
-            return False
-        except Exception:
-            pass
+    except subprocess.TimeoutExpired:
+        logger.warning(f"TIMEOUT: Killing vncsnapshot against {target}")
+        process.kill()
 
-    return False
+    if not is_valid_image(output_file):
+        return {}
+
+    logger.info(f"VNC screenshot acquired for {target} on port 5900")
+    return {
+        "host": target,
+        "port": 5900,
+        "service": "VNC",
+        "data": base64_file(output_file),
+    }

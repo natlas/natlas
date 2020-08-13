@@ -1,6 +1,5 @@
 import subprocess
 import threading
-import shutil
 import os
 import ipaddress
 
@@ -109,32 +108,19 @@ def scan(target_data, config):
         result.is_up(nmap_report.hosts[0].is_up())
         result.add_item("port_count", len(nmap_report.hosts[0].get_ports()))
 
-    if agentConfig["webScreenshots"] and shutil.which("aquatone") is not None:
+    if agentConfig["webScreenshots"]:
         screens = screenshots.get_web_screenshots(
             target, scan_id, agentConfig["webScreenshotTimeout"]
         )
         for item in screens:
             result.add_screenshot(item)
 
-    if (
-        agentConfig["vncScreenshots"]
-        and "5900/tcp" in result.result["nmap_data"]
-        and screenshots.get_vnc_screenshots(
+    if agentConfig["vncScreenshots"] and "5900/tcp" in result.result["nmap_data"]:
+        vnc_screenshot = screenshots.get_vnc_screenshots(
             target, scan_id, agentConfig["vncScreenshotTimeout"]
         )
-    ):
-
-        screenshotPath = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")
-        if os.path.isfile(screenshotPath):
-            result.add_screenshot(
-                {
-                    "host": target,
-                    "port": 5900,
-                    "service": "VNC",
-                    "data": screenshots.base64_image(screenshotPath),
-                }
-            )
-            logger.info(f"VNC screenshot acquired for {result.result['ip']}")
+        if vnc_screenshot:
+            result.add_screenshot(vnc_screenshot)
 
     # submit result
 
