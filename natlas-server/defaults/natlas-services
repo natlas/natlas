@@ -1002,3 +1002,9 @@ memcached	11211/tcp
 mongod	27017/tcp
 mongod 27018/tcp
 mongod 27019/tcp
+dockerd 2376/tcp
+kubeadm 6443/tcp
+kubeadm 10250/tcp
+kubeadm 10251/tcp
+minecraft 25565/tcp
+elastic 9300/tcp
