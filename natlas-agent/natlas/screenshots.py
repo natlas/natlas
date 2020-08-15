@@ -53,23 +53,23 @@ def parse_aquatone_page(page: dict, file_path: str) -> dict:
 
 def get_aquatone_session(base_dir: str) -> dict:
     session_path = os.path.join(base_dir, "aquatone_session.json")
-    output = {}
     if not os.path.isfile(session_path):
-        return output
+        return {}
 
     with open(session_path) as f:
         session = json.load(f)
 
     if session["stats"]["screenshotSuccessful"] == 0:
-        return output
+        return {}
     return session
 
 
 def parse_aquatone_session(base_dir: str) -> list:
     session = get_aquatone_session(base_dir)
-    output = []
     if not session:
-        return output
+        return []
+
+    output = []
     for _, page in session["pages"].items():
         fqScreenshotPath = os.path.join(base_dir, page["screenshotPath"])
         parsed_page = parse_aquatone_page(page, fqScreenshotPath)
