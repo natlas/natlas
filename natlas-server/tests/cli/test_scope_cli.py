@@ -1,6 +1,6 @@
 import json
 
-from app.cli.scope import import_items
+from app.cli.scope import import_items, export_items
 from app.models import ScopeItem
 
 DEFAULT_SCOPE_ITEMS = ["10.0.0.0/8", "192.168.1.0/24", "192.168.5.0/28"]
@@ -53,3 +53,19 @@ def test_import_items_verbose(runner):
         result_dict = json.loads(result.output)
         assert len(result_dict["scope"]) == len(DEFAULT_SCOPE_ITEMS)
         assert result_dict["summary"]["scope"]["successful"] == len(DEFAULT_SCOPE_ITEMS)
+
+
+def test_export_items_tagged(runner):
+    scope_items = ["10.0.0.0/8,a", "192.168.5.0/28"]
+    blacklist_items = ["192.168.1.0/24,b"]
+    ScopeItem.import_scope_list(scope_items, False)
+    ScopeItem.import_scope_list(blacklist_items, True)
+    result = runner.invoke(export_items)
+    assert result.exit_code == 0
+    result_dict = json.loads(result.output)
+    assert len(result_dict["scope"]) == 2
+    assert result_dict["scope"][0]["tags"] == ["a"]
+    assert result_dict["scope"][1]["tags"] == []
+    assert len(result_dict["blacklist"]) == 1
+    assert result_dict["blacklist"][0]["blacklist"] is True
+    assert result_dict["blacklist"][0]["tags"] == ["b"]
