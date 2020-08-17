@@ -34,6 +34,9 @@ class ScopeItem(db.Model, DictSerializable):
     def is_tagged(self, tag):
         return tag in self.tags
 
+    def get_tag_names(self):
+        return [tag.name for tag in self.tags]
+
     @staticmethod
     def getBlacklist():
         return ScopeItem.query.filter_by(blacklist=True).all()
