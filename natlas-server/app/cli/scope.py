@@ -14,10 +14,10 @@ import_helptext = "Import scope/blacklist from a file containing line-separated 
 Optionally, each line can contain a comma separated list of tags to apply to that target. e.g. 127.0.0.1,local,private,test"
 
 
-def import_scope(scope: typing.TextIO, blacklist: bool):
-    if not scope:
+def import_scope(scope_file: typing.TextIO, blacklist: bool):
+    if not scope_file:
         return {"failed": 0, "existed": 0, "successful": 0}
-    addresses = scope.readlines()
+    addresses = scope_file.readlines()
     fail, exist, success = ScopeItem.import_scope_list(addresses, blacklist)
     db.session.commit()
 
@@ -44,8 +44,9 @@ def print_import_output(results: dict, verbose: bool):
 @cli_group.command("import", help=import_helptext)
 @click.argument("file", type=click.File("r"))
 @click.option(
-    "--scope/--blacklist",
-    default=True,
+    "--blacklist/--scope",
+    "import_as_blacklist",
+    default=False,
     help="Should this file be considered in scope or blacklisted?",
 )
 @click.option(
@@ -53,9 +54,9 @@ def print_import_output(results: dict, verbose: bool):
     default=False,
     help="Print status of all addresses / ranges instead of only the summary.",
 )
-def import_items(file: str, scope: bool, verbose: bool):
-    import_name = "scope" if scope else "blacklist"
-    results = {import_name: import_scope(file, scope)}
+def import_items(file: str, import_as_blacklist: bool, verbose: bool):
+    import_name = "blacklist" if import_as_blacklist else "scope"
+    results = {import_name: import_scope(file, import_as_blacklist)}
     results["summary"] = {
         "timestamp": datetime.utcnow().isoformat(),
         import_name: summarize_import_results(results[import_name]),
