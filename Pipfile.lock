@@ -75,18 +75,18 @@
         },
         "flynt": {
             "hashes": [
-                "sha256:e151bab9f72d8d2cfca2d7cb6f20f53f9bb8deeebde69a3458814a1ac1f93e7c",
-                "sha256:f68d4f9732cf28547dad5ccb61233766b1f67d8a80c1a8d21ae4d9bd24a02fcc"
+                "sha256:0116fd1a42c05390da4efe2f44848aae8b7b33d267af2160fa428c30ba143979",
+                "sha256:f27e1223ee3d4bf0a6ab9b56c567264fb5c1635e02b29d3f51178777277af5ae"
             ],
             "index": "pypi",
-            "version": "==0.50"
+            "version": "==0.52"
         },
         "identify": {
             "hashes": [
-                "sha256:110ed090fec6bce1aabe3c72d9258a9de82207adeaa5a05cd75c635880312f9a",
-                "sha256:ccd88716b890ecbe10920659450a635d2d25de499b9a638525a48b48261d989b"
+                "sha256:69c4769f085badafd0e04b1763e847258cbbf6d898e8678ebffc91abdb86f6c6",
+                "sha256:d6ae6daee50ba1b493e9ca4d36a5edd55905d2cf43548fdc20b2a14edef102e7"
             ],
-            "version": "==1.4.25"
+            "version": "==1.4.28"
         },
         "nodeenv": {
             "hashes": [
