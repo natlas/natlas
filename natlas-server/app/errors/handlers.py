@@ -1,24 +1,47 @@
-from flask import render_template
+from flask import request
 from app.errors import bp
 from app import db
 import elasticsearch
 import sentry_sdk
 
+from .http_error import HTTPError
+from .responses import get_response, get_supported_formats
+
+
+def build_response(err: HTTPError):
+    selected_format = request.accept_mimetypes.best_match(
+        get_supported_formats(), default="application/json"
+    )
+    return get_response(selected_format, err)
+
+
+@bp.app_errorhandler(400)
+def bad_request(e):
+    errmsg = "The server was unable to process your request"
+    err = HTTPError(400, errmsg)
+    return build_response(err)
+
 
 @bp.app_errorhandler(404)
 def page_not_found(e):
-    return render_template("errors/404.html"), 404
+    errmsg = f"{request.path} Not found"
+    err = HTTPError(404, errmsg)
+    return build_response(err)
 
 
 @bp.app_errorhandler(405)
 def method_not_allowed(e):
-    return render_template("errors/405.html"), 405
+    errmsg = f"Method {request.method} Not Allowed on {request.path}"
+    err = HTTPError(405, errmsg)
+    return build_response(err)
 
 
 @bp.app_errorhandler(500)
 def internal_server_error(e):
+    errmsg = "Internal Server Error"
+    err = HTTPError(500, errmsg)
     db.session.rollback()
-    return render_template("errors/500.html"), 500
+    return build_response(err)
 
 
 @bp.app_errorhandler(elasticsearch.ConnectionError)
@@ -28,5 +51,7 @@ def elastic_unavailable(e):
         the others use Flask's exception handling already. Since we are handling
         a specific exception class, we have to capture it explicitly.
     """
+    errmsg = "Service Temporarily Unavailable"
+    err = HTTPError(503, errmsg)
     sentry_sdk.capture_exception(e)
-    return render_template("errors/503.html"), 503
+    return build_response(err)
