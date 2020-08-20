@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set title = "400 - Bad Request" %}
+{% block content %}
+  <div class="row">
+      <div class="col">
+          <h2>Invalid Search Query</h2>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col">
+        <p><strong>{{ err }}</strong></p>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col">
+        <ul>
+          <li>Need help <a target="_blank" rel="noopener noreferrer" href="https://docs.natlas.io/docs/tasks/searching-natlas/">searching?</a></li>
+          <li>Maybe you'd prefer to go on <a href="{{url_for('host.random_host')}}">an adventure</a>?</li>
+          <li>Or maybe you'd like to <a href="{{ url_for('main.browse') }}">look around</a>.</li>
+        </ul>
+    </div>
+  </div>
+{% endblock %}
