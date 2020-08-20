@@ -9,10 +9,13 @@ from flask import (
     jsonify,
 )
 from flask_login import current_user
+import elasticsearch
+
 from app.main import bp
 from app.main.pagination import build_pagination_urls, results_offset
 from app.auth.wrappers import is_authenticated
 from app.auth.forms import LoginForm, RegistrationForm
+from app.errors import NatlasSearchError
 
 
 @bp.route("/")
@@ -91,9 +94,13 @@ def search():
 
     searchIndex = "history" if includeHistory else "latest"
 
-    count, context = current_app.elastic.search(
-        results_per_page, search_offset, query=query, searchIndex=searchIndex
-    )
+    try:
+        count, context = current_app.elastic.search(
+            results_per_page, search_offset, query=query, searchIndex=searchIndex
+        )
+    except elasticsearch.RequestError as e:
+        raise NatlasSearchError(e)
+
     totalHosts = current_app.elastic.total_hosts()
 
     if includeHistory:

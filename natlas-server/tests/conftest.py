@@ -8,10 +8,9 @@ import pytest
 @pytest.fixture
 def app():
     app = create_app(TestConfig)
-    app_context = app.app_context()
-    app_context.push()
-    db.create_all()
-    return app
+    with app.app_context():
+        db.create_all()
+        yield app
 
 
 @pytest.fixture

@@ -1,3 +1,5 @@
+from flask import url_for, current_app
+
 json_headers = {"Accept": "application/json"}
 html_headers = {"Accept": "text/html"}
 weighted_headers = {"Accept": "text/html;q=0.8, application/json"}
@@ -36,3 +38,13 @@ def test_html_error(client):
 def test_content_type_matching(client):
     response = client.get(NONEXISTANT_URL, headers=weighted_headers)
     assert response.content_type == "application/json; charset=utf-8"
+
+
+def test_invalid_search(client):
+    invalid_query = "tags:!invalid"
+    current_app.config["LOGIN_REQUIRED"] = False
+    response = client.get(
+        url_for("main.search", query=invalid_query), headers=json_headers
+    )
+    assert response.status_code == 400
+    assert invalid_query in response.get_json()["message"]

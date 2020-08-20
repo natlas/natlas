@@ -1,15 +1,15 @@
 from flask import Response, render_template
 
-from .http_error import HTTPError
+from .errors import NatlasServiceError
 
 
-def json_response(err: HTTPError) -> Response:
+def json_response(err: NatlasServiceError) -> Response:
     return Response(
         err.get_json(), err.status_code, content_type="application/json; charset=utf-8"
     )
 
 
-def html_response(err: HTTPError) -> Response:
+def html_response(err: NatlasServiceError) -> Response:
     return Response(render_template(err.template, err=err), err.status_code)
 
 
@@ -17,7 +17,7 @@ def html_response(err: HTTPError) -> Response:
 supported_formats = {"text/html": html_response, "application/json": json_response}
 
 
-def get_response(requested_format: str, err: HTTPError) -> Response:
+def get_response(requested_format: str, err: NatlasServiceError) -> Response:
     return supported_formats.get(requested_format)(err)
 
 

@@ -1,7 +1,7 @@
 import json
 
 
-class HTTPError:
+class NatlasServiceError(Exception):
     def __init__(self, status_code: int, message: str, template: str = None):
         self.status_code = status_code
         self.message = message
@@ -15,3 +15,10 @@ class HTTPError:
 
     def get_json(self):
         return json.dumps(self.get_dict(), sort_keys=True, indent=4)
+
+
+class NatlasSearchError(NatlasServiceError):
+    def __init__(self, e):
+        self.status_code = 400
+        self.message = e.info["error"]["root_cause"][0]["reason"]
+        self.template = "errors/search.html"
