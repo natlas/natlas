@@ -4,7 +4,7 @@ import os
 import ipaddress
 
 from libnmap.parser import NmapParser, NmapParserException
-from sentry_sdk import capture_exception
+from sentry_sdk import add_breadcrumb, capture_exception, push_scope
 
 from natlas import screenshots
 from natlas import logging
@@ -48,7 +48,6 @@ def scan(target_data, config):
 
     if not utils.validate_target(target_data["target"], config):
         return False
-
     target = target_data["target"]
     scan_id = target_data["scan_id"]
 
@@ -67,10 +66,10 @@ def scan(target_data, config):
             timeout=int(agentConfig["scanTimeout"]),
         )  # nosec
     except subprocess.TimeoutExpired:
+        add_breadcrumb(level="warn", message="Nmap scan timed out")
         result.add_item("timed_out", True)
         logger.warning(f"TIMEOUT: Nmap against {target} ({scan_id})")
         return result
-
     logger.info(f"Nmap {target} ({scan_id}) complete")
 
     for ext in "nmap", "gnmap", "xml":
@@ -81,13 +80,11 @@ def scan(target_data, config):
         except Exception:
             logger.warning(f"Couldn't read {path}")
             return False
-
     try:
         nmap_report = NmapParser.parse(result.result["xml_data"])
     except NmapParserException:
         logger.warning(f"Couldn't parse nmap.{scan_id}.xml")
         return False
-
     if nmap_report.hosts_total < 1:
         logger.warning(f"No hosts found in nmap.{scan_id}.xml")
         return False
@@ -107,21 +104,18 @@ def scan(target_data, config):
         # host is up and reportable ports were found
         result.is_up(nmap_report.hosts[0].is_up())
         result.add_item("port_count", len(nmap_report.hosts[0].get_ports()))
-
     if agentConfig["webScreenshots"]:
         screens = screenshots.get_web_screenshots(
             target, scan_id, agentConfig["webScreenshotTimeout"]
         )
         for item in screens:
             result.add_screenshot(item)
-
     if agentConfig["vncScreenshots"] and "5900/tcp" in result.result["nmap_data"]:
         vnc_screenshot = screenshots.get_vnc_screenshots(
             target, scan_id, agentConfig["vncScreenshotTimeout"]
         )
         if vnc_screenshot:
             result.add_screenshot(vnc_screenshot)
-
     # submit result
 
     return result
@@ -174,18 +168,34 @@ class ThreadScan(threading.Thread):
             )
 
     def run(self):
-        try:
-            while True:
+        while True:
+            with push_scope() as scope:
+                add_breadcrumb(
+                    category="scan_workflow", message="Fetching work", level="info"
+                )
                 work_item = self.get_work()
 
                 if not work_item:
                     break
-
-                self.execute_scan(work_item)
-                work_item.complete()
-        except Exception as e:
-            logger.warning(f"Failed to process work item: {e}")
-            capture_exception(e)
+                scope.set_extra("natlas_scan_id", work_item.target_data["scan_id"])
+                add_breadcrumb(
+                    category="scan_workflow",
+                    message="Starting scan for %s" % work_item.target_data["target"],
+                    level="info",
+                )
+                try:
+                    self.execute_scan(work_item)
+                    add_breadcrumb(
+                        category="scan_workflow",
+                        message="Scan completed. Reporting",
+                        level="info",
+                    )
+                    work_item.complete()
+                except Exception as e:
+                    event_id = capture_exception(e)
+                    logger.warning(
+                        f"Failed to process work item: {e}. Sentry event id: {event_id}"
+                    )
 
     def get_work(self):
         # If we're in auto mode, the threads handle getting work from the server
@@ -201,12 +211,10 @@ class ThreadScan(threading.Thread):
                     logger.warning(
                         f"Failed to get updated services from {self.config.server}"
                     )
-
             return ScanWorkItem(target_data)
         else:  # Manual
             target_data = self.queue.get()
             if not target_data:
                 return None
-
             logger.info(f"Manual Target: {target_data['target']}")
             return ManualScanWorkItem(self.queue, target_data)

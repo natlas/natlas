@@ -1,8 +1,9 @@
 from urllib.parse import urlparse
 import sentry_sdk
+from config import Config
 
 
-def initialize_sentryio(config):
+def initialize_sentryio(config: Config):
     if config.sentry_dsn:
         url = urlparse(config.sentry_dsn)
         print(
