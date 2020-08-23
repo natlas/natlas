@@ -13,6 +13,7 @@ from app.elastic import ElasticInterface
 from .instrumentation import initialize_opencensus
 from .config_loader import load_config_from_db
 from app.scope import ScopeManager
+from app.url_converters import register_converters
 
 
 class AnonUser(AnonymousUserMixin):
@@ -71,6 +72,8 @@ def create_app(config_class=config.Config, load_config=False):
         load_config_from_db(app, db)
         if db.engine.has_table("scope_item"):
             ScopeManager.load_all_groups()
+
+    register_converters(app)
 
     from app.cli.user import cli_group as user_cli
 
