@@ -102,7 +102,7 @@ def submit():
         mark_scan_completed(newhost["ip"], newhost["scan_id"])
 
     try:
-        nmap = NmapParser.parse(newhost["xml_data"])
+        nmap = NmapParser.parse(newhost.get("xml_data", None))
         # If there's more or less than 1 host in the xml data, reject it (for now)
         if nmap.hosts_total != 1:
             status_code = 400
