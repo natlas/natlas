@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% set title = ip ~ " | Summary" %}
+{% set active_page = "summary" %}
+{% set pagetype = 'single' %}
+{% block content %}
+    {% include 'host/versions/0.6.12/_header.html' %}
+    {% include 'host/versions/0.6.12/_host-row.html' %}
+    {% include 'host/versions/0.6.12/_imagemodal.html' %}
+{% endblock %}

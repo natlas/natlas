@@ -27,7 +27,7 @@ def casted_value(expected_type, value):
 class Config(object):
 
     # Current Version
-    NATLAS_VERSION = "0.6.11"
+    NATLAS_VERSION = "0.6.12"
 
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     load_dotenv(os.path.join(BASEDIR, ".env"))
