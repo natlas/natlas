@@ -7,6 +7,21 @@ and this project strives to adhere to [Semantic Versioning](https://semver.org/s
 
 ## [Unreleased]
 
+## [v0.6.12]
+
+### Added
+
+- (Agent) Better telemetry indicators for exceptions with Sentry ([#445](https://github.com/natlas/natlas/pull/445))
+
+### Fixed
+
+- (Server) Scope import via cli now works as expected ([#436](https://github.com/natlas/natlas/issues/436))
+- (Server) Scope export now works even when scope items have tags ([#426](https://github.com/natlas/natlas/issues/426))
+- (Server) Errors are now reported as json when json is expected ([#442](https://github.com/natlas/natlas/pull/442))
+- (Server) Searching with a bad search query now returns a 400 Bad Request page instead of an Internal Server Error, and links to [our search documentation](https://docs.natlas.io/docs/tasks/searching-natlas/) ([#444](https://github.com/natlas/natlas/issues/444))
+- (Server) Accessing `/host/<an.invalid.ip>` no longer throws an exception but rather throws a 404 as expected. ([#449](https://github.com/natlas/natlas/issues/449))
+- (Server) No longer throw an exception when `xml_data` is missing from a submission ([#441](https://github.com/natlas/natlas/issues/441))
+
 ## [v0.6.11]
 
 ### Added
@@ -337,7 +352,8 @@ More Info can be found at [natlas/v0.5.0](https://github.com/natlas/natlas/relea
 - Ability to run in standalone mode
 
 
-[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.10...HEAD
+[Unreleased]: https://github.com/natlas/natlas/compare/v0.6.12...HEAD
+[v0.6.12]: https://github.com/natlas/natlas/compare/v0.6.11...v0.6.12
 [v0.6.11]: https://github.com/natlas/natlas/compare/v0.6.10...v0.6.11
 [v0.6.10]: https://github.com/natlas/natlas/compare/v0.6.9...v0.6.10
 [v0.6.9]: https://github.com/natlas/natlas/compare/v0.6.8...v0.6.9
