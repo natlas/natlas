@@ -16,7 +16,7 @@
     },
     "devDependencies": {
         "@types/jquery": "^3.5.1",
-        "@typescript-eslint/parser": "^3.9.0",
+        "@typescript-eslint/parser": "^3.9.1",
         "css-loader": "^4.2.1",
         "eslint": "^7.7.0",
         "eslint-import-resolver-webpack": "^0.12.1",
