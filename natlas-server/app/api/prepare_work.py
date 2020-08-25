@@ -1,17 +1,13 @@
 from flask import current_app
-from netaddr import IPNetwork
 import secrets
 from app.models import ScopeItem
 
 
-def get_target_tags(target):
-    targetnet = IPNetwork(target)
+def get_target_tags(target: str) -> list:
+    overlap = ScopeItem.get_overlapping_ranges(target)
     tags = []
-    for scope in current_app.ScopeManager.get_scope():
-        if targetnet in scope:
-            scopetags = ScopeItem.query.filter_by(target=str(scope)).first().tags
-            for tag in scopetags:
-                tags.append(tag.name)
+    for scope in overlap:
+        tags.extend(scope.get_tag_names())
     return list(
         set(tags)
     )  # make it a set for only uniques, then make it a list to serialize to JSON
