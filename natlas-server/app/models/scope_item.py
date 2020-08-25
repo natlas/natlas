@@ -1,7 +1,7 @@
-from app import db
 import ipaddress
+from netaddr import IPNetwork, IPAddress
+from app import db
 from app.models.dict_serializable import DictSerializable
-
 
 # Many to many table that ties tags and scopes together
 scopetags = db.Table(
@@ -22,6 +22,33 @@ class ScopeItem(db.Model, DictSerializable):
         backref=db.backref("scope", lazy=True),
         lazy=True,
     )
+    addr_family = db.Column(db.Integer)
+    start_addr = db.Column(db.VARBINARY(16))
+    stop_addr = db.Column(db.VARBINARY(16))
+
+    def __init__(self, target: str, blacklist: bool):
+        self.target = target
+        self.blacklist = blacklist
+        self.parse_network_range(target)
+
+    def parse_network_range(self, network: str):
+        net = IPNetwork(network)
+        self.addr_family = net.version
+        size = 4 if net.version == 4 else 16
+        self.start_addr = net.first.to_bytes(size, byteorder="big")
+        self.stop_addr = net.last.to_bytes(size, byteorder="big")
+
+    @staticmethod
+    def get_overlapping_ranges(addr: str) -> list:
+        addr = IPAddress(addr)
+        size = 4 if addr.version == 4 else 16
+        binval = addr.value.to_bytes(size, byteorder="big")
+        return (
+            ScopeItem.query.filter(ScopeItem.addr_family == addr.version)
+            .filter(ScopeItem.start_addr <= binval)
+            .filter(ScopeItem.stop_addr >= binval)
+            .all()
+        )
 
     def addTag(self, tag):
         if not self.is_tagged(tag):
