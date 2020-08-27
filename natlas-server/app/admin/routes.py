@@ -43,6 +43,7 @@ def admin():
             confitem.value = str(fieldvalue)
             db.session.add(confitem)
         db.session.commit()
+        flash("Successfully updated Natlas configuration.", "success")
     return render_template(
         "admin/index.html", configForm=configForm, configItems=configItems
     )
@@ -81,7 +82,7 @@ def delete_user(id):
         user = User.query.filter_by(id=id).first()
         User.query.filter_by(id=id).delete()
         db.session.commit()
-        flash(f"{user.email} deleted!", "success")
+        flash(f"{user.email} deleted.", "success")
     else:
         flash("Form couldn't validate!", "danger")
 
@@ -100,7 +101,7 @@ def toggle_user(id):
             return redirect(url_for("admin.users"))
         user.is_admin = not user.is_admin
         db.session.commit()
-        flash("User status toggled!", "success")
+        flash("User status toggled.", "success")
     else:
         flash("Form couldn't validate!", "danger")
 
@@ -131,7 +132,7 @@ def scope():
         db.session.add(newTarget)
         db.session.commit()
         current_app.ScopeManager.update()
-        flash(f"{newTarget.target} added!", "success")
+        flash(f"{newTarget.target} added.", "success")
         return redirect(url_for("admin.scope"))
     return render_template("admin/scope.html", **render)
 
@@ -159,7 +160,7 @@ def blacklist():
         db.session.add(newTarget)
         db.session.commit()
         current_app.ScopeManager.update()
-        flash(f"{newTarget.target} blacklisted!", "success")
+        flash(f"{newTarget.target} blacklisted.", "success")
         return redirect(url_for("admin.blacklist"))
     return render_template("admin/blacklist.html", **render)
 
@@ -184,9 +185,9 @@ def import_scope(scopetype=""):
         db.session.commit()
         current_app.ScopeManager.update()
         if success:
-            flash(f"{len(success)} targets added to {scopetype}!", "success")
+            flash(f"{len(success)} targets added to {scopetype}.", "success")
         if exist:
-            flash(f"{len(exist)} targets already existed!", "info")
+            flash(f"{len(exist)} targets already existed.", "info")
         if fail:
             flash(f"{len(fail)} targets failed to import!", "danger")
             for item in fail:
@@ -228,7 +229,7 @@ def delete_scope(scopetype, id):
         ScopeItem.query.filter_by(id=id).delete()
         db.session.commit()
         current_app.ScopeManager.update()
-        flash(f"{item.target} deleted!", "success")
+        flash(f"{item.target} deleted.", "success")
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
@@ -244,7 +245,7 @@ def toggle_scope(scopetype, id):
     if toggleForm.validate_on_submit():
         item = ScopeItem.query.filter_by(id=id).first()
         item.blacklist = not item.blacklist
-        flash(f"Toggled scope status for {item.target}!", "success")
+        flash(f"Toggled scope status for {item.target}.", "success")
         db.session.commit()
         current_app.ScopeManager.update()
     else:
@@ -265,7 +266,7 @@ def tag_scope(scopetype, id):
         mytag = Tag.query.filter_by(name=addTagForm.tagname.data).first()
         scope.addTag(mytag)
         db.session.commit()
-        flash(f'Tag "{mytag.name}" added to {scope.target}', "success")
+        flash(f'Tag "{mytag.name}" added to {scope.target}.', "success")
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
@@ -284,7 +285,7 @@ def untag_scope(scopetype, id):
         mytag = Tag.query.filter_by(name=delTagForm.tagname.data).first()
         scope.delTag(mytag)
         db.session.commit()
-        flash(f'Tag "{mytag.name}" removed from {scope.target}', "success")
+        flash(f'Tag "{mytag.name}" removed from {scope.target}.', "success")
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
@@ -377,6 +378,7 @@ def agent_config():
         agentForm.populate_obj(agentConfig)
         db.session.commit()
         current_app.agentConfig = agentConfig.as_dict()
+        flash("Successfully updated agent configuration.", "success")
 
     return render_template(
         "admin/agents.html",
@@ -398,9 +400,11 @@ def add_script():
         db.session.add(newscript)
         db.session.commit()
         current_app.agent_scripts = AgentScript.get_scripts_string()
-        flash(f"{newscript.name} successfully added to scripts", "success")
+        flash(f"{newscript.name} successfully added to scripts.", "success")
     else:
-        flash(f"{addScriptForm.scriptName.data} couldn't be added to scripts", "danger")
+        flash(
+            f"{addScriptForm.scriptName.data} couldn't be added to scripts!", "danger"
+        )
 
     return redirect(url_for("admin.agent_config"))
 
@@ -419,7 +423,7 @@ def delete_script(name):
             current_app.agent_scripts = AgentScript.get_scripts_string()
             flash(f"{name} successfully deleted.", "success")
         else:
-            flash(f"{name} doesn't exist", "danger")
+            flash(f"{name} doesn't exist!", "danger")
         return redirect(url_for("admin.agent_config"))
 
 
@@ -433,7 +437,7 @@ def delete_scan(scan_id):
     if delForm.validate_on_submit():
         deleted = current_app.elastic.delete_scan(scan_id)
         if deleted not in [1, 2]:
-            flash(f"Couldn't delete scan {scan_id}", "danger")
+            flash(f"Couldn't delete scan {scan_id}!", "danger")
         else:
             flash(f"Successfully deleted scan {scan_id}.", "success")
     else:
@@ -453,12 +457,12 @@ def delete_host(ip):
         deleted = current_app.elastic.delete_host(ip)
         if deleted > 0:
             flash(
-                f"Successfully deleted {deleted - 1 if deleted > 1 else deleted} scans for {ip}",
+                f"Successfully deleted {deleted - 1 if deleted > 1 else deleted} scans for {ip}.",
                 "success",
             )
             return redirect(redirectLoc)
         else:
-            flash(f"Couldn't delete host: {ip}", "danger")
+            flash(f"Couldn't delete host: {ip}!", "danger")
     else:
         flash("Couldn't validate form!")
         return redirect(redirectLoc)
@@ -476,7 +480,7 @@ def tags():
         newTag = Tag(name=prepared_tag)
         db.session.add(newTag)
         db.session.commit()
-        flash(f"Successfully added tag {newTag.name}", "success")
+        flash(f"Successfully added tag {newTag.name}.", "success")
         return redirect(url_for("admin.tags"))
     return render_template("admin/tags.html", tags=tags, addForm=addForm)
 
