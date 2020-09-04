@@ -1,5 +1,5 @@
-import ipaddress
 from netaddr import IPNetwork, IPAddress
+from netaddr.core import AddrFormatError
 from app import db
 from app.models.dict_serializable import DictSerializable
 
@@ -96,39 +96,81 @@ class ScopeItem(db.Model, DictSerializable):
         return ip, tags
 
     @staticmethod
+    def extract_import_tags(import_list: list) -> set:
+        tags = set()
+        for line in import_list:
+            split = line.split(",")
+            if len(split) > 1:
+                for tag in split[1:]:
+                    tags.add(tag)
+        return tags
+
+    @staticmethod
     def create_if_none(ip, blacklist, tags=[]):
         new = False
         item = ScopeItem.query.filter_by(target=ip).first()
         if not item:
             item = ScopeItem(target=ip, blacklist=blacklist)
-            db.session.add(item)
             new = True
-        if tags:
-            ScopeItem.addTags(item, tags)
+        for tag in tags:
+            item.addTag(tag)
         return new, item
 
     @staticmethod
     def validate_ip(ip_str):
         try:
-            # False will mask out hostbits for us, ip_network for eventual ipv6 compat
-            return ipaddress.ip_network(ip_str, False)
-        except ValueError:
-            # if we hit this ValueError it means that the input couldn't be a CIDR range
+            return IPNetwork(ip_str)
+        except AddrFormatError:
             return False
 
     @staticmethod
-    def import_scope_list(address_list, blacklist):
-        fail, exists, success = [], [], []
+    def import_scope_list(address_list, blacklist) -> dict:
+        result = {"fail": [], "success": 0, "exist": 0}
+        prefixes = {"sqlite": " OR IGNORE", "mysql": " IGNORE"}
+        selected_prefix = prefixes.get(db.session.bind.dialect.name)
+        scope_import = {}
+        scope_tag_import = {}
+        address_list = [line.strip() for line in address_list]
+        tags = ScopeItem.extract_import_tags(address_list)
+        tag_dict = {}
+        from app.models import Tag
+
+        for tag in tags:
+            tag_dict[tag] = Tag.create_if_none(tag)
+        db.session.commit()
         for line in address_list:
-            ip, tags = ScopeItem.parse_import_line(line.strip())
+            ip, tags = ScopeItem.parse_import_line(line)
             if not ip:
-                fail.append(line)
+                result["fail"].append(line)
                 continue
-
-            new, item = ScopeItem.create_if_none(ip.with_prefixlen, blacklist, tags)
-            if not new:
-                exists.append(item.target)
-            else:
-                success.append(item.target)
-
-        return fail, exists, success
+            tags = [tag_dict[tag] for tag in tags]
+            item = ScopeItem(target=str(ip), blacklist=blacklist).as_dict()
+            scope_tag_import[item["target"]] = tags
+            scope_import[item["target"]] = item
+        import_list = [v for _, v in scope_import.items()]
+        chunk_size = 10000
+        import_chunks = [
+            import_list[i : i + chunk_size]
+            for i in range(0, len(import_list), chunk_size)
+        ]
+        for chunk in import_chunks:
+            ins_stmt = (
+                ScopeItem.__table__.insert().prefix_with(selected_prefix).values(chunk)
+            )
+            ins_result = db.session.execute(ins_stmt)
+            result["success"] += ins_result.rowcount
+        result["exist"] = len(address_list) - len(result["fail"]) - result["success"]
+        all_scope = {item.target: item.id for item in ScopeItem.query.all()}
+        tags_to_import = []
+        for k, v in scope_tag_import.items():
+            for tag in v:
+                tags_to_import.append(dict(scope_id=all_scope[k], tag_id=tag.id))
+        import_chunks = [
+            tags_to_import[i : i + chunk_size]
+            for i in range(0, len(tags_to_import), chunk_size)
+        ]
+        for chunk in import_chunks:
+            tag_stmt = scopetags.insert().prefix_with(selected_prefix).values(chunk)
+            db.session.execute(tag_stmt)
+        db.session.commit()
+        return result
