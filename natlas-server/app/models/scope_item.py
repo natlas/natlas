@@ -2,6 +2,8 @@ from netaddr import IPNetwork, IPAddress
 from netaddr.core import AddrFormatError
 from app import db
 from app.models.dict_serializable import DictSerializable
+from typing import Iterable
+from app.models.tag import Tag
 
 # Many to many table that ties tags and scopes together
 scopetags = db.Table(
@@ -50,15 +52,15 @@ class ScopeItem(db.Model, DictSerializable):
             .all()
         )
 
-    def addTag(self, tag):
+    def addTag(self, tag: Tag):
         if not self.is_tagged(tag):
             self.tags.append(tag)
 
-    def delTag(self, tag):
+    def delTag(self, tag: Tag):
         if self.is_tagged(tag):
             self.tags.remove(tag)
 
-    def is_tagged(self, tag):
+    def is_tagged(self, tag: Tag):
         return tag in self.tags
 
     def get_tag_names(self):
@@ -73,7 +75,7 @@ class ScopeItem(db.Model, DictSerializable):
         return ScopeItem.query.filter_by(blacklist=False).all()
 
     @staticmethod
-    def addTags(scopeitem, tags):
+    def addTags(scopeitem, tags: Iterable):
         from app.models import Tag
 
         for tag in tags:
@@ -83,32 +85,38 @@ class ScopeItem(db.Model, DictSerializable):
             scopeitem.addTag(tag_obj)
 
     @staticmethod
-    def parse_import_line(line):
+    def parse_tags(tags: Iterable) -> Iterable:
+        out = []
+        for t in tags:
+            if t.strip() == "":
+                continue
+            out.append(t)
+        return out
+
+    @staticmethod
+    def parse_import_line(line: str):
         splitline = line.split(",")
+        tags = []
         if len(splitline) > 1:
             ip = splitline[0]
-            tags = splitline[1:]
+            tags = ScopeItem.parse_tags(splitline[1:])
         else:
             ip = line
-            tags = []
-
         ip = ScopeItem.validate_ip(ip)
         return ip, tags
 
     @staticmethod
-    def extract_import_tags(import_list: list) -> set[str]:
-        tags = set()
+    def extract_import_tags(import_list: list) -> Iterable[str]:
+        out = set()
         for line in import_list:
             split = line.split(",")
             if len(split) > 1:
-                for tag in split[1:]:
-                    if tag.strip() == "":
-                        continue
-                    tags.add(tag)
-        return tags
+                tags = ScopeItem.parse_tags(split[1:])
+                out.update(tags)
+        return out
 
     @staticmethod
-    def create_if_none(ip, blacklist, tags=[]):
+    def create_if_none(ip: str, blacklist: bool, tags=[]):
         new = False
         item = ScopeItem.query.filter_by(target=ip).first()
         if not item:
@@ -119,14 +127,14 @@ class ScopeItem(db.Model, DictSerializable):
         return new, item
 
     @staticmethod
-    def validate_ip(ip_str):
+    def validate_ip(ip: str):
         try:
-            return IPNetwork(ip_str)
+            return IPNetwork(ip)
         except AddrFormatError:
             return False
 
     @staticmethod
-    def import_scope_list(address_list, blacklist) -> dict:
+    def import_scope_list(address_list: Iterable, blacklist: bool) -> dict:
         result = {"fail": [], "success": 0, "exist": 0}
         prefixes = {"sqlite": " OR IGNORE", "mysql": " IGNORE"}
         selected_prefix = prefixes.get(db.session.bind.dialect.name)

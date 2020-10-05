@@ -45,16 +45,6 @@ def test_import_items_blacklist_flag(runner):
         assert len(result_dict["blacklist"]) == len(DEFAULT_SCOPE_ITEMS)
 
 
-def test_import_items_verbose(runner):
-    with runner.isolated_filesystem():
-        scope_file = mock_scope_file()
-        result = runner.invoke(import_items, ["--verbose", scope_file])
-        assert result.exit_code == 0
-        result_dict = json.loads(result.output)
-        assert len(result_dict["scope"]) == len(DEFAULT_SCOPE_ITEMS)
-        assert result_dict["summary"]["scope"]["successful"] == len(DEFAULT_SCOPE_ITEMS)
-
-
 def test_export_items_tagged(runner):
     scope_items = ["10.0.0.0/8,a", "192.168.5.0/28"]
     blacklist_items = ["192.168.1.0/24,b"]
