@@ -18,27 +18,10 @@ def import_scope(scope_file: typing.TextIO, blacklist: bool):
     if not scope_file:
         return {"failed": 0, "existed": 0, "successful": 0}
     addresses = scope_file.readlines()
-    fail, exist, success = ScopeItem.import_scope_list(addresses, blacklist)
+    result = ScopeItem.import_scope_list(addresses, blacklist)
     db.session.commit()
 
-    return {"failed": fail, "existed": exist, "successful": success}
-
-
-def summarize_import_results(results: dict):
-    if not results:
-        return {}
-    return {
-        "failed": len(results["failed"]),
-        "existed": len(results["existed"]),
-        "successful": len(results["successful"]),
-    }
-
-
-def print_import_output(results: dict, verbose: bool):
-    if verbose:
-        print(json.dumps(results, indent=2))
-    else:
-        print(json.dumps(results["summary"], indent=2))
+    return result
 
 
 @cli_group.command("import", help=import_helptext)
@@ -49,19 +32,13 @@ def print_import_output(results: dict, verbose: bool):
     default=False,
     help="Should this file be considered in scope or blacklisted?",
 )
-@click.option(
-    "--verbose/--summarize",
-    default=False,
-    help="Print status of all addresses / ranges instead of only the summary.",
-)
-def import_items(file: str, import_as_blacklist: bool, verbose: bool):
+def import_items(file: str, import_as_blacklist: bool):
     import_name = "blacklist" if import_as_blacklist else "scope"
-    results = {import_name: import_scope(file, import_as_blacklist)}
-    results["summary"] = {
+    results = {
         "timestamp": datetime.utcnow().isoformat(),
-        import_name: summarize_import_results(results[import_name]),
+        import_name: import_scope(file, import_as_blacklist),
     }
-    print_import_output(results, verbose)
+    print(json.dumps(results, indent=2))
 
 
 @cli_group.command("export")

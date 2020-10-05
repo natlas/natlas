@@ -54,10 +54,10 @@ notevenanip
 
 
 def test_import_scope(app):
-    fails, exists, succeeds = ScopeItem.import_scope_list(scopefile.split(), False)
-    assert len(fails) == 1
-    assert len(exists) == 1
-    assert len(succeeds) == 5
+    result = ScopeItem.import_scope_list(scopefile.split(), False)
+    assert len(result["fail"]) == 1
+    assert result["exist"] == 1
+    assert result["success"] == 5
     item = ScopeItem.query.filter_by(target="127.0.0.1/32").first()
     tags = [t.name for t in item.tags]
     assert len(tags) == 3

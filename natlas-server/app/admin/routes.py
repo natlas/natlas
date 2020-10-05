@@ -179,18 +179,16 @@ def import_scope(scopetype=""):
         return abort(404)
     if importForm.validate_on_submit():
         newScopeItems = importForm.scope.data.split("\n")
-        fail, exist, success = ScopeItem.import_scope_list(
-            newScopeItems, importBlacklist
-        )
+        result = ScopeItem.import_scope_list(newScopeItems, importBlacklist)
         db.session.commit()
         current_app.ScopeManager.update()
-        if success:
-            flash(f"{len(success)} targets added to {scopetype}.", "success")
-        if exist:
-            flash(f"{len(exist)} targets already existed.", "info")
-        if fail:
-            flash(f"{len(fail)} targets failed to import!", "danger")
-            for item in fail:
+        if result["success"]:
+            flash(f"{result['success']} targets added to {scopetype}.", "success")
+        if result["exist"]:
+            flash(f"{result['exist']} targets already existed.", "info")
+        if result["fail"]:
+            flash(f"{len(result['fail'])} targets failed to import!", "danger")
+            for item in result["fail"]:
                 flash(f"{item}", "danger")
     else:
         for field, errors in importForm.errors.items():
