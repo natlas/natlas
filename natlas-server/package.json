@@ -18,7 +18,7 @@
         "@types/jquery": "^3.5.1",
         "@typescript-eslint/parser": "^4.2.0",
         "css-loader": "^4.3.0",
-        "eslint": "^7.9.0",
+        "eslint": "^7.10.0",
         "eslint-import-resolver-webpack": "^0.13.0",
         "eslint-plugin-import": "^2.20.2",
         "file-loader": "^6.1.0",
