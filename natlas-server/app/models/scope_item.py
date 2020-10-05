@@ -96,12 +96,14 @@ class ScopeItem(db.Model, DictSerializable):
         return ip, tags
 
     @staticmethod
-    def extract_import_tags(import_list: list) -> set:
+    def extract_import_tags(import_list: list) -> set[str]:
         tags = set()
         for line in import_list:
             split = line.split(",")
             if len(split) > 1:
                 for tag in split[1:]:
+                    if tag.strip() == "":
+                        continue
                     tags.add(tag)
         return tags
 
