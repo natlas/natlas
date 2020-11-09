@@ -9,7 +9,7 @@ flake8 = "*"
 [packages]
 python-dotenv = "~=0.15.0"
 requests = "~=2.24.0"
-sentry-sdk = "~=0.19.1"
+sentry-sdk = "~=0.19.2"
 natlas-libnmap = "*"
 pillow = "*"
 
