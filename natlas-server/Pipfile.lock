@@ -150,10 +150,10 @@
         },
         "google-api-core": {
             "hashes": [
-                "sha256:1bb3c485c38eacded8d685b1759968f6cf47dd9432922d34edb90359eaa391e2",
-                "sha256:94d8c707d358d8d9e8b0045c42be20efb58433d308bd92cf748511c7825569c8"
+                "sha256:2f74562c6c2df8d2df1fd3f8d08d64cadd71ee6830b4ab6a83ed862e75b8a0b0",
+                "sha256:6f7ff9c88af7b76a33e7cd04999f763a21b40efc64ac5ec488ea2918a94b354b"
             ],
-            "version": "==1.23.0"
+            "version": "==1.24.0"
         },
         "google-auth": {
             "hashes": [
@@ -752,11 +752,11 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:4288fed0d9153d9646bfcdf0c0428197dba1ecb27a33bb6e031d002fa88653fe",
-                "sha256:c0a7e94a8cdbc5422a51ccdad8e6f1024795939cc89159a0ae7f0b316ad3823e"
+                "sha256:b12e09409c5bdedc28d308469e156127004a436b41e9b44f9bff6446cbab9152",
+                "sha256:d69e1a80b34fe4d596c9142f35d9e523d98a2838976f1a68419a8f051b24cec6"
             ],
             "index": "pypi",
-            "version": "==6.1.2"
+            "version": "==6.2.0"
         },
         "pytest-flask": {
             "hashes": [
