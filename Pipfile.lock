@@ -75,11 +75,11 @@
         },
         "flynt": {
             "hashes": [
-                "sha256:14c68ca85c852092a64c9b8f7ccdb8e9acd36c4d9d58acc99344314fd90e20c9",
-                "sha256:b99e8a172162b77518a5fd2d4ef64b9498d9e60d79b6fef3e9b5546e4b649c46"
+                "sha256:0630c2f80ae9afa3c7e75b64cd3cc2c2c8fecd8ad87802a168598abe22824699",
+                "sha256:7b74e02a7f902986e819b11d185078b701dc58ce00441dba5f151a7f560ff4da"
             ],
             "index": "pypi",
-            "version": "==0.57"
+            "version": "==0.58"
         },
         "identify": {
             "hashes": [
