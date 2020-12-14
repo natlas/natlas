@@ -319,13 +319,14 @@
         },
         "mysqlclient": {
             "hashes": [
-                "sha256:3f39855a4ad22805361e782cc4d1010ac74796225fa2d1c03cc16673ccdc983a",
-                "sha256:a6b5648f648b16335e3b1aaec93dc3fcc81a9a661180e306936437cc522c810b",
-                "sha256:edd42ccaa444b00702d5374b2f5f7585c9d0ce201917f15339f1c3cf91c1b1ed",
-                "sha256:fb2f75aea14722390d2d8ddf384ad99da708c707a96656210a7be8af20a2c5e5"
+                "sha256:3739824f4b8f29a6a4e5fc965f933fdce7c9edc2454990c3e5c6e038779e5580",
+                "sha256:4861e33b9fad83dadf38feae77a14106365fc8c354ec4300fab5d8ccfbee4b4e",
+                "sha256:4d91dde55230a512937aafc5981c6c11c0efad2c6b3d33e83287208c8bdab367",
+                "sha256:8944d9008c29abfa43e3c97551416ea23b2ccb017af85682b79f34fc26dc43ae",
+                "sha256:8df057b08fc27d8f7106bfa997d0a21e2acef017f905f06d6fb0aa6a20d4d2b2"
             ],
             "index": "pypi",
-            "version": "==2.0.1"
+            "version": "==2.0.2"
         },
         "natlas-libnmap": {
             "hashes": [
