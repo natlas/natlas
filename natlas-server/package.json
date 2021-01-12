@@ -15,7 +15,7 @@
         "tsparticles": "^1.18.11"
     },
     "devDependencies": {
-        "@types/jquery": "^3.5.4",
+        "@types/jquery": "^3.5.5",
         "@typescript-eslint/parser": "^4.13.0",
         "css-loader": "^5.0.1",
         "eslint": "^7.15.0",
