@@ -8,7 +8,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.2",
         "@sentry/browser": "^6.1.0",
-        "bootstrap": "^4.5.3",
+        "bootstrap": "^4.6.0",
         "datatables.net-bs4": "^1.10.23",
         "jquery": "^3.4.1",
         "popper.js": "^1.16.0",
