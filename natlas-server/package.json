@@ -6,7 +6,7 @@
     "bugs": "https://github.com/natlas/natlas/issues",
     "repository": "github:natlas/natlas",
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^5.15.2",
+        "@fortawesome/fontawesome-free": "^5.15.3",
         "@sentry/browser": "^6.2.2",
         "bootstrap": "^4.6.0",
         "datatables.net-bs4": "^1.10.24",
