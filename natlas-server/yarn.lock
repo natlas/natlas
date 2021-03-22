@@ -6092,10 +6092,10 @@ tslint@^6.1.3:
     tslib "^1.13.0"
     tsutils "^2.29.0"
 
-tsparticles@^1.20.1:
-  version "1.20.1"
-  resolved "https://registry.yarnpkg.com/tsparticles/-/tsparticles-1.20.1.tgz#3be82dd22cd0e79cbd6c6ee95381e99b501f7740"
-  integrity sha512-xkDRZxkCWYoWFNqJLIz10iNdFBd7i/F3IwXWiUZCjLgg6ubBOQTY4ijm4V13BJUcHtpcZWZwIZJwKA5d16myGQ==
+tsparticles@^1.23.0:
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/tsparticles/-/tsparticles-1.23.0.tgz#f41bf1600497503762ddd4920d489ccca90a3310"
+  integrity sha512-1lnQyq8n+RqLJQiw1XoNbpmPJlBjtpP6jmxhxqezvOJKechL3STQ6Fao3G1GjC4MM43LY3OSJmyfiHmmMR7JLQ==
   optionalDependencies:
     pathseg "^1.2.0"
 
