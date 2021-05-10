@@ -1,4 +1,4 @@
-FROM python:3.6 as build
+FROM python:3.9.5 as build
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	export BUILD_PKGS="unzip" \
