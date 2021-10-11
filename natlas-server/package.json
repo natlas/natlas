@@ -12,7 +12,7 @@
         "datatables.net-bs4": "^1.10.24",
         "jquery": "^3.6.0",
         "popper.js": "^1.16.0",
-        "tsparticles": "^1.25.0"
+        "tsparticles": "^1.35.4"
     },
     "devDependencies": {
         "@types/jquery": "^3.5.5",
