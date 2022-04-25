@@ -7,7 +7,7 @@ verify_ssl = true
 flake8 = "*"
 
 [packages]
-python-dotenv = "~=0.17.0"
+python-dotenv = "~=0.20.0"
 requests = "~=2.25.1"
 sentry-sdk = "~=1.0.0"
 natlas-libnmap = "*"
