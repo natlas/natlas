@@ -4530,11 +4530,6 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
-pathseg@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/pathseg/-/pathseg-1.2.0.tgz#22af051e28037671e7799e296fe96c5dcbe53acd"
-  integrity sha512-+pQS7lTaoVIXhaCW7R3Wd/165APzZHWzYVqe7dxzdupxQwebgpBaCmf0/XZwmoA/rkDq3qvzO0qv4d5oFVrBRw==
-
 pbkdf2@^3.0.3:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/pbkdf2/-/pbkdf2-3.1.1.tgz#cb8724b0fada984596856d1a6ebafd3584654b94"
@@ -6083,12 +6078,337 @@ tslint@^6.1.3:
     tslib "^1.13.0"
     tsutils "^2.29.0"
 
-tsparticles@^1.25.0:
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/tsparticles/-/tsparticles-1.25.0.tgz#78103e31d34e841e62ebfe494b553b808510e813"
-  integrity sha512-e2sacId827yeiaU/bSj29w1Fa6ocUdDC5Mv18A3VuJvaHCIzFYH4NuCqhYgaNyQaGjf4G/K11d6nFNVnGGu04A==
-  optionalDependencies:
-    pathseg "^1.2.0"
+tsparticles-engine@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-engine/-/tsparticles-engine-2.3.3.tgz#cabdc72ac5458b5926e96dae4f6d1c1d4e6d9a89"
+  integrity sha512-OryoHLPwMRRj+P8eC17fCi1a+KAMZM8iayystk+Xbe/QGzJ45rptvcbzKwRGkxyuLorVqfbhqLhS5Aeglx/vzQ==
+
+tsparticles-interaction-external-attract@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-attract/-/tsparticles-interaction-external-attract-2.3.3.tgz#638b0c7c8b4cedacc21dcb34bc2181a11eccdf6c"
+  integrity sha512-EZnw1Dz2cl1fOrNlcEzpWmaMB51Qpvciue6WRHJvD0adPpm8jOUE7pZo2OlG29ONJo25ViOurTGO1MGdWd4OuQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-bounce@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-bounce/-/tsparticles-interaction-external-bounce-2.3.3.tgz#3cdaaa9205997332f4122f2d3c39aee61774bd76"
+  integrity sha512-HoKjYvzCtvGeS0VKpba3fMfO+tTWx4Gb4fz59EKm7niZy+R+mzBr2UTh3iN6eMPiLpGKJrscdG8Qc15haGL+LA==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-bubble@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-bubble/-/tsparticles-interaction-external-bubble-2.3.3.tgz#d9d831ad8051ff893a123144612764e9739bd1b4"
+  integrity sha512-t+lqNCQQsauGElUGJpsyv8UZSGvxgEvqlB2QpxUEjN8kadkytKBKEbx1Xm/kSkEG+hC3YiCtz2c+xvErWI/qFA==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-connect@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-connect/-/tsparticles-interaction-external-connect-2.3.3.tgz#da156f5f372e188bd08131b268e7c3b6fb758b9a"
+  integrity sha512-DTAMqopJTgff8WSrmuzDf18Q0UFux/fLpSRpcNnt4Cba0P6MgiCjo2kyBIU6oUgwJPA2nvmWHlvdmF/Sw4e98A==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-grab@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-grab/-/tsparticles-interaction-external-grab-2.3.3.tgz#38b4f253eb38822472f06fde5cac6448bb3335c7"
+  integrity sha512-IJkxEBAyOXVdsGprfW8oCRH9movBiAGprgLxNu0hh/kCr6pOOo43Vgsb5CkR+h8uBBP8+z+rHmxSm6fKBjO5wQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-pause@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-pause/-/tsparticles-interaction-external-pause-2.3.3.tgz#bf6b8f01fcfdbe1da4998076ef7c270b1e5968f6"
+  integrity sha512-ZtlNehe+kDqIUIHfv6M11Gs/lpVy3zVeTwQ7oskxv3XR6Tc7x//383Gj6cWZE7DR3XfKv31LciY5nBX1lZu3rQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-push@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-push/-/tsparticles-interaction-external-push-2.3.3.tgz#d5d3b4183d1ff2d6f0bf44327379d1ade2655313"
+  integrity sha512-dQVxOlxXd0P6CFowOC8Yer9LQy8Twi5tSErgLWxnLoKeAQJjFxf+ccKP6KluBaGAV3I6uUqdh+UDQL20bAesbg==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-remove@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-remove/-/tsparticles-interaction-external-remove-2.3.3.tgz#24bfd216729a7d6894338943555ca02355520bb9"
+  integrity sha512-VFBq9DSBg5JYPwNRLDONhY3UfZbbqQGmvCzOFpfbYO78OZMrcZjgZrUZIf50zdMk/lJ1zNxwVxTjxOuHqtbS0w==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-repulse@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-repulse/-/tsparticles-interaction-external-repulse-2.3.4.tgz#8c149a55cdcfa9a66b0999249d0c07e80b0cdbff"
+  integrity sha512-2JeUN6XEIwepMQYhufOD/gg4Luzk7aZE1fsZbs1fdbtAkHNckmSikzAPpOgMIVGdMCkENJSGn6V+D7UpilfSMw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-slow@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-slow/-/tsparticles-interaction-external-slow-2.3.3.tgz#1746e76b0ada986221d906cd6d6860fd7bf97323"
+  integrity sha512-C3hCA9js3nUsmfws2A5In+F+gQGx+a+yJidIqCNeknzltQytOFsUCH6JN5KezWJqgLWTCN53hR/rdsttVKQWKQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-external-trail@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-external-trail/-/tsparticles-interaction-external-trail-2.3.3.tgz#339b3d082ff6ffc8c979d7466bbd51d9a1444975"
+  integrity sha512-DGMSsTprE+yg9I/MSBxhFdLFE3+5VlcJOLQDCW1aupnLvZdCJ4l+Thg8rd4BaZAAeH3Ljaosp94yQx8qy8cLOQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-particles-attract@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-particles-attract/-/tsparticles-interaction-particles-attract-2.3.3.tgz#fd4f86c5472d9ec4c0f254d5242b89d299758dcb"
+  integrity sha512-K0QoPQE8F/RBg+fYd/Nz+uky4420vfDni833qurzMIMqc8dFRQ53oDHnvwVoE0HU5iUCzPCUvmps/hF5LlFvgw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-particles-collisions@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-particles-collisions/-/tsparticles-interaction-particles-collisions-2.3.3.tgz#1ae6792db463a9fcd7dbd582894c7442a25efce0"
+  integrity sha512-Qx1IeP+WWLpfK56RJXXRrtgUQ5e7s2SmBXfj/C6DSC+aMdgFNwFw2onukZ41d81+QEsPCwgtCB6iyWc6ERnaKg==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-interaction-particles-links@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-interaction-particles-links/-/tsparticles-interaction-particles-links-2.3.3.tgz#d44c7097007f1878e3950fbca7e0684d01dad9f5"
+  integrity sha512-sOk0FdnP2xL2lDPzMZA1N/ZjtaKgBMnc3hHgYMWPtVQ50GpcCxhiauGTEQW/Wj6+Ja0Qpf/TJ3MwbzPqv3h59Q==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-move-base@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-move-base/-/tsparticles-move-base-2.3.3.tgz#18632363fc31346c0f62892ae440d5a7c4f83487"
+  integrity sha512-D8tBkezutSZJUepkPefeV0AlUh7hwWifbufCqDVTRyZLyCvhamPNG3G/IISK0AePh5ZhCt1VlZ4m+4fzr1DLBg==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-move-parallax@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-move-parallax/-/tsparticles-move-parallax-2.3.3.tgz#30a769b02b8f1f49324febd7de19524b43204287"
+  integrity sha512-Pb8/Ous3qXhGfvWYQYND/t/tUxFA/nx544LACBlerOv7hMnb+gWVpfRRqlGDXJNKjjgmgebipI8s6+nxNN0yvw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-particles.js@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-particles.js/-/tsparticles-particles.js-2.3.3.tgz#ca53c9893e4439c0d548c657898edd1e3d3fc22e"
+  integrity sha512-PXlK8YVGIHkX8dPwMs4BLFHq/994oBrixUWuFQbLX+/M5LCrvvbqZIgR9/yUm1qe6RG2WCnAzoSYpogj7dPm+w==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-plugin-absorbers@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/tsparticles-plugin-absorbers/-/tsparticles-plugin-absorbers-2.3.4.tgz#49f6d0570b2390fa2df19e8495d819314cd07026"
+  integrity sha512-H2woja+NF405cGPrqzttjKtKP7BklgfdtKXeORFgtdQqetAPF31TqVptRvReTlF7TvLVfIq9Ct962zIQiLJ8jw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-plugin-emitters@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/tsparticles-plugin-emitters/-/tsparticles-plugin-emitters-2.3.4.tgz#d39a48d25c8bf349e613c99c8772e5510942b405"
+  integrity sha512-idukwsKpaDhiSNk2tHsNxO9vk2u+HZnLqJpWriNtR3l2NFQBl+vwBbWrHHC3aw2hLVOcB9YWKClMSn2nZE1Jcw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-plugin-polygon-mask@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-plugin-polygon-mask/-/tsparticles-plugin-polygon-mask-2.3.3.tgz#678f55091837b7693bab7823cbd77de8643e9bca"
+  integrity sha512-EJcIBO6xhDKPa4+o2K9RaUWDWsYlwkWQin8LLMZfFAchK/77bBz7n6L/jMkMey8NIBg1TkrNhwHSLaTa24PIjQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-shape-circle@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-shape-circle/-/tsparticles-shape-circle-2.3.3.tgz#85971653b7be9d18c3d34bf52ef1dba13b12c5a4"
+  integrity sha512-oWiF8WUSBailuqIYu9EXtzMRzix+KnsWRLgF5FRWsXgNcnzNEe8yfCMFRHTUg/VpLzhs8ZKEf88Wm1MFywEa+A==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-shape-image@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-shape-image/-/tsparticles-shape-image-2.3.3.tgz#996b3d4159e7f6e33a65962875d517c7799f468d"
+  integrity sha512-8txrkUEQKmcuQ2q7AdjSoz4pN8HDEMAbqwn1LEu9VqDH1qbs1sFV33viU0ydLmQcx1IM1d9ZHRwjU0IJf/DI5A==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-shape-line@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-shape-line/-/tsparticles-shape-line-2.3.3.tgz#48ac52dfa42c0a4f7d8c17c9653e0d3cf1d4045d"
+  integrity sha512-feiJXdvVQQQpm4xEH1QuDOcy3CdFHTqcmr88UjctIt/IHv4qpgaIMx9WI0b1muz2MlCVonSxpD2KSLuwS20Vhg==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-shape-polygon@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-shape-polygon/-/tsparticles-shape-polygon-2.3.3.tgz#6eec7205aab6bfb5f48c0e9933717a6e275dd45b"
+  integrity sha512-dMLo6EVDwUwXTFa/6kj4h1BYqcbKQQWn/GX4RsCwKtrYaqMAK6IrzLGUWZuhMFvz5LZ9LjFE611etHndZZLFTg==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-shape-square@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-shape-square/-/tsparticles-shape-square-2.3.3.tgz#b39076eaad3f8b3e63298e31157af44903c5757d"
+  integrity sha512-QTWe3SKtZuUcC6lFboGA/JRTki84259tJ13TKFMAruBZNo2903IQML5mCq50ueZ40IlkMzo5QpFeRDde82YZ1Q==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-shape-star@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-shape-star/-/tsparticles-shape-star-2.3.3.tgz#b25e1d6a42c2e60ef072c39baddeccb79784e6c0"
+  integrity sha512-7Y0vLdR1PGndpbP1TpDYOsaOn7Iy/4Jc53nh1rWT/Ww2O0JRH/M/6UZfq2uAy9O2jydyRF1kd5euentPKyYyXw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-shape-text@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-shape-text/-/tsparticles-shape-text-2.3.3.tgz#45f1b4d44736b07c352a8464cba521f71b2b2a27"
+  integrity sha512-eAcfsuUNlPnL1BB/+3HAxuMBcd9z3xvCa/M9sXBJsx7XC6Si+5ThgCyPxN/2dVY/CDL0Sk1x2RV5bS/+ATErZA==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-slim@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/tsparticles-slim/-/tsparticles-slim-2.3.4.tgz#e9e0f7f18225b0945536043022f246f2855a5d16"
+  integrity sha512-UGzzdTSewR2cOzFzpSTVieAotdyFoOwujntltEbSziGlgU0B3mVCYOj4F+NeZpRQcIbLiOpqVM0aYPE8rGwfDQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+    tsparticles-interaction-external-attract "^2.3.3"
+    tsparticles-interaction-external-bounce "^2.3.3"
+    tsparticles-interaction-external-bubble "^2.3.3"
+    tsparticles-interaction-external-connect "^2.3.3"
+    tsparticles-interaction-external-grab "^2.3.3"
+    tsparticles-interaction-external-pause "^2.3.3"
+    tsparticles-interaction-external-push "^2.3.3"
+    tsparticles-interaction-external-remove "^2.3.3"
+    tsparticles-interaction-external-repulse "^2.3.4"
+    tsparticles-interaction-external-slow "^2.3.3"
+    tsparticles-interaction-particles-attract "^2.3.3"
+    tsparticles-interaction-particles-collisions "^2.3.3"
+    tsparticles-interaction-particles-links "^2.3.3"
+    tsparticles-move-base "^2.3.3"
+    tsparticles-move-parallax "^2.3.3"
+    tsparticles-particles.js "^2.3.3"
+    tsparticles-shape-circle "^2.3.3"
+    tsparticles-shape-image "^2.3.3"
+    tsparticles-shape-line "^2.3.3"
+    tsparticles-shape-polygon "^2.3.3"
+    tsparticles-shape-square "^2.3.3"
+    tsparticles-shape-star "^2.3.3"
+    tsparticles-shape-text "^2.3.3"
+    tsparticles-updater-angle "^2.3.3"
+    tsparticles-updater-color "^2.3.3"
+    tsparticles-updater-life "^2.3.3"
+    tsparticles-updater-opacity "^2.3.3"
+    tsparticles-updater-out-modes "^2.3.3"
+    tsparticles-updater-size "^2.3.3"
+    tsparticles-updater-stroke-color "^2.3.3"
+
+tsparticles-updater-angle@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-angle/-/tsparticles-updater-angle-2.3.3.tgz#504b77e52fd3ae98b1ca22e9697fc12b62872398"
+  integrity sha512-rIvfZK3KYB4sicJENfdnenjlTirVVHfvr/tcXqGxvIeWSMEnReO+IVcMTYds9ARNJDOfSZtkFwNzwD7nYCLwCg==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-color@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-color/-/tsparticles-updater-color-2.3.3.tgz#6f07c94754f7d6a466d4f72020032709fc8dd30d"
+  integrity sha512-DLWThK+eO2lCqi0tkAzNsvWr/H/0u1pd44MLcwvj9P2MFL+Jz3R58myU+cTuN+QOv4lkf3nuU0t07Mv9Tvzhjw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-destroy@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-destroy/-/tsparticles-updater-destroy-2.3.3.tgz#34a899cc2781fab70287004667eeb0ea0e1a70e3"
+  integrity sha512-AHPR1zdn8zrohfggNBQA6sUyDwmLTx7LCktDiZi03lRAbtzSv6h3U1XyQDaKtLlwu/Vt5ffvPZuX5MGSY/iCnw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-life@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-life/-/tsparticles-updater-life-2.3.3.tgz#62030898999cda2895fd01e12d4a979b6ebf87e4"
+  integrity sha512-NNW7WUhKaun3/nr7iBCBg25gOxBOMrfON7Xg3UWJrGPf59Q4c2k9BAO/lqPRW5JmyZ8PXVCYIPwulKP0HDkr0A==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-opacity@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-opacity/-/tsparticles-updater-opacity-2.3.3.tgz#7fad48f5cda5b2efe54178f794a69d95f2066ae6"
+  integrity sha512-pA9T7h3FREMb9Xv4Qcnv/5neUdLQVHmexuhuIr6/FqrnsWOQB4+PmdetKKWxfojkFAAWzignDEF78lzzXJzIuQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-out-modes@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-out-modes/-/tsparticles-updater-out-modes-2.3.3.tgz#9326d476515877008e32f4443d82444b691c0944"
+  integrity sha512-aoVg6ecXcnZvxnPzVY8ytyNz+Y47zD2+V1OPmfhi5CnOvOHgG97msinEvY4GL3OigBKB7d21X8r3l7WkV+/5Tw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-roll@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-roll/-/tsparticles-updater-roll-2.3.3.tgz#c1e4b02ef709b2a4c72bfa45b2cdf9ad5e699628"
+  integrity sha512-y2ATGesKf+vTw++VNt21IYp1lEZoWOGUcPEtckcadr5cslwTTnYjvsMqbd6e4e3Iy5tZJXnUyzaPznSUcX7OFw==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-size@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-size/-/tsparticles-updater-size-2.3.3.tgz#dda4e8a7ef6f151060d7e7fe7e5ce569b5d31083"
+  integrity sha512-Ksl5e8lG0S3OkjDjwYTKEKMA5ANX0cfK01PiJsTwuKqoDCWnpuBWixHCRCyrLoG7yGBBRLb4131pVuIL6ApY1A==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-stroke-color@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-stroke-color/-/tsparticles-updater-stroke-color-2.3.3.tgz#81b8d4d2dab743bcf4f0987a12bc718a454eaf16"
+  integrity sha512-HGGEe7lPjldOdzcHwmenttfOh+kIsDqxKmZzS3GiA027dpetF9OFh1dISz5d40lurffd8a/vg+kxATD0jAuZYQ==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-tilt@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-tilt/-/tsparticles-updater-tilt-2.3.3.tgz#6b912c5d9ad08ed9a341626ff9c57e13cc10f19e"
+  integrity sha512-Z9Sr/NrfDhxPulKFPujJ6rWg22fRdDVDq5ieVVTMYBcIA38DvwSDd8q7J6mi13Q7sY8N3NQ2YabflqVemGhzQA==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-twinkle@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-twinkle/-/tsparticles-updater-twinkle-2.3.3.tgz#d95ad21180870a2c5d3b29172eb9b4fab10cb7ad"
+  integrity sha512-0zM8OBM4geQkuFVjgkzbMAEaXeOqfCotWKVSN/jyHjYghzKl/8yCQAqfs/4W8E4QmcPA5wsHqq8E09mEtRuojg==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles-updater-wobble@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/tsparticles-updater-wobble/-/tsparticles-updater-wobble-2.3.3.tgz#7c7c12088c273a98801d6aad1a5fc37e0ddc5166"
+  integrity sha512-AH0izo5ir6gYm0h7a7MBlo3g3hDpJApWwh/Y+Dls1LBslXsxQHILrRX3JsN/q9yA8kfgIu4aE87z7rdIE4gASA==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+
+tsparticles@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/tsparticles/-/tsparticles-2.3.4.tgz#94ef81a03fed7f389e50250253a138fc34b08317"
+  integrity sha512-0ZZN+Pv0NhS3vKkG1zO7lGXX+TOCq/UKcaGJqjI5aOA8M7ywdsw1+rwXbKygYBrJjs4fltKTgmkA2kVCwYCeMA==
+  dependencies:
+    tsparticles-engine "^2.3.3"
+    tsparticles-interaction-external-trail "^2.3.3"
+    tsparticles-plugin-absorbers "^2.3.4"
+    tsparticles-plugin-emitters "^2.3.4"
+    tsparticles-plugin-polygon-mask "^2.3.3"
+    tsparticles-slim "^2.3.4"
+    tsparticles-updater-destroy "^2.3.3"
+    tsparticles-updater-roll "^2.3.3"
+    tsparticles-updater-tilt "^2.3.3"
+    tsparticles-updater-twinkle "^2.3.3"
+    tsparticles-updater-wobble "^2.3.3"
 
 tsutils@^2.29.0:
   version "2.29.0"
