@@ -2,8 +2,7 @@ import elasticsearch
 import time
 from datetime import datetime
 import logging
-from opencensus.trace import execution_context
-from opencensus.trace import span as span_module
+from opentelemetry import trace
 import semver
 
 
@@ -120,7 +119,7 @@ class ElasticClient:
             results = self._execute_raw_query(
                 self.es.search, doc_type="_doc", rest_total_hits_as_int=True, **kwargs
             )
-            span.add_attribute("es.hits.total", results["hits"]["total"])
+            span.set_attribute("es.hits.total", results["hits"]["total"])
             self._attach_shard_span_attrs(span, results)
             return results
 
@@ -166,18 +165,17 @@ class ElasticClient:
 
     # Tracing methods
     def _new_trace_span(self, operation: str, **kwargs):
-        tracer = execution_context.get_opencensus_tracer()
+        tracer = trace.get_tracer(__name__)
         span_name = "elasticsearch"
         if "index" in kwargs:
             span_name += "." + operation
-        span = tracer.span(name=span_name)
-        span.span_kind = span_module.SpanKind.CLIENT
+        span = tracer.start_span(name=span_name)
         if "index" in kwargs:
-            span.add_attribute("es.index", kwargs["index"])
+            span.set_attribute("es.index", f'{kwargs["index"]}')
         if "body" in kwargs:
-            span.add_attribute("es.query", kwargs["body"])
+            span.set_attribute("es.query", f'{kwargs["body"]}')
         return span
 
     def _attach_shard_span_attrs(self, span, results: dict):
-        span.add_attribute("es.shards.total", results["_shards"]["total"])
-        span.add_attribute("es.shards.successful", results["_shards"]["successful"])
+        span.set_attribute("es.shards.total", results["_shards"]["total"])
+        span.set_attribute("es.shards.successful", results["_shards"]["successful"])

@@ -34,17 +34,19 @@ services:
       - backend
 
   zipkin-server:
-    image: openzipkin/zipkin-slim:2.21.6
+    image: openzipkin/zipkin-slim:3.1.0
     ports:
       - 9411:9411
     networks:
       - backend
 
-  opencensus-agent:
-    image: omnition/opencensus-agent:0.1.11
-    command: --config=/conf/opencensus-dev.yml
+  otel-collector:
+    image: otel/opentelemetry-collector:0.95.0
+    ports:
+      - 4317:4317
+      - 55679:55679
     volumes:
-      - ./.opencensus-dev.yml:/conf/opencensus-dev.yml:ro
+      - ./.otel-collector-dev.yml:/etc/otelcol/config.yaml
     networks:
       - backend
 
@@ -69,7 +71,9 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
       - FLASK_ENV=development
-      - OPENCENSUS_AGENT=opencensus-agent:55678
+      - OTEL_ENABLE=True
+      - OTEL_COLLECTOR=otel-collector:4317
+      - DB_AUTO_UPGRADE=True
     volumes:
       - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
