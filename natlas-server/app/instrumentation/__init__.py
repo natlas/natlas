@@ -1,10 +1,14 @@
 import flask
 import sentry_sdk
 import threading
-from opencensus.ext.ocagent import trace_exporter as ocagent_trace_exporter
-from opencensus.ext.flask.flask_middleware import FlaskMiddleware
-from opencensus.trace import config_integration, samplers
-from opencensus.trace import execution_context
+
+from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+
 from .sentryio_middleware import SentryIoContextMiddleware
 from urllib.parse import urlparse
 
@@ -16,27 +20,28 @@ template_span = threading.local()
 def render_template_end(*kargs, **kwargs):  # sender, template, context):
     span = template_span.x
     template_span.x = None
-    span.__exit__(None, None, None)
+    span.end()
 
 
 def render_template_start(app, template, context):
-    tracer = execution_context.get_opencensus_tracer()
-    template_span.x = tracer.span(name="render_template")
-    template_span.x.add_attribute("flask.template", template.name)
+    tracer = trace.get_tracer(__name__)
+    template_span.x = tracer.start_span(name="render_template")
+    template_span.x.set_attribute("flask.template", template.name)
 
 
-def initialize_opencensus(config, flask_app):
-    if config.opencensus_enable:
-        agent = config.opencensus_agent
-        print(f"OpenCensus enabled and reporting to {agent} using gRPC")
-        exporter = ocagent_trace_exporter.TraceExporter(
-            service_name=SERVICE_NAME, endpoint=agent
+def initialize_opentelemetry(config, flask_app):
+    if config.otel_enable:
+        collector = config.otel_collector
+        print(f"OpenTelemetry enabled and reporting to {collector} using gRPC")
+        exporter = OTLPSpanExporter(endpoint=collector, insecure=True)
+        provider = TracerProvider(
+            resource=Resource.create({"service.name": SERVICE_NAME})
         )
-        sampler = samplers.ProbabilitySampler(rate=config.opencensus_sample_rate)
-        config_integration.trace_integrations(["sqlalchemy"])
-        FlaskMiddleware(flask_app, exporter=exporter, sampler=sampler)
+        processor = BatchSpanProcessor(exporter)
+        provider.add_span_processor(processor)
+        trace.set_tracer_provider(provider)
         flask_app.wsgi_app = SentryIoContextMiddleware(flask_app.wsgi_app)
-
+        FlaskInstrumentor().instrument_app(flask_app)
         flask.before_render_template.connect(render_template_start, flask_app)
         flask.template_rendered.connect(render_template_end, flask_app)
 

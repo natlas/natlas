@@ -1,5 +1,5 @@
 from sentry_sdk import configure_scope
-from opencensus.trace import execution_context
+from opentelemetry import trace
 
 
 class SentryIoContextMiddleware(object):
@@ -7,7 +7,7 @@ class SentryIoContextMiddleware(object):
         self.app = app
 
     def __call__(self, environ, start_response):
-        tracer = execution_context.get_opencensus_tracer()
+        span = trace.get_current_span()
         with configure_scope() as scope:
-            scope.set_extra("trace_id", tracer.span_context.trace_id)
+            scope.set_extra("trace_id", span.get_span_context().trace_id)
             return self.app(environ, start_response)
