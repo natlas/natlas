@@ -12,6 +12,8 @@ services:
       - discovery.type=single-node
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - "ELASTIC_PASSWORD=natlas-dev-password-do-not-use"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
@@ -27,7 +29,7 @@ services:
       test:     
         [
           "CMD-SHELL",
-          "curl -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'"
+          "curl -u elastic:natlas-dev-password-do-not-use -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'"
         ]
       interval: 2s
       timeout: 10s
@@ -79,6 +81,9 @@ services:
       - backend
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
+      - ELASTIC_AUTH_ENABLE=True
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=natlas-dev-password-do-not-use
       - FLASK_ENV=development
       - OTEL_ENABLE=True
       - OTEL_COLLECTOR=otel-collector:4317

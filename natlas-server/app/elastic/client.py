@@ -15,9 +15,15 @@ class ElasticClient:
     logger = logging.getLogger("elasticsearch")
     logger.setLevel("ERROR")
 
-    def __init__(self, elasticURL: str):
+    def __init__(self, elasticURL: str, authEnabled: bool, elasticUser: str, elasticPassword: str):
         try:
-            self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
+            if authEnabled:
+                self.es = elasticsearch.Elasticsearch(elasticURL,
+                                                      timeout=5,
+                                                      max_retries=1,
+                                                      http_auth=(elasticUser, elasticPassword))
+            else:
+                self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
             self.status = self._ping()
             if self.status:
                 self.esversion = semver.VersionInfo.parse(
@@ -57,6 +63,9 @@ class ElasticClient:
         if not (self.status or self._attempt_reconnect()):
             raise elasticsearch.ConnectionError("Could not connect to Elasticsearch")
         return self.status
+
+    def set_auth(self, elasticUser: str, elasticPassword: str):
+        self.es.options(basic_auth=(elasticUser, elasticPassword))
 
     def initialize_index(self, index: str, mapping: dict):
         """

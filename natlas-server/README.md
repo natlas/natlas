@@ -7,7 +7,7 @@ The Natlas server is a flask application that handles browsing and searching Nat
 Backing services in the Natlas server are defined via environment configs. They are as follows:
 
 * A SQL Database (SQLite is used if an external Database connection string is not supplied)
-* An Elasticsearch 7.x Cluster
+* An Elasticsearch 7.x Cluster (8.x may work in compatbility mode with ELASTIC_CLIENT_APIVERSIONING=1)
 * (Optional) A mail server for user account related functionality
 
 ## Installation (Production)
@@ -114,6 +114,9 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `SQLALCHEMY_DATABASE_URI` | `sqlite:///$DATA_DIR/db/metadata.db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the database to store natlas metadata in. Supported types by natlas-server are: `sqlite:`, `mysql:` |
 | `DB_AUTO_UPGRADE` | `False` | Automatically perform necessary data migrations when upgrading to a new version of natlas. Not recommended for multi-node deployments. |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
+| `ELASTIC_AUTH_ENABLE` | `False` | Whether authentication is enabled on the elasticsearch cluster |
+| `ELASTIC_USER` | `elastic` | elasticsearch user for authentication |
+| `ELASTIC_PASSWORD` | `""` | elasticsearch user password for authentication |
 | `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
 | `MEDIA_DIRECTORY` | `$DATA_DIR/media/` | If you want to store media (screenshots) in a larger mounted storage volume, set this value to an absolute path. If you change this value, be sure to copy the contents of the previous media directory to the new location, otherwise old media will not render.|
