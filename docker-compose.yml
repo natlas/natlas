@@ -5,7 +5,7 @@
 version: "3.7"
 services:
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
     container_name: elastic
     environment:
       - node.name=elastic
