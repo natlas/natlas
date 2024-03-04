@@ -117,7 +117,7 @@ class ElasticClient:
         """
         with self._new_trace_span(operation="search", **kwargs) as span:
             results = self._execute_raw_query(
-                self.es.search, doc_type="_doc", rest_total_hits_as_int=True, **kwargs
+                self.es.search, rest_total_hits_as_int=True, **kwargs
             )
             span.set_attribute("es.hits.total", results["hits"]["total"])
             self._attach_shard_span_attrs(span, results)
@@ -129,7 +129,7 @@ class ElasticClient:
         """
         results = None
         with self._new_trace_span(operation="count", **kwargs) as span:
-            results = self._execute_raw_query(self.es.count, doc_type="_doc", **kwargs)
+            results = self._execute_raw_query(self.es.count, **kwargs)
             self._attach_shard_span_attrs(span, results)
         if not results:
             return 0
@@ -141,7 +141,7 @@ class ElasticClient:
         """
         with self._new_trace_span(operation="delete_by", **kwargs):
             return self._execute_raw_query(
-                self.es.delete_by_query, doc_type="_doc", **kwargs
+                self.es.delete_by_query, **kwargs
             )
 
     def execute_index(self, **kwargs):
@@ -149,7 +149,7 @@ class ElasticClient:
             Executes an arbitrary index.
         """
         with self._new_trace_span(operation="index", **kwargs):
-            return self._execute_raw_query(self.es.index, doc_type="_doc", **kwargs)
+            return self._execute_raw_query(self.es.index, **kwargs)
 
     # Inner-most query executor. All queries route through here.
     def _execute_raw_query(self, func: callable, **kwargs):

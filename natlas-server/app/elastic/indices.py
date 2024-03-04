@@ -33,7 +33,7 @@ class ElasticIndices:
             Delete all indices in this context
         """
         for index in self.all_indices():
-            self.client.delete_index(index)
+            self.client.delete_index(index=index)
         self.logger.info(f"Deleted Elasticsearch {self.basename} indices")
 
     def name(self, alias: str):
