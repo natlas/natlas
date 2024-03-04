@@ -23,6 +23,15 @@ services:
       - 9200:9200
     networks:
       - backend
+    healthcheck:
+      test:     
+        [
+          "CMD-SHELL",
+          "curl -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'"
+        ]
+      interval: 2s
+      timeout: 10s
+      retries: 24
 
   mysql:
     image: mysql:8.0.21
@@ -80,6 +89,10 @@ services:
       - html_assets:/opt/natlas/natlas-server/static/dist
     links:
       - elastic
+    depends_on:
+      elastic:
+        condition: service_healthy
+
 
   natlas-agent:
     build: natlas-agent

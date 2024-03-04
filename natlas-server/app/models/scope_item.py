@@ -137,7 +137,7 @@ class ScopeItem(db.Model, DictSerializable):
     def import_scope_list(address_list: Iterable, blacklist: bool) -> dict:
         result = {"fail": [], "success": 0, "exist": 0}
         prefixes = {"sqlite": " OR IGNORE", "mysql": " IGNORE"}
-        selected_prefix = prefixes.get(db.session.bind.dialect.name)
+        selected_prefix = prefixes.get(db.engine.dialect.name)
         scope_import = {}
         scope_tag_import = {}
         address_list = [line.strip() for line in address_list]

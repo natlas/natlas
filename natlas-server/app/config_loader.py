@@ -1,8 +1,9 @@
 import config
-
+import sqlalchemy
 
 def load_natlas_config(app, db):
-    if not db.engine.has_table("config_item"):
+    insp = sqlalchemy.inspect(db.engine)
+    if not insp.has_table("config_item"):
         return
 
     from app.models import ConfigItem
@@ -12,7 +13,8 @@ def load_natlas_config(app, db):
 
 
 def load_natlas_services(app, db):
-    if not db.engine.has_table("natlas_services"):
+    insp = sqlalchemy.inspect(db.engine)
+    if not insp.has_table("natlas_services"):
         return
     from app.models import NatlasServices
 
@@ -20,17 +22,18 @@ def load_natlas_services(app, db):
 
 
 def load_agent_config(app, db):
-    if not db.engine.has_table("agent_config"):
+    insp = sqlalchemy.inspect(db.engine)
+    if not insp.has_table("agent_config"):
         return
 
     from app.models import AgentConfig
 
     # the agent config is updated in place so there's only ever 1 record
-    app.agentConfig = AgentConfig.query.get(1).as_dict()
-
+    app.agentConfig = db.session.get(AgentConfig, 1).as_dict()
 
 def load_agent_scripts(app, db):
-    if not db.engine.has_table("agent_script"):
+    insp = sqlalchemy.inspect(db.engine)
+    if not insp.has_table("agent_script"):
         return
 
     from app.models import AgentScript
