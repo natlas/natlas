@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 from email_validator import validate_email, EmailNotValidError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -58,7 +58,7 @@ class User(UserMixin, db.Model, DictSerializable):
 
     def new_reset_token(self):
         self.password_reset_token = secrets.token_urlsafe(User.token_length)
-        self.password_reset_expiration = datetime.utcnow() + timedelta(
+        self.password_reset_expiration = datetime.now(UTC) + timedelta(
             seconds=User.expiration_duration
         )
 
@@ -69,7 +69,7 @@ class User(UserMixin, db.Model, DictSerializable):
     def validate_reset_token(self):
         if not (self.password_reset_token and self.password_reset_expiration):
             return False
-        return self.password_reset_expiration > datetime.utcnow()
+        return self.password_reset_expiration > datetime.now(UTC)
 
     @staticmethod
     def get_reset_token(email):

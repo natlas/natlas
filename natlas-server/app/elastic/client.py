@@ -1,6 +1,6 @@
 import elasticsearch
 import time
-from datetime import datetime
+from datetime import datetime, UTC
 import logging
 from opentelemetry import trace
 import semver
@@ -35,7 +35,7 @@ class ElasticClient:
             raise
         finally:
             # Set the lastReconnectAttempt to the timestamp after initialization
-            self.lastReconnectAttempt = datetime.utcnow()
+            self.lastReconnectAttempt = datetime.now(UTC)
 
     def _ping(self):
         """
@@ -48,7 +48,7 @@ class ElasticClient:
         """
             Attempt to reconnect if we haven't tried to reconnect too recently
         """
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         delta = now - self.lastReconnectAttempt
         if delta.seconds >= 30:
             self.status = self._ping()
@@ -72,8 +72,8 @@ class ElasticClient:
             Check each required index and make sure it exists, if it doesn't then create it
         """
         with self._new_trace_span(operation="initialize_index"):
-            if not self.es.indices.exists(index):
-                self.es.indices.create(index)
+            if not self.es.indices.exists(index=index):
+                self.es.indices.create(index=index)
 
             time.sleep(1)
 
@@ -88,14 +88,14 @@ class ElasticClient:
         """
             Delete an existing index
         """
-        if self.es.indices.exists(index):
-            self.es.indices.delete(index)
+        if self.es.indices.exists(index=index):
+            self.es.indices.delete(index=index)
 
     def index_exists(self, index: str):
         """
             Check if index exists
         """
-        return self.es.indices.exists(index)
+        return self.es.indices.exists(index=index)
 
     def get_collection(self, **kwargs):
         """
