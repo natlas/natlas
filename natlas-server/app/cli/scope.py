@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 import json
 import typing
 
@@ -35,7 +35,7 @@ def import_scope(scope_file: typing.TextIO, blacklist: bool):
 def import_items(file: str, import_as_blacklist: bool):
     import_name = "blacklist" if import_as_blacklist else "scope"
     results = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         import_name: import_scope(file, import_as_blacklist),
     }
     print(json.dumps(results, indent=2))
@@ -44,7 +44,7 @@ def import_items(file: str, import_as_blacklist: bool):
 @cli_group.command("export")
 def export_items():
     result = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "scope": [
             {
                 "target": item.target,

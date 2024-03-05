@@ -30,7 +30,7 @@ jobs:
             - ${HOME}/.venv/
   server-tests:
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.12
         environment:
           PIPENV_VENV_IN_PROJECT: true
       - image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18

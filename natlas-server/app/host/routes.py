@@ -10,7 +10,7 @@ from flask import (
     jsonify,
 )
 from flask_login import current_user, login_required
-from datetime import datetime
+from datetime import datetime, UTC
 from app.models import RescanTask
 from app.admin.forms import DeleteForm
 from app.host.forms import RescanForm
@@ -176,7 +176,7 @@ def rescan_host(ip):
         scan_window = current_app.agentConfig["scanTimeout"] * 2
         if (
             scan.dispatched
-            and (datetime.utcnow() - scan.date_dispatched).seconds > scan_window
+            and (datetime.now(UTC) - scan.date_dispatched).seconds > scan_window
         ):
             # It should never take this long so mark it as not dispatched
             scan.dispatched = False
