@@ -8,7 +8,7 @@ function setMotion(e: MediaQueryList | MediaQueryListEvent) {
     loadFull(tsParticles);
     if (e.matches) {
         tsParticles.load({
-            id:'tsparticles', 
+            id:'tsparticles',
             options: particlesConfig(false)
         });
     } else {

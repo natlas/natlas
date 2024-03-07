@@ -48,13 +48,13 @@
     border-top: 0;
 }
 
-@media only screen and (min-width: 1000px) {
+@media only screen and (width >= 1000px) {
     .modal-dialog {
         width: 1000px;
     }
 }
 
-@media only screen and (min-width: 1200px) {
+@media only screen and (width >= 1200px) {
     .modal-dialog {
         width: 1170px;
     }
