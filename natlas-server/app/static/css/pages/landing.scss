@@ -23,7 +23,6 @@
 
 @keyframes spin {
     100% {
-        -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }
@@ -56,10 +55,7 @@
 .landing-input {
     background-color: var(--input-bg);
     border: 0;
-    border-top-left-radius: 0.5em;
-    border-top-right-radius: 0.5em;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-radius: 0.5em 0.5em 0 0;
     color: var(--text-primary);
     line-height: 3em;
     padding-left: 0.5em;

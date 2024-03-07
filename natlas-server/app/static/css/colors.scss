@@ -1,10 +1,13 @@
+@use "sass:color";
+
 $green: #008000;
 $red: #f00;
 $white: #fff;
-$dark-content-bg-alpha: rgba(60, 60, 60, 0.75);
+$dark: #3c3c3c;
+$dark-content-bg-alpha: rgb(60 60 60 / 75%);
 $dark-content-bg-alt: #3c3c3c;
 $dark-content-bg: #191919;
-$light-content-bg-alpha: rgba(225, 225, 225, 0.75);
+$light-content-bg-alpha: rgb(255 255 255 / 75%);
 $light-content-bg-alt: #ececec;
 $light-content-bg: #f9f9f9;
 $natlas-blue: #0b59bd;
@@ -27,7 +30,7 @@ $muted: #6c757d;
         #{--translucent-bg}: $light-content-bg-alpha;
         #{--input-bg}: $off-white-darker;
         #{--text-primary}: $off-black;
-        #{--text-secondary}: lighten($off-black, 20);
+        #{--text-secondary}: color.adjust($off-black, $lightness: 20);
     }
 }
 
@@ -39,7 +42,7 @@ $muted: #6c757d;
         #{--translucent-bg}: $dark-content-bg-alpha;
         #{--input-bg}: $off-black-lighter;
         #{--text-primary}: $off-white;
-        #{--text-secondary}: darken($off-white, 20);
+        #{--text-secondary}: color.adjust($off-white, $lightness: -20);
     }
 }
 

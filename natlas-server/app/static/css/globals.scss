@@ -1,3 +1,7 @@
+@import 'components/backtotop';
+@import 'components/footer';
+@import 'components/header';
+
 html {
     box-sizing: border-box;
     height: 100%;
@@ -28,7 +32,3 @@ a:hover {
 pre {
     color: var(--text-primary);
 }
-
-@import 'components/backtotop';
-@import 'components/footer';
-@import 'components/header';

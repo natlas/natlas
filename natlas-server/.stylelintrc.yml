@@ -1,9 +1,10 @@
-extends: stylelint-config-standard
+extends: stylelint-config-standard-scss
 plugins:
     - stylelint-scss
 syntax: scss
 rules:
   color-no-invalid-hex: true
-  indentation: 4
   at-rule-no-unknown: null
   scss/at-rule-no-unknown: true
+  selector-class-pattern: null
+  selector-id-pattern: null
