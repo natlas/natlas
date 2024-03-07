@@ -1,4 +1,4 @@
-FROM node:15-stretch as webpack
+FROM node:20-bookworm as webpack
 ARG NATLAS_VERSION=unknown
 
 WORKDIR /app
