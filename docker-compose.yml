@@ -62,7 +62,7 @@ services:
       - backend
 
   webpack-server:
-    image: node:14-stretch
+    image: node:20-bookworm
     command: /bin/bash -c '/usr/local/bin/yarn install && /usr/local/bin/yarn run webpack --mode development --watch'
     networks:
       - backend
