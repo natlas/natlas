@@ -1,6 +1,7 @@
 import config
 import sqlalchemy
 
+
 def load_natlas_config(app, db):
     insp = sqlalchemy.inspect(db.engine)
     if not insp.has_table("config_item"):
@@ -30,6 +31,7 @@ def load_agent_config(app, db):
 
     # the agent config is updated in place so there's only ever 1 record
     app.agentConfig = db.session.get(AgentConfig, 1).as_dict()
+
 
 def load_agent_scripts(app, db):
     insp = sqlalchemy.inspect(db.engine)

@@ -20,7 +20,7 @@ class ElasticIndices:
 
     def _initialize_indices(self):
         """
-            Ensure each index in this context is initalized
+        Ensure each index in this context is initalized
         """
         with open(Config().BASEDIR + "/defaults/elastic/mapping.json") as mapfile:
             mapping = json.loads(mapfile.read())
@@ -30,7 +30,7 @@ class ElasticIndices:
 
     def _delete_indices(self):
         """
-            Delete all indices in this context
+        Delete all indices in this context
         """
         for index in self.all_indices():
             self.client.delete_index(index=index)
@@ -38,18 +38,18 @@ class ElasticIndices:
 
     def name(self, alias: str):
         """
-            Get the name of an index based on the current context
+        Get the name of an index based on the current context
         """
         return self.indices[alias]
 
     def all_indices(self):
         """
-            Return a list of indices in the current context
+        Return a list of indices in the current context
         """
         return [v for _, v in self.indices.items()]
 
     def str_indices(self):
         """
-            Return a comma-separated string of indices in the current context
+        Return a comma-separated string of indices in the current context
         """
         return ",".join(self.all_indices())

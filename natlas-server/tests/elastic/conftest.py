@@ -13,7 +13,13 @@ def reset_indices(indices):
 
 @pytest.fixture(scope="module")
 def esinterface():
-    esi = ElasticInterface(conf.ELASTICSEARCH_URL, True, "elastic", "natlas-dev-password-do-not-use", "natlas_test")
+    esi = ElasticInterface(
+        conf.ELASTICSEARCH_URL,
+        True,
+        "elastic",
+        "natlas-dev-password-do-not-use",
+        "natlas_test",
+    )
     yield esi
     reset_indices(esi.indices)
 

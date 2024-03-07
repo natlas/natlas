@@ -9,22 +9,27 @@ class ElasticInterface:
     client = None
     indices = None
 
-    def __init__(self, elasticUrl: str,
-                 authEnabled: bool,
-                 elasticUser: str,
-                 elasticPassword: str,
-                 basename: str = "nmap"):
-        self.client = ElasticClient(elasticUrl,
-                                    authEnabled=authEnabled,
-                                    elasticUser=elasticUser,
-                                    elasticPassword=elasticPassword)
+    def __init__(
+        self,
+        elasticUrl: str,
+        authEnabled: bool,
+        elasticUser: str,
+        elasticPassword: str,
+        basename: str = "nmap",
+    ):
+        self.client = ElasticClient(
+            elasticUrl,
+            authEnabled=authEnabled,
+            elasticUser=elasticUser,
+            elasticPassword=elasticPassword,
+        )
         self.indices = ElasticIndices(self.client, basename)
 
     def search(
         self, limit: int, offset: int, query: str = "nmap", searchIndex: str = "latest"
     ):
         """
-            Execute a user supplied search and return the results
+        Execute a user supplied search and return the results
         """
         query = {
             "bool": {
@@ -48,29 +53,30 @@ class ElasticInterface:
             query=query,
             sort=sort,
             from_=offset,
-
         )
 
     def total_hosts(self):
         """
-            Count the number of documents in nmap and return the count
+        Count the number of documents in nmap and return the count
         """
         result = self.client.execute_count(index=self.indices.name("latest"))
         return result["count"]
 
     def new_result(self, host: dict):
         """
-            Create new elastic documents in both indices for a new scan result
+        Create new elastic documents in both indices for a new scan result
         """
         ip = str(host["ip"])
 
         self.client.execute_index(index=self.indices.name("history"), document=host)
-        self.client.execute_index(index=self.indices.name("latest"), id=ip, document=host)
+        self.client.execute_index(
+            index=self.indices.name("latest"), id=ip, document=host
+        )
         return True
 
     def get_host(self, ip: str):
         """
-            Gets the most recent result for a host, but by querying the nmap_history it also gives us the total number of historical results
+        Gets the most recent result for a host, but by querying the nmap_history it also gives us the total number of historical results
         """
 
         size = 1
@@ -78,15 +84,12 @@ class ElasticInterface:
         sort = {"ctime": {"order": "desc"}}
 
         return self.client.get_single_host(
-            index=self.indices.name("history"),
-            size=size,
-            query=query,
-            sort=sort
+            index=self.indices.name("history"), size=size, query=query, sort=sort
         )
 
     def get_host_history(self, ip: str, limit: int, offset: int):
         """
-            Gets a collection of historical results for a specific ip address
+        Gets a collection of historical results for a specific ip address
         """
         query = {"term": {"ip": ip}}
         sort = {"ctime": {"order": "desc"}}
@@ -96,12 +99,12 @@ class ElasticInterface:
             size=limit,
             from_=offset,
             query=query,
-            sort=sort
+            sort=sort,
         )
 
     def count_host_screenshots(self, ip: str):
         """
-            Search history for an ip address and returns the number of historical screenshots
+        Search history for an ip address and returns the number of historical screenshots
         """
         query = {"term": {"ip": ip}}
         aggs = {"screenshot_count": {"sum": {"field": "num_screenshots"}}}
@@ -112,7 +115,7 @@ class ElasticInterface:
 
     def get_host_screenshots(self, ip: str, limit: int, offset: int):
         """
-            Gets screenshots and minimal context for a given host
+        Gets screenshots and minimal context for a given host
         """
         query = {
             "bool": {
@@ -122,11 +125,7 @@ class ElasticInterface:
                 ]
             }
         }
-        sort = {
-            "ctime": {
-                "order": "desc"
-            }
-        }
+        sort = {"ctime": {"order": "desc"}}
         source_fields = ["screenshots", "ctime", "scan_id"]
         return self.client.get_collection(
             index=self.indices.name("history"),
@@ -140,7 +139,7 @@ class ElasticInterface:
 
     def get_host_by_scan_id(self, scan_id: str):
         """
-            Get a specific historical result based on scan_id, which should be unique
+        Get a specific historical result based on scan_id, which should be unique
         """
 
         size = 1
@@ -154,25 +153,19 @@ class ElasticInterface:
         sort = {"ctime": {"order": "desc"}}
 
         return self.client.get_single_host(
-            index=self.indices.name("history"),
-            size=size,
-            query=query,
-            sort=sort
+            index=self.indices.name("history"), size=size, query=query, sort=sort
         )
 
     def delete_scan(self, scan_id: str):
         """
-            Delete a specific scan, if it's the most recent then try to migrate the next oldest back into the latest index
+        Delete a specific scan, if it's the most recent then try to migrate the next oldest back into the latest index
         """
         migrate = False
         size = 1
         query = {"query_string": {"query": scan_id, "fields": ["scan_id"]}}
         sort = {"ctime": {"order": "desc"}}
         count, host = self.client.get_single_host(
-            index=self.indices.name("latest"),
-            size=size,
-            query=query,
-            sort=sort
+            index=self.indices.name("latest"), size=size, query=query, sort=sort
         )
         if count != 0:
             # we're deleting the most recent scan result and need to pull the next most recent into the nmap index
@@ -209,7 +202,7 @@ class ElasticInterface:
 
     def delete_host(self, ip: str):
         """
-            Delete all occurrences of a given ip address
+        Delete all occurrences of a given ip address
         """
         deleteBody = {
             "query": {
@@ -228,7 +221,7 @@ class ElasticInterface:
 
     def random_host(self):
         """
-            Get a random single host and return it
+        Get a random single host and return it
         """
         seed = random.randrange(sys.maxsize)
         offset = 0
@@ -248,16 +241,13 @@ class ElasticInterface:
         }
 
         count, host = self.client.get_single_host(
-            index=self.indices.name("latest"),
-            size=size,
-            from_=offset,
-            query=query
+            index=self.indices.name("latest"), size=size, from_=offset, query=query
         )
         return host
 
     def get_current_screenshots(self, limit: int, offset: int):
         """
-            Get all current screenshots
+        Get all current screenshots
         """
         query = {"range": {"num_screenshots": {"gt": 0}}}
         aggs = {"screenshot_count": {"sum": {"field": "num_screenshots"}}}
@@ -281,14 +271,14 @@ class ElasticInterface:
 
     def count_scans_since(self, timestamp: datetime):
         """
-            Count the number of scans that started after a given timestamp
+        Count the number of scans that started after a given timestamp
         """
         query = {"range": {"scan_start": {"gte": timestamp}}}
         return self.count_scans_matching(query=query)["hits"]["total"]
 
     def count_scans_matching(self, index: str = "history", **kwargs):
         """
-            Count the number of scans that match an arbitrary search body
+        Count the number of scans that match an arbitrary search body
         """
         return self.client.execute_search(
             index=self.indices.name(index), size=0, track_scores=False, **kwargs

@@ -68,10 +68,12 @@ def create_app(config_class=config.Config, migrating=False):
         )
 
     app.jinja_env.add_extension("jinja2.ext.do")
-    app.elastic = ElasticInterface(app.config["ELASTICSEARCH_URL"],
-                                   app.config["ELASTIC_AUTH_ENABLE"],
-                                   app.config["ELASTIC_USER"],
-                                   app.config["ELASTIC_PASSWORD"])
+    app.elastic = ElasticInterface(
+        app.config["ELASTICSEARCH_URL"],
+        app.config["ELASTIC_AUTH_ENABLE"],
+        app.config["ELASTIC_USER"],
+        app.config["ELASTIC_PASSWORD"],
+    )
 
     login.init_app(app)
     mail.init_app(app)

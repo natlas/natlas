@@ -67,7 +67,7 @@ class Config(object):
     ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200")
     ELASTIC_AUTH_ENABLE = casted_bool(os.environ.get("ELASTIC_AUTH_ENABLE", False))
     ELASTIC_USER = os.environ.get("ELASTIC_USER", "elastic")
-    ELASTIC_PASSWORD =  os.environ.get("ELASTIC_PASSWORD", "")
+    ELASTIC_PASSWORD = os.environ.get("ELASTIC_PASSWORD", "")
 
     # MAIL SETTINGS
     MAIL_SERVER = os.environ.get("MAIL_SERVER", None)

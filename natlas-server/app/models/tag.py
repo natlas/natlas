@@ -9,7 +9,7 @@ class Tag(db.Model, DictSerializable):
 
     @staticmethod
     def create_if_none(tag):
-        """ If tag exists, return it. If not, create it and return it. """
+        """If tag exists, return it. If not, create it and return it."""
         tag = tag.strip()
         existingTag = Tag.query.filter_by(name=tag).first()
         if not existingTag:

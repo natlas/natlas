@@ -30,7 +30,7 @@ class ScopeManager:
 
     def load_all_groups(self):
         """
-            Used at initialization to update all scan groups with their database values
+        Used at initialization to update all scan groups with their database values
         """
         for _, group in self.scopes.items():
             group.update()

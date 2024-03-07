@@ -7,9 +7,9 @@ from .scan_manager import IPScanManager
 
 class ScanGroup:
     """
-        A scan group two scope collections:
-        - One for scanning scope
-        - One for blacklisted scope
+    A scan group two scope collections:
+    - One for scanning scope
+    - One for blacklisted scope
     """
 
     def __init__(self, scope: str, blacklist: str):
