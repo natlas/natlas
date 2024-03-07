@@ -1,7 +1,5 @@
 import './util/error-tracking';
 import $ from 'jquery';
-import dataTable from 'datatables.net-bs4'; // TODO: Switch to a NPM native
-
 import { isNewerVersionAvailable } from './util/version-check';
 import { initializeStatusUpdates } from './util/system-status';
 import { registerTagModalEvents } from './controls/natlas-tagging';
@@ -10,9 +8,7 @@ import { registerParticleEvents, authFormSwitcher } from './pages/login';
 import { getReducedMotion } from './util/media-queries';
 import 'natlas.scss';
 import 'bootstrap';
-
-// Install Datatables.net library onto existing jQuery
-dataTable(window, $);
+import 'datatables.net-bs4';
 
 $(function() {
     $('.expand-img').on('click', function() {
