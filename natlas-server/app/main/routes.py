@@ -43,7 +43,7 @@ def send_media(filename):
 @is_authenticated
 def browse():
     """
-        A simple browser that doesn't deal with queries at all
+    A simple browser that doesn't deal with queries at all
     """
     page = int(request.args.get("page", 1))
     includeHistory = request.args.get("includeHistory", False)
@@ -80,7 +80,7 @@ def browse():
 @is_authenticated
 def search():
     """
-        Return search results for a given query
+    Return search results for a given query
     """
     query = request.args.get("query", "")
     if query == "":
@@ -169,6 +169,6 @@ def screenshots():
 @is_authenticated
 def status():
     """
-        Simple html representation of the status api
+    Simple html representation of the status api
     """
     return render_template("main/status.html")

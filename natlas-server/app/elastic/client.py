@@ -15,15 +15,21 @@ class ElasticClient:
     logger = logging.getLogger("elasticsearch")
     logger.setLevel("ERROR")
 
-    def __init__(self, elasticURL: str, authEnabled: bool, elasticUser: str, elasticPassword: str):
+    def __init__(
+        self, elasticURL: str, authEnabled: bool, elasticUser: str, elasticPassword: str
+    ):
         try:
             if authEnabled:
-                self.es = elasticsearch.Elasticsearch(elasticURL,
-                                                      timeout=5,
-                                                      max_retries=1,
-                                                      http_auth=(elasticUser, elasticPassword))
+                self.es = elasticsearch.Elasticsearch(
+                    elasticURL,
+                    timeout=5,
+                    max_retries=1,
+                    http_auth=(elasticUser, elasticPassword),
+                )
             else:
-                self.es = elasticsearch.Elasticsearch(elasticURL, timeout=5, max_retries=1)
+                self.es = elasticsearch.Elasticsearch(
+                    elasticURL, timeout=5, max_retries=1
+                )
             self.status = self._ping()
             if self.status:
                 self.esversion = semver.VersionInfo.parse(
@@ -39,14 +45,14 @@ class ElasticClient:
 
     def _ping(self):
         """
-            Returns True if the cluster is up, False otherwise
+        Returns True if the cluster is up, False otherwise
         """
         with self._new_trace_span(operation="ping"):
             return self.es.ping()
 
     def _attempt_reconnect(self):
         """
-            Attempt to reconnect if we haven't tried to reconnect too recently
+        Attempt to reconnect if we haven't tried to reconnect too recently
         """
         now = datetime.now(UTC)
         delta = now - self.lastReconnectAttempt
@@ -58,7 +64,7 @@ class ElasticClient:
 
     def _check_status(self):
         """
-            If we're in a known bad state, try to reconnect
+        If we're in a known bad state, try to reconnect
         """
         if not (self.status or self._attempt_reconnect()):
             raise elasticsearch.ConnectionError("Could not connect to Elasticsearch")
@@ -69,7 +75,7 @@ class ElasticClient:
 
     def initialize_index(self, index: str, mapping: dict):
         """
-            Check each required index and make sure it exists, if it doesn't then create it
+        Check each required index and make sure it exists, if it doesn't then create it
         """
         with self._new_trace_span(operation="initialize_index"):
             if not self.es.indices.exists(index=index):
@@ -86,20 +92,20 @@ class ElasticClient:
 
     def delete_index(self, index: str):
         """
-            Delete an existing index
+        Delete an existing index
         """
         if self.es.indices.exists(index=index):
             self.es.indices.delete(index=index)
 
     def index_exists(self, index: str):
         """
-            Check if index exists
+        Check if index exists
         """
         return self.es.indices.exists(index=index)
 
     def get_collection(self, **kwargs):
         """
-            Execute a search and return a collection of results
+        Execute a search and return a collection of results
         """
         results = self.execute_search(**kwargs)
         if not results:
@@ -109,7 +115,7 @@ class ElasticClient:
 
     def get_single_host(self, **kwargs):
         """
-            Execute a search and return a single result
+        Execute a search and return a single result
         """
         results = self.execute_search(**kwargs)
         if not results or results["hits"]["total"] == 0:
@@ -122,7 +128,7 @@ class ElasticClient:
     # Mid-level query executor abstraction.
     def execute_search(self, **kwargs):
         """
-            Execute an arbitrary search.
+        Execute an arbitrary search.
         """
         with self._new_trace_span(operation="search", **kwargs) as span:
             results = self._execute_raw_query(
@@ -134,7 +140,7 @@ class ElasticClient:
 
     def execute_count(self, **kwargs):
         """
-            Executes an arbitrary count.
+        Executes an arbitrary count.
         """
         results = None
         with self._new_trace_span(operation="count", **kwargs) as span:
@@ -146,16 +152,14 @@ class ElasticClient:
 
     def execute_delete_by_query(self, **kwargs):
         """
-            Executes an arbitrary delete_by_query.
+        Executes an arbitrary delete_by_query.
         """
         with self._new_trace_span(operation="delete_by", **kwargs):
-            return self._execute_raw_query(
-                self.es.delete_by_query, **kwargs
-            )
+            return self._execute_raw_query(self.es.delete_by_query, **kwargs)
 
     def execute_index(self, **kwargs):
         """
-            Executes an arbitrary index.
+        Executes an arbitrary index.
         """
         with self._new_trace_span(operation="index", **kwargs):
             return self._execute_raw_query(self.es.index, **kwargs)
@@ -163,7 +167,7 @@ class ElasticClient:
     # Inner-most query executor. All queries route through here.
     def _execute_raw_query(self, func: callable, **kwargs):
         """
-            Wraps the es client to make sure that ConnectionErrors are handled uniformly
+        Wraps the es client to make sure that ConnectionErrors are handled uniformly
         """
         self._check_status()
         try:
