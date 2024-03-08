@@ -1,4 +1,4 @@
-FROM python:3.6 as build
+FROM python:3.10 as build
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	export BUILD_PKGS="unzip" \
@@ -26,7 +26,7 @@ WORKDIR /opt/natlas/natlas-agent
 RUN python3 -m compileall .
 
 # Build final image
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
@@ -43,7 +43,7 @@ RUN bash -c 'mkdir -p /data/{scans,conf,logs} \
 
 # We have to copy packages like this because the python directory is different between python images and ubuntu images
 # So the /.venv/bin/python3 symlink ends point pointing to something that doesn't exist
-COPY --from=build /.venv/lib/python3.6/site-packages /usr/local/lib/python3.6/dist-packages
+COPY --from=build /.venv/lib/python3.10/site-packages /usr/local/lib/python3.10/dist-packages
 WORKDIR /opt/natlas/natlas-agent
 USER www-data
 ENV LC_ALL='C.UTF-8'
