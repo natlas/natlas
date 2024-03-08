@@ -117,7 +117,7 @@ def main():
         if i and not i % 10:
             time.sleep(5)
         t = ThreadScan(q, config, autoScan, servicesSha)
-        t.setDaemon(True)
+        t.daemon = True
         t.start()
 
     if args.target:

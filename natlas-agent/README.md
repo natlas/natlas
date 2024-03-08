@@ -14,6 +14,11 @@ Production ready docker containers for the Natlas agent are [available on docker
 
 In order to take screenshots, you'll need to use a custom seccomp profile for the container. This [seccomp profile](https://github.com/jessfraz/dotfiles/blob/master/etc/docker/seccomp/chrome.json) was originally created by [Jess Frazelle](https://github.com/jessfraz) and has been mirrored into the Natlas project for posterity.
 
+The following additions have been made to the clone seccomp profile:
+
+- "faccessat2" syscall was added in Linux kernel 5.8 and is added in the mirrored seccomp profile.
+- "clone3" syscall adopted in Ubuntu 21
+
 Before launching your docker container, create an `agent_env` file containing the relevant configurations from [the config table](#the-config).
 
 ### Example ENV
