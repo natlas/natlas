@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   general-analysis:
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.12
         environment:
           PIPENV_VENV_IN_PROJECT: true
     working_directory: ~/repo
