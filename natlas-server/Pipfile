@@ -28,9 +28,9 @@ webpack-manifest = "~=2.1.1"
 natlas-libnmap = "*"
 cyclicprng = "*"
 mysqlclient = "*"
-opentelemetry-sdk = "*"
-opentelemetry-exporter-otlp = "*"
-opentelemetry-instrumentation-flask = "*"
+opentelemetry-sdk = "~=1.23"
+opentelemetry-exporter-otlp = "~=1.23"
+opentelemetry-instrumentation-flask = "~=0.44b"
 python-dateutil = "*"
 
 [requires]
