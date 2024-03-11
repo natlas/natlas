@@ -384,14 +384,19 @@
         },
         "mysqlclient": {
             "hashes": [
-                "sha256:0ac0dd759c4ca02c35a9fedc24bc982cf75171651e8187c2495ec957a87dfff7",
-                "sha256:3381ca1a4f37ff1155fcfde20836b46416d66531add8843f6aa6d968982731c3",
-                "sha256:71c4b330cf2313bbda0307fc858cc9055e64493ba9bf28454d25cf8b3ee8d7f5",
-                "sha256:f6ebea7c008f155baeefe16c56cd3ee6239f7a5a9ae42396c2f1860f08a7c432",
-                "sha256:fc575093cf81b6605bed84653e48b277318b880dc9becf42dd47fa11ffd3e2b6"
+                "sha256:329e4eec086a2336fe3541f1ce095d87a6f169d1cc8ba7b04ac68bcb234c9711",
+                "sha256:33bc9fb3464e7d7c10b1eaf7336c5ff8f2a3d3b88bab432116ad2490beb3bf41",
+                "sha256:3c318755e06df599338dad7625f884b8a71fcf322a9939ef78c9b3db93e1de7a",
+                "sha256:4e80dcad884dd6e14949ac6daf769123223a52a6805345608bf49cdaf7bc8b3a",
+                "sha256:9d3310295cb682232cadc28abd172f406c718b9ada41d2371259098ae37779d3",
+                "sha256:9d4c015480c4a6b2b1602eccd9846103fc70606244788d04aa14b31c4bd1f0e2",
+                "sha256:ac44777eab0a66c14cb0d38965572f762e193ec2e5c0723bcd11319cc5b693c5",
+                "sha256:d43987bb9626096a302ca6ddcdd81feaeca65ced1d5fe892a6a66b808326aa54",
+                "sha256:e1ebe3f41d152d7cb7c265349fdb7f1eca86ccb0ca24a90036cde48e00ceb2ab"
             ],
             "index": "pypi",
-            "version": "==2.0.3"
+            "markers": "python_version >= '3.8'",
+            "version": "==2.2.4"
         },
         "natlas-libnmap": {
             "hashes": [
