@@ -1,6 +1,6 @@
 import elasticsearch
 import time
-from datetime import datetime, UTC
+from datetime import datetime
 import logging
 from opentelemetry import trace
 import semver
@@ -41,7 +41,7 @@ class ElasticClient:
             raise
         finally:
             # Set the lastReconnectAttempt to the timestamp after initialization
-            self.lastReconnectAttempt = datetime.now(UTC)
+            self.lastReconnectAttempt = datetime.utcnow()
 
     def _ping(self):
         """
@@ -54,7 +54,7 @@ class ElasticClient:
         """
         Attempt to reconnect if we haven't tried to reconnect too recently
         """
-        now = datetime.now(UTC)
+        now = datetime.utcnow()
         delta = now - self.lastReconnectAttempt
         if delta.seconds >= 30:
             self.status = self._ping()

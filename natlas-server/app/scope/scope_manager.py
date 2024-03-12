@@ -2,7 +2,7 @@ from netaddr import IPAddress
 from netaddr.core import AddrFormatError
 from .scan_manager import IPScanManager
 from .scan_group import ScanGroup
-from datetime import datetime, UTC
+from datetime import datetime
 from flask import current_app
 
 
@@ -26,7 +26,7 @@ class ScopeManager:
                     blacklist=ScopeManager.default_group,
                 )
             }
-        self.init_time = datetime.now(UTC)
+        self.init_time = datetime.utcnow()
 
     def load_all_groups(self):
         """
@@ -61,7 +61,7 @@ class ScopeManager:
 
     def update(self, group: str = default_group):
         self.scopes.get(group).update()
-        current_app.logger.info(f"{str(datetime.now(UTC))} - ScopeManager Updated\n")
+        current_app.logger.info(f"{str(datetime.utcnow())} - ScopeManager Updated\n")
 
     def is_acceptable_target(self, target: str, group: str = default_group) -> bool:
         try:

@@ -58,7 +58,7 @@ class User(UserMixin, db.Model, DictSerializable):
 
     def new_reset_token(self):
         self.password_reset_token = secrets.token_urlsafe(User.token_length)
-        self.password_reset_expiration = datetime.now(UTC) + timedelta(
+        self.password_reset_expiration = datetime.utcnow() + timedelta(
             seconds=User.expiration_duration
         )
 
@@ -69,7 +69,7 @@ class User(UserMixin, db.Model, DictSerializable):
     def validate_reset_token(self):
         if not (self.password_reset_token and self.password_reset_expiration):
             return False
-        return self.password_reset_expiration > datetime.now(UTC)
+        return self.password_reset_expiration > datetime.utcnow()
 
     @staticmethod
     def get_reset_token(email):

@@ -1,6 +1,6 @@
 from app import db
 from app.models.dict_serializable import DictSerializable
-from datetime import datetime, UTC
+from datetime import datetime
 
 
 # Rescan Queue
@@ -21,12 +21,12 @@ class RescanTask(db.Model, DictSerializable):
 
     def dispatchTask(self):
         self.dispatched = True
-        self.date_dispatched = datetime.now(UTC)
+        self.date_dispatched = datetime.utcnow()
 
     def completeTask(self, scan_id):
         self.scan_id = scan_id
         self.complete = True
-        self.date_completed = datetime.now(UTC)
+        self.date_completed = datetime.utcnow()
 
     @staticmethod
     def getPendingTasks():

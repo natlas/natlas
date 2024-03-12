@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime
 
 from flask import current_app
 
@@ -15,7 +15,7 @@ def test_new_scopemanager(app):
     assert sm.get_scope() == []
     assert sm.get_blacklist() == []
     assert sm.scanmanager is None
-    assert datetime.now(UTC) > sm.init_time
+    assert datetime.utcnow() > sm.init_time
 
 
 def test_scope_update(app):

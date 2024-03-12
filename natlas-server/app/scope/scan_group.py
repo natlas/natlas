@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime
 from typing import Union
 from flask import current_app
 from .scope_collection import ScopeCollection
@@ -60,6 +60,6 @@ class ScanGroup:
         except Exception as e:
             if self.scan_manager is None or self.scan_manager.get_total() == 0:
                 errmsg = "Scan manager could not be instantiated because there was no scope configured."
-                current_app.logger.warning(f"{str(datetime.now(UTC))} - {errmsg}\n")
+                current_app.logger.warning(f"{str(datetime.utcnow())} - {errmsg}\n")
             else:
                 raise e
