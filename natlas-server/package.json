@@ -31,7 +31,7 @@
         "stylelint-scss": "^6.2.1",
         "ts-loader": "^8.1.0",
         "typescript": "^4.2.3",
-        "webpack": "5.90.0",
+        "webpack": "5.90.3",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^5.0.2",
         "webpack-yam-plugin": "^1.0.1"
