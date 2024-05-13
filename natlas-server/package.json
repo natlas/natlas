@@ -9,7 +9,7 @@
         "@fortawesome/fontawesome-free": "^5.15.3",
         "@sentry/browser": "^6.2.5",
         "bootstrap": "^4.6.0",
-        "datatables.net-bs4": "^1.10.24",
+        "datatables.net-bs4": "^2.0.7",
         "jquery": "^3.6.0",
         "popper.js": "^1.16.0",
         "@tsparticles/engine": "^3.3.0",
