@@ -3,10 +3,8 @@ import sentry_sdk
 from flask import request
 
 from app import db
-from app.errors import bp
-
-from .errors import NatlasSearchError, NatlasServiceError
-from .responses import get_response, get_supported_formats
+from app.errors import NatlasSearchError, NatlasServiceError, bp
+from app.errors.responses import get_response, get_supported_formats
 
 
 def build_response(err: NatlasServiceError):
