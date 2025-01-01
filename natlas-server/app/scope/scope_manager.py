@@ -4,8 +4,8 @@ from flask import current_app
 from netaddr import IPAddress
 from netaddr.core import AddrFormatError
 
-from .scan_group import ScanGroup
-from .scan_manager import IPScanManager
+from app.scope.scan_group import ScanGroup
+from app.scope.scan_manager import IPScanManager
 
 
 class ScopeManager:

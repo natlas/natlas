@@ -10,7 +10,7 @@ from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from .sentryio_middleware import SentryIoContextMiddleware
+from app.instrumentation.sentryio_middleware import SentryIoContextMiddleware
 
 SERVICE_NAME = "natlas-server"
 template_span = threading.local()
