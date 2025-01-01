@@ -178,7 +178,7 @@ class ScopeItem(db.Model, DictSerializable):
         tags_to_import = []
         for k, v in scope_tag_import.items():
             for tag in v:
-                tags_to_import.append(dict(scope_id=all_scope[k], tag_id=tag.id))
+                tags_to_import.append({"scope_id": all_scope[k], "tag_id": tag.id})
         import_chunks = [
             tags_to_import[i : i + chunk_size]
             for i in range(0, len(tags_to_import), chunk_size)

@@ -8,6 +8,8 @@ requires-python = "==3.11"
 select = [
     # flake8-bugbear
     "B",
+    # flake8-comprehensions
+    "C4",
     # isort
     "I",
 ]
