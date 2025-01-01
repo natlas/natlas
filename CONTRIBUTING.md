@@ -88,30 +88,23 @@ If this seems like a lot or you aren't able to do all this setup, you might also
 
 If you want to go the usual route and run the project locally, though:
 
-* Be using an ubuntu-based development environment
+* Use a development environment that supports Docker
 * [Fork the project](https://guides.github.com/activities/forking/#fork)
 * Download and install docker desktop.
   * [Windows](https://docs.docker.com/docker-for-windows/install/)
   * [Mac](https://docs.docker.com/docker-for-mac/install/)
   * [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-* Install docker-compose
-  * [All Operating Systems](https://docs.docker.com/compose/install/)
 * Read [Getting started with Docker](https://docs.docker.com/get-started/)
 * Modify the code
 * Run `docker-compose up -d`
-* Before you're ready to commit, install the prerequisite pre-commit hooks.
-  * From the root of the natlas repository, `pipenv install` to install dev dependencies
-  * `pipenv run pre-commit install` to install the precommit hooks into your .git directory
-  * `pipenv run pre-commit run --all-files` to ensure that the hooks work correctly before committing
+* Before you're ready to commit, ensure you have [pre-commit](https://pre-commit.com/) setup. Commits that do not adhere to the pre-commit rules will not be allowed to merge.
 * If your code passes the pre-commit hooks, you're ready to commit!
 * Commit and push to your fork and then [open a pull request](#submitting-a-pull-request)
 * A series of checks will automatically run against your pull request. These must all pass in order for your PR to be accepted.
 
 ### Coding Conventions
 
-* Code must be `black` formatted
-* Code must pass `flake8` using the supplied `.flake8` file
-* Code must pass all supplied `pre-commit` hooks
+Code must pass all defined `pre-commit` hooks in order to be merged. This strategy ensures that style, linting, and convention are all enforced by code, rather than by tribal knowledge. Just make sure you have pre-commit installed and have the hooks enabled in the natlas repository and you'll be good to go.
 
 ## Contribute Documentation
 

@@ -5,10 +5,7 @@
 [![Contributors](https://img.shields.io/github/contributors/natlas/natlas.svg)](https://github.com/natlas/natlas/graphs/contributors)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg?style=flat)](LICENSE)
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/321141e5cf7426874cd7/maintainability)](https://codeclimate.com/github/natlas/natlas/maintainability)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/natlas/natlas.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/natlas/natlas/alerts/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 [![Server downloads](https://img.shields.io/docker/pulls/natlas/server?label=server%20downloads&logo=docker)](https://hub.docker.com/repository/docker/natlas/server)
 [![Agent downloads](https://img.shields.io/docker/pulls/natlas/agent?label=agent%20downloads&logo=docker)](https://hub.docker.com/repository/docker/natlas/agent)
