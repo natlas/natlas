@@ -26,11 +26,6 @@ repos:
             - 'stylelint'
             - 'stylelint-config-standard-scss'
             - 'stylelint-scss'
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.1
-    hooks:
-      - id: pyupgrade
-        args: [--py311-plus, --keep-runtime-typing]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
     rev: v0.8.4

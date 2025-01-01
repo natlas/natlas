@@ -56,19 +56,18 @@ class NatlasNetworkServices:
                         os._exit(403)
                 if req.status_code == 400:
                     if "message" in req.json():
-                        self.netlogger.warn("[Server] " + req.json()["message"])
+                        self.netlogger.warning("[Server] " + req.json()["message"])
                     return req
                 if req.status_code != statusCode:
                     self.netlogger.error(
                         f"Expected {statusCode}, received {req.status_code}"
                     )
                     if "message" in req.json():
-                        self.netlogger.warn("[Server] " + req.json()["message"])
+                        self.netlogger.warning("[Server] " + req.json()["message"])
                     return req
                 if req.headers["content-type"] != contentType:
-                    self.netlogger.warn(
-                        "Expected %s, received %s"
-                        % (contentType, req.headers["content-type"])
+                    self.netlogger.warning(
+                        f'Expected {contentType}, received {req.headers["content-type"]}'
                     )
                     return False
             elif reqType == "POST" and postData:
@@ -85,20 +84,22 @@ class NatlasNetworkServices:
                         os._exit(403)
                 if req.status_code == 400:
                     if "message" in req.json():
-                        self.netlogger.warn("[Server] " + req.json()["message"])
+                        self.netlogger.warning("[Server] " + req.json()["message"])
                     return req
                 if req.status_code != statusCode:
-                    self.netlogger.warn(
+                    self.netlogger.warning(
                         f"Expected {statusCode}, received {req.status_code}"
                     )
                     if "message" in req.json():
-                        self.netlogger.warn("[Server] " + req.json()["message"])
+                        self.netlogger.warning("[Server] " + req.json()["message"])
                     return req
         except requests.ConnectionError:
-            self.netlogger.warn(f"Connection Error connecting to {self.config.server}")
+            self.netlogger.warning(
+                f"Connection Error connecting to {self.config.server}"
+            )
             return False
         except requests.Timeout:
-            self.netlogger.warn(
+            self.netlogger.warning(
                 f"Request timed out after {self.config.request_timeout} seconds."
             )
             return False
@@ -133,9 +134,8 @@ class NatlasNetworkServices:
             if RETRY:
                 attempt += 1
                 if giveup and attempt == self.config.max_retries:
-                    self.netlogger.warn(
-                        "Request to %s failed %s times. Giving up"
-                        % (self.config.server, self.config.max_retries)
+                    self.netlogger.warning(
+                        f"Request to {self.config.server} failed {self.config.max_retries} times. Giving up"
                     )
                     return False
                 jitter = (
@@ -145,9 +145,8 @@ class NatlasNetworkServices:
                     min(self.config.backoff_max, self.config.backoff_base * 2**attempt)
                     + jitter
                 )
-                self.netlogger.warn(
-                    "Request to %s failed. Waiting %s seconds before retrying."
-                    % (self.config.server, current_sleep)
+                self.netlogger.warning(
+                    f"Request to {self.config.server} failed. Waiting {current_sleep} seconds before retrying."
                 )
                 time.sleep(current_sleep)
         return result
@@ -168,8 +167,7 @@ class NatlasNetworkServices:
                 != serviceData["sha256"]
             ):
                 self.netlogger.error(
-                    "hash provided by %s doesn't match locally computed hash of services"
-                    % self.config.server
+                    f"hash provided by {self.config.server} doesn't match locally computed hash of services"
                 )
                 return False
             with open(services_path, "w") as f:
@@ -219,8 +217,7 @@ class NatlasNetworkServices:
             and results.result["port_count"] >= 0
         ):
             self.netlogger.info(
-                "Submitting %s ports for %s"
-                % (results.result["port_count"], results.result["ip"])
+                f"Submitting {results.result['port_count']} ports for {results.result['ip']}"
             )
         elif not results.result["is_up"]:
             self.netlogger.info(

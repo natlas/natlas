@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 
 class ScanResult:
@@ -10,14 +10,14 @@ class ScanResult:
             "scan_id": target_data["scan_id"],
             "agent_version": config.NATLAS_VERSION,
             "agent": config.agent_id if config.agent_id else "anonymous",
-            "scan_start": datetime.now(timezone.utc).isoformat(),
+            "scan_start": datetime.now(UTC).isoformat(),
         }
 
     def add_item(self, name, value):
         self.result[name] = value
 
     def scan_stop(self):
-        self.result["scan_stop"] = datetime.now(timezone.utc).isoformat()
+        self.result["scan_stop"] = datetime.now(UTC).isoformat()
 
     def is_up(self, status):
         self.result["is_up"] = status

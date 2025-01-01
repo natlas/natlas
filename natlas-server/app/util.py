@@ -1,9 +1,9 @@
 import secrets
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 
 def utcnow_tz():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def generate_hex_16():
