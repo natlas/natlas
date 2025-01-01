@@ -1,7 +1,6 @@
 import logging
 import time
 from datetime import datetime
-from typing import ClassVar
 
 import elasticsearch
 import semver

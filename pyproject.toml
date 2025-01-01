@@ -10,6 +10,8 @@ select = [
     "B",
     # flake8-comprehensions
     "C4",
+    # pyflakes
+    "F",
     # flynt
     "FLY",
     # isort

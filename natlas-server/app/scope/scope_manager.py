@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import ClassVar
 
 from flask import current_app
 from netaddr import IPAddress
