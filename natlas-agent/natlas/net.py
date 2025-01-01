@@ -3,6 +3,7 @@ import json
 import os
 import random
 import time
+from typing import ClassVar
 
 import requests
 from natlas import logging, utils
@@ -13,7 +14,7 @@ class NatlasNetworkServices:
     config = None
     netlogger = logging.get_logger("NetworkServices")
 
-    api_endpoints = {
+    api_endpoints: ClassVar = {
         "GETSERVICES": "/api/natlas-services",
         "GETWORK": "/api/getwork",
         "SUBMIT": "/api/submit",
@@ -206,7 +207,7 @@ class NatlasNetworkServices:
 
     # Results is a ScanResult object
     def submit_results(self, results):
-        if "timed_out" in results.result and results.result["timed_out"]:
+        if results.result.get("timed_out"):
             self.netlogger.info(
                 f"Submitting scan timeout notice for {results.result['ip']}"
             )

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import ClassVar
 
 from flask import current_app
 from netaddr import IPAddress
@@ -9,8 +10,8 @@ from app.scope.scan_manager import IPScanManager
 
 
 class ScopeManager:
-    pendingRescans = []
-    dispatchedRescans = []
+    pendingRescans: ClassVar = []
+    dispatchedRescans: ClassVar = []
     scanmanager = None
     init_time = None
     scopes = None
@@ -62,7 +63,7 @@ class ScopeManager:
 
     def update(self, group: str = default_group):
         self.scopes.get(group).update()
-        current_app.logger.info(f"{str(datetime.utcnow())} - ScopeManager Updated\n")
+        current_app.logger.info(f"{datetime.utcnow()!s} - ScopeManager Updated\n")
 
     def is_acceptable_target(self, target: str, group: str = default_group) -> bool:
         try:

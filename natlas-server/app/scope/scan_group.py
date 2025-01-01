@@ -61,6 +61,6 @@ class ScanGroup:
         except Exception as e:
             if self.scan_manager is None or self.scan_manager.get_total() == 0:
                 errmsg = "Scan manager could not be instantiated because there was no scope configured."
-                current_app.logger.warning(f"{str(datetime.utcnow())} - {errmsg}\n")
+                current_app.logger.warning(f"{datetime.utcnow()!s} - {errmsg}\n")
             else:
                 raise e

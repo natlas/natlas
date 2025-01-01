@@ -137,4 +137,4 @@ def create_app(config_class=config.Config, migrating=False):
     return app
 
 
-from app import models  # noqa: E402,F401
+from app import models

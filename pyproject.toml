@@ -12,6 +12,8 @@ select = [
     "C4",
     # isort
     "I",
+    # Ruff's own rules
+    "RUF",
     # flake8-simplify
     "SIM",
     # flake8-tidy-imports
