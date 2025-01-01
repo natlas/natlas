@@ -1,6 +1,6 @@
 /*
- * Row container
- */
+* Row container
+*/
 
 .host-row {
     border-radius: 15px;
@@ -17,8 +17,8 @@
 }
 
 /*
- * Legacy
- */
+* Legacy
+*/
 
 .host-headshot {
     max-width: 100%;
@@ -29,13 +29,13 @@
 }
 
 .nmap_data {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgb(0 0 0 / 5%);
     border-radius: 10px;
     font-size: 75%;
 }
 
 .preview_nmap {
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgb(0 0 0 / 75%);
     color: $white;
     line-height: 2em;
     margin-top: -1em;
@@ -43,7 +43,7 @@
 }
 
 .preview_nmap:hover {
-    background-color: rgba(0, 0, 0, 1);
+    background-color: rgb(0 0 0 / 100%);
 }
 
 a.preview_link,

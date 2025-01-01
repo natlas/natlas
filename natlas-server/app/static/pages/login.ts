@@ -1,17 +1,24 @@
-import { tsParticles } from 'tsparticles';
-
+import { tsParticles } from '@tsparticles/engine';
+import { loadFull } from "tsparticles";
 import { particlesConfig } from '../conf/particles';
 import { getReducedMotion } from '../util/media-queries';
 
 function setMotion(e: MediaQueryList | MediaQueryListEvent) {
     tsParticles.init();
-
+    loadFull(tsParticles);
     if (e.matches) {
-        tsParticles.load('tsparticles', particlesConfig(false));
+        tsParticles.load({
+            id:'tsparticles',
+            options: particlesConfig(false)
+        });
     } else {
-        tsParticles.load('tsparticles', particlesConfig(true));
+        tsParticles.load({
+            id:'tsparticles',
+            options: particlesConfig(true)
+        });
     }
 }
+
 
 export function authFormSwitcher(): void {
     const loginBtn = document.querySelector('#login-button');
@@ -38,10 +45,11 @@ export function authFormSwitcher(): void {
     }
 }
 
+
 export function registerParticleEvents(): void {
     if (document.getElementById('tsparticles')) {
         const reducedMotion = getReducedMotion();
-        reducedMotion.addListener(setMotion);
+        reducedMotion.addEventListener("change", setMotion);
         setMotion(reducedMotion);
     }
 }

@@ -13,15 +13,18 @@ repos:
     -   id: debug-statements
     -   id: mixed-line-ending
 -   repo: https://github.com/psf/black
-    rev: 19.3b0
+    rev: 24.2.0
     hooks:
     -   id: black
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.3
+-   repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
     hooks:
     -   id: flake8
--   repo: https://github.com/awebdeveloper/pre-commit-stylelint
-    rev: 8f63da497580898a7e0ceef6bf9e72cc0af07828
+-   repo: https://github.com/thibaudcolas/pre-commit-stylelint
+    rev: v16.2.1
     hooks:
     -   id: stylelint
-        additional_dependencies: ['stylelint', 'stylelint-config-standard', 'stylelint-scss']
+        additional_dependencies:
+            - 'stylelint'
+            - 'stylelint-config-standard-scss'
+            - 'stylelint-scss'

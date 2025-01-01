@@ -1,6 +1,6 @@
 from app import db
 import secrets
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, UTC
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 from app.models import User

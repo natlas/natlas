@@ -86,7 +86,7 @@ def get_web_screenshots(target, scan_id, proctimeout):
     output_dir = os.path.join(scan_dir, f"aquatone.{scan_id}")
     logger.info(f"Attempting to take screenshots for {target}")
 
-    aquatoneArgs = ["aquatone", "-nmap", "-scan-timeout", "2500", "-out", output_dir]
+    aquatoneArgs = ["aquatone", "-nmap", "-scan-timeout", "2500", "-threads", "1", "-out", output_dir]
     with open(xml_file, "r") as f:
         process = subprocess.Popen(
             aquatoneArgs, stdin=f, stdout=subprocess.DEVNULL

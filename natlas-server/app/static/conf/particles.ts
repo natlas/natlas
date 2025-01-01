@@ -1,5 +1,5 @@
-import { IOptions } from 'tsparticles/dist/Options/Interfaces/IOptions';
-import { RecursivePartial } from 'tsparticles/dist/Types/RecursivePartial';
+import { IOptions } from '@tsparticles/engine';
+import { RecursivePartial } from '@tsparticles/engine';
 
 export function particlesConfig(active: boolean): RecursivePartial<IOptions> {
 
@@ -7,43 +7,49 @@ export function particlesConfig(active: boolean): RecursivePartial<IOptions> {
         'fpsLimit': 60,
         'particles': {
             'number': {
-                'value': 100,
+                'value': 200,
                 'density': {
-                    'enable': true,
-                    'value_area': 500
+                    'enable': true
                 }
             },
             'color': {
                 'value': '#ed1e79'
             },
+            'stroke': {
+                'width': 0,
+                'color': '#ed1e79'
+            },
             'shape': {
-                'type': 'triangle',
-                'stroke': {
-                    'width': 0,
-                    'color': '#ed1e79'
-                }
+                'type': 'triangle'
             },
             'opacity': {
-                'value': 0.33,
-                'random': false,
-                'anim': {
+                'value': {
+                    min: 0.1,
+                    max: 0.33
+                },
+                'animation': {
                     'enable': false,
+                    'mode': 'random',
                     'speed': 1,
-                    'opacity_min': 0.1,
                     'sync': false
                 }
             },
             'size': {
-                'value': 3,
-                'random': true,
-                'anim': {
+                'value': {
+                    min: 0.1,
+                    max: 3
+                },
+                'animation': {
                     'enable': false,
-                    'speed': 40,
-                    'size_min': 0.1,
+                    'speed': {
+                        min: 40,
+                        max: 40
+                    },
+                    'mode': 'random',
                     'sync': false
                 }
             },
-            'line_linked': {
+            'links': {
                 'enable': true,
                 'distance': 150,
                 'color': '#ed1e79',
@@ -56,53 +62,58 @@ export function particlesConfig(active: boolean): RecursivePartial<IOptions> {
                 'direction': 'none',
                 'random': false,
                 'straight': false,
-                'out_mode': 'out',
-                'bounce': false,
+                'outModes': {
+                    'default': 'out'
+                },
                 'attract': {
                     'enable': false,
-                    'rotateX': 600,
-                    'rotateY': 1200
+                    'rotate': {
+                        'x': 600,
+                        'y': 1200
+                    }
                 }
             }
         },
         'interactivity': {
-            'detect_on': 'canvas',
+            'detectOn': 'canvas',
             'events': {
-                'onhover': {
+                'onHover': {
                     'enable': active,
                     'mode': 'repulse'
                 },
-                'onclick': {
+                'onClick': {
                     'enable': active,
                     'mode': 'push'
                 },
-                'resize': true
+                'resize': {
+                    delay: 1,
+                    enable: true
+                }
             },
             'modes': {
                 'grab': {
                     'distance': 400,
-                    'line_linked': {
+                    'links': {
                         'opacity': 1
                     }
                 },
                 'bubble': {
                     'distance': 400,
                     'size': 40,
-                    'duration': 2,
-                    'opacity': 8
+                    'duration': 2
                 },
                 'repulse': {
                     'distance': 100,
                     'duration': 0.4
                 },
                 'push': {
-                    'particles_nb': 4
+                    'quantity': 4
                 },
                 'remove': {
-                    'particles_nb': 2
+                    'quantity': 2
                 }
             }
         },
-        'retina_detect': true
+        'detectsRetina': true
     };
 }

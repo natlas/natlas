@@ -5,13 +5,15 @@
 version: "3.7"
 services:
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
     container_name: elastic
     environment:
       - node.name=elastic
       - discovery.type=single-node
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - "ELASTIC_PASSWORD=natlas-dev-password-do-not-use"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
@@ -23,6 +25,15 @@ services:
       - 9200:9200
     networks:
       - backend
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -u elastic:natlas-dev-password-do-not-use -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'"
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 24
 
   mysql:
     image: mysql:8.0.21
@@ -34,22 +45,24 @@ services:
       - backend
 
   zipkin-server:
-    image: openzipkin/zipkin-slim:2.21.6
+    image: openzipkin/zipkin-slim:3.1.0
     ports:
       - 9411:9411
     networks:
       - backend
 
-  opencensus-agent:
-    image: omnition/opencensus-agent:0.1.11
-    command: --config=/conf/opencensus-dev.yml
+  otel-collector:
+    image: otel/opentelemetry-collector:0.95.0
+    ports:
+      - 4317:4317
+      - 55679:55679
     volumes:
-      - ./.opencensus-dev.yml:/conf/opencensus-dev.yml:ro
+      - ./.otel-collector-dev.yml:/etc/otelcol/config.yaml
     networks:
       - backend
 
   webpack-server:
-    image: node:14-stretch
+    image: node:20-bookworm
     command: /bin/bash -c '/usr/local/bin/yarn install && /usr/local/bin/yarn run webpack --mode development --watch'
     networks:
       - backend
@@ -68,14 +81,23 @@ services:
       - backend
     environment:
       - ELASTICSEARCH_URL=http://elastic:9200
+      - ELASTIC_AUTH_ENABLE=True
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=natlas-dev-password-do-not-use
       - FLASK_ENV=development
-      - OPENCENSUS_AGENT=opencensus-agent:55678
+      - OTEL_ENABLE=True
+      - OTEL_COLLECTOR=otel-collector:4317
+      - DB_AUTO_UPGRADE=True
     volumes:
       - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
       - html_assets:/opt/natlas/natlas-server/static/dist
     links:
       - elastic
+    depends_on:
+      elastic:
+        condition: service_healthy
+
 
   natlas-agent:
     build: natlas-agent

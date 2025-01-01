@@ -20,4 +20,7 @@ class TestConfig(Config):
     DB_AUTO_UPGRADE = True
 
     # Assume that the test environment has access to elastic via localhost:9200
-    ELASTICSEARCH_URL = "http://localhost:9200"
+    ELASTICSEARCH_URL = "http://elastic:9200"
+    ELASTIC_AUTH_ENABLE = True
+    ELASTIC_USER = "elastic"
+    ELASTIC_PASSWORD = "natlas-dev-password-do-not-use"

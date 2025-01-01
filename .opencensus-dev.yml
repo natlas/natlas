@@ -1,7 +1,0 @@
-receivers:
-  opencensus:
-    address: "0.0.0.0:55678"
-
-exporters:
-  zipkin:
-    endpoint: "http://zipkin-server:9411/api/v2/spans"

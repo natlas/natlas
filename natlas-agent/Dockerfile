@@ -1,4 +1,4 @@
-FROM python:3.6 as build
+FROM python:3.11 as build
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	export BUILD_PKGS="unzip" \
@@ -26,11 +26,11 @@ WORKDIR /opt/natlas/natlas-agent
 RUN python3 -m compileall .
 
 # Build final image
-FROM ubuntu:18.04
+FROM debian:bookworm
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
-	&& apt-get install --no-install-recommends -qy python3 python3-pkg-resources chromium-browser nmap xvfb vncsnapshot libcap2-bin \
+	&& apt-get install --no-install-recommends -qy python3 python3-pkg-resources chromium nmap xvfb vncsnapshot libcap2-bin \
 	&& setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap \
 	&& rm -rf /var/cache/* /root /var/lib/apt/info/* /var/lib/apt/lists/* /var/lib/ghc /var/lib/dpkg /var/lib/log/*
 
@@ -43,7 +43,7 @@ RUN bash -c 'mkdir -p /data/{scans,conf,logs} \
 
 # We have to copy packages like this because the python directory is different between python images and ubuntu images
 # So the /.venv/bin/python3 symlink ends point pointing to something that doesn't exist
-COPY --from=build /.venv/lib/python3.6/site-packages /usr/local/lib/python3.6/dist-packages
+COPY --from=build /.venv/lib/python3.11/site-packages /usr/local/lib/python3.11/dist-packages
 WORKDIR /opt/natlas/natlas-agent
 USER www-data
 ENV LC_ALL='C.UTF-8'

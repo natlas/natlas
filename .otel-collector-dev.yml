@@ -1,0 +1,28 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+    timeout: 10s
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+
+exporters:
+  zipkin:
+    endpoint: 'http://zipkin-server:9411/api/v2/spans'
+  logging:
+    loglevel: debug
+
+service:
+  telemetry:
+    logs:
+      level: debug
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, probabilistic_sampler]
+      exporters: [zipkin, logging]

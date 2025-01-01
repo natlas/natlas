@@ -65,6 +65,9 @@ class Config(object):
 
     # Elasticsearch only gets loaded from environment
     ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200")
+    ELASTIC_AUTH_ENABLE = casted_bool(os.environ.get("ELASTIC_AUTH_ENABLE", False))
+    ELASTIC_USER = os.environ.get("ELASTIC_USER", "elastic")
+    ELASTIC_PASSWORD = os.environ.get("ELASTIC_PASSWORD", "")
 
     # MAIL SETTINGS
     MAIL_SERVER = os.environ.get("MAIL_SERVER", None)
@@ -89,6 +92,5 @@ class Config(object):
     # Instrumentation isn't directly used by the flask app context so does not need to be ALL_CAPS
     sentry_dsn = os.environ.get("SENTRY_DSN", None)
     SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN", None)
-    opencensus_enable = casted_bool(os.environ.get("OPENCENSUS_ENABLE", False))
-    opencensus_sample_rate = float(os.environ.get("OPENCENSUS_SAMPLE_RATE", 1))
-    opencensus_agent = os.environ.get("OPENCENSUS_AGENT", "127.0.0.1:55678")
+    otel_enable = casted_bool(os.environ.get("OTEL_ENABLE", False))
+    otel_collector = os.environ.get("OTEL_COLLECTOR", "127.0.0.1:4317")

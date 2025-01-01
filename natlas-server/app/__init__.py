@@ -10,7 +10,7 @@ from webpack_manifest import webpack_manifest
 
 import config
 from app.elastic import ElasticInterface
-from .instrumentation import initialize_opencensus
+from .instrumentation import initialize_opentelemetry
 from .config_loader import load_config_from_db
 from app.scope import ScopeManager
 from app.url_converters import register_converters
@@ -49,7 +49,7 @@ def unauthorized():
 
 def create_app(config_class=config.Config, migrating=False):
     app = Flask(__name__)
-    initialize_opencensus(config_class, app)
+    initialize_opentelemetry(config_class, app)
 
     app.config.from_object(config_class)
     db.init_app(app)
@@ -68,7 +68,12 @@ def create_app(config_class=config.Config, migrating=False):
         )
 
     app.jinja_env.add_extension("jinja2.ext.do")
-    app.elastic = ElasticInterface(app.config["ELASTICSEARCH_URL"])
+    app.elastic = ElasticInterface(
+        app.config["ELASTICSEARCH_URL"],
+        app.config["ELASTIC_AUTH_ENABLE"],
+        app.config["ELASTIC_USER"],
+        app.config["ELASTIC_PASSWORD"],
+    )
 
     login.init_app(app)
     mail.init_app(app)

@@ -145,9 +145,7 @@ class NatlasNetworkServices:
                     random.randint(0, 1000) / 1000
                 )  # jitter to reduce chance of locking
                 current_sleep = (
-                    min(
-                        self.config.backoff_max, self.config.backoff_base * 2 ** attempt
-                    )
+                    min(self.config.backoff_max, self.config.backoff_base * 2**attempt)
                     + jitter
                 )
                 self.netlogger.warn(
@@ -189,9 +187,7 @@ class NatlasNetworkServices:
                     )
                     return False
         else:
-            return (
-                False
-            )  # return false if we were unable to get a response from the server
+            return False  # return false if we were unable to get a response from the server
         return serviceData[
             "sha256"
         ]  # return True if we got a response and everything checks out
