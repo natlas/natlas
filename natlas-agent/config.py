@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 
 
 class Config:
-
     # Current Version
     NATLAS_VERSION = "0.6.12"
 

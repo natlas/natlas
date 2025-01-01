@@ -3,7 +3,7 @@ import secrets
 import json
 from dotenv import load_dotenv
 
-with open("defaults/db_configs.json", "r") as f:
+with open("defaults/db_configs.json") as f:
     defaultConfig = json.load(f)
 
 
@@ -24,8 +24,7 @@ def casted_value(expected_type, value):
 
 
 # Things in the Class object are config options we will likely never want to change from the database.
-class Config(object):
-
+class Config:
     # Current Version
     NATLAS_VERSION = "0.6.12"
 

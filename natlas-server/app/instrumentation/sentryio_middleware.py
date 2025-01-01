@@ -2,7 +2,7 @@ from sentry_sdk import configure_scope
 from opentelemetry import trace
 
 
-class SentryIoContextMiddleware(object):
+class SentryIoContextMiddleware:
     def __init__(self, app):
         self.app = app
 

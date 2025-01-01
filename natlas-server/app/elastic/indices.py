@@ -6,7 +6,6 @@ from app.elastic.client import ElasticClient
 
 
 class ElasticIndices:
-
     basename = None
     indices = None
     logger = logging.getLogger("elasticsearch")

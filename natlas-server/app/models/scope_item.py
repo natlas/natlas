@@ -2,7 +2,7 @@ from netaddr import IPNetwork, IPAddress
 from netaddr.core import AddrFormatError
 from app import db
 from app.models.dict_serializable import DictSerializable
-from typing import Iterable
+from collections.abc import Iterable
 from app.models.tag import Tag
 
 # Many to many table that ties tags and scopes together

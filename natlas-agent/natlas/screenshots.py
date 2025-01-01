@@ -86,11 +86,18 @@ def get_web_screenshots(target, scan_id, proctimeout):
     output_dir = os.path.join(scan_dir, f"aquatone.{scan_id}")
     logger.info(f"Attempting to take screenshots for {target}")
 
-    aquatoneArgs = ["aquatone", "-nmap", "-scan-timeout", "2500", "-threads", "1", "-out", output_dir]
-    with open(xml_file, "r") as f:
-        process = subprocess.Popen(
-            aquatoneArgs, stdin=f, stdout=subprocess.DEVNULL
-        )  # nosec
+    aquatoneArgs = [
+        "aquatone",
+        "-nmap",
+        "-scan-timeout",
+        "2500",
+        "-threads",
+        "1",
+        "-out",
+        output_dir,
+    ]
+    with open(xml_file) as f:
+        process = subprocess.Popen(aquatoneArgs, stdin=f, stdout=subprocess.DEVNULL)  # nosec
 
     try:
         process.communicate(timeout=proctimeout)
@@ -106,7 +113,6 @@ def get_web_screenshots(target, scan_id, proctimeout):
 
 
 def get_vnc_screenshots(target, scan_id, proctimeout):
-
     scan_dir = utils.get_scan_dir(scan_id)
     output_file = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")
 

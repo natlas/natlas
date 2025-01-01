@@ -18,7 +18,6 @@ from migrations.migrator import migration_needed, handle_db_upgrade
 
 
 class AnonUser(AnonymousUserMixin):
-
     results_per_page = 50
     preview_length = 50
 
@@ -138,4 +137,4 @@ def create_app(config_class=config.Config, migrating=False):
     return app
 
 
-from app import models  # noqa: F401
+from app import models  # noqa: E402,F401

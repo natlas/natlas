@@ -45,7 +45,6 @@ def command_builder(scan_id, agentConfig, target):
 
 
 def scan(target_data, config):
-
     if not utils.validate_target(target_data["target"], config):
         return False
     target = target_data["target"]
@@ -75,7 +74,7 @@ def scan(target_data, config):
     for ext in "nmap", "gnmap", "xml":
         path = os.path.join(scan_dir, f"nmap.{scan_id}.{ext}")
         try:
-            with open(path, "r") as f:
+            with open(path) as f:
                 result.add_item(ext + "_data", f.read())
         except Exception:
             logger.warning(f"Couldn't read {path}")
@@ -131,7 +130,7 @@ class ScanWorkItem:
 
 class ManualScanWorkItem(ScanWorkItem):
     def __init__(self, queue, target_data):
-        super(ManualScanWorkItem, self).__init__(target_data)
+        super().__init__(target_data)
         self.queue = queue
 
     def complete(self):

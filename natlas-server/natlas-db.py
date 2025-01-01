@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 """
-    This is a special app instance that allows us to perform database operations
-    without going through the app's migration_needed check. Running this script
-    is functionally equivalent to what `flask db` normally does. The reason we
-    can't continue to use that is that command is that it invokes the app instance from
-    FLASK_APP env variable (natlas-server.py) which performs the migration check and exits
-    during initialization.
+This is a special app instance that allows us to perform database operations
+without going through the app's migration_needed check. Running this script
+is functionally equivalent to what `flask db` normally does. The reason we
+can't continue to use that is that command is that it invokes the app instance from
+FLASK_APP env variable (natlas-server.py) which performs the migration check and exits
+during initialization.
 """
+
 import argparse
 
 from app import create_app
