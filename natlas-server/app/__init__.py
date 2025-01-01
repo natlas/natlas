@@ -17,7 +17,7 @@ from app.scope import ScopeManager
 from app.url_converters import register_converters
 
 
-class AnonUser(AnonymousUserMixin):
+class AnonUser(AnonymousUserMixin):  # type: ignore[misc]
     results_per_page = 50
     preview_length = 50
 
@@ -31,11 +31,11 @@ mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
 csrf = CSRFProtect()
-ScopeManager = ScopeManager()
+ScopeManager = ScopeManager()  # type: ignore[assignment, misc]
 
 
 @login.unauthorized_handler
-def unauthorized():
+def unauthorized():  # type: ignore[no-untyped-def]
     if current_user.is_anonymous:
         flash("You must login to continue.", "warning")
         return redirect(url_for("auth.login"))
@@ -46,7 +46,7 @@ def unauthorized():
     return redirect(url_for("auth.login"))
 
 
-def create_app(config_class=config.Config, migrating=False):
+def create_app(config_class=config.Config, migrating=False):  # type: ignore[no-untyped-def]
     app = Flask(__name__)
     initialize_opentelemetry(config_class, app)
 
@@ -67,7 +67,7 @@ def create_app(config_class=config.Config, migrating=False):
         )
 
     app.jinja_env.add_extension("jinja2.ext.do")
-    app.elastic = ElasticInterface(
+    app.elastic = ElasticInterface(  # type: ignore[attr-defined]
         app.config["ELASTICSEARCH_URL"],
         app.config["ELASTIC_AUTH_ENABLE"],
         app.config["ELASTIC_USER"],
@@ -77,7 +77,7 @@ def create_app(config_class=config.Config, migrating=False):
     login.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
-    ScopeManager.init_app(app)
+    ScopeManager.init_app(app)  # type: ignore[arg-type, call-arg]
     app.config["webpack"] = webpack_manifest.load(
         # An absolute path to a manifest file
         path=os.path.join(
@@ -89,7 +89,7 @@ def create_app(config_class=config.Config, migrating=False):
 
     with app.app_context():
         load_config_from_db(app, db)
-        ScopeManager.load_all_groups()
+        ScopeManager.load_all_groups()  # type: ignore[call-arg]
 
     register_converters(app)
 

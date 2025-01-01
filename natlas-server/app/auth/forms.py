@@ -5,14 +5,14 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 from app.models import User
 
 
-class LoginForm(FlaskForm):
+class LoginForm(FlaskForm):  # type: ignore[misc]
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     remember_me = BooleanField("Remember Me")
     submit = SubmitField("Sign In")
 
 
-class RegistrationForm(FlaskForm):
+class RegistrationForm(FlaskForm):  # type: ignore[misc]
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
     password2 = PasswordField(
@@ -20,18 +20,18 @@ class RegistrationForm(FlaskForm):
     )
     submit = SubmitField("Register")
 
-    def validate_email(self, email):
+    def validate_email(self, email):  # type: ignore[no-untyped-def]
         user = User.query.filter_by(email=email.data.lower()).first()
         if user is not None:
             raise ValidationError("Email already exists!")
 
 
-class ResetPasswordRequestForm(FlaskForm):
+class ResetPasswordRequestForm(FlaskForm):  # type: ignore[misc]
     email = StringField("Email", validators=[DataRequired(), Email()])
     submit = SubmitField("Request Password Reset")
 
 
-class ResetPasswordForm(FlaskForm):
+class ResetPasswordForm(FlaskForm):  # type: ignore[misc]
     password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
     password2 = PasswordField(
         "Repeat Password", validators=[DataRequired(), EqualTo("password")]
@@ -39,7 +39,7 @@ class ResetPasswordForm(FlaskForm):
     submit = SubmitField("Reset Password")
 
 
-class AcceptInviteForm(FlaskForm):
+class AcceptInviteForm(FlaskForm):  # type: ignore[misc]
     password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
     password2 = PasswordField(
         "Repeat Password", validators=[DataRequired(), EqualTo("password")]

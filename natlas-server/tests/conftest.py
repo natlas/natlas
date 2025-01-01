@@ -8,7 +8,7 @@ from tests.config import TestConfig
 
 
 @pytest.fixture
-def app():
+def app():  # type: ignore[no-untyped-def]
     conf = TestConfig()
     db_fd, db_name = tempfile.mkstemp()
     conf.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_name
@@ -20,6 +20,6 @@ def app():
 
 
 @pytest.fixture
-def client(app):
+def client(app):  # type: ignore[no-untyped-def]
     with app.test_client() as client:
         yield client

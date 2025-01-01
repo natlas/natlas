@@ -8,20 +8,20 @@ with open("defaults/db_configs.json") as f:
     defaultConfig = json.load(f)
 
 
-def get_defaults():
+def get_defaults():  # type: ignore[no-untyped-def]
     return defaultConfig.items()
 
 
 # This mechanism for casting a bool is needed because bool("False") == True
-def casted_bool(value):
+def casted_bool(value):  # type: ignore[no-untyped-def]
     if isinstance(value, bool):
         return value
     return value.lower() == "true"
 
 
-def casted_value(expected_type, value):
+def casted_value(expected_type, value):  # type: ignore[no-untyped-def]
     cast_map = {"bool": casted_bool, "string": str, "int": int}
-    return cast_map[expected_type](value)
+    return cast_map[expected_type](value)  # type: ignore[operator]
 
 
 # Things in the Class object are config options we will likely never want to change from the database.

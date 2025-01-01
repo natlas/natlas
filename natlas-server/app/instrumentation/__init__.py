@@ -16,19 +16,19 @@ SERVICE_NAME = "natlas-server"
 template_span = threading.local()
 
 
-def render_template_end(*kargs, **kwargs):  # sender, template, context):
+def render_template_end(*kargs, **kwargs):  # type: ignore[no-untyped-def]
     span = template_span.x
     template_span.x = None
     span.end()
 
 
-def render_template_start(app, template, context):
+def render_template_start(app, template, context):  # type: ignore[no-untyped-def]
     tracer = trace.get_tracer(__name__)
     template_span.x = tracer.start_span(name="render_template")
     template_span.x.set_attribute("flask.template", template.name)
 
 
-def initialize_opentelemetry(config, flask_app):
+def initialize_opentelemetry(config, flask_app):  # type: ignore[no-untyped-def]
     if config.otel_enable:
         collector = config.otel_collector
         print(f"OpenTelemetry enabled and reporting to {collector} using gRPC")
@@ -45,7 +45,7 @@ def initialize_opentelemetry(config, flask_app):
         flask.template_rendered.connect(render_template_end, flask_app)
 
 
-def initialize_sentryio(config):
+def initialize_sentryio(config):  # type: ignore[no-untyped-def]
     if config.sentry_dsn:
         url = urlparse(config.sentry_dsn)
         print(

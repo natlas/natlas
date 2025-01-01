@@ -32,7 +32,7 @@ def get_file_path(img_hash: str, subdir: str, ext: str) -> str:
     return os.path.join(hash_dir, img_hash + ext)
 
 
-def create_thumbnail(fname, file_ext):
+def create_thumbnail(fname, file_ext):  # type: ignore[no-untyped-def]
     thumb_size = (255, 160)
     thumb = Image.open(fname)
     thumb.thumbnail(thumb_size)
@@ -43,12 +43,12 @@ def create_thumbnail(fname, file_ext):
     return thumb_hash
 
 
-def process_screenshot(screenshot: dict):
+def process_screenshot(screenshot: dict):  # type: ignore[no-untyped-def, type-arg]
     file_ext = get_file_ext(screenshot["service"])
     image = base64.b64decode(screenshot["data"])
     del screenshot["data"]
 
-    if not is_valid_image(BytesIO(image)):
+    if not is_valid_image(BytesIO(image)):  # type: ignore[arg-type]
         return {}
 
     image_hash = hashlib.sha256(image).hexdigest()
@@ -63,7 +63,7 @@ def process_screenshot(screenshot: dict):
     return screenshot
 
 
-def process_screenshots(screenshots: list) -> tuple:
+def process_screenshots(screenshots: list) -> tuple:  # type: ignore[type-arg]
     processed_screenshots = []
     for item in screenshots:
         screenshot = process_screenshot(item)

@@ -12,7 +12,7 @@ going through the full app init process\
 """
 
 
-def main():
+def main():  # type: ignore[no-untyped-def]
     parser = argparse.ArgumentParser(description=parser_desc)
     parser.add_argument(
         "--message",

@@ -4,7 +4,7 @@ from app.email import send_email
 from flask import current_app
 
 
-def test_send_mail(app):
+def test_send_mail(app):  # type: ignore[no-untyped-def]
     with mail.record_messages() as outbox:
         send_email(
             "Natlas Test Mail",
@@ -17,7 +17,7 @@ def test_send_mail(app):
     assert outbox[0].sender == current_app.config["MAIL_FROM"]
 
 
-def test_send_invite(app):
+def test_send_invite(app):  # type: ignore[no-untyped-def]
     test_token = "testinvitepleaseignore"
     with mail.record_messages() as outbox:
         result = deliver_auth_link("user@example.com", test_token, "invite")
@@ -28,7 +28,7 @@ def test_send_invite(app):
     assert test_token not in result
 
 
-def test_send_password_reset(app):
+def test_send_password_reset(app):  # type: ignore[no-untyped-def]
     test_token = "testresetpleaseignore"
     with mail.record_messages() as outbox:
         result = deliver_auth_link("user@example.com", test_token, "reset")
@@ -39,7 +39,7 @@ def test_send_password_reset(app):
     assert test_token not in result
 
 
-def test_password_reset_no_email(app_no_email):
+def test_password_reset_no_email(app_no_email):  # type: ignore[no-untyped-def]
     test_token = "testresetpleaseignore"
     email = "user@example.com"
     result = deliver_auth_link(email, test_token, "reset")
@@ -47,7 +47,7 @@ def test_password_reset_no_email(app_no_email):
     assert email not in result
 
 
-def test_invite_no_email(app_no_email):
+def test_invite_no_email(app_no_email):  # type: ignore[no-untyped-def]
     test_token = "testinvitepleaseignore"
     email = "user@example.com"
     result = deliver_auth_link(email, test_token, "invite")

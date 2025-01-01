@@ -2,7 +2,7 @@ from app import db, mail
 from app.models import User, UserInvitation
 
 
-def test_new_anonymous_invite(app):
+def test_new_anonymous_invite(app):  # type: ignore[no-untyped-def]
     test_invite = UserInvitation.new_invite()
     assert test_invite.token in UserInvitation.deliver_invite(test_invite)
     assert not test_invite.is_expired
@@ -14,7 +14,7 @@ def test_new_anonymous_invite(app):
     db.session.rollback()
 
 
-def test_new_email_invite(app):
+def test_new_email_invite(app):  # type: ignore[no-untyped-def]
     email = "test_invite@example.com"
     test_invite = UserInvitation.new_invite(email)
     with mail.record_messages() as outbox:
@@ -28,14 +28,14 @@ def test_new_email_invite(app):
     db.session.rollback()
 
 
-def test_double_anonymous_deliver(app):
+def test_double_anonymous_deliver(app):  # type: ignore[no-untyped-def]
     test_invite = UserInvitation.new_invite()
     assert test_invite.token in UserInvitation.deliver_invite(test_invite)
     assert test_invite.token in UserInvitation.deliver_invite(test_invite)
     db.session.rollback()
 
 
-def test_double_email_deliver(app):
+def test_double_email_deliver(app):  # type: ignore[no-untyped-def]
     email = "test_invite@example.com"
     test_invite = UserInvitation.new_invite(email)
     with mail.record_messages() as outbox:
@@ -45,7 +45,7 @@ def test_double_email_deliver(app):
     db.session.rollback()
 
 
-def test_double_invite(app):
+def test_double_invite(app):  # type: ignore[no-untyped-def]
     email = "test_invite@example.com"
     invite_1 = UserInvitation.new_invite(email)
     old_token = invite_1.token
@@ -58,7 +58,7 @@ def test_double_invite(app):
     db.session.rollback()
 
 
-def test_inviting_existing_user(app):
+def test_inviting_existing_user(app):  # type: ignore[no-untyped-def]
     email = "test_invite@example.com"
     u = User(email=email)
     db.session.add(u)

@@ -7,8 +7,9 @@ import subprocess
 import time
 from urllib.parse import urlparse
 
-from natlas import logging, utils
 from PIL import Image, UnidentifiedImageError
+
+from natlas import logging, utils
 
 logger = logging.get_logger("ScreenshotUtils")
 
@@ -26,14 +27,14 @@ def is_valid_image(path: str) -> bool:
         return False
 
 
-def parse_url(url: str) -> tuple:
+def parse_url(url: str) -> tuple:  # type: ignore[type-arg]
     urlp = urlparse(url)
     port = (80 if urlp.scheme == "http" else 443) if not urlp.port else urlp.port
 
     return urlp.scheme.upper(), port
 
 
-def parse_aquatone_page(page: dict, file_path: str) -> dict:
+def parse_aquatone_page(page: dict, file_path: str) -> dict:  # type: ignore[type-arg]
     if not (page["hasScreenshot"] and is_valid_image(file_path)):
         return {}
     scheme, port = parse_url(page["url"])
@@ -46,7 +47,7 @@ def parse_aquatone_page(page: dict, file_path: str) -> dict:
     }
 
 
-def get_aquatone_session(base_dir: str) -> dict:
+def get_aquatone_session(base_dir: str) -> dict:  # type: ignore[type-arg]
     session_path = os.path.join(base_dir, "aquatone_session.json")
     if not os.path.isfile(session_path):
         return {}
@@ -56,10 +57,10 @@ def get_aquatone_session(base_dir: str) -> dict:
 
     if session["stats"]["screenshotSuccessful"] == 0:
         return {}
-    return session
+    return session  # type: ignore[no-any-return]
 
 
-def parse_aquatone_session(base_dir: str) -> list:
+def parse_aquatone_session(base_dir: str) -> list:  # type: ignore[type-arg]
     session = get_aquatone_session(base_dir)
     if not session:
         return []
@@ -75,7 +76,7 @@ def parse_aquatone_session(base_dir: str) -> list:
     return output
 
 
-def get_web_screenshots(target, scan_id, proctimeout):
+def get_web_screenshots(target, scan_id, proctimeout):  # type: ignore[no-untyped-def]
     scan_dir = utils.get_scan_dir(scan_id)
     xml_file = os.path.join(scan_dir, f"nmap.{scan_id}.xml")
     output_dir = os.path.join(scan_dir, f"aquatone.{scan_id}")
@@ -107,7 +108,7 @@ def get_web_screenshots(target, scan_id, proctimeout):
     return parse_aquatone_session(output_dir)
 
 
-def get_vnc_screenshots(target, scan_id, proctimeout):
+def get_vnc_screenshots(target, scan_id, proctimeout):  # type: ignore[no-untyped-def]
     scan_dir = utils.get_scan_dir(scan_id)
     output_file = os.path.join(scan_dir, f"vncsnapshot.{scan_id}.jpg")
 

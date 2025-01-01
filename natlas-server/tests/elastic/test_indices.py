@@ -1,7 +1,7 @@
 from app.elastic.indices import ElasticIndices
 
 
-def test_index_lifecycle(esclient):
+def test_index_lifecycle(esclient):  # type: ignore[no-untyped-def]
     base = "unittest"
     new_indices = ElasticIndices(esclient, base)
     assert new_indices.name("latest") == base

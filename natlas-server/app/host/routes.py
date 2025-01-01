@@ -25,7 +25,7 @@ from app.models import RescanTask
 
 @bp.route("/<ip:ip>")
 @is_authenticated
-def host(ip):
+def host(ip):  # type: ignore[no-untyped-def]
     info, context = hostinfo(ip)
     delForm = DeleteForm()
     delHostForm = DeleteForm()
@@ -46,7 +46,7 @@ def host(ip):
 
 @bp.route("/<ip:ip>/history")
 @is_authenticated
-def host_history(ip):
+def host_history(ip):  # type: ignore[no-untyped-def]
     info, context = hostinfo(ip)
     page = int(request.args.get("p", 1))
     searchOffset = current_user.results_per_page * (page - 1)
@@ -54,7 +54,7 @@ def host_history(ip):
     delHostForm = DeleteForm()
     rescanForm = RescanForm()
 
-    count, context = current_app.elastic.get_host_history(
+    count, context = current_app.elastic.get_host_history(  # type: ignore[attr-defined]
         ip, current_user.results_per_page, searchOffset
     )
     if count == 0:
@@ -83,12 +83,12 @@ def host_history(ip):
 
 @bp.route("/<ip:ip>/<scan_id>")
 @is_authenticated
-def host_historical_result(ip, scan_id):
+def host_historical_result(ip, scan_id):  # type: ignore[no-untyped-def]
     delForm = DeleteForm()
     delHostForm = DeleteForm()
     rescanForm = RescanForm()
     info, context = hostinfo(ip)
-    count, context = current_app.elastic.get_host_by_scan_id(scan_id)
+    count, context = current_app.elastic.get_host_by_scan_id(scan_id)  # type: ignore[attr-defined]
 
     version = determine_data_version(context)
     template_str = f"host/versions/{version}/summary.html"
@@ -105,14 +105,14 @@ def host_historical_result(ip, scan_id):
 
 @bp.route("/<ip:ip>/<scan_id>.<ext>")
 @is_authenticated
-def export_scan(ip, scan_id, ext):
+def export_scan(ip, scan_id, ext):  # type: ignore[no-untyped-def]
     if ext not in ["xml", "nmap", "gnmap", "json"]:
         return abort(404)
 
     export_field = f"{ext}_data"
 
     mime = "application/json" if ext == "json" else "text/plain"
-    count, context = current_app.elastic.get_host_by_scan_id(scan_id)
+    count, context = current_app.elastic.get_host_by_scan_id(scan_id)  # type: ignore[attr-defined]
     if ext == "json" and count > 0:
         return jsonify(context)
     if count > 0 and export_field in context:
@@ -122,14 +122,14 @@ def export_scan(ip, scan_id, ext):
 
 @bp.route("/<ip:ip>/screenshots")
 @is_authenticated
-def host_screenshots(ip):
+def host_screenshots(ip):  # type: ignore[no-untyped-def]
     page = int(request.args.get("p", 1))
     searchOffset = current_user.results_per_page * (page - 1)
 
     delHostForm = DeleteForm()
     rescanForm = RescanForm()
     info, context = hostinfo(ip)
-    total_entries, screenshots = current_app.elastic.get_host_screenshots(
+    total_entries, screenshots = current_app.elastic.get_host_screenshots(  # type: ignore[attr-defined]
         ip, current_user.results_per_page, searchOffset
     )
 
@@ -157,24 +157,24 @@ def host_screenshots(ip):
 
 @bp.route("/<ip:ip>/rescan", methods=["POST"])
 @login_required
-def rescan_host(ip):
+def rescan_host(ip):  # type: ignore[no-untyped-def]
     rescanForm = RescanForm()
 
     if not (
         rescanForm.validate_on_submit()
-        or current_app.ScopeManager.is_acceptable_target(ip)
+        or current_app.ScopeManager.is_acceptable_target(ip)  # type: ignore[attr-defined]
     ):
         flash(f"Could not handle rescan request for {ip}", "danger")
         return redirect(url_for("host.host", ip=ip))
 
-    incompleteScans = current_app.ScopeManager.get_incomplete_scans()
+    incompleteScans = current_app.ScopeManager.get_incomplete_scans()  # type: ignore[attr-defined]
     scan_dispatched = {}
     for scan in incompleteScans:
         scan_dispatched[scan.target] = scan
 
     if ip in scan_dispatched:
         scan = scan_dispatched[ip]
-        scan_window = current_app.agentConfig["scanTimeout"] * 2
+        scan_window = current_app.agentConfig["scanTimeout"] * 2  # type: ignore[attr-defined]
         if (
             scan.dispatched
             and (datetime.utcnow() - scan.date_dispatched).seconds > scan_window
@@ -182,8 +182,8 @@ def rescan_host(ip):
             # It should never take this long so mark it as not dispatched
             scan.dispatched = False
             db.session.commit()
-            current_app.ScopeManager.update_pending_rescans()
-            current_app.ScopeManager.update_dispatched_rescans()
+            current_app.ScopeManager.update_pending_rescans()  # type: ignore[attr-defined]
+            current_app.ScopeManager.update_dispatched_rescans()  # type: ignore[attr-defined]
             flash(f"Refreshed stale rescan request for {ip}", "success")
             return redirect(url_for("host.host", ip=ip))
         flash(f"There's an outstanding rescan request for {ip}", "warning")
@@ -192,16 +192,16 @@ def rescan_host(ip):
     rescan = RescanTask(user_id=current_user.id, target=ip)
     db.session.add(rescan)
     db.session.commit()
-    current_app.ScopeManager.update_pending_rescans()
-    current_app.ScopeManager.update_dispatched_rescans()
+    current_app.ScopeManager.update_pending_rescans()  # type: ignore[attr-defined]
+    current_app.ScopeManager.update_dispatched_rescans()  # type: ignore[attr-defined]
     flash(f"Requested rescan of {ip}", "success")
     return redirect(url_for("host.host", ip=ip))
 
 
 @bp.route("/random")
 @is_authenticated
-def random_host():
-    random_host = current_app.elastic.random_host()
+def random_host():  # type: ignore[no-untyped-def]
+    random_host = current_app.elastic.random_host()  # type: ignore[attr-defined]
     # This would most likely occur when there are no hosts up in the index, so just throw a 404
     if not random_host:
         return abort(404)

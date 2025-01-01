@@ -7,19 +7,19 @@ weighted_headers = {"Accept": "text/html;q=0.8, application/json"}
 NONEXISTANT_URL = "/very_long_obviously_not_legitimate_url"
 
 
-def test_404_error(client):
+def test_404_error(client):  # type: ignore[no-untyped-def]
     expected_err_code = 404
     response = client.get(NONEXISTANT_URL)
     assert response.status_code == expected_err_code
 
 
-def test_405_error(client):
+def test_405_error(client):  # type: ignore[no-untyped-def]
     expected_err_code = 405
     response = client.delete("/")
     assert response.status_code == expected_err_code
 
 
-def test_json_error(client):
+def test_json_error(client):  # type: ignore[no-untyped-def]
     expected_err_code = 404
     expected_keys = ["status", "message"]
     response = client.get(NONEXISTANT_URL, headers=json_headers)
@@ -30,17 +30,17 @@ def test_json_error(client):
     assert response.get_json()["status"] == expected_err_code
 
 
-def test_html_error(client):
+def test_html_error(client):  # type: ignore[no-untyped-def]
     response = client.get(NONEXISTANT_URL, headers=html_headers)
     assert response.content_type == "text/html; charset=utf-8"
 
 
-def test_content_type_matching(client):
+def test_content_type_matching(client):  # type: ignore[no-untyped-def]
     response = client.get(NONEXISTANT_URL, headers=weighted_headers)
     assert response.content_type == "application/json; charset=utf-8"
 
 
-def test_invalid_search(client):
+def test_invalid_search(client):  # type: ignore[no-untyped-def]
     invalid_query = "tags:!invalid"
     current_app.config["LOGIN_REQUIRED"] = False
     response = client.get(

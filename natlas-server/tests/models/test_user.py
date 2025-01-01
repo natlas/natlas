@@ -6,7 +6,7 @@ from app.models import User
 test_password = secrets.token_urlsafe(16)
 
 
-def test_new_user(app):
+def test_new_user(app):  # type: ignore[no-untyped-def]
     test_user = User(email="newuser@example.com", is_active=True)
     test_user.set_password(test_password)
     db.session.add(test_user)
@@ -19,7 +19,7 @@ def test_new_user(app):
     db.session.rollback()
 
 
-def test_validate_email():
+def test_validate_email():  # type: ignore[no-untyped-def]
     assert User.validate_email("test@example.com")
     assert User.validate_email("test+extensions@example.com")
     assert User.validate_email("test.extensions@example.com")
@@ -28,7 +28,7 @@ def test_validate_email():
     assert not User.validate_email("test@example")
 
 
-def test_reset_token():
+def test_reset_token():  # type: ignore[no-untyped-def]
     email = "resettoken@example.com"
     user = User(email=email)
     db.session.add(user)
@@ -43,7 +43,7 @@ def test_reset_token():
     db.session.rollback()
 
 
-def test_double_reset_token():
+def test_double_reset_token():  # type: ignore[no-untyped-def]
     email = "double_validate@example.com"
     user = User(email=email)
     db.session.add(user)

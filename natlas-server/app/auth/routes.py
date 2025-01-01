@@ -19,7 +19,7 @@ from app.models import User, UserInvitation
 
 @bp.route("/login", methods=["GET", "POST"])
 @is_not_authenticated
-def login():
+def login():  # type: ignore[no-untyped-def]
     form = LoginForm(prefix="login")
     if form.validate_on_submit():
         user = User.query.filter_by(email=User.validate_email(form.email.data)).first()
@@ -36,14 +36,14 @@ def login():
 
 @bp.route("/logout")
 @is_authenticated
-def logout():
+def logout():  # type: ignore[no-untyped-def]
     logout_user()
     return redirect(url_for("auth.login"))
 
 
 @bp.route("/register", methods=["GET", "POST"])
 @is_not_authenticated
-def register():
+def register():  # type: ignore[no-untyped-def]
     if not current_app.config["REGISTER_ALLOWED"]:
         flash(
             "Sorry, we're not currently accepting new users. If you feel you've received this message in error, please contact an administrator.",
@@ -67,7 +67,7 @@ def register():
 
 @bp.route("/reset_password_request", methods=["GET", "POST"])
 @is_not_authenticated
-def reset_password_request():
+def reset_password_request():  # type: ignore[no-untyped-def]
     if not email_configured():
         flash(
             "Sorry, self-service password resets are not currently available. Please contact an administrator for assistance.",
@@ -95,7 +95,7 @@ def reset_password_request():
 
 @bp.route("/reset_password", methods=["GET", "POST"])
 @is_not_authenticated
-def reset_password():
+def reset_password():  # type: ignore[no-untyped-def]
     url_token = request.args.get("token", None)
     if not url_token:
         flash("No reset token found")
@@ -119,7 +119,7 @@ def reset_password():
 
 @bp.route("/invite", methods=["GET", "POST"])
 @is_not_authenticated
-def invite_user():
+def invite_user():  # type: ignore[no-untyped-def]
     url_token = request.args.get("token", None)
     invite = UserInvitation.get_invite(url_token)
     if not invite:
@@ -132,7 +132,7 @@ def invite_user():
     }
 
     form_type = "invite" if invite.email else "register"
-    form = supported_forms[form_type]["form"]()
+    form = supported_forms[form_type]["form"]()  # type: ignore[operator]
     if form.validate_on_submit():
         email = invite.email if invite.email else form.email.data
         new_user = User.new_user_from_invite(invite, form.password.data, email=email)
@@ -141,5 +141,7 @@ def invite_user():
         flash("Your password has been set.", "success")
         return redirect(url_for("main.browse"))
     return render_template(
-        supported_forms[form_type]["template"], title="Accept Invitation", form=form
+        supported_forms[form_type]["template"],
+        title="Accept Invitation",
+        form=form,  # type: ignore[arg-type]
     )

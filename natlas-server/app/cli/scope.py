@@ -14,8 +14,8 @@ import_helptext = "Import scope/blacklist from a file containing line-separated 
 Optionally, each line can contain a comma separated list of tags to apply to that target. e.g. 127.0.0.1,local,private,test"
 
 
-def import_scope(scope_file: typing.TextIO, blacklist: bool):
-    if not scope_file:
+def import_scope(scope_file: typing.TextIO, blacklist: bool):  # type: ignore[no-untyped-def]
+    if not scope_file:  # type: ignore[truthy-bool]
         return {"failed": 0, "existed": 0, "successful": 0}
     addresses = scope_file.readlines()
     result = ScopeItem.import_scope_list(addresses, blacklist)
@@ -32,17 +32,17 @@ def import_scope(scope_file: typing.TextIO, blacklist: bool):
     default=False,
     help="Should this file be considered in scope or blacklisted?",
 )
-def import_items(file: str, import_as_blacklist: bool):
+def import_items(file: str, import_as_blacklist: bool):  # type: ignore[no-untyped-def]
     import_name = "blacklist" if import_as_blacklist else "scope"
     results = {
         "timestamp": datetime.utcnow().isoformat(),
-        import_name: import_scope(file, import_as_blacklist),
+        import_name: import_scope(file, import_as_blacklist),  # type: ignore[arg-type]
     }
     print(json.dumps(results, indent=2))
 
 
 @cli_group.command("export")
-def export_items():
+def export_items():  # type: ignore[no-untyped-def]
     result = {
         "timestamp": datetime.utcnow().isoformat(),
         "scope": [

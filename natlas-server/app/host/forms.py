@@ -2,5 +2,5 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField
 
 
-class RescanForm(FlaskForm):
+class RescanForm(FlaskForm):  # type: ignore[misc]
     requestRescan = SubmitField("Request Rescan")

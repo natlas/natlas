@@ -1,7 +1,7 @@
 from flask import redirect, url_for
 
 
-def get_scope_redirect(type):
+def get_scope_redirect(type):  # type: ignore[no-untyped-def]
     redirects = {
         "scope": url_for("admin.scope"),
         "blacklist": url_for("admin.blacklist"),

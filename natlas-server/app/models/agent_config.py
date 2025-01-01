@@ -2,7 +2,7 @@ from app import db
 from app.models.dict_serializable import DictSerializable
 
 
-class AgentConfig(db.Model, DictSerializable):
+class AgentConfig(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     id = db.Column(db.Integer, primary_key=True)
     versionDetection = db.Column(
         db.Boolean, default=True

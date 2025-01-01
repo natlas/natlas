@@ -15,7 +15,7 @@ scopetags = db.Table(
 )
 
 
-class ScopeItem(db.Model, DictSerializable):
+class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     id = db.Column(db.Integer, primary_key=True)
     target = db.Column(db.String(128), index=True, unique=True)
     blacklist = db.Column(db.Boolean, index=True)
@@ -35,7 +35,7 @@ class ScopeItem(db.Model, DictSerializable):
         self.blacklist = blacklist
         self.parse_network_range(target)
 
-    def parse_network_range(self, network: str):
+    def parse_network_range(self, network: str):  # type: ignore[no-untyped-def]
         net = IPNetwork(network)
         self.addr_family = net.version
         size = 4 if net.version == 4 else 16
@@ -43,41 +43,41 @@ class ScopeItem(db.Model, DictSerializable):
         self.stop_addr = net.last.to_bytes(size, byteorder="big")
 
     @staticmethod
-    def get_overlapping_ranges(addr: str) -> list:
+    def get_overlapping_ranges(addr: str) -> list:  # type: ignore[type-arg]
         addr = IPAddress(addr)
-        size = 4 if addr.version == 4 else 16
-        binval = addr.value.to_bytes(size, byteorder="big")
-        return (
-            ScopeItem.query.filter(ScopeItem.addr_family == addr.version)
+        size = 4 if addr.version == 4 else 16  # type: ignore[attr-defined]
+        binval = addr.value.to_bytes(size, byteorder="big")  # type: ignore[attr-defined]
+        return (  # type: ignore[no-any-return]
+            ScopeItem.query.filter(ScopeItem.addr_family == addr.version)  # type: ignore[attr-defined]
             .filter(ScopeItem.start_addr <= binval)
             .filter(ScopeItem.stop_addr >= binval)
             .all()
         )
 
-    def addTag(self, tag: Tag):
+    def addTag(self, tag: Tag):  # type: ignore[no-untyped-def]
         if not self.is_tagged(tag):
             self.tags.append(tag)
 
-    def delTag(self, tag: Tag):
+    def delTag(self, tag: Tag):  # type: ignore[no-untyped-def]
         if self.is_tagged(tag):
             self.tags.remove(tag)
 
-    def is_tagged(self, tag: Tag):
-        return tag in self.tags
+    def is_tagged(self, tag: Tag):  # type: ignore[no-untyped-def]
+        return tag in self.tags  # type: ignore[attr-defined]
 
-    def get_tag_names(self):
-        return [tag.name for tag in self.tags]
+    def get_tag_names(self):  # type: ignore[no-untyped-def]
+        return [tag.name for tag in self.tags]  # type: ignore[attr-defined]
 
     @staticmethod
-    def getBlacklist():
+    def getBlacklist():  # type: ignore[no-untyped-def]
         return ScopeItem.query.filter_by(blacklist=True).all()
 
     @staticmethod
-    def getScope():
+    def getScope():  # type: ignore[no-untyped-def]
         return ScopeItem.query.filter_by(blacklist=False).all()
 
     @staticmethod
-    def addTags(scopeitem, tags: Iterable):
+    def addTags(scopeitem, tags: Iterable):  # type: ignore[no-untyped-def, type-arg]
         from app.models import Tag
 
         for tag in tags:
@@ -87,7 +87,7 @@ class ScopeItem(db.Model, DictSerializable):
             scopeitem.addTag(tag_obj)
 
     @staticmethod
-    def parse_tags(tags: Iterable) -> Iterable:
+    def parse_tags(tags: Iterable) -> Iterable:  # type: ignore[type-arg]
         out = []
         for t in tags:
             if t.strip() == "":
@@ -96,20 +96,20 @@ class ScopeItem(db.Model, DictSerializable):
         return out
 
     @staticmethod
-    def parse_import_line(line: str):
+    def parse_import_line(line: str):  # type: ignore[no-untyped-def]
         splitline = line.split(",")
-        tags = []
+        tags = []  # type: ignore[var-annotated]
         if len(splitline) > 1:
             ip = splitline[0]
-            tags = ScopeItem.parse_tags(splitline[1:])
+            tags = ScopeItem.parse_tags(splitline[1:])  # type: ignore[assignment]
         else:
             ip = line
         ip = ScopeItem.validate_ip(ip)
         return ip, tags
 
     @staticmethod
-    def extract_import_tags(import_list: list) -> Iterable[str]:
-        out = set()
+    def extract_import_tags(import_list: list) -> Iterable[str]:  # type: ignore[type-arg]
+        out = set()  # type: ignore[var-annotated]
         for line in import_list:
             split = line.split(",")
             if len(split) > 1:
@@ -118,7 +118,7 @@ class ScopeItem(db.Model, DictSerializable):
         return out
 
     @staticmethod
-    def create_if_none(ip: str, blacklist: bool, tags=None):
+    def create_if_none(ip: str, blacklist: bool, tags=None):  # type: ignore[no-untyped-def]
         if tags is None:
             tags = []
         new = False
@@ -131,14 +131,14 @@ class ScopeItem(db.Model, DictSerializable):
         return new, item
 
     @staticmethod
-    def validate_ip(ip: str):
+    def validate_ip(ip: str):  # type: ignore[no-untyped-def]
         try:
             return IPNetwork(ip)
         except AddrFormatError:
             return False
 
     @staticmethod
-    def import_scope_list(address_list: Iterable, blacklist: bool) -> dict:
+    def import_scope_list(address_list: Iterable, blacklist: bool) -> dict:  # type: ignore[type-arg]
         result = {"fail": [], "success": 0, "exist": 0}
         prefixes = {"sqlite": " OR IGNORE", "mysql": " IGNORE"}
         selected_prefix = prefixes.get(db.engine.dialect.name)
@@ -155,7 +155,7 @@ class ScopeItem(db.Model, DictSerializable):
         for line in address_list:
             ip, tags = ScopeItem.parse_import_line(line)
             if not ip:
-                result["fail"].append(line)
+                result["fail"].append(line)  # type: ignore[attr-defined]
                 continue
             tags = [tag_dict[tag] for tag in tags]
             item = ScopeItem(target=str(ip), blacklist=blacklist).as_dict()
@@ -173,18 +173,18 @@ class ScopeItem(db.Model, DictSerializable):
             )
             ins_result = db.session.execute(ins_stmt)
             result["success"] += ins_result.rowcount
-        result["exist"] = len(address_list) - len(result["fail"]) - result["success"]
+        result["exist"] = len(address_list) - len(result["fail"]) - result["success"]  # type: ignore[arg-type, operator]
         all_scope = {item.target: item.id for item in ScopeItem.query.all()}
         tags_to_import = []
         for k, v in scope_tag_import.items():
             for tag in v:
-                tags_to_import.append({"scope_id": all_scope[k], "tag_id": tag.id})
+                tags_to_import.append({"scope_id": all_scope[k], "tag_id": tag.id})  # type: ignore[attr-defined]
         import_chunks = [
             tags_to_import[i : i + chunk_size]
             for i in range(0, len(tags_to_import), chunk_size)
         ]
         for chunk in import_chunks:
-            tag_stmt = scopetags.insert().prefix_with(selected_prefix).values(chunk)
+            tag_stmt = scopetags.insert().prefix_with(selected_prefix).values(chunk)  # type: ignore[arg-type]
             db.session.execute(tag_stmt)
         db.session.commit()
         return result

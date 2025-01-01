@@ -16,7 +16,7 @@ token_types = {
 }
 
 
-def validate_email(addr):
+def validate_email(addr):  # type: ignore[no-untyped-def]
     from app.models import User
 
     validemail = User.validate_email(addr)
@@ -29,7 +29,7 @@ def validate_email(addr):
     return validemail
 
 
-def build_email_url(token, token_type):
+def build_email_url(token, token_type):  # type: ignore[no-untyped-def]
     return url_for(
         token_types[token_type]["route"],
         token=token,
@@ -39,10 +39,10 @@ def build_email_url(token, token_type):
 
 
 def email_configured() -> bool:
-    return current_app.config["MAIL_FROM"] and current_app.config["MAIL_SERVER"]
+    return current_app.config["MAIL_FROM"] and current_app.config["MAIL_SERVER"]  # type: ignore[no-any-return]
 
 
-def send_auth_email(email, token, token_type):
+def send_auth_email(email, token, token_type):  # type: ignore[no-untyped-def]
     send_email(
         token_types[token_type]["subject"],
         sender=current_app.config["MAIL_FROM"],
@@ -53,7 +53,7 @@ def send_auth_email(email, token, token_type):
     )
 
 
-def deliver_auth_link(email: str, token: str, token_type: str):
+def deliver_auth_link(email: str, token: str, token_type: str):  # type: ignore[no-untyped-def]
     if email_configured() and email:
         send_auth_email(email, token, token_type)
         msg = f"Email sent to {email} via {current_app.config['MAIL_SERVER']}!"
