@@ -1,4 +1,4 @@
-from flask import url_for, current_app
+from flask import current_app, url_for
 
 json_headers = {"Accept": "application/json"}
 html_headers = {"Accept": "text/html"}

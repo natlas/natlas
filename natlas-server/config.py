@@ -1,6 +1,7 @@
+import json
 import os
 import secrets
-import json
+
 from dotenv import load_dotenv
 
 with open("defaults/db_configs.json") as f:

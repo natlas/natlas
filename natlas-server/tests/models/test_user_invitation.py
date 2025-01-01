@@ -1,5 +1,5 @@
 from app import db, mail
-from app.models import UserInvitation, User
+from app.models import User, UserInvitation
 
 
 def test_new_anonymous_invite(app):

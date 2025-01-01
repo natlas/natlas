@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+
 import sentry_sdk
 from config import Config
 

@@ -1,17 +1,19 @@
-from flask_wtf import FlaskForm
+import ipaddress
+
 from flask import flash
+from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import (
-    StringField,
     BooleanField,
-    SubmitField,
-    TextAreaField,
     IntegerField,
     SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
 )
-from wtforms.validators import DataRequired, ValidationError, Email
-from app.models import User, ScopeItem, AgentScript
-import ipaddress
+from wtforms.validators import DataRequired, Email, ValidationError
+
+from app.models import AgentScript, ScopeItem, User
 
 
 class ConfigForm(FlaskForm):

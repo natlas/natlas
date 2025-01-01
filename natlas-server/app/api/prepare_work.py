@@ -1,5 +1,7 @@
-from flask import current_app
 import secrets
+
+from flask import current_app
+
 from app.models import ScopeItem
 
 

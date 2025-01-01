@@ -1,8 +1,9 @@
-from flask import current_app
 import base64
 import hashlib
 import os
 from io import BytesIO
+
+from flask import current_app
 from PIL import Image, UnidentifiedImageError
 
 

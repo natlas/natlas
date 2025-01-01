@@ -1,31 +1,30 @@
 import ipaddress
 
 from flask import (
-    render_template,
-    redirect,
-    url_for,
-    current_app,
-    flash,
     Response,
     abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    url_for,
 )
 from flask_login import current_user, login_required
 
 from app import db
-from app.admin import bp
-from app.admin import forms, redirects
+from app.admin import bp, forms, redirects
+from app.auth.wrappers import is_admin
 from app.models import (
-    User,
-    ScopeItem,
-    ConfigItem,
-    NatlasServices,
     AgentConfig,
     AgentScript,
-    Tag,
+    ConfigItem,
+    NatlasServices,
+    ScopeItem,
     ScopeLog,
+    Tag,
+    User,
     UserInvitation,
 )
-from app.auth.wrappers import is_admin
 
 
 @bp.route("/", methods=["GET", "POST"])

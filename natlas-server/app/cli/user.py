@@ -1,9 +1,9 @@
-from app.auth.email import deliver_auth_link
 import click
 from flask import current_app
 from flask.cli import AppGroup
 
 from app import db
+from app.auth.email import deliver_auth_link
 from app.models import User, UserInvitation
 
 cli_group = AppGroup("user")

@@ -1,4 +1,5 @@
-from flask import render_template, current_app, flash, url_for
+from flask import current_app, flash, render_template, url_for
+
 from app.email import send_email
 
 token_types = {

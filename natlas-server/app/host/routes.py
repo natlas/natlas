@@ -1,24 +1,26 @@
+from datetime import datetime
+
 from flask import (
-    current_app,
-    render_template,
-    url_for,
     Response,
-    request,
-    flash,
     abort,
-    redirect,
+    current_app,
+    flash,
     jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
 from flask_login import current_user, login_required
-from datetime import datetime
-from app.models import RescanTask
-from app.admin.forms import DeleteForm
-from app.host.forms import RescanForm
-from app.host.summarizers import hostinfo
-from app.host.migrators import determine_data_version
-from app.host import bp
-from app.auth.wrappers import is_authenticated
+
 from app import db
+from app.admin.forms import DeleteForm
+from app.auth.wrappers import is_authenticated
+from app.host import bp
+from app.host.forms import RescanForm
+from app.host.migrators import determine_data_version
+from app.host.summarizers import hostinfo
+from app.models import RescanTask
 
 
 @bp.route("/<ip:ip>")

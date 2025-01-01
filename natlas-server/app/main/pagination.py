@@ -1,5 +1,5 @@
-from flask_login import current_user
 from flask import url_for
+from flask_login import current_user
 
 
 def build_pagination_urls(route, page, count, **kargs):

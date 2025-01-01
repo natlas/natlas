@@ -5,10 +5,10 @@ from app.models.config_item import ConfigItem
 from app.models.natlas_services import NatlasServices
 from app.models.rescan_task import RescanTask
 from app.models.scope_item import ScopeItem
+from app.models.scope_log import ScopeLog
 from app.models.tag import Tag
 from app.models.user import User
 from app.models.user_invitation import UserInvitation
-from app.models.scope_log import ScopeLog
 
 __all__ = [
     "Agent",

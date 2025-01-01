@@ -1,10 +1,11 @@
-from flask import request
-from app.errors import bp
-from app import db
 import elasticsearch
 import sentry_sdk
+from flask import request
 
-from .errors import NatlasServiceError, NatlasSearchError
+from app import db
+from app.errors import bp
+
+from .errors import NatlasSearchError, NatlasServiceError
 from .responses import get_response, get_supported_formats
 
 

@@ -1,9 +1,11 @@
+from datetime import datetime
+
+from flask import current_app
 from netaddr import IPAddress
 from netaddr.core import AddrFormatError
-from .scan_manager import IPScanManager
+
 from .scan_group import ScanGroup
-from datetime import datetime
-from flask import current_app
+from .scan_manager import IPScanManager
 
 
 class ScopeManager:

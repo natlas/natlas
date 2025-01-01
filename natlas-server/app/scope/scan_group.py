@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from flask import current_app
-from .scope_collection import ScopeCollection
+
 from .scan_manager import IPScanManager
+from .scope_collection import ScopeCollection
 
 
 class ScanGroup:

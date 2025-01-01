@@ -1,9 +1,10 @@
-import elasticsearch
+import logging
 import time
 from datetime import datetime
-import logging
-from opentelemetry import trace
+
+import elasticsearch
 import semver
+from opentelemetry import trace
 
 
 class ElasticClient:

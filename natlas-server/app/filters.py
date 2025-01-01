@@ -1,5 +1,5 @@
-from flask import Blueprint
 from dateutil import parser
+from flask import Blueprint
 
 bp = Blueprint("filters", __name__)
 

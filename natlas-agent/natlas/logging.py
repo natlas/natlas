@@ -1,10 +1,11 @@
 import logging
-import time
-import sys
 import os
+import sys
+import time
 from logging.handlers import RotatingFileHandler
-from config import Config
 from pathlib import Path
+
+from config import Config
 
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 logging.Formatter.converter = time.gmtime  # Always log in GMT
