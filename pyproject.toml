@@ -6,6 +6,8 @@ requires-python = "==3.11"
 
 [tool.ruff.lint]
 select = [
+    # flake8-bugbear
+    "B",
     # isort
-    "I"
+    "I",
 ]

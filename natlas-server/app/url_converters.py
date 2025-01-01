@@ -14,8 +14,8 @@ class IPConverter(NatlasConverter):
     def to_python(self, value):
         try:
             return str(IPAddress(value))
-        except AddrFormatError:
-            raise ValidationError
+        except AddrFormatError as e:
+            raise ValidationError from e
 
 
 def register_converters(app: Flask) -> dict:
