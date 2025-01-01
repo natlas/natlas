@@ -1,0 +1,20 @@
+name: "Fetch"
+description: "Fetch a single git reference"
+inputs:
+  remote:
+    description: "Remote"
+    required: true
+    default: "origin"
+  ref:
+    description: "Commit reference"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Fetching"
+      run: git -c protocol.version=2 fetch --no-tags --prune --progress --no-recurse-submodules --depth=1 ${{ inputs.remote }} ${{ inputs.ref }}
+      shell: bash
+    - name: Verifying
+      run: git rev-parse --verify ${{ inputs.ref }} || git branch ${{ inputs.ref }} ${{ inputs.remote }}/${{ inputs.ref }}
+      shell: bash
