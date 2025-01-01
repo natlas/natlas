@@ -40,7 +40,7 @@ jobs:
       - name: Merge base branch into PR branch
         run: |
           git fetch origin ${{ needs.check-out-base.outputs.base-ref }} --depth=1
-          git merge --no-commit --no-ff FETCH_HEAD || exit 1
+          git merge --no-commit --no-ff FETCH_HEAD --allow-unrelated-histories || exit 1
 
       - name: Set up Python
         uses: actions/setup-python@v4
