@@ -13,7 +13,7 @@ runs:
   using: "composite"
   steps:
     - name: "Fetching"
-      run: git -c protocol.version=2 fetch --no-tags --prune --progress --no-recursive-submodules --depth=1 ${{ inputs.remote }} ${{ inputs.ref }}
+      run: git -c protocol.version=2 fetch --no-tags --prune --progress --no-recurse`-submodules --depth=1 ${{ inputs.remote }} ${{ inputs.ref }}
       shell: bash
     - name: Verifying
       run: git rev-parse --verify ${{ inputs.ref }} || git branch ${{ inputs.ref }} ${{ inputs.remote }}/${{ inputs.ref }}
