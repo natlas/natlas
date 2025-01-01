@@ -25,7 +25,7 @@ def get_user(email):
 
 def validate_email(ctx, param, value):
     if not value:
-        return
+        return None
     valid_email = User.validate_email(value)
     if not valid_email:
         raise click.BadParameter(err_msgs["invalid_email"].format(value))

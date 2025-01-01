@@ -28,10 +28,9 @@ def getwork():
             response_body = json.dumps(
                 {"status": 400, "message": errmsg, "retry": False}
             )
-            response = Response(
+            return Response(
                 response=response_body, status=400, content_type=json_content
             )
-            return response
     work = {}
 
     if manual:
@@ -71,10 +70,9 @@ def getwork():
                     "retry": True,
                 }
             )
-            response = Response(
+            return Response(
                 response=response_body, status=404, content_type=json_content
             )
-            return response
 
         work["target"] = str(scanmanager.get_next_ip())
         work["scan_reason"] = "auto"
@@ -86,8 +84,7 @@ def getwork():
 
     work = prepare_work(work)
     response_body = json.dumps(work)
-    response = Response(response=response_body, status=200, content_type=json_content)
-    return response
+    return Response(response=response_body, status=200, content_type=json_content)
 
 
 @bp.route("/submit", methods=["POST"])
@@ -147,10 +144,9 @@ def submit():
 
     # If status_code and response_body have been set by this point, return a response.
     if status_code and response_body:
-        response = Response(
+        return Response(
             response=response_body, status=status_code, content_type=json_content
         )
-        return response
 
     if newhost["scan_start"] and newhost["scan_stop"]:
         elapsed = dateutil.parser.parse(newhost["scan_stop"]) - dateutil.parser.parse(
@@ -212,10 +208,9 @@ def submit():
             }
         )
 
-    response = Response(
+    return Response(
         response=response_body, status=status_code, content_type=json_content
     )
-    return response
 
 
 @bp.route("/natlas-services", methods=["GET"])

@@ -84,22 +84,21 @@ def scan(target_data, config):
     if nmap_report.hosts_total < 1:
         logger.warning(f"No hosts found in nmap.{scan_id}.xml")
         return False
-    elif nmap_report.hosts_total > 1:
+    if nmap_report.hosts_total > 1:
         logger.warning(f"Too many hosts found in nmap.{scan_id}.xml")
         return False
-    elif nmap_report.hosts_down == 1:
+    if nmap_report.hosts_down == 1:
         # host is down
         result.is_up(False)
         return result
-    elif nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
+    if nmap_report.hosts_up == 1 and len(nmap_report.hosts) == 0:
         # host is up but no reportable ports were found
         result.is_up(True)
         result.add_item("port_count", 0)
         return result
-    else:
-        # host is up and reportable ports were found
-        result.is_up(nmap_report.hosts[0].is_up())
-        result.add_item("port_count", len(nmap_report.hosts[0].get_ports()))
+    # host is up and reportable ports were found
+    result.is_up(nmap_report.hosts[0].is_up())
+    result.add_item("port_count", len(nmap_report.hosts[0].get_ports()))
     if agentConfig["webScreenshots"]:
         screens = screenshots.get_web_screenshots(
             target, scan_id, agentConfig["webScreenshotTimeout"]
@@ -208,9 +207,9 @@ class ThreadScan(threading.Thread):
                         f"Failed to get updated services from {self.config.server}"
                     )
             return ScanWorkItem(target_data)
-        else:  # Manual
-            target_data = self.queue.get()
-            if not target_data:
-                return None
-            logger.info(f"Manual Target: {target_data['target']}")
-            return ManualScanWorkItem(self.queue, target_data)
+        # Manual
+        target_data = self.queue.get()
+        if not target_data:
+            return None
+        logger.info(f"Manual Target: {target_data['target']}")
+        return ManualScanWorkItem(self.queue, target_data)

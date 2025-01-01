@@ -71,8 +71,7 @@ class IPScanManager:
         if self.rng:
             index = self.rng.get_random()
             return self.get_ip(index)
-        else:
-            return None
+        return None
 
     def get_ip(self, index):
         def binarysearch(networks, i):
@@ -80,9 +79,8 @@ class IPScanManager:
             network = networks[middle]
             if i < network["index"]:
                 return binarysearch(networks[:middle], i)
-            elif i >= (network["index"] + network["size"]):
+            if i >= (network["index"] + network["size"]):
                 return binarysearch(networks[middle + 1 :], i)
-            else:
-                return network["network"][i - network["index"]]
+            return network["network"][i - network["index"]]
 
         return binarysearch(self.networks, index)

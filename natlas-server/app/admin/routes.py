@@ -422,6 +422,7 @@ def delete_script(name):
         else:
             flash(f"{name} doesn't exist!", "danger")
         return redirect(url_for("admin.agent_config"))
+    return None
 
 
 @bp.route("/scans/delete/<scan_id>", methods=["POST"])
@@ -458,11 +459,10 @@ def delete_host(ip):
                 "success",
             )
             return redirect(redirectLoc)
-        else:
-            flash(f"Couldn't delete host: {ip}!", "danger")
-    else:
-        flash("Couldn't validate form!")
-        return redirect(redirectLoc)
+        flash(f"Couldn't delete host: {ip}!", "danger")
+        return None
+    flash("Couldn't validate form!")
+    return redirect(redirectLoc)
 
 
 @bp.route("/tags", methods=["GET", "POST"])

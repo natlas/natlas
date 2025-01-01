@@ -121,7 +121,7 @@ def main():
         global_logger.info(f"Finished scanning: {args.target}")
         return
 
-    elif args.tfile:
+    if args.tfile:
         global_logger.info(f"Reading scope from file: {args.tfile}")
         with open(args.tfile) as f:
             for target in f:
@@ -131,9 +131,8 @@ def main():
         return
 
     # This is the default behavior of fetching work from the server
-    else:
-        while True:
-            time.sleep(60)
+    while True:
+        time.sleep(60)
 
 
 if __name__ == "__main__":
