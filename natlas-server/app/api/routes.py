@@ -1,7 +1,6 @@
 import json
 from datetime import UTC
 from datetime import datetime as dt
-from datetime import timezone as tz
 
 import dateutil.parser
 from flask import Response, current_app, jsonify, request

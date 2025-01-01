@@ -137,4 +137,4 @@ def create_app(config_class=config.Config, migrating=False):
     return app
 
 
-from app import models
+from app import models as models
