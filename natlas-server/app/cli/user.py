@@ -16,14 +16,14 @@ err_msgs = {
 }
 
 
-def get_user(email):
+def get_user(email):  # type: ignore[no-untyped-def]
     user = User.query.filter_by(email=email).first()
     if not user:
         raise click.BadParameter(err_msgs["no_such_user"].format(email))
     return user
 
 
-def validate_email(ctx, param, value):
+def validate_email(ctx, param, value):  # type: ignore[no-untyped-def]
     if not value:
         return None
     valid_email = User.validate_email(value)
@@ -32,7 +32,7 @@ def validate_email(ctx, param, value):
     return valid_email
 
 
-def ensure_server_name():
+def ensure_server_name():  # type: ignore[no-untyped-def]
     if not current_app.config["SERVER_NAME"]:
         raise click.UsageError(err_msgs["server_name"])
 
@@ -40,7 +40,7 @@ def ensure_server_name():
 @cli_group.command("new")
 @click.option("--email", callback=validate_email, default=None)
 @click.option("--admin", is_flag=True, default=False)
-def new_user(email, admin):
+def new_user(email, admin):  # type: ignore[no-untyped-def]
     ensure_server_name()
 
     if email and User.exists(email):
@@ -55,7 +55,7 @@ def new_user(email, admin):
 @cli_group.command("role")
 @click.argument("email", callback=validate_email)
 @click.option("--promote/--demote", default=False)
-def promote_user(email, promote):
+def promote_user(email, promote):  # type: ignore[no-untyped-def]
     user = get_user(email)
     if user.is_admin == promote:
         print(f"{email} is already{' not ' if not promote else ' '}an admin")
@@ -67,7 +67,7 @@ def promote_user(email, promote):
 
 @cli_group.command("reset-password")
 @click.argument("email", callback=validate_email)
-def reset_password(email):
+def reset_password(email):  # type: ignore[no-untyped-def]
     ensure_server_name()
     user = User.get_reset_token(email)
     if not user:

@@ -7,18 +7,18 @@ class NatlasServiceError(Exception):
         self.message = message
         self.template = template if template else f"errors/{self.status_code}.html"
 
-    def __str__(self):
+    def __str__(self):  # type: ignore[no-untyped-def]
         return f"{self.status_code}: {self.message}"
 
-    def get_dict(self):
+    def get_dict(self):  # type: ignore[no-untyped-def]
         return {"status": self.status_code, "message": self.message}
 
-    def get_json(self):
+    def get_json(self):  # type: ignore[no-untyped-def]
         return json.dumps(self.get_dict(), sort_keys=True, indent=4)
 
 
 class NatlasSearchError(NatlasServiceError):
-    def __init__(self, e):
+    def __init__(self, e):  # type: ignore[no-untyped-def]
         self.status_code = 400
         self.message = e.info["error"]["root_cause"][0]["reason"]
         self.template = "errors/search.html"

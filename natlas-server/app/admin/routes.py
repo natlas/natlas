@@ -30,7 +30,7 @@ from app.models import (
 @bp.route("/", methods=["GET", "POST"])
 @login_required
 @is_admin
-def admin():
+def admin():  # type: ignore[no-untyped-def]
     configForm = forms.ConfigForm()
     configItems = current_app.config
     if configForm.validate_on_submit():
@@ -51,7 +51,7 @@ def admin():
 @bp.route("/users", methods=["GET", "POST"])
 @login_required
 @is_admin
-def users():
+def users():  # type: ignore[no-untyped-def]
     users = User.query.all()
     inviteForm = forms.InviteUserForm()
     if inviteForm.validate_on_submit():
@@ -72,7 +72,7 @@ def users():
 @bp.route("/users/<int:id>/delete", methods=["POST"])
 @login_required
 @is_admin
-def delete_user(id):
+def delete_user(id):  # type: ignore[no-untyped-def]
     delForm = forms.UserDeleteForm()
     if delForm.validate_on_submit():
         if current_user.id == id:
@@ -91,7 +91,7 @@ def delete_user(id):
 @bp.route("/users/<int:id>/toggle", methods=["POST"])
 @login_required
 @is_admin
-def toggle_user(id):
+def toggle_user(id):  # type: ignore[no-untyped-def]
     editForm = forms.UserEditForm()
     if editForm.validate_on_submit():
         user = User.query.filter_by(id=id).first()
@@ -110,11 +110,11 @@ def toggle_user(id):
 @bp.route("/scope", methods=["GET", "POST"])
 @login_required
 @is_admin
-def scope():
+def scope():  # type: ignore[no-untyped-def]
     render = {
         "scope": ScopeItem.getScope(),
-        "scopeSize": current_app.ScopeManager.get_scope_size(),
-        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),
+        "scopeSize": current_app.ScopeManager.get_scope_size(),  # type: ignore[attr-defined]
+        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),  # type: ignore[attr-defined]
         "newForm": forms.NewScopeForm(),
         "delForm": forms.ScopeDeleteForm(),
         "editForm": forms.ScopeToggleForm(),
@@ -130,7 +130,7 @@ def scope():
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=False)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.ScopeManager.update()
+        current_app.ScopeManager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} added.", "success")
         return redirect(url_for("admin.scope"))
     return render_template("admin/scope.html", **render)
@@ -139,11 +139,11 @@ def scope():
 @bp.route("/blacklist", methods=["GET", "POST"])
 @login_required
 @is_admin
-def blacklist():
+def blacklist():  # type: ignore[no-untyped-def]
     render = {
         "scope": ScopeItem.getBlacklist(),
-        "blacklistSize": current_app.ScopeManager.get_blacklist_size(),
-        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),
+        "blacklistSize": current_app.ScopeManager.get_blacklist_size(),  # type: ignore[attr-defined]
+        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),  # type: ignore[attr-defined]
         "newForm": forms.NewScopeForm(),
         "delForm": forms.ScopeDeleteForm(),
         "editForm": forms.ScopeToggleForm(),
@@ -158,7 +158,7 @@ def blacklist():
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=True)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.ScopeManager.update()
+        current_app.ScopeManager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} blacklisted.", "success")
         return redirect(url_for("admin.blacklist"))
     return render_template("admin/blacklist.html", **render)
@@ -167,7 +167,7 @@ def blacklist():
 @bp.route("/import/<string:scopetype>", methods=["POST"])
 @login_required
 @is_admin
-def import_scope(scopetype=""):
+def import_scope(scopetype=""):  # type: ignore[no-untyped-def]
     if scopetype == "blacklist":
         importBlacklist = True
         importForm = forms.ImportBlacklistForm()
@@ -180,7 +180,7 @@ def import_scope(scopetype=""):
         newScopeItems = importForm.scope.data.split("\n")
         result = ScopeItem.import_scope_list(newScopeItems, importBlacklist)
         db.session.commit()
-        current_app.ScopeManager.update()
+        current_app.ScopeManager.update()  # type: ignore[attr-defined]
         if result["success"]:
             flash(f"{result['success']} targets added to {scopetype}.", "success")
         if result["exist"]:
@@ -199,7 +199,7 @@ def import_scope(scopetype=""):
 @bp.route("/export/<string:scopetype>", methods=["GET"])
 @login_required
 @is_admin
-def export_scope(scopetype=""):
+def export_scope(scopetype=""):  # type: ignore[no-untyped-def]
     if scopetype == "blacklist":
         exportBlacklist = True
     elif scopetype == "scope":
@@ -215,7 +215,7 @@ def export_scope(scopetype=""):
 @bp.route("/<string:scopetype>/<int:id>/delete", methods=["POST"])
 @login_required
 @is_admin
-def delete_scope(scopetype, id):
+def delete_scope(scopetype, id):  # type: ignore[no-untyped-def]
     if scopetype not in ["scope", "blacklist"]:
         return abort(404)
     delForm = forms.ScopeDeleteForm()
@@ -225,7 +225,7 @@ def delete_scope(scopetype, id):
             item.tags.remove(tag)
         ScopeItem.query.filter_by(id=id).delete()
         db.session.commit()
-        current_app.ScopeManager.update()
+        current_app.ScopeManager.update()  # type: ignore[attr-defined]
         flash(f"{item.target} deleted.", "success")
     else:
         flash("Form couldn't validate!", "danger")
@@ -235,7 +235,7 @@ def delete_scope(scopetype, id):
 @bp.route("/<string:scopetype>/<int:id>/toggle", methods=["POST"])
 @login_required
 @is_admin
-def toggle_scope(scopetype, id):
+def toggle_scope(scopetype, id):  # type: ignore[no-untyped-def]
     if scopetype not in ["scope", "blacklist"]:
         return abort(404)
     toggleForm = forms.ScopeToggleForm()
@@ -244,7 +244,7 @@ def toggle_scope(scopetype, id):
         item.blacklist = not item.blacklist
         flash(f"Toggled scope status for {item.target}.", "success")
         db.session.commit()
-        current_app.ScopeManager.update()
+        current_app.ScopeManager.update()  # type: ignore[attr-defined]
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
@@ -253,7 +253,7 @@ def toggle_scope(scopetype, id):
 @bp.route("/<string:scopetype>/<int:id>/tag", methods=["POST"])
 @login_required
 @is_admin
-def tag_scope(scopetype, id):
+def tag_scope(scopetype, id):  # type: ignore[no-untyped-def]
     if scopetype not in ["scope", "blacklist"]:
         return abort(404)
     addTagForm = forms.TagScopeForm()
@@ -272,7 +272,7 @@ def tag_scope(scopetype, id):
 @bp.route("/<string:scopetype>/<int:id>/untag", methods=["POST"])
 @login_required
 @is_admin
-def untag_scope(scopetype, id):
+def untag_scope(scopetype, id):  # type: ignore[no-untyped-def]
     if scopetype not in ["scope", "blacklist"]:
         return abort(404)
     delTagForm = forms.TagScopeForm()
@@ -291,7 +291,7 @@ def untag_scope(scopetype, id):
 @bp.route("/services", methods=["GET", "POST"])
 @login_required
 @is_admin
-def services():
+def services():  # type: ignore[no-untyped-def]
     uploadForm = forms.ServicesUploadForm(prefix="upload-services")
     addServiceForm = forms.AddServiceForm(prefix="add-service")
     addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp", "UDP")]
@@ -300,12 +300,12 @@ def services():
             uploadForm.serviceFile.data.read().decode("utf-8").rstrip("\r\n")
         )
         new_services = NatlasServices(services=newServicesContent)
-        if not new_services.hash_equals(current_app.current_services["sha256"]):
+        if not new_services.hash_equals(current_app.current_services["sha256"]):  # type: ignore[attr-defined]
             db.session.add(new_services)
             db.session.commit()
-            current_app.current_services = new_services.as_dict()
+            current_app.current_services = new_services.as_dict()  # type: ignore[attr-defined]
             flash(
-                f'New services file with hash {current_app.current_services["sha256"]} has been uploaded.',
+                f'New services file with hash {current_app.current_services["sha256"]} has been uploaded.',  # type: ignore[attr-defined]
                 "success",
             )
         else:
@@ -321,11 +321,11 @@ def services():
             + "/"
             + addServiceForm.serviceProtocol.data
         )
-        if "\t" + newServicePort in str(current_app.current_services["services"]):
+        if "\t" + newServicePort in str(current_app.current_services["services"]):  # type: ignore[attr-defined]
             flash(f"A service with port {newServicePort} already exists!", "danger")
         else:
             newServices = (
-                current_app.current_services["services"]
+                current_app.current_services["services"]  # type: ignore[attr-defined]
                 + "\n"
                 + newServiceName
                 + "\t"
@@ -334,7 +334,7 @@ def services():
             ns = NatlasServices(services=newServices)
             db.session.add(ns)
             db.session.commit()
-            current_app.current_services = NatlasServices.get_latest_services()
+            current_app.current_services = NatlasServices.get_latest_services()  # type: ignore[attr-defined]
             flash(
                 f"New service {newServiceName} on port {newServicePort} has been added.",
                 "success",
@@ -354,7 +354,7 @@ def services():
 @bp.route("/services/export", methods=["GET"])
 @login_required
 @is_admin
-def export_services():
+def export_services():  # type: ignore[no-untyped-def]
     current_services = NatlasServices.get_latest_services()
     return Response(str(current_services["services"]), mimetype="text/plain")
 
@@ -362,7 +362,7 @@ def export_services():
 @bp.route("/agents", methods=["GET", "POST"])
 @login_required
 @is_admin
-def agent_config():
+def agent_config():  # type: ignore[no-untyped-def]
     agentConfig = AgentConfig.query.get(1)
     agent_scripts = AgentScript.query.all()
     # pass the model to the form to populate
@@ -374,7 +374,7 @@ def agent_config():
         # populate the object from the form data
         agentForm.populate_obj(agentConfig)
         db.session.commit()
-        current_app.agentConfig = agentConfig.as_dict()
+        current_app.agentConfig = agentConfig.as_dict()  # type: ignore[attr-defined]
         flash("Successfully updated agent configuration.", "success")
 
     return render_template(
@@ -389,14 +389,14 @@ def agent_config():
 @bp.route("/agents/script/add", methods=["POST"])
 @login_required
 @is_admin
-def add_script():
+def add_script():  # type: ignore[no-untyped-def]
     addScriptForm = forms.AddScriptForm(prefix="add-script")
 
     if addScriptForm.validate_on_submit():
         newscript = AgentScript(name=addScriptForm.scriptName.data)
         db.session.add(newscript)
         db.session.commit()
-        current_app.agent_scripts = AgentScript.get_scripts_string()
+        current_app.agent_scripts = AgentScript.get_scripts_string()  # type: ignore[attr-defined]
         flash(f"{newscript.name} successfully added to scripts.", "success")
     else:
         flash(
@@ -409,7 +409,7 @@ def add_script():
 @bp.route("/agents/script/<string:name>/delete", methods=["POST"])
 @login_required
 @is_admin
-def delete_script(name):
+def delete_script(name):  # type: ignore[no-untyped-def]
     deleteForm = forms.DeleteForm()
 
     if deleteForm.validate_on_submit():
@@ -417,7 +417,7 @@ def delete_script(name):
         if delScript:
             db.session.delete(delScript)
             db.session.commit()
-            current_app.agent_scripts = AgentScript.get_scripts_string()
+            current_app.agent_scripts = AgentScript.get_scripts_string()  # type: ignore[attr-defined]
             flash(f"{name} successfully deleted.", "success")
         else:
             flash(f"{name} doesn't exist!", "danger")
@@ -428,12 +428,12 @@ def delete_script(name):
 @bp.route("/scans/delete/<scan_id>", methods=["POST"])
 @login_required
 @is_admin
-def delete_scan(scan_id):
+def delete_scan(scan_id):  # type: ignore[no-untyped-def]
     delForm = forms.DeleteForm()
     redirectLoc = url_for("main.browse")
 
     if delForm.validate_on_submit():
-        deleted = current_app.elastic.delete_scan(scan_id)
+        deleted = current_app.elastic.delete_scan(scan_id)  # type: ignore[attr-defined]
         if deleted not in [1, 2]:
             flash(f"Couldn't delete scan {scan_id}!", "danger")
         else:
@@ -447,12 +447,12 @@ def delete_scan(scan_id):
 @bp.route("/hosts/delete/<ip>", methods=["POST"])
 @login_required
 @is_admin
-def delete_host(ip):
+def delete_host(ip):  # type: ignore[no-untyped-def]
     delForm = forms.DeleteForm()
     redirectLoc = url_for("main.browse")
 
     if delForm.validate_on_submit():
-        deleted = current_app.elastic.delete_host(ip)
+        deleted = current_app.elastic.delete_host(ip)  # type: ignore[attr-defined]
         if deleted > 0:
             flash(
                 f"Successfully deleted {deleted - 1 if deleted > 1 else deleted} scans for {ip}.",
@@ -468,7 +468,7 @@ def delete_host(ip):
 @bp.route("/tags", methods=["GET", "POST"])
 @login_required
 @is_admin
-def tags():
+def tags():  # type: ignore[no-untyped-def]
     tags = Tag.query.all()
 
     addForm = forms.AddTagForm()
@@ -485,6 +485,6 @@ def tags():
 @bp.route("/logs", methods=["GET"])
 @login_required
 @is_admin
-def logs():
+def logs():  # type: ignore[no-untyped-def]
     scope_logs = ScopeLog.query.order_by(ScopeLog.created_at.desc()).all()
     return render_template("admin/logs.html", scope_logs=scope_logs)

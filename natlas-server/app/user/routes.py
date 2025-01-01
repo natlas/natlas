@@ -14,7 +14,7 @@ from app.user.forms import (
 
 @bp.route("/", methods=["GET", "POST"])
 @login_required
-def profile():
+def profile():  # type: ignore[no-untyped-def]
     myagents = current_user.agents
     changePasswordForm = ChangePasswordForm(prefix="change-password")
     displaySettingsForm = DisplaySettingsForm(
@@ -71,7 +71,7 @@ def profile():
 
 @bp.route("/agent/<string:agent_id>/newToken", methods=["POST"])
 @login_required
-def generate_new_token(agent_id):
+def generate_new_token(agent_id):  # type: ignore[no-untyped-def]
     generateTokenForm = GenerateTokenForm()
 
     if generateTokenForm.validate_on_submit():
@@ -86,7 +86,7 @@ def generate_new_token(agent_id):
 
 @bp.route("/agent/<string:agent_id>/newName", methods=["POST"])
 @login_required
-def change_agent_name(agent_id):
+def change_agent_name(agent_id):  # type: ignore[no-untyped-def]
     agentNameForm = AgentNameForm()
 
     if agentNameForm.validate_on_submit():
@@ -104,7 +104,7 @@ def change_agent_name(agent_id):
 
 @bp.route("/agent/newAgent", methods=["POST"])
 @login_required
-def new_agent():
+def new_agent():  # type: ignore[no-untyped-def]
     newAgentForm = AgentNameForm()
 
     if newAgentForm.validate_on_submit():

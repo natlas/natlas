@@ -26,7 +26,7 @@ except Exception as e:
 
 
 @app.shell_context_processor
-def make_shell_context():
+def make_shell_context():  # type: ignore[no-untyped-def]
     return {
         "db": db,
         "User": User,

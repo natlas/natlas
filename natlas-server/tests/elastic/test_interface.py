@@ -1,7 +1,7 @@
 from time import sleep
 
 
-def test_delete_host(esinterface):
+def test_delete_host(esinterface):  # type: ignore[no-untyped-def]
     ip = "127.0.0.1"
     esinterface.new_result({"ip": ip})
     esinterface.new_result({"ip": ip})
@@ -9,7 +9,7 @@ def test_delete_host(esinterface):
     assert esinterface.delete_host(ip) == 3
 
 
-def test_delete_scan(esinterface):
+def test_delete_scan(esinterface):  # type: ignore[no-untyped-def]
     ip = "127.0.0.2"
     scan_id = "testscan"
     esinterface.new_result({"ip": ip, "scan_id": scan_id})
@@ -19,7 +19,7 @@ def test_delete_scan(esinterface):
     assert esinterface.delete_scan(scan_id * 2) == 2
 
 
-def test_get_host(esinterface):
+def test_get_host(esinterface):  # type: ignore[no-untyped-def]
     ip = "127.0.0.3"
     esinterface.new_result({"ip": ip})
     sleep(1)
@@ -29,7 +29,7 @@ def test_get_host(esinterface):
     assert esinterface.delete_host(ip) == 2
 
 
-def test_delete_scan_migrate(esinterface):
+def test_delete_scan_migrate(esinterface):  # type: ignore[no-untyped-def]
     ip = "127.0.0.4"
     scan_id = "testscan"
     scan_id2 = "nomatch"
@@ -43,7 +43,7 @@ def test_delete_scan_migrate(esinterface):
     assert host["ip"] == ip
 
 
-def test_get_scan(esinterface):
+def test_get_scan(esinterface):  # type: ignore[no-untyped-def]
     ip = "127.0.0.5"
     scan_id = "testscan1"
     esinterface.new_result({"ip": ip, "scan_id": scan_id})
@@ -54,7 +54,7 @@ def test_get_scan(esinterface):
     assert esinterface.delete_host(ip) == 2
 
 
-def test_random_host(esinterface):
+def test_random_host(esinterface):  # type: ignore[no-untyped-def]
     ips = ["127.0.0.6", "127.0.0.7", "127.0.0.8"]
     for ip in ips:
         esinterface.new_result({"ip": ip, "port_count": 2, "is_up": True})

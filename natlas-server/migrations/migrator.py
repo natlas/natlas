@@ -6,7 +6,7 @@ from alembic.migration import MigrationContext
 from alembic.script import ScriptDirectory
 
 
-def migration_needed(sqlalchemy_uri):
+def migration_needed(sqlalchemy_uri):  # type: ignore[no-untyped-def]
     engine = sqlalchemy.create_engine(sqlalchemy_uri)
     conn = engine.connect()
 
@@ -14,11 +14,11 @@ def migration_needed(sqlalchemy_uri):
     cfg = alembic_cfg("migrations/alembic.ini")
     cfg.set_main_option("script_location", "migrations")
     scripts_dir = ScriptDirectory.from_config(cfg)
-    with context.EnvironmentContext(cfg, scripts_dir):
+    with context.EnvironmentContext(cfg, scripts_dir):  # type: ignore[attr-defined]
         return context.get_head_revision() != m_ctx.get_current_revision()
 
 
-def handle_db_upgrade(app):
+def handle_db_upgrade(app):  # type: ignore[no-untyped-def]
     if app.config["DB_AUTO_UPGRADE"]:
         with app.app_context():
             print("upgrading")
@@ -28,13 +28,13 @@ def handle_db_upgrade(app):
         return False
 
 
-def handle_db_downgrade(app):
+def handle_db_downgrade(app):  # type: ignore[no-untyped-def]
     with app.app_context():
         print("downgrading")
         flask_migrate.downgrade()
 
 
-def handle_db_migrate(app, message=""):
+def handle_db_migrate(app, message=""):  # type: ignore[no-untyped-def]
     with app.app_context():
         print("migrating")
         flask_migrate.migrate(message=message)

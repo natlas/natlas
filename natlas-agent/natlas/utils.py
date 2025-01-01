@@ -4,13 +4,14 @@ import shutil
 from pathlib import Path
 
 from config import Config
+
 from natlas import logging
 
 utillogger = logging.get_logger("Utilities")
 conf = Config()
 
 
-def validate_target(target, config):
+def validate_target(target, config):  # type: ignore[no-untyped-def]
     try:
         iptarget = ipaddress.ip_address(target)
         if iptarget.is_private and not config.scan_local:
@@ -22,29 +23,29 @@ def validate_target(target, config):
     return True
 
 
-def get_conf_dir():
+def get_conf_dir():  # type: ignore[no-untyped-def]
     return os.path.join(conf.data_dir, "conf")
 
 
-def get_services_path():
+def get_services_path():  # type: ignore[no-untyped-def]
     return os.path.join(get_conf_dir(), "natlas-services")
 
 
-def get_scan_dir(scan_id):
+def get_scan_dir(scan_id):  # type: ignore[no-untyped-def]
     return os.path.join(conf.data_dir, "scans", f"natlas.{scan_id}")
 
 
-def create_scan_dir(scan_id):
+def create_scan_dir(scan_id):  # type: ignore[no-untyped-def]
     Path(get_scan_dir(scan_id)).mkdir(parents=True, exist_ok=True)
 
 
-def delete_files(scan_id):
+def delete_files(scan_id):  # type: ignore[no-untyped-def]
     scan_dir = get_scan_dir(scan_id)
     if os.path.isdir(scan_dir):
         shutil.rmtree(scan_dir)
 
 
-def save_files(scan_id):
+def save_files(scan_id):  # type: ignore[no-untyped-def]
     failroot = os.path.join(conf.data_dir, "scans", "failures")
     scan_dir = get_scan_dir(scan_id)
     Path(failroot).mkdir(parents=True, exist_ok=True)
@@ -54,7 +55,7 @@ def save_files(scan_id):
         shutil.move(src, dst)
 
 
-def cleanup_files(scan_id, failed=False, saveFails=False):
+def cleanup_files(scan_id, failed=False, saveFails=False):  # type: ignore[no-untyped-def]
     utillogger.info(f"Cleaning up files for {scan_id}")
     if saveFails and failed:
         save_files(scan_id)

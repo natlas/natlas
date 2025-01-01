@@ -6,13 +6,13 @@ from app.models import ScopeItem
 DEFAULT_SCOPE_ITEMS = ["10.0.0.0/8", "192.168.1.0/24", "192.168.5.0/28"]
 
 
-def mock_scope_file(scope_items: list = DEFAULT_SCOPE_ITEMS) -> str:
+def mock_scope_file(scope_items: list = DEFAULT_SCOPE_ITEMS) -> str:  # type: ignore[type-arg]
     with open("scope.txt", "w") as f:
         f.write("\n".join(scope_items))
     return "scope.txt"
 
 
-def test_import_items_no_flags(runner):
+def test_import_items_no_flags(runner):  # type: ignore[no-untyped-def]
     with runner.isolated_filesystem():
         scope_file = mock_scope_file()
         result = runner.invoke(import_items, [scope_file])
@@ -23,7 +23,7 @@ def test_import_items_no_flags(runner):
         assert len(result_dict["scope"]) == len(DEFAULT_SCOPE_ITEMS)
 
 
-def test_import_items_scope_flag(runner):
+def test_import_items_scope_flag(runner):  # type: ignore[no-untyped-def]
     with runner.isolated_filesystem():
         scope_file = mock_scope_file()
         result = runner.invoke(import_items, ["--scope", scope_file])
@@ -34,7 +34,7 @@ def test_import_items_scope_flag(runner):
         assert len(result_dict["scope"]) == len(DEFAULT_SCOPE_ITEMS)
 
 
-def test_import_items_blacklist_flag(runner):
+def test_import_items_blacklist_flag(runner):  # type: ignore[no-untyped-def]
     with runner.isolated_filesystem():
         scope_file = mock_scope_file()
         result = runner.invoke(import_items, ["--blacklist", scope_file])
@@ -45,7 +45,7 @@ def test_import_items_blacklist_flag(runner):
         assert len(result_dict["blacklist"]) == len(DEFAULT_SCOPE_ITEMS)
 
 
-def test_export_items_tagged(runner):
+def test_export_items_tagged(runner):  # type: ignore[no-untyped-def]
     scope_items = ["10.0.0.0/8,a", "192.168.5.0/28"]
     blacklist_items = ["192.168.1.0/24,b"]
     ScopeItem.import_scope_list(scope_items, False)

@@ -10,13 +10,13 @@ class Config:
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     load_dotenv(os.path.join(BASEDIR, ".env"))
 
-    def get_int(self, varname):
+    def get_int(self, varname):  # type: ignore[no-untyped-def]
         tmp = os.environ.get(varname)
         if tmp:
             return int(tmp)
         return None
 
-    def get_bool(self, varname):
+    def get_bool(self, varname):  # type: ignore[no-untyped-def]
         tmp = os.environ.get(varname)
         if tmp and tmp.upper() == "TRUE":
             return True
@@ -24,7 +24,7 @@ class Config:
             return False
         return None
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         # url of server to get/submit work from/to
         self.server = os.environ.get("NATLAS_SERVER_ADDRESS") or "http://127.0.0.1:5000"
 

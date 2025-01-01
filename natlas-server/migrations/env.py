@@ -10,7 +10,7 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+fileConfig(config.config_file_name)  # type: ignore[arg-type]
 logger = logging.getLogger("alembic.env")
 
 # add your model's MetaData object here
@@ -20,7 +20,8 @@ logger = logging.getLogger("alembic.env")
 from flask import current_app
 
 config.set_main_option(
-    "sqlalchemy.url", current_app.config.get("SQLALCHEMY_DATABASE_URI")
+    "sqlalchemy.url",
+    current_app.config.get("SQLALCHEMY_DATABASE_URI"),  # type: ignore[arg-type]
 )
 target_metadata = current_app.extensions["migrate"].db.metadata
 
@@ -30,7 +31,7 @@ target_metadata = current_app.extensions["migrate"].db.metadata
 # ... etc.
 
 
-def run_migrations_offline():
+def run_migrations_offline():  # type: ignore[no-untyped-def]
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -49,7 +50,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online():  # type: ignore[no-untyped-def]
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -60,7 +61,7 @@ def run_migrations_online():
     # this callback is used to prevent an auto-migration from being generated
     # when there are no changes to the schema
     # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html
-    def process_revision_directives(context, revision, directives):
+    def process_revision_directives(context, revision, directives):  # type: ignore[no-untyped-def]
         if getattr(config.cmd_opts, "autogenerate", False):
             script = directives[0]
             if script.upgrade_ops.is_empty():
@@ -68,7 +69,7 @@ def run_migrations_online():
                 logger.info("No changes in schema detected.")
 
     engine = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config.get_section(config.config_ini_section),  # type: ignore[arg-type]
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

@@ -2,6 +2,35 @@
 name = "natlas"
 requires-python = "==3.11"
 
+[tool.mypy]
+disable_error_code = [
+  "import-untyped",
+  "no-untyped-call"
+]
+enable_error_code = [
+  "ignore-without-code",
+  "possibly-undefined",
+  "redundant-self",
+  "truthy-bool",
+  "truthy-iterable",
+  "unimported-reveal",
+  "unused-awaitable"
+]
+exclude = [
+  # This is weird because technically the exclude is for natlas-server/migrations, but mypy runs from within natlas-server using this config file
+  # so this is technically correct to ignore mypy for migrations.
+  'migrations/versions/.*\.py$'
+]
+files = "."
+local_partial_types = true
+mypy_path = "mypy_stubs"
+no_implicit_reexport = false
+pretty = false
+strict = true
+strict_optional = true
+warn_unreachable = true
+warn_unused_configs = true
+
 [tool.ruff]
 
 [tool.ruff.lint]

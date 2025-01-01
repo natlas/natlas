@@ -7,7 +7,7 @@ from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 
 
-class UserInvitation(db.Model, DictSerializable):
+class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(254), unique=True)
     token = db.Column(db.String(256), unique=True, nullable=False)
@@ -24,7 +24,7 @@ class UserInvitation(db.Model, DictSerializable):
 
     # Build a new invitation
     @staticmethod
-    def new_invite(email=None, is_admin=False):
+    def new_invite(email=None, is_admin=False):  # type: ignore[no-untyped-def]
         if email and User.query.filter_by(email=email).first():
             return False
         now = datetime.utcnow()
@@ -45,31 +45,31 @@ class UserInvitation(db.Model, DictSerializable):
         return invite
 
     @staticmethod
-    def deliver_invite(invite):
+    def deliver_invite(invite):  # type: ignore[no-untyped-def]
         from app.auth.email import deliver_auth_link
 
         return deliver_auth_link(invite.email, invite.token, "invite")
 
     @staticmethod
-    def get_invite(url_token):
+    def get_invite(url_token):  # type: ignore[no-untyped-def]
         record = UserInvitation.query.filter_by(token=url_token).first()
         if not record:
             return False
         return validate_token(record, url_token, record.token, record.validate_invite)
 
-    def accept_invite(self):
+    def accept_invite(self):  # type: ignore[no-untyped-def]
         now = datetime.utcnow()
         self.accepted_date = now
         self.expire_invite(now)
 
     # If a token is expired, mark it as such
-    def expire_invite(self, timestamp):
+    def expire_invite(self, timestamp):  # type: ignore[no-untyped-def]
         self.expiration_date = min(timestamp, self.expiration_date)
 
         # Leave original expiration date intact since it's already past
         self.is_expired = True
 
     # verify that the token is not expired
-    def validate_invite(self):
+    def validate_invite(self):  # type: ignore[no-untyped-def]
         now = datetime.utcnow()
         return self.expiration_date > now and not self.is_expired

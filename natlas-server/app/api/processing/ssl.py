@@ -1,4 +1,4 @@
-def parse_alt_names(cert_data):
+def parse_alt_names(cert_data):  # type: ignore[no-untyped-def]
     altnames = []
     # Parse out Subject Alternative Names because libnmap doesn't give them to us
     for line in cert_data.split("\n"):
@@ -10,7 +10,7 @@ def parse_alt_names(cert_data):
     return altnames
 
 
-def parse_subject(subject, altnames):
+def parse_subject(subject, altnames):  # type: ignore[no-untyped-def]
     subDict = {}
     if subject.get("commonName"):
         subDict["commonName"] = subject.get("commonName")
@@ -19,7 +19,7 @@ def parse_subject(subject, altnames):
     return subDict
 
 
-def parse_pubkey(pubkey):
+def parse_pubkey(pubkey):  # type: ignore[no-untyped-def]
     pubkeyDict = {}
     if pubkey.get("type"):
         pubkeyDict["type"] = pubkey.get("type")
@@ -28,7 +28,7 @@ def parse_pubkey(pubkey):
     return pubkeyDict
 
 
-def parse_ssl_data(sslcert):
+def parse_ssl_data(sslcert):  # type: ignore[no-untyped-def]
     altnames = parse_alt_names(sslcert["output"])
     elements = sslcert["elements"]
     subject = elements.get("subject")

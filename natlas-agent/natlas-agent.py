@@ -25,7 +25,7 @@ global_logger = logging.get_logger("MainThread")
 netsrv = NatlasNetworkServices(config)
 
 
-def add_targets_to_queue(target, q):
+def add_targets_to_queue(target, q):  # type: ignore[no-untyped-def]
     targetNetwork = ipaddress.ip_network(target.strip())
     if targetNetwork.num_addresses == 1:
         target_data = netsrv.get_work(target=str(targetNetwork.network_address))
@@ -41,7 +41,7 @@ def add_targets_to_queue(target, q):
             q.put(target_data)
 
 
-def main():
+def main():  # type: ignore[no-untyped-def]
     PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
     PARSER_EPILOG = "Report problems to https://github.com/natlas/natlas"
     parser = argparse.ArgumentParser(
@@ -91,7 +91,7 @@ def main():
 
     # Initialize SentryIo after basic environment checks complete
     error_reporting.initialize_sentryio(config)
-    q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
+    q = queue.Queue(maxsize=MAX_QUEUE_SIZE)  # type: ignore[var-annotated]
 
     servicesSha = ""
     SERVICESPATH = utils.get_services_path()

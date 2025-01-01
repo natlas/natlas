@@ -10,7 +10,7 @@ from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 
 
-class User(UserMixin, db.Model, DictSerializable):
+class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(254), index=True, unique=True)
     password_hash = db.Column(db.String(128))
@@ -29,49 +29,49 @@ class User(UserMixin, db.Model, DictSerializable):
     expiration_duration = 60 * 60 * 24 * 2
     token_length = 32
 
-    def __repr__(self):
+    def __repr__(self):  # type: ignore[no-untyped-def]
         return f"<User {self.email}>"
 
     @staticmethod
-    def exists(email):
+    def exists(email):  # type: ignore[no-untyped-def]
         return User.query.filter_by(email=email).first() is not None
 
     # https://github.com/JoshData/python-email-validator
     @staticmethod
-    def validate_email(email):
+    def validate_email(email):  # type: ignore[no-untyped-def]
         try:
             valid = validate_email(email)
             return valid["email"]
         except EmailNotValidError:
             return False
 
-    def set_password(self, password):
+    def set_password(self, password):  # type: ignore[no-untyped-def]
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password):  # type: ignore[no-untyped-def]
         return check_password_hash(self.password_hash, password)
 
     @login.user_loader
-    def load_user(id):
+    def load_user(id):  # type: ignore[no-untyped-def]
         return User.query.get(id)
 
-    def new_reset_token(self):
+    def new_reset_token(self):  # type: ignore[no-untyped-def]
         self.password_reset_token = secrets.token_urlsafe(User.token_length)
         self.password_reset_expiration = datetime.utcnow() + timedelta(
             seconds=User.expiration_duration
         )
 
-    def expire_reset_token(self):
+    def expire_reset_token(self):  # type: ignore[no-untyped-def]
         self.password_reset_token = None
         self.password_reset_expiration = None
 
-    def validate_reset_token(self):
+    def validate_reset_token(self):  # type: ignore[no-untyped-def]
         if not (self.password_reset_token and self.password_reset_expiration):
             return False
         return self.password_reset_expiration > datetime.utcnow()
 
     @staticmethod
-    def get_reset_token(email):
+    def get_reset_token(email):  # type: ignore[no-untyped-def]
         user = User.query.filter_by(email=email).first()
         if not user:
             return None
@@ -80,7 +80,7 @@ class User(UserMixin, db.Model, DictSerializable):
         return user
 
     @staticmethod
-    def get_user_by_token(url_token):
+    def get_user_by_token(url_token):  # type: ignore[no-untyped-def]
         record = User.query.filter_by(password_reset_token=url_token).first()
         if not record:
             return False
@@ -89,7 +89,7 @@ class User(UserMixin, db.Model, DictSerializable):
         )
 
     @staticmethod
-    def new_user_from_invite(invite, password, email=None):
+    def new_user_from_invite(invite, password, email=None):  # type: ignore[no-untyped-def]
         user_email = email if email else invite.email
         new_user = User(email=user_email, is_admin=invite.is_admin, is_active=True)
         new_user.set_password(password)

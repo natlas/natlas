@@ -1,5 +1,6 @@
 [dev-packages]
 flake8 = "*"
+mypy = "~=1.14"
 
 [packages]
 natlas-libnmap = "*"

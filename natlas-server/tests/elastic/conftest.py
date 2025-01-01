@@ -5,13 +5,13 @@ from tests.config import TestConfig
 conf = TestConfig()
 
 
-def reset_indices(indices):
+def reset_indices(indices):  # type: ignore[no-untyped-def]
     indices._delete_indices()
     indices._initialize_indices()
 
 
 @pytest.fixture(scope="module")
-def esinterface():
+def esinterface():  # type: ignore[no-untyped-def]
     esi = ElasticInterface(
         conf.ELASTICSEARCH_URL,
         True,
@@ -24,5 +24,5 @@ def esinterface():
 
 
 @pytest.fixture(scope="module")
-def esclient(esinterface):
+def esclient(esinterface):  # type: ignore[no-untyped-def]
     return esinterface.client

@@ -19,7 +19,7 @@ json_content = "application/json"
 
 @bp.route("/getwork", methods=["GET"])
 @is_agent_authenticated
-def getwork():
+def getwork():  # type: ignore[no-untyped-def]
     manual = request.args.get("target", "")
     if "natlas-agent" in request.headers["user-agent"]:
         verstr = request.headers["user-agent"].split("/")[1]
@@ -34,7 +34,7 @@ def getwork():
     work = {}
 
     if manual:
-        canTarget = current_app.ScopeManager.is_acceptable_target(manual)
+        canTarget = current_app.ScopeManager.is_acceptable_target(manual)  # type: ignore[attr-defined]
         if canTarget:
             work["scan_reason"] = "manual"
             work["target"] = manual
@@ -52,15 +52,15 @@ def getwork():
             )
         return response
 
-    rescans = current_app.ScopeManager.get_pending_rescans()
+    rescans = current_app.ScopeManager.get_pending_rescans()  # type: ignore[attr-defined]
     if (
         len(rescans) == 0
     ):  # If there aren't any rescans, update the Rescan Queue and get it again, because of lazy loading
-        current_app.ScopeManager.update_pending_rescans()
-        rescans = current_app.ScopeManager.get_pending_rescans()
+        current_app.ScopeManager.update_pending_rescans()  # type: ignore[attr-defined]
+        rescans = current_app.ScopeManager.get_pending_rescans()  # type: ignore[attr-defined]
 
     if len(rescans) == 0:  # if we don't have rescans, use the ScanManager
-        scanmanager = current_app.ScopeManager.get_scan_manager()
+        scanmanager = current_app.ScopeManager.get_scan_manager()  # type: ignore[attr-defined]
 
         if not scanmanager:
             response_body = json.dumps(
@@ -89,7 +89,7 @@ def getwork():
 
 @bp.route("/submit", methods=["POST"])
 @is_agent_authenticated
-def submit():
+def submit():  # type: ignore[no-untyped-def]
     status_code = None
     response_body = None
     data = request.get_json()
@@ -113,7 +113,7 @@ def submit():
             )
 
         # If it's not an acceptable target, tell the agent it's out of scope
-        elif len(nmap.hosts) == 1 and not current_app.ScopeManager.is_acceptable_target(
+        elif len(nmap.hosts) == 1 and not current_app.ScopeManager.is_acceptable_target(  # type: ignore[attr-defined]
             nmap.hosts[0].address
         ):
             status_code = 400
@@ -127,7 +127,7 @@ def submit():
 
         # If there's no further processing to do, store the host and prepare the response
         elif not newhost["is_up"] or (newhost["is_up"] and newhost["port_count"] == 0):
-            current_app.elastic.new_result(newhost)
+            current_app.elastic.new_result(newhost)  # type: ignore[attr-defined]
             status_code = 200
             response_body = json.dumps(
                 {"status": status_code, "message": "Received: " + newhost["ip"]}
@@ -154,7 +154,7 @@ def submit():
         )
         newhost["elapsed"] = elapsed.seconds
 
-    newhost["ip"] = nmap.hosts[0].address
+    newhost["ip"] = nmap.hosts[0].address  # type: ignore[possibly-undefined]
     if len(nmap.hosts[0].hostnames) > 0:
         newhost["hostname"] = nmap.hosts[0].hostnames[0]
 
@@ -200,7 +200,7 @@ def submit():
         )
     else:
         status_code = 200
-        current_app.elastic.new_result(newhost)
+        current_app.elastic.new_result(newhost)  # type: ignore[attr-defined]
         response_body = json.dumps(
             {
                 "status": status_code,
@@ -215,10 +215,10 @@ def submit():
 
 @bp.route("/natlas-services", methods=["GET"])
 @is_agent_authenticated
-def natlasServices():
-    if current_app.current_services["id"] != "None":
+def natlasServices():  # type: ignore[no-untyped-def]
+    if current_app.current_services["id"] != "None":  # type: ignore[attr-defined]
         tmpdict = (
-            current_app.current_services.copy()
+            current_app.current_services.copy()  # type: ignore[attr-defined]
         )  # make an actual copy of the dict so that we can remove the list
         del tmpdict[
             "as_list"
@@ -226,7 +226,7 @@ def natlasServices():
         response_body = json.dumps(tmpdict)
         status_code = 200
     else:
-        response_body = json.dumps(current_app.current_services)
+        response_body = json.dumps(current_app.current_services)  # type: ignore[attr-defined]
         status_code = 404
     return Response(
         response=response_body, status=status_code, content_type=json_content
@@ -235,25 +235,25 @@ def natlasServices():
 
 @bp.route("/status", methods=["GET"])
 @is_authenticated
-def status():
-    last_cycle_start = current_app.ScopeManager.get_last_cycle_start()
-    completed_cycles = current_app.ScopeManager.get_completed_cycle_count()
+def status():  # type: ignore[no-untyped-def]
+    last_cycle_start = current_app.ScopeManager.get_last_cycle_start()  # type: ignore[attr-defined]
+    completed_cycles = current_app.ScopeManager.get_completed_cycle_count()  # type: ignore[attr-defined]
     avg_cycle_time = None
     if last_cycle_start:
-        scans_this_cycle = current_app.elastic.count_scans_since(last_cycle_start)
+        scans_this_cycle = current_app.elastic.count_scans_since(last_cycle_start)  # type: ignore[attr-defined]
         if completed_cycles > 0:
             delta = (
-                last_cycle_start - current_app.ScopeManager.init_time
+                last_cycle_start - current_app.ScopeManager.init_time  # type: ignore[attr-defined]
             ) / completed_cycles
             avg_cycle_time = pretty_time_delta(delta)
     else:
         scans_this_cycle = 0
     payload = {
-        "natlas_start_time": current_app.ScopeManager.init_time,
+        "natlas_start_time": current_app.ScopeManager.init_time,  # type: ignore[attr-defined]
         "cycle_start_time": last_cycle_start,
         "completed_cycles": completed_cycles,
         "scans_this_cycle": scans_this_cycle,
-        "effective_scope_size": current_app.ScopeManager.get_effective_scope_size(),
+        "effective_scope_size": current_app.ScopeManager.get_effective_scope_size(),  # type: ignore[attr-defined]
         "avg_cycle_duration": avg_cycle_time,
     }
     return jsonify(payload)

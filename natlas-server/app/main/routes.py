@@ -19,7 +19,7 @@ from app.main.pagination import build_pagination_urls, results_offset
 
 
 @bp.route("/")
-def index():
+def index():  # type: ignore[no-untyped-def]
     login_form = None
     reg_form = None
     if current_user.is_anonymous:
@@ -33,7 +33,7 @@ def index():
 # Serve media files in case the front-end proxy doesn't do it
 @bp.route("/media/<path:filename>")
 @is_authenticated
-def send_media(filename):
+def send_media(filename):  # type: ignore[no-untyped-def]
     # If you're looking at this function, wondering why your files aren't sending...
     # It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
     return send_from_directory(current_app.config["MEDIA_DIRECTORY"], filename)
@@ -41,7 +41,7 @@ def send_media(filename):
 
 @bp.route("/browse")
 @is_authenticated
-def browse():
+def browse():  # type: ignore[no-untyped-def]
     """
     A simple browser that doesn't deal with queries at all
     """
@@ -52,10 +52,10 @@ def browse():
 
     searchIndex = "history" if includeHistory else "latest"
 
-    count, hostdata = current_app.elastic.search(
+    count, hostdata = current_app.elastic.search(  # type: ignore[attr-defined]
         results_per_page, search_offset, searchIndex=searchIndex
     )
-    totalHosts = current_app.elastic.total_hosts()
+    totalHosts = current_app.elastic.total_hosts()  # type: ignore[attr-defined]
 
     if includeHistory:
         next_url, prev_url = build_pagination_urls(
@@ -78,7 +78,7 @@ def browse():
 
 @bp.route("/search")
 @is_authenticated
-def search():
+def search():  # type: ignore[no-untyped-def]
     """
     Return search results for a given query
     """
@@ -95,13 +95,13 @@ def search():
     searchIndex = "history" if includeHistory else "latest"
 
     try:
-        count, context = current_app.elastic.search(
+        count, context = current_app.elastic.search(  # type: ignore[attr-defined]
             results_per_page, search_offset, query=query, searchIndex=searchIndex
         )
     except elasticsearch.RequestError as e:
         raise NatlasSearchError(e) from e
 
-    totalHosts = current_app.elastic.total_hosts()
+    totalHosts = current_app.elastic.total_hosts()  # type: ignore[attr-defined]
 
     if includeHistory:
         next_url, prev_url = build_pagination_urls(
@@ -137,18 +137,18 @@ def search():
 
 @bp.route("/searchmodal")
 @is_authenticated
-def search_modal():
+def search_modal():  # type: ignore[no-untyped-def]
     return render_template("includes/search_modal_content.html")
 
 
 @bp.route("/screenshots")
 @is_authenticated
-def screenshots():
+def screenshots():  # type: ignore[no-untyped-def]
     page = int(request.args.get("page", 1))
 
     results_per_page, search_offset = results_offset(page)
 
-    total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(
+    total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(  # type: ignore[attr-defined]
         results_per_page, search_offset
     )
 
@@ -166,7 +166,7 @@ def screenshots():
 
 @bp.route("/status")
 @is_authenticated
-def status():
+def status():  # type: ignore[no-untyped-def]
     """
     Simple html representation of the status api
     """

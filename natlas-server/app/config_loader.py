@@ -2,7 +2,7 @@ import config
 import sqlalchemy
 
 
-def load_natlas_config(app, db):
+def load_natlas_config(app, db):  # type: ignore[no-untyped-def]
     insp = sqlalchemy.inspect(db.engine)
     if not insp.has_table("config_item"):
         return
@@ -13,7 +13,7 @@ def load_natlas_config(app, db):
         app.config[item.name] = config.casted_value(item.type, item.value)
 
 
-def load_natlas_services(app, db):
+def load_natlas_services(app, db):  # type: ignore[no-untyped-def]
     insp = sqlalchemy.inspect(db.engine)
     if not insp.has_table("natlas_services"):
         return
@@ -22,7 +22,7 @@ def load_natlas_services(app, db):
     app.current_services = NatlasServices.get_latest_services()
 
 
-def load_agent_config(app, db):
+def load_agent_config(app, db):  # type: ignore[no-untyped-def]
     insp = sqlalchemy.inspect(db.engine)
     if not insp.has_table("agent_config"):
         return
@@ -33,7 +33,7 @@ def load_agent_config(app, db):
     app.agentConfig = db.session.get(AgentConfig, 1).as_dict()
 
 
-def load_agent_scripts(app, db):
+def load_agent_scripts(app, db):  # type: ignore[no-untyped-def]
     insp = sqlalchemy.inspect(db.engine)
     if not insp.has_table("agent_script"):
         return
@@ -43,7 +43,7 @@ def load_agent_scripts(app, db):
     app.agent_scripts = AgentScript.get_scripts_string()
 
 
-def load_config_from_db(app, db):
+def load_config_from_db(app, db):  # type: ignore[no-untyped-def]
     load_natlas_config(app, db)
     load_natlas_services(app, db)
     load_agent_config(app, db)

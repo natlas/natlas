@@ -6,14 +6,15 @@ from flask_mail import Message
 from app import mail
 
 
-def send_async_email(app, msg):
+def send_async_email(app, msg):  # type: ignore[no-untyped-def]
     with app.app_context():
         mail.send(msg)
 
 
-def send_email(subject, sender, recipients, text_body):
+def send_email(subject, sender, recipients, text_body):  # type: ignore[no-untyped-def]
     msg = Message(subject, sender=sender, recipients=recipients)
     msg.body = text_body
     Thread(
-        target=send_async_email, args=(current_app._get_current_object(), msg)
+        target=send_async_email,
+        args=(current_app._get_current_object(), msg),  # type: ignore[attr-defined]
     ).start()

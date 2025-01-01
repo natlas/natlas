@@ -9,9 +9,9 @@ from app.models import Agent
 
 
 # This can be used in lieu of @login_required for pages that don't require a user account
-def is_authenticated(f):
+def is_authenticated(f):  # type: ignore[no-untyped-def]
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args, **kwargs):  # type: ignore[no-untyped-def]
         if current_app.config["LOGIN_REQUIRED"] and not current_user.is_authenticated:
             return lm.unauthorized()
         return f(*args, **kwargs)
@@ -20,9 +20,9 @@ def is_authenticated(f):
 
 
 # An explicit wrapper to make a route only available if a request is not authenticated
-def is_not_authenticated(f):
+def is_not_authenticated(f):  # type: ignore[no-untyped-def]
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args, **kwargs):  # type: ignore[no-untyped-def]
         if current_user.is_authenticated:
             flash("You're already logged in!", "warning")
             return redirect(url_for("main.browse"))
@@ -32,9 +32,9 @@ def is_not_authenticated(f):
 
 
 # Ensure current user is an admin
-def is_admin(f):
+def is_admin(f):  # type: ignore[no-untyped-def]
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args, **kwargs):  # type: ignore[no-untyped-def]
         if current_user.is_anonymous or not current_user.is_admin:
             return lm.unauthorized()
         return f(*args, **kwargs)
@@ -43,9 +43,9 @@ def is_admin(f):
 
 
 # Validate agent authentication if required
-def is_agent_authenticated(f):
+def is_agent_authenticated(f):  # type: ignore[no-untyped-def]
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args, **kwargs):  # type: ignore[no-untyped-def]
         # if we don't require agent authentication then don't bother
         if not current_app.config["AGENT_AUTHENTICATION"]:
             return f(*args, **kwargs)

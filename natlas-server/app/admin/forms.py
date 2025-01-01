@@ -16,7 +16,7 @@ from wtforms.validators import DataRequired, Email, ValidationError
 from app.models import AgentScript, ScopeItem, User
 
 
-class ConfigForm(FlaskForm):
+class ConfigForm(FlaskForm):  # type: ignore[misc]
     login_required = BooleanField("Login Required")
     register_allowed = BooleanField("Registration Allowed")
     agent_authentication = BooleanField("Agent Authentication Required")
@@ -24,11 +24,11 @@ class ConfigForm(FlaskForm):
     submit = SubmitField("Save Changes")
 
 
-class InviteUserForm(FlaskForm):
+class InviteUserForm(FlaskForm):  # type: ignore[misc]
     email = StringField("Email", validators=[DataRequired(), Email()])
     submit = SubmitField("Invite User")
 
-    def validate_email(self, email):
+    def validate_email(self, email):  # type: ignore[no-untyped-def]
         if not User.validate_email(email.data):
             flash(
                 f"{email.data} does not appear to be a valid, deliverable email address.",
@@ -41,20 +41,20 @@ class InviteUserForm(FlaskForm):
             raise ValidationError
 
 
-class UserDeleteForm(FlaskForm):
+class UserDeleteForm(FlaskForm):  # type: ignore[misc]
     deleteUser = SubmitField("Delete User")
 
 
-class UserEditForm(FlaskForm):
+class UserEditForm(FlaskForm):  # type: ignore[misc]
     editUser = SubmitField("Toggle Admin")
 
 
-class NewScopeForm(FlaskForm):
+class NewScopeForm(FlaskForm):  # type: ignore[misc]
     target = StringField("Target", validators=[DataRequired()])
     blacklist = BooleanField("Blacklist")
     submit = SubmitField("Add Target")
 
-    def validate_target(self, target):
+    def validate_target(self, target):  # type: ignore[no-untyped-def]
         try:
             isValid = ipaddress.ip_network(target.data, False)
             item = ScopeItem.query.filter_by(target=isValid.with_prefixlen).first()
@@ -64,45 +64,45 @@ class NewScopeForm(FlaskForm):
             raise ValidationError(e) from e
 
 
-class ImportScopeForm(FlaskForm):
+class ImportScopeForm(FlaskForm):  # type: ignore[misc]
     scope = TextAreaField("Scope Import", validators=[DataRequired()])
     submit = SubmitField("Import Scope")
 
 
-class ImportBlacklistForm(FlaskForm):
+class ImportBlacklistForm(FlaskForm):  # type: ignore[misc]
     scope = TextAreaField("Blacklist Import", validators=[DataRequired()])
     submit = SubmitField("Import Blacklist")
 
 
-class ScopeDeleteForm(FlaskForm):
+class ScopeDeleteForm(FlaskForm):  # type: ignore[misc]
     deleteScopeItem = SubmitField("Delete Target")
 
 
-class ScopeToggleForm(FlaskForm):
+class ScopeToggleForm(FlaskForm):  # type: ignore[misc]
     toggleScopeItem = SubmitField("Toggle Blacklist")
 
 
-class ServicesUploadForm(FlaskForm):
+class ServicesUploadForm(FlaskForm):  # type: ignore[misc]
     serviceFile = FileField("Select a file to upload", validators=[DataRequired()])
     uploadFile = SubmitField("Upload Services File")
 
 
-class AddServiceForm(FlaskForm):
+class AddServiceForm(FlaskForm):  # type: ignore[misc]
     serviceName = StringField("Service Name", validators=[DataRequired()])
     servicePort = IntegerField("Service Port", validators=[DataRequired()])
     serviceProtocol = SelectField("Protocol", validators=[DataRequired()])
     addService = SubmitField("Add Service")
 
-    def validate_serviceName(self, serviceName):
+    def validate_serviceName(self, serviceName):  # type: ignore[no-untyped-def]
         if " " in serviceName.data:
             raise ValidationError("Service names cannot contain spaces! Use - instead.")
 
-    def validate_servicePort(self, servicePort):
+    def validate_servicePort(self, servicePort):  # type: ignore[no-untyped-def]
         if servicePort.data > 65535 or servicePort.data < 0:
             raise ValidationError("Port has to be withing range of 0-65535")
 
 
-class AgentConfigForm(FlaskForm):
+class AgentConfigForm(FlaskForm):  # type: ignore[misc]
     versionDetection = BooleanField("Version Detection (-sV)")
     osDetection = BooleanField("OS Detection (-O)")
     enableScripts = BooleanField("Scripting Engine (--script)")
@@ -121,25 +121,25 @@ class AgentConfigForm(FlaskForm):
     updateAgents = SubmitField("Update Agent Config")
 
 
-class AddScriptForm(FlaskForm):
+class AddScriptForm(FlaskForm):  # type: ignore[misc]
     scriptName = StringField("Script Name", validators=[DataRequired()])
     addScript = SubmitField("Add Script")
 
-    def validate_scriptname(self, scriptName):
+    def validate_scriptname(self, scriptName):  # type: ignore[no-untyped-def]
         script = AgentScript.query.filter_by(name=scriptName).first()
         if script is not None:
             raise ValidationError(f"{script.name} already exists!")
 
 
-class DeleteForm(FlaskForm):
+class DeleteForm(FlaskForm):  # type: ignore[misc]
     delete = SubmitField("Delete")
 
 
-class AddTagForm(FlaskForm):
+class AddTagForm(FlaskForm):  # type: ignore[misc]
     tagname = StringField("Tag Name", validators=[DataRequired()])
     addTag = SubmitField("Add Tag")
 
 
-class TagScopeForm(FlaskForm):
+class TagScopeForm(FlaskForm):  # type: ignore[misc]
     tagname = SelectField("Tag Name", validators=[DataRequired()])
     addTagToScope = SubmitField("Add Tag to Scope")
