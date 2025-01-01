@@ -69,14 +69,13 @@ def main():
     try:
         nmap_path = subprocess.check_output(["which", "nmap"]).decode("utf-8").strip()  # nosec
         nmap_caps = subprocess.check_output(["getcap", nmap_path]).decode("utf-8")  # nosec
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as err:
         msg = "Couldn't find nmap"
         global_logger.critical(msg)
-        raise SystemExit(f"[!] {msg}")
+        raise SystemExit(f"[!] {msg}") from err
 
     needed_caps = ["cap_net_raw", "cap_net_admin", "cap_net_bind_service"]
-    missing_caps = [cap for cap in needed_caps if cap not in nmap_caps]
-    if missing_caps:
+    if missing_caps := [cap for cap in needed_caps if cap not in nmap_caps]:
         msg = f"Missing Nmap capabilities: {' '.join(missing_caps)}"
         global_logger.critical(msg)
         raise SystemExit(f"[!] {msg}")

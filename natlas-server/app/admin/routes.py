@@ -190,7 +190,7 @@ def import_scope(scopetype=""):
             for item in result["fail"]:
                 flash(f"{item}", "danger")
     else:
-        for field, errors in importForm.errors.items():
+        for _field, errors in importForm.errors.items():
             for error in errors:
                 flash(error, "danger")
     return redirect(url_for(f"admin.{scopetype}"))

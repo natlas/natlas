@@ -99,7 +99,7 @@ def search():
             results_per_page, search_offset, query=query, searchIndex=searchIndex
         )
     except elasticsearch.RequestError as e:
-        raise NatlasSearchError(e)
+        raise NatlasSearchError(e) from e
 
     totalHosts = current_app.elastic.total_hosts()
 

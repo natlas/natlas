@@ -61,7 +61,7 @@ class NewScopeForm(FlaskForm):
             if item is not None:
                 raise ValidationError(f"Target {item.target} already exists!")
         except ipaddress.AddressValueError as e:
-            raise ValidationError(e)
+            raise ValidationError(e) from e
 
 
 class ImportScopeForm(FlaskForm):

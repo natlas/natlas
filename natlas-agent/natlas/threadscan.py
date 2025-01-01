@@ -31,7 +31,7 @@ def command_builder(scan_id, agentConfig, target):
         "hostTimeout": "--host-timeout={hostTimeout}",
     }
 
-    for k, v in agentConfig.items():
+    for k, _v in agentConfig.items():
         if agentConfig[k] and k in commandDict:
             command.append(commandDict[k].format(**agentConfig))
     if ipaddress.ip_network(target).version == 6:

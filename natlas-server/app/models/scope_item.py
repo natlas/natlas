@@ -118,7 +118,9 @@ class ScopeItem(db.Model, DictSerializable):
         return out
 
     @staticmethod
-    def create_if_none(ip: str, blacklist: bool, tags=[]):
+    def create_if_none(ip: str, blacklist: bool, tags=None):
+        if tags is None:
+            tags = []
         new = False
         item = ScopeItem.query.filter_by(target=ip).first()
         if not item:
