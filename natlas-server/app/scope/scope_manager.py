@@ -74,14 +74,10 @@ class ScopeManager:
         if self.get_scope_size() == 0:
             self.update()
 
-        if (
-            target in self.scopes[group].blacklist.set
-            or target not in self.scopes[group].scope.set
-        ):
-            return False
-
-        # Address is in scope and not blacklisted
-        return True
+        return (
+            target not in self.scopes[group].blacklist.set
+            and target in self.scopes[group].scope.set
+        )
 
     def get_pending_rescans(self) -> list:
         return self.pendingRescans

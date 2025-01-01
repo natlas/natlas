@@ -9,10 +9,7 @@ def determine_data_version(hostdata):
         fallupVer = semver.VersionInfo.parse("0.6.3")
 
         # If agent_version is present and older than 0.6.3, "fall up" to 0.6.3 templates
-        if ver < fallupVer:
-            version = str(fallupVer)
-        else:
-            version = hostdata["agent_version"]
+        version = str(fallupVer) if ver < fallupVer else hostdata["agent_version"]
     else:
         version = str(fallupVer)
 
