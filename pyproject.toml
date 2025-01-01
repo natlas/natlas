@@ -5,36 +5,36 @@ requires-python = "==3.11"
 [tool.ruff]
 
 [tool.ruff.lint]
-select = [
-    # flake8-bugbear
-    "B",
-    # flake8-comprehensions
-    "C4",
-    # pyflakes
-    "F",
-    # flynt
-    "FLY",
-    # isort
-    "I",
-    # pylint
-    "PL",
-    # flake8-return
-    "RET",
-    # Ruff's own rules
-    "RUF",
-    # flake8-simplify
-    "SIM",
-    # flake8-tidy-imports
-    "TID",
-    # pyupgrade
-    "UP",
-]
 ignore = [
-    "PLR2004",
-    "PLR0912",
-    "PLR0911",
-    "PLR0915",
-    "PLC0414"
+  "PLC0414",
+  "PLR0911",
+  "PLR0912",
+  "PLR0915",
+  "PLR2004"
+]
+select = [
+  # flake8-bugbear
+  "B",
+  # flake8-comprehensions
+  "C4",
+  # pyflakes
+  "F",
+  # flynt
+  "FLY",
+  # isort
+  "I",
+  # pylint
+  "PL",
+  # flake8-return
+  "RET",
+  # Ruff's own rules
+  "RUF",
+  # flake8-simplify
+  "SIM",
+  # flake8-tidy-imports
+  "TID",
+  # pyupgrade
+  "UP"
 ]
 
 [tool.ruff.lint.flake8-tidy-imports]

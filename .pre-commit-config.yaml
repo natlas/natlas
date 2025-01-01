@@ -26,6 +26,11 @@ repos:
             - 'stylelint'
             - 'stylelint-config-standard-scss'
             - 'stylelint-scss'
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.24.2
+    hooks:
+      - id: toml-sort
+        args: [--all, --in-place]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
     rev: v0.8.4
