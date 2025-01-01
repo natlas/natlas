@@ -42,7 +42,6 @@ def add_targets_to_queue(target, q):
 
 
 def main():
-
     PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
     PARSER_EPILOG = "Report problems to https://github.com/natlas/natlas"
     parser = argparse.ArgumentParser(
@@ -68,12 +67,8 @@ def main():
 
     # Check if Nmap has required capabilities to run as a non-root user
     try:
-        nmap_path = (
-            subprocess.check_output(["which", "nmap"]).decode("utf-8").strip()
-        )  # nosec
-        nmap_caps = subprocess.check_output(["getcap", nmap_path]).decode(
-            "utf-8"
-        )  # nosec
+        nmap_path = subprocess.check_output(["which", "nmap"]).decode("utf-8").strip()  # nosec
+        nmap_caps = subprocess.check_output(["getcap", nmap_path]).decode("utf-8")  # nosec
     except subprocess.CalledProcessError:
         msg = "Couldn't find nmap"
         global_logger.critical(msg)
@@ -102,7 +97,7 @@ def main():
     servicesSha = ""
     SERVICESPATH = utils.get_services_path()
     if os.path.isfile(SERVICESPATH):
-        with open(SERVICESPATH, "r") as f:
+        with open(SERVICESPATH) as f:
             servicesSha = hashlib.sha256(f.read().rstrip("\r\n").encode()).hexdigest()
     else:
         servicesSha = netsrv.get_services_file()
@@ -129,7 +124,7 @@ def main():
 
     elif args.tfile:
         global_logger.info(f"Reading scope from file: {args.tfile}")
-        with open(args.tfile, "r") as f:
+        with open(args.tfile) as f:
             for target in f:
                 add_targets_to_queue(target, q)
         q.join()

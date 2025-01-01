@@ -2,7 +2,6 @@ from config import Config
 
 
 class TestConfig(Config):
-
     # MAIL_FROM and MAIL_SERVER are required checks for delivering mail
     MAIL_FROM = "Test Mail <noreply@example.com>"
     MAIL_SERVER = "localhost"

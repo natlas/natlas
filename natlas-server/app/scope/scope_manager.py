@@ -7,7 +7,6 @@ from flask import current_app
 
 
 class ScopeManager:
-
     pendingRescans = []
     dispatchedRescans = []
     scanmanager = None

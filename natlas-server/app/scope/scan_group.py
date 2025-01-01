@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Union
 from flask import current_app
 from .scope_collection import ScopeCollection
 from .scan_manager import IPScanManager
@@ -29,10 +28,10 @@ class ScanGroup:
     def get_effective_size(self) -> int:
         return self.effective_size
 
-    def get_scan_manager(self) -> Union[None, IPScanManager]:
+    def get_scan_manager(self) -> None | IPScanManager:
         return self.scan_manager
 
-    def get_last_cycle_start(self) -> Union[None, datetime]:
+    def get_last_cycle_start(self) -> None | datetime:
         if self.scan_manager is None:
             return None
         else:

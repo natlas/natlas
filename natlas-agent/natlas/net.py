@@ -12,7 +12,6 @@ from natlas import utils
 
 
 class NatlasNetworkServices:
-
     config = None
     netlogger = logging.get_logger("NetworkServices")
 
@@ -177,7 +176,7 @@ class NatlasNetworkServices:
                 return False
             with open(services_path, "w") as f:
                 f.write(serviceData["services"])
-            with open(services_path, "r") as f:
+            with open(services_path) as f:
                 if (
                     hashlib.sha256(f.read().rstrip("\r\n").encode()).hexdigest()
                     != serviceData["sha256"]

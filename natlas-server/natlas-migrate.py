@@ -13,7 +13,6 @@ going through the full app init process\
 
 
 def main():
-
     parser = argparse.ArgumentParser(description=parser_desc)
     parser.add_argument(
         "--message",
