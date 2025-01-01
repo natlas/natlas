@@ -17,9 +17,8 @@ def converter_client():
         # abort 400 to differentiate from an invalid ip 404 status code
         return abort(400)
 
-    with app.app_context():
-        with app.test_client() as client:
-            yield client
+    with app.app_context(), app.test_client() as client:
+        yield client
 
 
 def test_ip_converter(converter_client):

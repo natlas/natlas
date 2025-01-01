@@ -28,10 +28,7 @@ def is_valid_image(path: str) -> bool:
 
 def parse_url(url: str) -> tuple:
     urlp = urlparse(url)
-    if not urlp.port:
-        port = 80 if urlp.scheme == "http" else 443
-    else:
-        port = urlp.port
+    port = (80 if urlp.scheme == "http" else 443) if not urlp.port else urlp.port
 
     return urlp.scheme.upper(), port
 

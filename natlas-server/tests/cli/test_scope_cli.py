@@ -18,7 +18,7 @@ def test_import_items_no_flags(runner):
         result = runner.invoke(import_items, [scope_file])
         assert result.exit_code == 0
         imported_scope = [item.target for item in ScopeItem.getScope()]
-        assert DEFAULT_SCOPE_ITEMS == imported_scope
+        assert imported_scope == DEFAULT_SCOPE_ITEMS
         result_dict = json.loads(result.output)
         assert len(result_dict["scope"]) == len(DEFAULT_SCOPE_ITEMS)
 
@@ -29,7 +29,7 @@ def test_import_items_scope_flag(runner):
         result = runner.invoke(import_items, ["--scope", scope_file])
         assert result.exit_code == 0
         imported_scope = [item.target for item in ScopeItem.getScope()]
-        assert DEFAULT_SCOPE_ITEMS == imported_scope
+        assert imported_scope == DEFAULT_SCOPE_ITEMS
         result_dict = json.loads(result.output)
         assert len(result_dict["scope"]) == len(DEFAULT_SCOPE_ITEMS)
 
@@ -40,7 +40,7 @@ def test_import_items_blacklist_flag(runner):
         result = runner.invoke(import_items, ["--blacklist", scope_file])
         assert result.exit_code == 0
         imported_blacklist = [item.target for item in ScopeItem.getBlacklist()]
-        assert DEFAULT_SCOPE_ITEMS == imported_blacklist
+        assert imported_blacklist == DEFAULT_SCOPE_ITEMS
         result_dict = json.loads(result.output)
         assert len(result_dict["blacklist"]) == len(DEFAULT_SCOPE_ITEMS)
 
