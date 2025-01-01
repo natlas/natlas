@@ -59,6 +59,7 @@ def scan(target_data, config):
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
             timeout=int(agentConfig["scanTimeout"]),
+            check=False,
         )  # nosec
     except subprocess.TimeoutExpired:
         add_breadcrumb(level="warn", message="Nmap scan timed out")

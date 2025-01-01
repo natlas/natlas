@@ -64,9 +64,7 @@ class UserInvitation(db.Model, DictSerializable):
 
     # If a token is expired, mark it as such
     def expire_invite(self, timestamp):
-        if self.expiration_date >= timestamp:
-            # Mark now as the expiration because it's been redeemed
-            self.expiration_date = timestamp
+        self.expiration_date = min(timestamp, self.expiration_date)
 
         # Leave original expiration date intact since it's already past
         self.is_expired = True

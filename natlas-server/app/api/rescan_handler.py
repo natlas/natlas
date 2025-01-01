@@ -9,7 +9,6 @@ def mark_scan_dispatched(rescan):
     db.session.commit()
     current_app.ScopeManager.update_pending_rescans()
     current_app.ScopeManager.update_dispatched_rescans()
-    return
 
 
 def mark_scan_completed(ip, scan_id):
