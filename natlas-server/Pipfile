@@ -1,37 +1,37 @@
-[[source]]
-name = "pypi"
-url = "https://pypi.org/simple"
-verify_ssl = true
-
 [dev-packages]
 flake8 = "*"
 pytest = "*"
 pytest-flask = "*"
 
 [packages]
-elasticsearch = "~=7.17.9"
-email-validator = "~=1.1.2"
 Flask-Login = "~=0.6.3"
 Flask-Mail = "~=0.9.1"
 Flask-Migrate = "~=4.0.7"
 Flask-SQLAlchemy = "~=3.1.1"
 Flask-WTF = "~=1.2.1"
-gunicorn = "~=20.1.0"
-netaddr = "~=0.8.0"
 Pillow = "~=10.2.0"
 PyJWT = "~=2.0.1"
+cyclicprng = "*"
+elasticsearch = "~=7.17.9"
+email-validator = "~=1.1.2"
+gunicorn = "~=20.1.0"
+mysqlclient = "*"
+natlas-libnmap = "*"
+netaddr = "~=0.8.0"
+opentelemetry-exporter-otlp = "~=1.23"
+opentelemetry-instrumentation-flask = "~=0.44b"
+opentelemetry-sdk = "~=1.23"
+python-dateutil = "*"
 python-dotenv = "~=0.17.0"
 semver = "~=2.13.0"
 sentry-sdk = "~=1.14.0"
 sympy = "~=1.8"
 webpack-manifest = "~=2.1.1"
-natlas-libnmap = "*"
-cyclicprng = "*"
-mysqlclient = "*"
-opentelemetry-sdk = "~=1.23"
-opentelemetry-exporter-otlp = "~=1.23"
-opentelemetry-instrumentation-flask = "~=0.44b"
-python-dateutil = "*"
 
 [requires]
 python_version = "3.12"
+
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
