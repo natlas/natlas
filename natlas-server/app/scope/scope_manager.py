@@ -10,13 +10,15 @@ from app.scope.scan_manager import IPScanManager
 
 
 class ScopeManager:
-    pendingRescans: ClassVar = []
-    dispatchedRescans: ClassVar = []
     scanmanager = None
     init_time = None
     scopes = None
     effective_size = 0
     default_group = "all"
+
+    def __init__(self):
+        self.pendingRescans = []
+        self.dispatchedRescans = []
 
     def init_app(self, app):
         app.ScopeManager = self
