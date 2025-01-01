@@ -2,8 +2,8 @@ from datetime import datetime
 
 from flask import current_app
 
-from .scan_manager import IPScanManager
-from .scope_collection import ScopeCollection
+from app.scope.scan_manager import IPScanManager
+from app.scope.scope_collection import ScopeCollection
 
 
 class ScanGroup:

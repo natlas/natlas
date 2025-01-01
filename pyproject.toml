@@ -12,4 +12,9 @@ select = [
     "C4",
     # isort
     "I",
+    # flake8-tidy-imports
+    "TID",
 ]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"

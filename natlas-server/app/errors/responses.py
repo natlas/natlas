@@ -1,6 +1,6 @@
 from flask import Response, render_template
 
-from .errors import NatlasServiceError
+from app.errors import NatlasServiceError
 
 
 def json_response(err: NatlasServiceError) -> Response:

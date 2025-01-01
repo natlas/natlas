@@ -10,12 +10,11 @@ from flask_wtf.csrf import CSRFProtect
 from migrations.migrator import handle_db_upgrade, migration_needed
 from webpack_manifest import webpack_manifest
 
+from app.config_loader import load_config_from_db
 from app.elastic import ElasticInterface
+from app.instrumentation import initialize_opentelemetry
 from app.scope import ScopeManager
 from app.url_converters import register_converters
-
-from .config_loader import load_config_from_db
-from .instrumentation import initialize_opentelemetry
 
 
 class AnonUser(AnonymousUserMixin):
