@@ -16,6 +16,8 @@ select = [
     "FLY",
     # isort
     "I",
+    # pylint
+    "PL",
     # Ruff's own rules
     "RUF",
     # flake8-simplify
@@ -24,6 +26,13 @@ select = [
     "TID",
     # pyupgrade
     "UP",
+]
+ignore = [
+    "PLR2004",
+    "PLR0912",
+    "PLR0911",
+    "PLR0915",
+    "PLC0414"
 ]
 
 [tool.ruff.lint.flake8-tidy-imports]
