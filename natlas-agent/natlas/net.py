@@ -1,14 +1,12 @@
-import requests
-import random
 import hashlib
-import time
 import json
 import os
+import random
+import time
 
+import requests
+from natlas import logging, utils
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-from natlas import logging
-from natlas import utils
 
 
 class NatlasNetworkServices:

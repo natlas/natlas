@@ -9,9 +9,8 @@ Create Date: 2019-02-07 03:00:36.999599
 import hashlib
 import os
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 from config import Config
 
 # revision identifiers, used by Alembic.

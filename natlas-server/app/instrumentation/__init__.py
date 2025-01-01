@@ -1,17 +1,16 @@
+import threading
+from urllib.parse import urlparse
+
 import flask
 import sentry_sdk
-import threading
-
 from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
 from .sentryio_middleware import SentryIoContextMiddleware
-from urllib.parse import urlparse
-
 
 SERVICE_NAME = "natlas-server"
 template_span = threading.local()

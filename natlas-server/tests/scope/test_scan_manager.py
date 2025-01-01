@@ -1,5 +1,5 @@
-from netaddr import IPSet
 from app.scope.scan_manager import IPScanManager
+from netaddr import IPSet
 
 
 def test_new_scan_manager(app):

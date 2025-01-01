@@ -1,14 +1,15 @@
-from flask import render_template, redirect, flash, url_for
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
+
 from app import db
+from app.models import Agent, User
 from app.user import bp
 from app.user.forms import (
+    AgentNameForm,
     ChangePasswordForm,
     DisplaySettingsForm,
     GenerateTokenForm,
-    AgentNameForm,
 )
-from app.models import User, Agent
 
 
 @bp.route("/", methods=["GET", "POST"])

@@ -1,5 +1,5 @@
-from sentry_sdk import configure_scope
 from opentelemetry import trace
+from sentry_sdk import configure_scope
 
 
 class SentryIoContextMiddleware:

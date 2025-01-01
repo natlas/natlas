@@ -1,8 +1,9 @@
-from datetime import datetime
-from app.elastic.client import ElasticClient
-from app.elastic.indices import ElasticIndices
 import random
 import sys
+from datetime import datetime
+
+from app.elastic.client import ElasticClient
+from app.elastic.indices import ElasticIndices
 
 
 class ElasticInterface:

@@ -1,17 +1,18 @@
-from flask import current_app, request, Response, jsonify
 import json
 from datetime import datetime as dt
 from datetime import timezone as tz
+
 import dateutil.parser
+from flask import Response, current_app, jsonify, request
+from libnmap.parser import NmapParser, NmapParserException
+
 from app.api import bp
 from app.api.prepare_work import prepare_work
 from app.api.processing.screenshot import process_screenshots
 from app.api.processing.ssl import parse_ssl_data
-from app.api.rescan_handler import mark_scan_dispatched, mark_scan_completed
-from libnmap.parser import NmapParser, NmapParserException
+from app.api.rescan_handler import mark_scan_completed, mark_scan_dispatched
 from app.auth.wrappers import is_agent_authenticated, is_authenticated
 from app.util import pretty_time_delta
-
 
 json_content = "application/json"
 

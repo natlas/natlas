@@ -1,20 +1,20 @@
 from app import create_app, db
+from app.instrumentation import initialize_sentryio
 from app.models import (
-    User,
-    ScopeItem,
+    Agent,
+    AgentConfig,
+    AgentScript,
     ConfigItem,
     NatlasServices,
-    AgentConfig,
     RescanTask,
-    Tag,
-    Agent,
-    AgentScript,
+    ScopeItem,
     ScopeLog,
+    Tag,
+    User,
     UserInvitation,
 )
-from app.instrumentation import initialize_sentryio
-from sentry_sdk import capture_exception
 from config import Config
+from sentry_sdk import capture_exception
 
 config = Config()
 initialize_sentryio(config)

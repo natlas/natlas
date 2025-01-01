@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 
-import subprocess
-import os
-import time
-import json
 import base64
+import json
+import os
+import subprocess
+import time
 from urllib.parse import urlparse
 
+from natlas import logging, utils
 from PIL import Image, UnidentifiedImageError
-
-from natlas import logging
-from natlas import utils
 
 logger = logging.get_logger("ScreenshotUtils")
 

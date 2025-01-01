@@ -6,11 +6,11 @@ Create Date: 2020-08-27 20:50:09.379922
 
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
+from netaddr import IPNetwork
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declarative_base
-from netaddr import IPNetwork
 
 # revision identifiers, used by Alembic.
 revision = "7099debf8cda"

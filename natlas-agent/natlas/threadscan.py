@@ -1,18 +1,14 @@
+import ipaddress
+import os
 import subprocess
 import threading
-import os
-import ipaddress
 
+from config import Config
 from libnmap.parser import NmapParser, NmapParserException
-from sentry_sdk import add_breadcrumb, capture_exception, push_scope
-
-from natlas import screenshots
-from natlas import logging
+from natlas import logging, screenshots, utils
 from natlas.net import NatlasNetworkServices
 from natlas.scanresult import ScanResult
-from natlas import utils
-from config import Config
-
+from sentry_sdk import add_breadcrumb, capture_exception, push_scope
 
 logger = logging.get_logger("AgentThread")
 conf = Config()

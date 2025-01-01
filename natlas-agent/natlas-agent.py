@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import subprocess
-import time
-import os
 import argparse
 import hashlib
 import ipaddress
+import os
 import queue
+import subprocess
+import time
 from pathlib import Path
 
-from natlas import logging, error_reporting, utils
 from config import Config
-from natlas.threadscan import ThreadScan
+from natlas import error_reporting, logging, utils
 from natlas.net import NatlasNetworkServices
+from natlas.threadscan import ThreadScan
 
 ERR = {"INVALIDTARGET": 1, "SCANTIMEOUT": 2, "DATANOTFOUND": 3, "INVALIDDATA": 4}
 
