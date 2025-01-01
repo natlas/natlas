@@ -1,10 +1,10 @@
-import tempfile
 import os
+import tempfile
+
+import pytest
 from app import create_app
 
 from tests.config import TestConfig
-
-import pytest
 
 
 @pytest.fixture

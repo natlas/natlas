@@ -1,6 +1,6 @@
-from datetime import datetime
 import json
 import typing
+from datetime import datetime
 
 import click
 from flask.cli import AppGroup

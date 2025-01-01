@@ -1,9 +1,9 @@
-from alembic.migration import MigrationContext
-from alembic import context
-from alembic.config import Config as alembic_cfg
-from alembic.script import ScriptDirectory
 import flask_migrate
 import sqlalchemy
+from alembic import context
+from alembic.config import Config as alembic_cfg
+from alembic.migration import MigrationContext
+from alembic.script import ScriptDirectory
 
 
 def migration_needed(sqlalchemy_uri):

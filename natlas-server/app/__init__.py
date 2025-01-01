@@ -1,20 +1,21 @@
 import os
 
-from flask import Flask, flash, redirect, url_for, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager, AnonymousUserMixin, current_user
+import config
+from flask import Flask, flash, redirect, request, url_for
+from flask_login import AnonymousUserMixin, LoginManager, current_user
 from flask_mail import Mail
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
+from migrations.migrator import handle_db_upgrade, migration_needed
 from webpack_manifest import webpack_manifest
 
-import config
 from app.elastic import ElasticInterface
-from .instrumentation import initialize_opentelemetry
-from .config_loader import load_config_from_db
 from app.scope import ScopeManager
 from app.url_converters import register_converters
-from migrations.migrator import migration_needed, handle_db_upgrade
+
+from .config_loader import load_config_from_db
+from .instrumentation import initialize_opentelemetry
 
 
 class AnonUser(AnonymousUserMixin):

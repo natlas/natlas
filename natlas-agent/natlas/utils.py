@@ -3,8 +3,8 @@ import os
 import shutil
 from pathlib import Path
 
-from natlas import logging
 from config import Config
+from natlas import logging
 
 utillogger = logging.get_logger("Utilities")
 conf = Config()

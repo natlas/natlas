@@ -1,21 +1,21 @@
+import elasticsearch
 from flask import (
-    redirect,
-    url_for,
-    render_template,
     Response,
     current_app,
+    jsonify,
+    redirect,
+    render_template,
     request,
     send_from_directory,
-    jsonify,
+    url_for,
 )
 from flask_login import current_user
-import elasticsearch
 
+from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.wrappers import is_authenticated
+from app.errors import NatlasSearchError
 from app.main import bp
 from app.main.pagination import build_pagination_urls, results_offset
-from app.auth.wrappers import is_authenticated
-from app.auth.forms import LoginForm, RegistrationForm
-from app.errors import NatlasSearchError
 
 
 @bp.route("/")

@@ -1,10 +1,9 @@
 from datetime import datetime
 
-from flask import current_app
-
-from app.scope import ScopeManager
 from app import db
-from app.models import ScopeItem, RescanTask, User
+from app.models import RescanTask, ScopeItem, User
+from app.scope import ScopeManager
+from flask import current_app
 
 network_lengths = {"/0": 4294967296, "/8": 16777216, "/16": 65536, "/24": 256, "/32": 1}
 

@@ -1,8 +1,10 @@
-from netaddr import IPNetwork, IPAddress
+from collections.abc import Iterable
+
+from netaddr import IPAddress, IPNetwork
 from netaddr.core import AddrFormatError
+
 from app import db
 from app.models.dict_serializable import DictSerializable
-from collections.abc import Iterable
 from app.models.tag import Tag
 
 # Many to many table that ties tags and scopes together

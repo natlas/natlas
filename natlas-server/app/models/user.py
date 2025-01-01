@@ -1,11 +1,11 @@
 import secrets
 from datetime import datetime, timedelta
 
-from email_validator import validate_email, EmailNotValidError
-from werkzeug.security import generate_password_hash, check_password_hash
+from email_validator import EmailNotValidError, validate_email
 from flask_login import UserMixin
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import login, db
+from app import db, login
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 

@@ -1,7 +1,7 @@
-from werkzeug.routing import BaseConverter, ValidationError
+from flask import Flask
 from netaddr import IPAddress
 from netaddr.core import AddrFormatError
-from flask import Flask
+from werkzeug.routing import BaseConverter, ValidationError
 
 
 class NatlasConverter(BaseConverter):

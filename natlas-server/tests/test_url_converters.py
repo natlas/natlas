@@ -1,7 +1,6 @@
-from flask import Flask, abort
 import pytest
-
 from app.url_converters import register_converters
+from flask import Flask, abort
 
 TEST_IP_ADDRS = ["127.0.0.1", "::1"]
 

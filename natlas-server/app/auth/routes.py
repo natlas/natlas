@@ -1,18 +1,20 @@
-from flask import redirect, url_for, flash, render_template, request, current_app
+from urllib.parse import urlparse
+
+from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user
+
 from app import db
+from app.auth import bp
+from app.auth.email import deliver_auth_link, email_configured, validate_email
 from app.auth.forms import (
+    AcceptInviteForm,
     LoginForm,
     RegistrationForm,
-    ResetPasswordRequestForm,
     ResetPasswordForm,
-    AcceptInviteForm,
+    ResetPasswordRequestForm,
 )
+from app.auth.wrappers import is_authenticated, is_not_authenticated
 from app.models import User, UserInvitation
-from app.auth.email import deliver_auth_link, validate_email, email_configured
-from app.auth import bp
-from app.auth.wrappers import is_not_authenticated, is_authenticated
-from urllib.parse import urlparse
 
 
 @bp.route("/login", methods=["GET", "POST"])

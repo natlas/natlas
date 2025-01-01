@@ -1,8 +1,7 @@
-from flask import current_app
-
-from app.email import send_email
-from app.auth.email import deliver_auth_link
 from app import mail
+from app.auth.email import deliver_auth_link
+from app.email import send_email
+from flask import current_app
 
 
 def test_send_mail(app):

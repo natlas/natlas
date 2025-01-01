@@ -60,6 +60,10 @@ Once the issue is filed:
 * If the team is able to reproduce the issue, it will be marked `needs-fix`, as well as any other tags that are relevant (such as `agent` or `server`), and the issue will be left to be [implemented by someone](#contribute-code).
 * If you or the maintainers don't respond to an issue for 30 days, the [issue may be closed](#clean-up-issues-and-prs). If you want to come back to it, reply to the issue and we will reopenit. Please avoid creating a new issue as an extension of one you've already made.
 
+## Report a security concern
+
+To report a security concern, please see [SECURITY.md](/SECURITY.md).
+
 ## Request a Feature
 
 If the project doesn't do something you need or want it to do:

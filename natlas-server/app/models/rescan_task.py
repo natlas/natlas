@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from app import db
 from app.models.dict_serializable import DictSerializable
-from datetime import datetime
 
 
 # Rescan Queue

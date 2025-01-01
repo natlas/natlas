@@ -1,0 +1,11 @@
+[project]
+name = "natlas"
+requires-python = "==3.11"
+
+[tool.ruff]
+
+[tool.ruff.lint]
+select = [
+    # isort
+    "I"
+]

@@ -2,6 +2,7 @@ import json
 import logging
 
 from config import Config
+
 from app.elastic.client import ElasticClient
 
 

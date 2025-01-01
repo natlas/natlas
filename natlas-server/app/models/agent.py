@@ -1,9 +1,10 @@
-from app import db
-from app.util import generate_hex_16
-import string
 import secrets
-from app.models.dict_serializable import DictSerializable
+import string
 from datetime import datetime
+
+from app import db
+from app.models.dict_serializable import DictSerializable
+from app.util import generate_hex_16
 
 
 # Agent registration

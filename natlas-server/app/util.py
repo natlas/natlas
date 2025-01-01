@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
 import secrets
+from datetime import datetime, timezone
 
 
 def utcnow_tz():

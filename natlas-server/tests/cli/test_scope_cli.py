@@ -1,6 +1,6 @@
 import json
 
-from app.cli.scope import import_items, export_items
+from app.cli.scope import export_items, import_items
 from app.models import ScopeItem
 
 DEFAULT_SCOPE_ITEMS = ["10.0.0.0/8", "192.168.1.0/24", "192.168.5.0/28"]

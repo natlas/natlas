@@ -1,9 +1,11 @@
-from flask import current_app, request, flash, url_for, redirect, Response
-from flask_login import current_user
-from app import login as lm
-from app.models import Agent
 import json
 from functools import wraps
+
+from flask import Response, current_app, flash, redirect, request, url_for
+from flask_login import current_user
+
+from app import login as lm
+from app.models import Agent
 
 
 # This can be used in lieu of @login_required for pages that don't require a user account

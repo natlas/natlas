@@ -1,5 +1,5 @@
-from netaddr import IPSet
 from cyclicprng import CyclicPRNG
+from netaddr import IPSet
 
 
 class IPScanManager:

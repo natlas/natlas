@@ -1,5 +1,4 @@
 import pytest
-
 from app.elastic import ElasticInterface
 from tests.config import TestConfig
 
