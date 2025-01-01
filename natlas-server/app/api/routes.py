@@ -1,4 +1,5 @@
 import json
+from datetime import UTC
 from datetime import datetime as dt
 from datetime import timezone as tz
 
@@ -98,7 +99,7 @@ def submit():
     data = request.get_json()
     newhost = {}
     newhost = json.loads(data)
-    newhost["ctime"] = dt.now(tz.utc)
+    newhost["ctime"] = dt.now(UTC)
     if newhost["scan_reason"] == "requested":
         mark_scan_completed(newhost["ip"], newhost["scan_id"])
 

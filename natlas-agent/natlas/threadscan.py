@@ -175,7 +175,7 @@ class ThreadScan(threading.Thread):
                 scope.set_extra("natlas_scan_id", work_item.target_data["scan_id"])
                 add_breadcrumb(
                     category="scan_workflow",
-                    message="Starting scan for %s" % work_item.target_data["target"],
+                    message=f"Starting scan for {work_item.target_data['target']}",
                     level="info",
                 )
                 try:

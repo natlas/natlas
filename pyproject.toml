@@ -12,4 +12,6 @@ select = [
     "C4",
     # isort
     "I",
+    # pyupgrade
+    "UP",
 ]
