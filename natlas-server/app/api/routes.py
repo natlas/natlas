@@ -182,7 +182,7 @@ def submit():
 
     newhost["port_str"] = ", ".join(tmpports)
 
-    if "screenshots" in newhost and newhost["screenshots"]:
+    if newhost.get("screenshots"):
         newhost["screenshots"], newhost["num_screenshots"] = process_screenshots(
             newhost["screenshots"]
         )

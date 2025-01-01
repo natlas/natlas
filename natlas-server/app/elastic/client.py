@@ -1,6 +1,7 @@
 import logging
 import time
 from datetime import datetime
+from typing import ClassVar
 
 import elasticsearch
 import semver
@@ -10,7 +11,6 @@ from opentelemetry import trace
 class ElasticClient:
     es = None
     lastReconnectAttempt = None
-    mapping = {}
     status = False
     # Quiets the elasticsearch logger because otherwise connection errors print tracebacks to the WARNING level, even when the exception is handled.
     logger = logging.getLogger("elasticsearch")

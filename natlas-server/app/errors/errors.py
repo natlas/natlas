@@ -2,7 +2,7 @@ import json
 
 
 class NatlasServiceError(Exception):
-    def __init__(self, status_code: int, message: str, template: str = None):
+    def __init__(self, status_code: int, message: str, template: str | None = None):
         self.status_code = status_code
         self.message = message
         self.template = template if template else f"errors/{self.status_code}.html"

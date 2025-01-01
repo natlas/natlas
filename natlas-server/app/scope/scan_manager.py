@@ -3,7 +3,7 @@ from netaddr import IPSet
 
 
 class IPScanManager:
-    networks = []
+    networks = None
     total = 0
     rng = None
     consistent = None
