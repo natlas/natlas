@@ -121,19 +121,18 @@ def search():
             else:
                 hostlist.append(str(host["ip"]))
         return Response("\n".join(hostlist), mimetype="text/plain")
-    elif format == "json":
+    if format == "json":
         return jsonify(list(context))
-    else:
-        return render_template(
-            "main/search.html",
-            query=query,
-            numresults=count,
-            totalHosts=totalHosts,
-            page=page,
-            hosts=context,
-            next_url=next_url,
-            prev_url=prev_url,
-        )
+    return render_template(
+        "main/search.html",
+        query=query,
+        numresults=count,
+        totalHosts=totalHosts,
+        page=page,
+        hosts=context,
+        next_url=next_url,
+        prev_url=prev_url,
+    )
 
 
 @bp.route("/searchmodal")

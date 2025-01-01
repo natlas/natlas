@@ -115,10 +115,9 @@ def export_scan(ip, scan_id, ext):
     count, context = current_app.elastic.get_host_by_scan_id(scan_id)
     if ext == "json" and count > 0:
         return jsonify(context)
-    elif count > 0 and export_field in context:
+    if count > 0 and export_field in context:
         return Response(context[export_field], mimetype=mime)
-    else:
-        return abort(404)
+    return abort(404)
 
 
 @bp.route("/<ip:ip>/screenshots")

@@ -41,8 +41,7 @@ class User(UserMixin, db.Model, DictSerializable):
     def validate_email(email):
         try:
             valid = validate_email(email)
-            email = valid["email"]
-            return email
+            return valid["email"]
         except EmailNotValidError:
             return False
 

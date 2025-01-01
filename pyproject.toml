@@ -18,6 +18,8 @@ select = [
     "I",
     # pylint
     "PL",
+    # flake8-return
+    "RET",
     # Ruff's own rules
     "RUF",
     # flake8-simplify

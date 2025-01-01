@@ -36,14 +36,12 @@ class ScanGroup:
     def get_last_cycle_start(self) -> None | datetime:
         if self.scan_manager is None:
             return None
-        else:
-            return self.scan_manager.rng.cycle_start_time
+        return self.scan_manager.rng.cycle_start_time
 
     def get_completed_cycle_count(self) -> int:
         if self.scan_manager is None:
             return 0
-        else:
-            return self.scan_manager.rng.completed_cycle_count
+        return self.scan_manager.rng.completed_cycle_count
 
     def update(self):
         self.scope.update()
