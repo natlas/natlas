@@ -43,14 +43,14 @@ services:
     networks:
       - backend
 
-  zipkin-server:
+  zipkin:
     image: openzipkin/zipkin-slim:3.1.0
     ports:
       - 9411:9411
     networks:
       - backend
 
-  otel-collector:
+  otel:
     image: otel/opentelemetry-collector:0.95.0
     ports:
       - 4317:4317
@@ -60,7 +60,7 @@ services:
     networks:
       - backend
 
-  webpack-server:
+  webpack:
     image: node:20-bookworm
     command: /bin/bash -c '/usr/local/bin/yarn install && /usr/local/bin/yarn run webpack --mode development --watch'
     networks:
@@ -71,7 +71,7 @@ services:
       - html_assets:/app/static/dist
     working_dir: /app
 
-  natlas-server:
+  server:
     build: natlas-server
     command: flask run --host 0.0.0.0
     ports:
@@ -85,7 +85,7 @@ services:
       - ELASTIC_PASSWORD=natlas-dev-password-do-not-use
       - FLASK_ENV=development
       - OTEL_ENABLE=True
-      - OTEL_COLLECTOR=otel-collector:4317
+      - OTEL_COLLECTOR=otel:4317
       - DB_AUTO_UPGRADE=True
     volumes:
       - ns-data:/data
@@ -98,12 +98,12 @@ services:
         condition: service_healthy
 
 
-  natlas-agent:
+  agent:
     build: natlas-agent
     networks:
       - backend
     environment:
-      - NATLAS_SERVER_ADDRESS=http://natlas-server:5000
+      - NATLAS_SERVER_ADDRESS=http://server:5000
       - NATLAS_SCAN_LOCAL=true
     cap_add:
       - NET_ADMIN
@@ -112,7 +112,7 @@ services:
     volumes:
       - ./natlas-agent:/opt/natlas/natlas-agent
     links:
-      - natlas-server
+      - server
 
 networks:
   backend:

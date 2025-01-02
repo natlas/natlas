@@ -1,5 +1,4 @@
 [dev-packages]
-flake8 = "*"
 mypy = "~=1.14"
 
 [packages]
@@ -10,7 +9,7 @@ requests = "~=2.31.0"
 sentry-sdk = "~=1.40.6"
 
 [requires]
-python_version = "3.11"
+python_version = "3.12"
 
 [[source]]
 name = "pypi"
