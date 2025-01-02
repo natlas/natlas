@@ -1,4 +1,6 @@
-FROM python:3.11 AS build
+FROM python:3.12-bookworm AS base
+
+FROM base AS build
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	export BUILD_PKGS="unzip" \
@@ -26,7 +28,7 @@ WORKDIR /opt/natlas/natlas-agent
 RUN python3 -m compileall .
 
 # Build final image
-FROM debian:bookworm
+FROM base
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
@@ -41,12 +43,11 @@ COPY --from=build /opt/natlas /opt/natlas
 RUN bash -c 'mkdir -p /data/{scans,conf,logs} \
 	&& chown -R www-data:www-data /data'
 
-# We have to copy packages like this because the python directory is different between python images and ubuntu images
-# So the /.venv/bin/python3 symlink ends point pointing to something that doesn't exist
-COPY --from=build /.venv/lib/python3.11/site-packages /usr/local/lib/python3.11/dist-packages
+COPY --from=build /.venv /.venv/
 WORKDIR /opt/natlas/natlas-agent
 USER www-data
-ENV LC_ALL='C.UTF-8'
+ENV LC_ALL='C.UTF-8' \
+    PATH="/.venv/bin:$PATH"
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["python3", "/opt/natlas/natlas-agent/natlas-agent.py"]
