@@ -1,7 +1,7 @@
 {
     "editor.insertSpaces": true,
-    "python.analysis.extraPaths": [
-        "natlas-server/",
-        "natlas-agent/"
-    ]
+    "files.exclude": {
+        "natlas-agent/": true,
+        "natlas-server/": true
+    }
 }
