@@ -86,7 +86,7 @@ def search():  # type: ignore[no-untyped-def]
     if query == "":
         return redirect(url_for("main.browse"))
     page = int(request.args.get("page", 1))
-    format = request.args.get("format", "")
+    _format = request.args.get("format", "")
     scan_ids = request.args.get("includeScanIDs", "")
     includeHistory = request.args.get("includeHistory", False)
 
@@ -113,7 +113,7 @@ def search():  # type: ignore[no-untyped-def]
         )
 
     # what kind of output are we looking for?
-    if format == "hostlist":
+    if _format == "hostlist":
         hostlist = []
         for host in context:
             if scan_ids:
@@ -121,7 +121,7 @@ def search():  # type: ignore[no-untyped-def]
             else:
                 hostlist.append(str(host["ip"]))
         return Response("\n".join(hostlist), mimetype="text/plain")
-    if format == "json":
+    if _format == "json":
         return jsonify(list(context))
     return render_template(
         "main/search.html",

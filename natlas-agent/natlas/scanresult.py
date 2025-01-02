@@ -9,7 +9,7 @@ class ScanResult:
             "tags": target_data["tags"],
             "scan_id": target_data["scan_id"],
             "agent_version": config.NATLAS_VERSION,
-            "agent": config.agent_id if config.agent_id else "anonymous",
+            "agent": config.agent_id or "anonymous",
             "scan_start": datetime.now(UTC).isoformat(),
         }
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import (
     Response,
@@ -168,16 +168,13 @@ def rescan_host(ip):  # type: ignore[no-untyped-def]
         return redirect(url_for("host.host", ip=ip))
 
     incompleteScans = current_app.ScopeManager.get_incomplete_scans()  # type: ignore[attr-defined]
-    scan_dispatched = {}
-    for scan in incompleteScans:
-        scan_dispatched[scan.target] = scan
-
+    scan_dispatched = {scan.target: scan for scan in incompleteScans}
     if ip in scan_dispatched:
         scan = scan_dispatched[ip]
         scan_window = current_app.agentConfig["scanTimeout"] * 2  # type: ignore[attr-defined]
         if (
             scan.dispatched
-            and (datetime.utcnow() - scan.date_dispatched).seconds > scan_window
+            and (datetime.now(UTC) - scan.date_dispatched).seconds > scan_window
         ):
             # It should never take this long so mark it as not dispatched
             scan.dispatched = False

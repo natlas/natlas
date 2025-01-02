@@ -34,24 +34,18 @@ def getwork():  # type: ignore[no-untyped-def]
     work = {}
 
     if manual:
-        canTarget = current_app.ScopeManager.is_acceptable_target(manual)  # type: ignore[attr-defined]
-        if canTarget:
+        if current_app.ScopeManager.is_acceptable_target(manual):
             work["scan_reason"] = "manual"
             work["target"] = manual
             work = prepare_work(work)
-            response = Response(
-                response=json.dumps(work), status=200, content_type=json_content
+            return Response(
+                response=json.dumps(work),
+                status=200,
+                content_type=json_content,
             )
-        else:
-            errmsg = f"{manual} is not a valid target for this server."
-            response_body = json.dumps(
-                {"status": 400, "message": errmsg, "retry": False}
-            )
-            response = Response(
-                response=response_body, status=400, content_type=json_content
-            )
-        return response
-
+        errmsg = f"{manual} is not a valid target for this server."
+        response_body = json.dumps({"status": 400, "message": errmsg, "retry": False})
+        return Response(response=response_body, status=400, content_type=json_content)
     rescans = current_app.ScopeManager.get_pending_rescans()  # type: ignore[attr-defined]
     if (
         len(rescans) == 0
@@ -112,7 +106,6 @@ def submit():  # type: ignore[no-untyped-def]
                 }
             )
 
-        # If it's not an acceptable target, tell the agent it's out of scope
         elif len(nmap.hosts) == 1 and not current_app.ScopeManager.is_acceptable_target(  # type: ignore[attr-defined]
             nmap.hosts[0].address
         ):
@@ -120,13 +113,12 @@ def submit():  # type: ignore[no-untyped-def]
             response_body = json.dumps(
                 {
                     "status": status_code,
-                    "message": "Out of scope: " + nmap.hosts[0].address,
+                    "message": f"Out of scope: {nmap.hosts[0].address}",
                     "retry": False,
                 }
             )
 
-        # If there's no further processing to do, store the host and prepare the response
-        elif not newhost["is_up"] or (newhost["is_up"] and newhost["port_count"] == 0):
+        elif not newhost["is_up"] or newhost["port_count"] == 0:
             current_app.elastic.new_result(newhost)  # type: ignore[attr-defined]
             status_code = 200
             response_body = json.dumps(
@@ -182,8 +174,8 @@ def submit():  # type: ignore[no-untyped-def]
             newhost["screenshots"]
         )
 
+    status_code = 200
     if len(newhost["ports"]) == 0:
-        status_code = 200
         response_body = json.dumps(
             {
                 "status": status_code,
@@ -191,7 +183,6 @@ def submit():  # type: ignore[no-untyped-def]
             }
         )
     elif len(newhost["ports"]) > 500:
-        status_code = 200
         response_body = json.dumps(
             {
                 "status": status_code,
@@ -199,7 +190,6 @@ def submit():  # type: ignore[no-untyped-def]
             }
         )
     else:
-        status_code = 200
         current_app.elastic.new_result(newhost)  # type: ignore[attr-defined]
         response_body = json.dumps(
             {

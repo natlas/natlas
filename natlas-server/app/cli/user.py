@@ -17,19 +17,17 @@ err_msgs = {
 
 
 def get_user(email):  # type: ignore[no-untyped-def]
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        raise click.BadParameter(err_msgs["no_such_user"].format(email))
-    return user
+    if user := User.query.filter_by(email=email).first():
+        return user
+    raise click.BadParameter(err_msgs["no_such_user"].format(email))
 
 
 def validate_email(ctx, param, value):  # type: ignore[no-untyped-def]
     if not value:
         return None
-    valid_email = User.validate_email(value)
-    if not valid_email:
-        raise click.BadParameter(err_msgs["invalid_email"].format(value))
-    return valid_email
+    if valid_email := User.validate_email(value):
+        return valid_email
+    raise click.BadParameter(err_msgs["invalid_email"].format(value))
 
 
 def ensure_server_name():  # type: ignore[no-untyped-def]
@@ -58,7 +56,7 @@ def new_user(email, admin):  # type: ignore[no-untyped-def]
 def promote_user(email, promote):  # type: ignore[no-untyped-def]
     user = get_user(email)
     if user.is_admin == promote:
-        print(f"{email} is already{' not ' if not promote else ' '}an admin")
+        print(f"{email} is already{' ' if promote else ' not '}an admin")
         return
     user.is_admin = promote
     db.session.commit()

@@ -315,12 +315,10 @@ def services():  # type: ignore[no-untyped-def]
         return redirect(url_for("admin.services"))
 
     if addServiceForm.serviceName.data and addServiceForm.validate_on_submit():
-        newServiceName = addServiceForm.serviceName.data
         newServicePort = (
-            str(addServiceForm.servicePort.data)
-            + "/"
-            + addServiceForm.serviceProtocol.data
+            f"{addServiceForm.servicePort.data!s}/{addServiceForm.serviceProtocol.data}"
         )
+        newServiceName = addServiceForm.serviceName.data
         if "\t" + newServicePort in str(current_app.current_services["services"]):  # type: ignore[attr-defined]
             flash(f"A service with port {newServicePort} already exists!", "danger")
         else:
@@ -413,8 +411,7 @@ def delete_script(name):  # type: ignore[no-untyped-def]
     deleteForm = forms.DeleteForm()
 
     if deleteForm.validate_on_submit():
-        delScript = AgentScript.query.filter_by(name=name).first()
-        if delScript:
+        if delScript := AgentScript.query.filter_by(name=name).first():
             db.session.delete(delScript)
             db.session.commit()
             current_app.agent_scripts = AgentScript.get_scripts_string()  # type: ignore[attr-defined]

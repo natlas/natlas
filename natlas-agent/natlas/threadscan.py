@@ -73,7 +73,7 @@ def scan(target_data, config):  # type: ignore[no-untyped-def]
         path = os.path.join(scan_dir, f"nmap.{scan_id}.{ext}")
         try:
             with open(path) as f:
-                result.add_item(ext + "_data", f.read())
+                result.add_item(f"{ext}_data", f.read())
         except Exception:
             logger.warning(f"Couldn't read {path}")
             return False
@@ -106,12 +106,16 @@ def scan(target_data, config):  # type: ignore[no-untyped-def]
         )
         for item in screens:
             result.add_screenshot(item)
-    if agentConfig["vncScreenshots"] and "5900/tcp" in result.result["nmap_data"]:
-        vnc_screenshot = screenshots.get_vnc_screenshots(
-            target, scan_id, agentConfig["vncScreenshotTimeout"]
+    if (
+        agentConfig["vncScreenshots"]
+        and "5900/tcp" in result.result["nmap_data"]
+        and (
+            vnc_screenshot := screenshots.get_vnc_screenshots(
+                target, scan_id, agentConfig["vncScreenshotTimeout"]
+            )
         )
-        if vnc_screenshot:
-            result.add_screenshot(vnc_screenshot)
+    ):
+        result.add_screenshot(vnc_screenshot)
     # submit result
 
     return result

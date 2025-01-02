@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from app import db
 from app.models import User
@@ -27,7 +27,7 @@ class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-def
     def new_invite(email=None, is_admin=False):  # type: ignore[no-untyped-def]
         if email and User.query.filter_by(email=email).first():
             return False
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         expiration_date = now + timedelta(seconds=UserInvitation.expiration_duration)
         new_token = secrets.token_urlsafe(UserInvitation.token_length)
         invite = UserInvitation.query.filter_by(email=email).first()
@@ -52,13 +52,14 @@ class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-def
 
     @staticmethod
     def get_invite(url_token):  # type: ignore[no-untyped-def]
-        record = UserInvitation.query.filter_by(token=url_token).first()
-        if not record:
-            return False
-        return validate_token(record, url_token, record.token, record.validate_invite)
+        if record := UserInvitation.query.filter_by(token=url_token).first():
+            return validate_token(
+                record, url_token, record.token, record.validate_invite
+            )
+        return False
 
     def accept_invite(self):  # type: ignore[no-untyped-def]
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         self.accepted_date = now
         self.expire_invite(now)
 
@@ -71,5 +72,5 @@ class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-def
 
     # verify that the token is not expired
     def validate_invite(self):  # type: ignore[no-untyped-def]
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         return self.expiration_date > now and not self.is_expired

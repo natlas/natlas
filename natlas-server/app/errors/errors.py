@@ -5,7 +5,7 @@ class NatlasServiceError(Exception):
     def __init__(self, status_code: int, message: str, template: str | None = None):
         self.status_code = status_code
         self.message = message
-        self.template = template if template else f"errors/{self.status_code}.html"
+        self.template = template or f"errors/{self.status_code}.html"
 
     def __str__(self):  # type: ignore[no-untyped-def]
         return f"{self.status_code}: {self.message}"

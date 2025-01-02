@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import current_app
 
@@ -57,8 +57,7 @@ class ScanGroup:
                 current_app.config["CONSISTENT_SCAN_CYCLE"],
             )
         except Exception as e:
-            if self.scan_manager is None or self.scan_manager.get_total() == 0:  # type: ignore[unreachable]
-                errmsg = "Scan manager could not be instantiated because there was no scope configured."
-                current_app.logger.warning(f"{datetime.utcnow()!s} - {errmsg}\n")
-            else:
+            if self.scan_manager is not None and self.scan_manager.get_total() != 0:
                 raise e
+            errmsg = "Scan manager could not be instantiated because there was no scope configured."
+            current_app.logger.warning(f"{datetime.now(UTC)!s} - {errmsg}\n")

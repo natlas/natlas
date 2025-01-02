@@ -1,6 +1,6 @@
 import logging
 import time
-from datetime import datetime
+from datetime import UTC, datetime
 
 import elasticsearch
 import semver
@@ -35,13 +35,13 @@ class ElasticClient:
                 self.esversion = semver.VersionInfo.parse(
                     self.es.info()["version"]["number"]
                 )
-                self.logger.info("Elastic Version: " + str(self.esversion))
+                self.logger.info(f"Elastic Version: {self.esversion!s}")
         except Exception:
             self.status = False
             raise
         finally:
             # Set the lastReconnectAttempt to the timestamp after initialization
-            self.lastReconnectAttempt = datetime.utcnow()
+            self.lastReconnectAttempt = datetime.now(UTC)
 
     def _ping(self):  # type: ignore[no-untyped-def]
         """
@@ -54,7 +54,7 @@ class ElasticClient:
         """
         Attempt to reconnect if we haven't tried to reconnect too recently
         """
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         delta = now - self.lastReconnectAttempt  # type: ignore[operator]
         if delta.seconds >= 30:
             self.status = self._ping()
@@ -148,9 +148,7 @@ class ElasticClient:
         with self._new_trace_span(operation="count", **kwargs) as span:
             results = self._execute_raw_query(self.es.count, **kwargs)  # type: ignore[union-attr]
             self._attach_shard_span_attrs(span, results)
-        if not results:
-            return 0
-        return results
+        return results or 0
 
     def execute_delete_by_query(self, **kwargs):  # type: ignore[no-untyped-def]
         """
@@ -183,7 +181,7 @@ class ElasticClient:
         tracer = trace.get_tracer(__name__)
         span_name = "elasticsearch"
         if "index" in kwargs:
-            span_name += "." + operation
+            span_name += f".{operation}"
         span = tracer.start_span(name=span_name)
         if "index" in kwargs:
             span.set_attribute("es.index", f'{kwargs["index"]}')

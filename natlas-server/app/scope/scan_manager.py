@@ -55,7 +55,7 @@ class IPScanManager:
         self.networks.sort(key=blockcomp)
 
         start = 1
-        for i in range(0, len(self.networks)):
+        for i in range(len(self.networks)):
             self.networks[i]["index"] = start
             start += self.networks[i]["size"]
 

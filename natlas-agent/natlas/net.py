@@ -6,7 +6,7 @@ import time
 from typing import ClassVar
 
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from urllib3.exceptions import InsecureRequestWarning
 
 from natlas import logging, utils
 
@@ -37,7 +37,7 @@ class NatlasNetworkServices:
     ):
         headers = {"user-agent": f"natlas-agent/{self.config.NATLAS_VERSION}"}  # type: ignore[union-attr]
         if self.config.agent_id and self.config.auth_token:  # type: ignore[union-attr]
-            authheader = self.config.agent_id + ":" + self.config.auth_token  # type: ignore[union-attr]
+            authheader = f"{self.config.agent_id}:{self.config.auth_token}"
             headers["Authorization"] = f"Bearer {authheader}"
         args = {
             "timeout": self.config.request_timeout,  # type: ignore[union-attr]
@@ -156,35 +156,35 @@ class NatlasNetworkServices:
     def get_services_file(self):  # type: ignore[no-untyped-def]
         self.netlogger.info(f"Fetching natlas-services file from {self.config.server}")  # type: ignore[union-attr]
         services_path = utils.get_services_path()
-        response = self.backoff_request(endpoint=self.api_endpoints["GETSERVICES"])
-        if response:
-            serviceData = response.json()
-            if serviceData["id"] == "None":
-                self.netlogger.error(
-                    f"{self.config.server} doesn't have a service file for us"  # type: ignore[union-attr]
-                )
-                return False
+        if not (
+            response := self.backoff_request(endpoint=self.api_endpoints["GETSERVICES"])
+        ):
+            return False  # return false if we were unable to get a response from the server
+        serviceData = response.json()
+        if serviceData["id"] == "None":
+            self.netlogger.error(
+                f"{self.config.server} doesn't have a service file for us"  # type: ignore[union-attr]
+            )
+            return False
+        if (
+            hashlib.sha256(serviceData["services"].encode()).hexdigest()
+            != serviceData["sha256"]
+        ):
+            self.netlogger.error(
+                f"hash provided by {self.config.server} doesn't match locally computed hash of services"  # type: ignore[union-attr]
+            )
+            return False
+        with open(services_path, "w") as f:
+            f.write(serviceData["services"])
+        with open(services_path) as f:
             if (
-                hashlib.sha256(serviceData["services"].encode()).hexdigest()
+                hashlib.sha256(f.read().rstrip("\r\n").encode()).hexdigest()
                 != serviceData["sha256"]
             ):
                 self.netlogger.error(
-                    f"hash provided by {self.config.server} doesn't match locally computed hash of services"  # type: ignore[union-attr]
+                    "hash of local file doesn't match hash provided by server"
                 )
                 return False
-            with open(services_path, "w") as f:
-                f.write(serviceData["services"])
-            with open(services_path) as f:
-                if (
-                    hashlib.sha256(f.read().rstrip("\r\n").encode()).hexdigest()
-                    != serviceData["sha256"]
-                ):
-                    self.netlogger.error(
-                        "hash of local file doesn't match hash provided by server"
-                    )
-                    return False
-        else:
-            return False  # return false if we were unable to get a response from the server
         return serviceData[
             "sha256"
         ]  # return True if we got a response and everything checks out
@@ -199,8 +199,7 @@ class NatlasNetworkServices:
             self.netlogger.info(f"Getting work from {self.config.server}")  # type: ignore[union-attr]
             get_work_endpoint = self.api_endpoints["GETWORK"]
 
-        response = self.backoff_request(endpoint=get_work_endpoint)
-        if response:
+        if response := self.backoff_request(endpoint=get_work_endpoint):
             work = response.json()
         else:
             return False  # failed to get work from server

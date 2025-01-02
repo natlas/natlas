@@ -15,4 +15,4 @@ def ctime(s, human=False):  # type: ignore[no-untyped-def]
 def get_screenshot_path(inhash: str, service: str = "HTTP"):  # type: ignore[no-untyped-def]
     ext_map = {"HTTP": ".png", "HTTPS": ".png", "VNC": ".jpg"}
 
-    return f"{inhash[0:2]}/{inhash[2:4]}/{inhash}{ext_map[service]}"
+    return f"{inhash[:2]}/{inhash[2:4]}/{inhash}{ext_map[service]}"

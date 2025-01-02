@@ -17,7 +17,7 @@ def get_target_tags(target: str) -> list:  # type: ignore[type-arg]
 
 def get_unique_scan_id():  # type: ignore[no-untyped-def]
     scan_id = ""
-    while scan_id == "":
+    while not scan_id:
         rand = secrets.token_hex(16)
         count, context = current_app.elastic.get_host_by_scan_id(rand)  # type: ignore[attr-defined]
         if count == 0:

@@ -19,8 +19,8 @@ def generate_hex_32():  # type: ignore[no-untyped-def]
 def pretty_time_delta(delta):  # type: ignore[no-untyped-def]
     hours, seconds = divmod(delta.seconds, 3600)
     minutes, seconds = divmod(seconds, 60)
-    daystr = (str(delta.days) + "d, ") if delta.days else ""
-    hourstr = (str(hours) + "h, ") if hours else ""
-    minstr = (str(minutes) + "m, ") if minutes else ""
-    secstr = str(seconds) + "s"
+    daystr = f"{delta.days!s}d, " if delta.days else ""
+    hourstr = f"{hours!s}h, " if hours else ""
+    minstr = f"{minutes!s}m, " if minutes else ""
+    secstr = f"{seconds!s}s"
     return daystr + hourstr + minstr + secstr

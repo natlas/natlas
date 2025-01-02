@@ -22,7 +22,7 @@ class ElasticIndices:
         """
         Ensure each index in this context is initalized
         """
-        with open(Config().BASEDIR + "/defaults/elastic/mapping.json") as mapfile:
+        with open(f"{Config().BASEDIR}/defaults/elastic/mapping.json") as mapfile:
             mapping = json.loads(mapfile.read())
         for index in self.all_indices():
             self.client.initialize_index(index, mapping)

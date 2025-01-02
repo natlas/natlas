@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import current_app
 from netaddr import IPAddress
@@ -29,7 +29,7 @@ class ScopeManager:
                     blacklist=ScopeManager.default_group,
                 )
             }
-        self.init_time = datetime.utcnow()
+        self.init_time = datetime.now(UTC)
 
     def load_all_groups(self):  # type: ignore[no-untyped-def]
         """
@@ -64,7 +64,7 @@ class ScopeManager:
 
     def update(self, group: str = default_group):  # type: ignore[no-untyped-def]
         self.scopes.get(group).update()  # type: ignore[union-attr]
-        current_app.logger.info(f"{datetime.utcnow()!s} - ScopeManager Updated\n")
+        current_app.logger.info(f"{datetime.now(UTC)!s} - ScopeManager Updated\n")
 
     def is_acceptable_target(self, target: str, group: str = default_group) -> bool:
         try:

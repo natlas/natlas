@@ -1,6 +1,6 @@
 import json
 import typing
-from datetime import datetime
+from datetime import UTC, datetime
 
 import click
 from flask.cli import AppGroup
@@ -35,8 +35,8 @@ def import_scope(scope_file: typing.TextIO, blacklist: bool):  # type: ignore[no
 def import_items(file: str, import_as_blacklist: bool):  # type: ignore[no-untyped-def]
     import_name = "blacklist" if import_as_blacklist else "scope"
     results = {
-        "timestamp": datetime.utcnow().isoformat(),
-        import_name: import_scope(file, import_as_blacklist),  # type: ignore[arg-type]
+        "timestamp": datetime.now(UTC).isoformat(),
+        import_name: import_scope(file, import_as_blacklist),
     }
     print(json.dumps(results, indent=2))
 
@@ -44,7 +44,7 @@ def import_items(file: str, import_as_blacklist: bool):  # type: ignore[no-untyp
 @cli_group.command("export")
 def export_items():  # type: ignore[no-untyped-def]
     result = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "scope": [
             {
                 "target": item.target,

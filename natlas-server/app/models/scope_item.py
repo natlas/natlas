@@ -88,12 +88,7 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
 
     @staticmethod
     def parse_tags(tags: Iterable) -> Iterable:  # type: ignore[type-arg]
-        out = []
-        for t in tags:
-            if t.strip() == "":
-                continue
-            out.append(t)
-        return out
+        return [t for t in tags if t.strip() != ""]
 
     @staticmethod
     def parse_import_line(line: str):  # type: ignore[no-untyped-def]
@@ -146,11 +141,9 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         scope_tag_import = {}
         address_list = [line.strip() for line in address_list]
         tags = ScopeItem.extract_import_tags(address_list)
-        tag_dict = {}
         from app.models import Tag
 
-        for tag in tags:
-            tag_dict[tag] = Tag.create_if_none(tag)
+        tag_dict = {tag: Tag.create_if_none(tag) for tag in tags}
         db.session.commit()
         for line in address_list:
             ip, tags = ScopeItem.parse_import_line(line)
@@ -177,8 +170,9 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         all_scope = {item.target: item.id for item in ScopeItem.query.all()}
         tags_to_import = []
         for k, v in scope_tag_import.items():
-            for tag in v:
-                tags_to_import.append({"scope_id": all_scope[k], "tag_id": tag.id})  # type: ignore[attr-defined]
+            tags_to_import.extend(
+                {"scope_id": all_scope[k], "tag_id": tag.id} for tag in v
+            )
         import_chunks = [
             tags_to_import[i : i + chunk_size]
             for i in range(0, len(tags_to_import), chunk_size)

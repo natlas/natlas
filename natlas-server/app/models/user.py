@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from email_validator import EmailNotValidError, validate_email
 from flask_login import UserMixin
@@ -57,7 +57,7 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
 
     def new_reset_token(self):  # type: ignore[no-untyped-def]
         self.password_reset_token = secrets.token_urlsafe(User.token_length)
-        self.password_reset_expiration = datetime.utcnow() + timedelta(
+        self.password_reset_expiration = datetime.now(UTC) + timedelta(
             seconds=User.expiration_duration
         )
 
@@ -68,7 +68,7 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
     def validate_reset_token(self):  # type: ignore[no-untyped-def]
         if not (self.password_reset_token and self.password_reset_expiration):
             return False
-        return self.password_reset_expiration > datetime.utcnow()
+        return self.password_reset_expiration > datetime.now(UTC)
 
     @staticmethod
     def get_reset_token(email):  # type: ignore[no-untyped-def]
@@ -81,16 +81,18 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
 
     @staticmethod
     def get_user_by_token(url_token):  # type: ignore[no-untyped-def]
-        record = User.query.filter_by(password_reset_token=url_token).first()
-        if not record:
-            return False
-        return validate_token(
-            record, url_token, record.password_reset_token, record.validate_reset_token
-        )
+        if record := User.query.filter_by(password_reset_token=url_token).first():
+            return validate_token(
+                record,
+                url_token,
+                record.password_reset_token,
+                record.validate_reset_token,
+            )
+        return False
 
     @staticmethod
     def new_user_from_invite(invite, password, email=None):  # type: ignore[no-untyped-def]
-        user_email = email if email else invite.email
+        user_email = email or invite.email
         new_user = User(email=user_email, is_admin=invite.is_admin, is_active=True)
         new_user.set_password(password)
         invite.accept_invite()

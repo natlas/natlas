@@ -54,9 +54,7 @@ def send_auth_email(email, token, token_type):  # type: ignore[no-untyped-def]
 
 
 def deliver_auth_link(email: str, token: str, token_type: str):  # type: ignore[no-untyped-def]
-    if email_configured() and email:
-        send_auth_email(email, token, token_type)
-        msg = f"Email sent to {email} via {current_app.config['MAIL_SERVER']}!"
-    else:
-        msg = f"Share this link: {build_email_url(token, token_type)}"
-    return msg
+    if not email_configured() or not email:
+        return f"Share this link: {build_email_url(token, token_type)}"
+    send_auth_email(email, token, token_type)
+    return f"Email sent to {email} via {current_app.config['MAIL_SERVER']}!"

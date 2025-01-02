@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from app import db
 from app.models.dict_serializable import DictSerializable
@@ -22,12 +22,12 @@ class RescanTask(db.Model, DictSerializable):  # type: ignore[misc, name-defined
 
     def dispatchTask(self):  # type: ignore[no-untyped-def]
         self.dispatched = True
-        self.date_dispatched = datetime.utcnow()
+        self.date_dispatched = datetime.now(UTC)
 
     def completeTask(self, scan_id):  # type: ignore[no-untyped-def]
         self.scan_id = scan_id
         self.complete = True
-        self.date_completed = datetime.utcnow()
+        self.date_completed = datetime.now(UTC)
 
     @staticmethod
     def getPendingTasks():  # type: ignore[no-untyped-def]

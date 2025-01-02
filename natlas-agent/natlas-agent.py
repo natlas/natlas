@@ -28,17 +28,15 @@ netsrv = NatlasNetworkServices(config)
 def add_targets_to_queue(target, q):  # type: ignore[no-untyped-def]
     targetNetwork = ipaddress.ip_network(target.strip())
     if targetNetwork.num_addresses == 1:
-        target_data = netsrv.get_work(target=str(targetNetwork.network_address))
-        if not target_data:
+        if target_data := netsrv.get_work(target=str(targetNetwork.network_address)):
+            q.put(target_data)
+        else:
             return
-        q.put(target_data)
     else:
         # Iterate over usable hosts in target, queue.put will block until a queue slot is available
         for t in targetNetwork.hosts():
-            target_data = netsrv.get_work(target=str(t))
-            if not target_data:
-                continue
-            q.put(target_data)
+            if target_data := netsrv.get_work(target=str(t)):
+                q.put(target_data)
 
 
 def main():  # type: ignore[no-untyped-def]
@@ -85,10 +83,7 @@ def main():  # type: ignore[no-untyped-def]
         req_dir = os.path.join(config.data_dir, directory)
         Path(req_dir).mkdir(parents=True, exist_ok=True)
 
-    autoScan = True
-    if args.target or args.tfile:
-        autoScan = False
-
+    autoScan = not args.target and not args.tfile
     # Initialize SentryIo after basic environment checks complete
     error_reporting.initialize_sentryio(config)
     q = queue.Queue(maxsize=MAX_QUEUE_SIZE)  # type: ignore[var-annotated]

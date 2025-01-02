@@ -79,8 +79,7 @@ def reset_password_request():  # type: ignore[no-untyped-def]
         validemail = validate_email(form.email.data)
         if not validemail:
             return redirect(url_for("auth.reset_password_request"))
-        user = User.get_reset_token(validemail)
-        if user:
+        if user := User.get_reset_token(validemail):
             deliver_auth_link(user.email, user.password_reset_token, "reset")
         db.session.commit()
         flash("Check your email for the instructions to reset your password", "info")
@@ -134,7 +133,7 @@ def invite_user():  # type: ignore[no-untyped-def]
     form_type = "invite" if invite.email else "register"
     form = supported_forms[form_type]["form"]()  # type: ignore[operator]
     if form.validate_on_submit():
-        email = invite.email if invite.email else form.email.data
+        email = invite.email or form.email.data
         new_user = User.new_user_from_invite(invite, form.password.data, email=email)
         db.session.commit()
         login_user(new_user)

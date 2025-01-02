@@ -29,7 +29,7 @@ def is_valid_image(path: str) -> bool:
 
 def parse_url(url: str) -> tuple:  # type: ignore[type-arg]
     urlp = urlparse(url)
-    port = (80 if urlp.scheme == "http" else 443) if not urlp.port else urlp.port
+    port = urlp.port or (80 if urlp.scheme == "http" else 443)
 
     return urlp.scheme.upper(), port
 
@@ -55,9 +55,7 @@ def get_aquatone_session(base_dir: str) -> dict:  # type: ignore[type-arg]
     with open(session_path) as f:
         session = json.load(f)
 
-    if session["stats"]["screenshotSuccessful"] == 0:
-        return {}
-    return session  # type: ignore[no-any-return]
+    return {} if session["stats"]["screenshotSuccessful"] == 0 else session
 
 
 def parse_aquatone_session(base_dir: str) -> list:  # type: ignore[type-arg]
@@ -68,10 +66,8 @@ def parse_aquatone_session(base_dir: str) -> list:  # type: ignore[type-arg]
     output = []
     for _, page in session["pages"].items():
         fqScreenshotPath = os.path.join(base_dir, page["screenshotPath"])
-        parsed_page = parse_aquatone_page(page, fqScreenshotPath)
-        if not parsed_page:
-            continue
-        output.append(parsed_page)
+        if parsed_page := parse_aquatone_page(page, fqScreenshotPath):
+            output.append(parsed_page)
 
     return output
 
