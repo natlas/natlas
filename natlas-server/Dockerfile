@@ -1,4 +1,4 @@
-FROM node:20-bookworm as webpack
+FROM node:20-bookworm AS webpack
 ARG NATLAS_VERSION=unknown
 
 WORKDIR /app
@@ -8,7 +8,7 @@ RUN yarn --no-progress --frozen-lockfile --non-interactive
 COPY . /app
 RUN yarn run webpack --mode production
 
-FROM python:3.12 as build
+FROM python:3.12 AS build
 
 COPY Pipfile .
 COPY Pipfile.lock .

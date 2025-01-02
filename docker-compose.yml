@@ -2,7 +2,6 @@
 #      DEVELOPMENT USE ONLY      #
 # DO NOT USE THIS IN PRODUCTION! #
 ##################################
-version: "3.7"
 services:
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
