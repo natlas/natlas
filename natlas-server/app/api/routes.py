@@ -34,7 +34,7 @@ def getwork():  # type: ignore[no-untyped-def]
     work = {}
 
     if manual:
-        if current_app.ScopeManager.is_acceptable_target(manual):
+        if current_app.ScopeManager.is_acceptable_target(manual):  # type: ignore[attr-defined]
             work["scan_reason"] = "manual"
             work["target"] = manual
             work = prepare_work(work)

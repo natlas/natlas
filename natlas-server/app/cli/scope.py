@@ -32,7 +32,7 @@ def import_scope(scope_file: typing.TextIO, blacklist: bool):  # type: ignore[no
     default=False,
     help="Should this file be considered in scope or blacklisted?",
 )
-def import_items(file: str, import_as_blacklist: bool):  # type: ignore[no-untyped-def]
+def import_items(file: typing.TextIO, import_as_blacklist: bool):  # type: ignore[no-untyped-def]
     import_name = "blacklist" if import_as_blacklist else "scope"
     results = {
         "timestamp": datetime.now(UTC).isoformat(),

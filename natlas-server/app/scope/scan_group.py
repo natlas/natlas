@@ -57,7 +57,7 @@ class ScanGroup:
                 current_app.config["CONSISTENT_SCAN_CYCLE"],
             )
         except Exception as e:
-            if self.scan_manager is not None and self.scan_manager.get_total() != 0:
+            if self.scan_manager is not None:
                 raise e
             errmsg = "Scan manager could not be instantiated because there was no scope configured."
             current_app.logger.warning(f"{datetime.now(UTC)!s} - {errmsg}\n")

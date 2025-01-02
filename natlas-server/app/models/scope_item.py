@@ -168,10 +168,11 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
             result["success"] += ins_result.rowcount
         result["exist"] = len(address_list) - len(result["fail"]) - result["success"]  # type: ignore[arg-type, operator]
         all_scope = {item.target: item.id for item in ScopeItem.query.all()}
-        tags_to_import = []
+        tags_to_import = []  # type: ignore[var-annotated]
         for k, v in scope_tag_import.items():
             tags_to_import.extend(
-                {"scope_id": all_scope[k], "tag_id": tag.id} for tag in v
+                {"scope_id": all_scope[k], "tag_id": tag.id}  # type: ignore[attr-defined]
+                for tag in v
             )
         import_chunks = [
             tags_to_import[i : i + chunk_size]

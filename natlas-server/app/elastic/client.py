@@ -132,9 +132,9 @@ class ElasticClient:
         """
         with self._new_trace_span(operation="search", **kwargs) as span:
             results = self._execute_raw_query(
-                self.es.search,
+                self.es.search,  # type: ignore[union-attr]
                 rest_total_hits_as_int=True,
-                **kwargs,  # type: ignore[union-attr]
+                **kwargs,
             )
             span.set_attribute("es.hits.total", results["hits"]["total"])
             self._attach_shard_span_attrs(span, results)

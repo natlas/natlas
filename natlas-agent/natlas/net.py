@@ -37,7 +37,7 @@ class NatlasNetworkServices:
     ):
         headers = {"user-agent": f"natlas-agent/{self.config.NATLAS_VERSION}"}  # type: ignore[union-attr]
         if self.config.agent_id and self.config.auth_token:  # type: ignore[union-attr]
-            authheader = f"{self.config.agent_id}:{self.config.auth_token}"
+            authheader = f"{self.config.agent_id}:{self.config.auth_token}"  # type: ignore[union-attr]
             headers["Authorization"] = f"Bearer {authheader}"
         args = {
             "timeout": self.config.request_timeout,  # type: ignore[union-attr]
