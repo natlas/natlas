@@ -24,7 +24,7 @@ def test_send_invite(app):  # type: ignore[no-untyped-def]
 
     assert len(outbox) == 1
     assert outbox[0].subject == "[Natlas] You've been invited to Natlas!"
-    assert test_token in outbox[0].body
+    assert test_token in outbox[0].body  # type: ignore[operator]
     assert test_token not in result
 
 
@@ -35,7 +35,7 @@ def test_send_password_reset(app):  # type: ignore[no-untyped-def]
 
     assert len(outbox) == 1
     assert outbox[0].subject == "[Natlas] Reset Your Password"
-    assert test_token in outbox[0].body
+    assert test_token in outbox[0].body  # type: ignore[operator]
     assert test_token not in result
 
 

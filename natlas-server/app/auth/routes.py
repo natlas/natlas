@@ -141,7 +141,7 @@ def invite_user():  # type: ignore[no-untyped-def]
         flash("Your password has been set.", "success")
         return redirect(url_for("main.browse"))
     return render_template(
-        supported_forms[form_type]["template"],
+        supported_forms[form_type]["template"],  # type: ignore[arg-type]
         title="Accept Invitation",
-        form=form,  # type: ignore[arg-type]
+        form=form,
     )
