@@ -15,6 +15,7 @@ natlas-agent/logs
 natlas-server/node_modules
 .DS_Store
 .vscode
+*.code-workspace
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
