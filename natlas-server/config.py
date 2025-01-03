@@ -60,6 +60,7 @@ class Config(BaseSettings):
     otel_collector: str = Field(default="127.0.0.1:4317")
 
     version_override: str | None = Field(default=None)
+    TESTING: bool = Field(default=False)
 
     @model_validator(mode="after")
     def override_version(self) -> Self:

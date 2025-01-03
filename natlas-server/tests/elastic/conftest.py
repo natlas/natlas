@@ -1,8 +1,6 @@
 import pytest
 from app.elastic import ElasticInterface
-from tests.config import TestConfig
-
-conf = TestConfig()
+from tests.config import test_config
 
 
 def reset_indices(indices):  # type: ignore[no-untyped-def]
@@ -13,7 +11,7 @@ def reset_indices(indices):  # type: ignore[no-untyped-def]
 @pytest.fixture(scope="module")
 def esinterface():  # type: ignore[no-untyped-def]
     esi = ElasticInterface(
-        conf.ELASTICSEARCH_URL,
+        test_config.ELASTICSEARCH_URL,
         True,
         "elastic",
         "natlas-dev-password-do-not-use",
