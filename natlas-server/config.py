@@ -1,8 +1,10 @@
 import json
 import os
 import secrets
+from typing import Self
 
-from dotenv import load_dotenv
+from pydantic import Field, model_validator
+from pydantic_settings import BaseSettings
 
 with open("defaults/db_configs.json") as f:
     defaultConfig = json.load(f)
@@ -24,73 +26,43 @@ def casted_value(expected_type, value):  # type: ignore[no-untyped-def]
     return cast_map[expected_type](value)  # type: ignore[operator]
 
 
-# Things in the Class object are config options we will likely never want to change from the database.
-class Config:
-    # Current Version
-    NATLAS_VERSION = "0.6.12"
-
-    BASEDIR = os.path.abspath(os.path.dirname(__file__))
-    load_dotenv(os.path.join(BASEDIR, ".env"))
-
-    DATA_DIR = os.environ.get("DATA_DIR", "/data")
-
-    # Leaving this empty will work fine for requests but scripts won't be able to generate links
-    # Examples: localhost:5000, natlas.io
-    SERVER_NAME = os.environ.get("SERVER_NAME", None)
-
-    # We aren't storing this in the database because it wouldn't be a very good secret then
-    # If a key is not provided, generate a new one when the application starts
-    SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_urlsafe(64))
-
-    # Optionally generate links with http instead of https by overriding this value
-    PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "https")
-
-    # This isn't in the database because this is where we find the database.
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "SQLALCHEMY_DATABASE_URI",
-        "sqlite:///" + os.path.join(DATA_DIR, "db", "metadata.db"),
+class Config(BaseSettings):
+    NATLAS_VERSION: str = "0.6.12"
+    BASEDIR: str = os.path.abspath(os.path.dirname(__file__))
+    DATA_DIR: str = "/data"
+    MEDIA_DIRECTORY: str = Field(default=os.path.join(DATA_DIR, "media/"))
+    SERVER_NAME: str = Field(default="localhost:5000")
+    SECRET_KEY: str = Field(default=secrets.token_urlsafe(64))
+    PREFERRED_URL_SCHEME: str = Field(default="https")
+    SQLALCHEMY_DATABASE_URI: str = Field(
+        default=f"sqlite:///{os.path.join(DATA_DIR, 'db', 'metadata.db')}"
     )
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    DB_AUTO_UPGRADE: bool = Field(default=False)
+    ELASTICSEARCH_URL: str = Field(default="http://localhost:9200")
+    ELASTIC_AUTH_ENABLE: bool = Field(default=False)
+    ELASTIC_USER: str = Field(default="elastic")
+    ELASTIC_PASSWORD: str = Field(default="")
 
-    # This isn't in the database because we'll never want to change it
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAIL_SERVER: str | None = Field(default=None)
+    MAIL_PORT: int = Field(default=587)
+    MAIL_USE_TLS: bool = Field(default=True)
+    MAIL_USE_SSL: bool = Field(default=False)
+    MAIL_USERNAME: str | None = Field(default=None)
+    MAIL_PASSWORD: str | None = Field(default=None)
+    MAIL_FROM: str | None = Field(default=None)
 
-    # Automatically perform any required migrations on app init
-    DB_AUTO_UPGRADE = casted_bool(os.environ.get("DB_AUTO_UPGRADE", False))
+    CONSISTENT_SCAN_CYCLE: bool = Field(default=False)
 
-    # This isn't in the database because it really shouldn't be changing on-the-fly
-    # Also make sure that you're using an absolute path if you're serving your app directly via flask
-    MEDIA_DIRECTORY = os.environ.get(
-        "MEDIA_DIRECTORY", os.path.join(DATA_DIR, "media/")
-    )
+    sentry_dsn: str | None = Field(default=None)
+    SENTRY_JS_DSN: str | None = Field(default=None)
+    otel_enable: bool = Field(default=False)
+    otel_collector: str = Field(default="127.0.0.1:4317")
 
-    # Elasticsearch only gets loaded from environment
-    ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200")
-    ELASTIC_AUTH_ENABLE = casted_bool(os.environ.get("ELASTIC_AUTH_ENABLE", False))
-    ELASTIC_USER = os.environ.get("ELASTIC_USER", "elastic")
-    ELASTIC_PASSWORD = os.environ.get("ELASTIC_PASSWORD", "")
+    version_override: str | None = Field(default=None)
 
-    # MAIL SETTINGS
-    MAIL_SERVER = os.environ.get("MAIL_SERVER", None)
-    MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
-    MAIL_USE_TLS = casted_bool(os.environ.get("MAIL_USE_TLS", True))
-    MAIL_USE_SSL = casted_bool(os.environ.get("MAIL_USE_SSL", False))
-    MAIL_USERNAME = os.environ.get("MAIL_USERNAME", None)
-    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", None)
-    MAIL_FROM = os.environ.get("MAIL_FROM", None)
-
-    # Scan Cycle option(s)
-    CONSISTENT_SCAN_CYCLE = casted_bool(os.environ.get("CONSISTENT_SCAN_CYCLE", False))
-
-    # Allow version overrides for local development
-    # Necessary to test versioned host data templates before release
-    version_override = os.environ.get("NATLAS_VERSION_OVERRIDE", None)
-
-    # Replace NATLAS_VERSION so that the rest of the code doesn't have to care if it's being overridden
-    if version_override:
-        NATLAS_VERSION = version_override
-
-    # Instrumentation isn't directly used by the flask app context so does not need to be ALL_CAPS
-    sentry_dsn = os.environ.get("SENTRY_DSN", None)
-    SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN", None)
-    otel_enable = casted_bool(os.environ.get("OTEL_ENABLE", False))
-    otel_collector = os.environ.get("OTEL_COLLECTOR", "127.0.0.1:4317")
+    @model_validator(mode="after")
+    def override_version(self) -> Self:
+        if self.version_override:
+            self.NATLAS_VERSION = self.version_override
+        return self

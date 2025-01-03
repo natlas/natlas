@@ -71,9 +71,9 @@ class ElasticInterface:
 
         self.client.execute_index(index=self.indices.name("history"), document=host)  # type: ignore[union-attr]
         self.client.execute_index(  # type: ignore[union-attr]
-            index=self.indices.name("latest"),
+            index=self.indices.name("latest"),  # type: ignore[union-attr]
             id=ip,
-            document=host,  # type: ignore[union-attr]
+            document=host,
         )
         return True
 
@@ -87,10 +87,10 @@ class ElasticInterface:
         sort = {"ctime": {"order": "desc"}}
 
         return self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("history"),
+            index=self.indices.name("history"),  # type: ignore[union-attr]
             size=size,
             query=query,
-            sort=sort,  # type: ignore[union-attr]
+            sort=sort,
         )
 
     def get_host_history(self, ip: str, limit: int, offset: int):  # type: ignore[no-untyped-def]
@@ -159,10 +159,10 @@ class ElasticInterface:
         sort = {"ctime": {"order": "desc"}}
 
         return self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("history"),
+            index=self.indices.name("history"),  # type: ignore[union-attr]
             size=size,
             query=query,
-            sort=sort,  # type: ignore[union-attr]
+            sort=sort,
         )
 
     def delete_scan(self, scan_id: str):  # type: ignore[no-untyped-def]
@@ -174,10 +174,10 @@ class ElasticInterface:
         query = {"query_string": {"query": scan_id, "fields": ["scan_id"]}}
         sort = {"ctime": {"order": "desc"}}
         count, host = self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("latest"),
+            index=self.indices.name("latest"),  # type: ignore[union-attr]
             size=size,
             query=query,
-            sort=sort,  # type: ignore[union-attr]
+            sort=sort,
         )
         if count != 0:
             # we're deleting the most recent scan result and need to pull the next most recent into the nmap index
@@ -188,10 +188,10 @@ class ElasticInterface:
             sort = {"ctime": {"order": "desc"}}
 
             count, twoscans = self.client.get_collection(  # type: ignore[union-attr]
-                index=self.indices.name("history"),
+                index=self.indices.name("history"),  # type: ignore[union-attr]
                 size=size,
                 query=query,
-                sort=sort,  # type: ignore[union-attr]
+                sort=sort,
             )
             # If count is one then there's only one result in history so we can just delete it.
             # If count is > 1 then we need to migrate the next oldest scan data
@@ -207,14 +207,14 @@ class ElasticInterface:
             }
         }
         result = self.client.execute_delete_by_query(  # type: ignore[union-attr]
-            index=self.indices.str_indices(),
-            body=deleteBody,  # type: ignore[union-attr]
+            index=self.indices.str_indices(),  # type: ignore[union-attr]
+            body=deleteBody,
         )
         if migrate:
             self.client.execute_index(  # type: ignore[union-attr]
-                index=self.indices.name("latest"),
-                id=ipaddr,
-                document=twoscans[1],  # type: ignore[possibly-undefined, union-attr]
+                index=self.indices.name("latest"),  # type: ignore[union-attr]
+                id=ipaddr,  # type: ignore[possibly-undefined]
+                document=twoscans[1],  # type: ignore[possibly-undefined]
             )
         return result["deleted"]
 
@@ -233,8 +233,8 @@ class ElasticInterface:
         }
 
         deleted = self.client.execute_delete_by_query(  # type: ignore[union-attr]
-            index=self.indices.str_indices(),
-            body=deleteBody,  # type: ignore[union-attr]
+            index=self.indices.str_indices(),  # type: ignore[union-attr]
+            body=deleteBody,
         )
         return deleted["deleted"]
 
@@ -260,10 +260,10 @@ class ElasticInterface:
         }
 
         count, host = self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("latest"),
+            index=self.indices.name("latest"),  # type: ignore[union-attr]
             size=size,
             from_=offset,
-            query=query,  # type: ignore[union-attr]
+            query=query,
         )
         return host
 
@@ -303,8 +303,8 @@ class ElasticInterface:
         Count the number of scans that match an arbitrary search body
         """
         return self.client.execute_search(  # type: ignore[union-attr]
-            index=self.indices.name(index),
+            index=self.indices.name(index),  # type: ignore[union-attr]
             size=0,
             track_scores=False,
-            **kwargs,  # type: ignore[union-attr]
+            **kwargs,
         )
