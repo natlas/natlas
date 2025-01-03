@@ -4,15 +4,14 @@ import tempfile
 import pytest
 from app import create_app
 
-from tests.config import TestConfig
+from tests.config import test_config
 
 
 @pytest.fixture
 def app():  # type: ignore[no-untyped-def]
-    conf = TestConfig()
     db_fd, db_name = tempfile.mkstemp()
-    conf.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_name
-    app = create_app(conf)
+    test_config.SQLALCHEMY_DATABASE_URI = "sqlite:///" + db_name
+    app = create_app(test_config)
     with app.app_context():
         yield app
     os.close(db_fd)
