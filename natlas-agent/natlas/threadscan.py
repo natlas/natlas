@@ -1,7 +1,9 @@
 import ipaddress
 import os
+import queue
 import subprocess
 import threading
+from typing import Any, Literal
 
 from config import Config
 from libnmap.parser import NmapParser, NmapParserException
@@ -9,13 +11,16 @@ from sentry_sdk import add_breadcrumb, capture_exception, push_scope
 
 from natlas import logging, screenshots, utils
 from natlas.net import NatlasNetworkServices
+from natlas.scan_work import ManualScanWorkItem, ScanWorkItem
 from natlas.scanresult import ScanResult
 
 logger = logging.get_logger("AgentThread")
 conf = Config()
 
 
-def command_builder(scan_id, agentConfig, target):  # type: ignore[no-untyped-def]
+def command_builder(
+    scan_id: str, agentConfig: dict[str, Any], target: str
+) -> list[str]:
     outFiles = os.path.join(utils.get_scan_dir(scan_id), f"nmap.{scan_id}")
     servicepath = utils.get_services_path()
     command = ["nmap", "--privileged", "-oA", outFiles, "--servicedb", servicepath]
@@ -41,7 +46,7 @@ def command_builder(scan_id, agentConfig, target):  # type: ignore[no-untyped-de
     return command
 
 
-def scan(target_data, config):  # type: ignore[no-untyped-def]
+def scan(target_data: dict[str, Any], config: Config) -> ScanResult | Literal[False]:
     if not utils.validate_target(target_data["target"], config):
         return False
     target = target_data["target"]
@@ -117,26 +122,14 @@ def scan(target_data, config):  # type: ignore[no-untyped-def]
     return result
 
 
-class ScanWorkItem:
-    def __init__(self, target_data):  # type: ignore[no-untyped-def]
-        self.target_data = target_data
-
-    def complete(self):  # type: ignore[no-untyped-def]
-        pass
-
-
-class ManualScanWorkItem(ScanWorkItem):
-    def __init__(self, queue, target_data):  # type: ignore[no-untyped-def]
-        super().__init__(target_data)
-        self.queue = queue
-
-    def complete(self):  # type: ignore[no-untyped-def]
-        super()
-        self.queue.task_done()
-
-
 class ThreadScan(threading.Thread):
-    def __init__(self, queue, config, auto=False, servicesSha=""):  # type: ignore[no-untyped-def]
+    def __init__(
+        self,
+        queue: queue.Queue[dict[str, Any]],
+        config: Config,
+        auto: bool = False,
+        servicesSha: str = "",
+    ) -> None:
         threading.Thread.__init__(self)
         self.queue = queue
         self.auto = auto
@@ -144,7 +137,7 @@ class ThreadScan(threading.Thread):
         self.config = config
         self.netsrv = NatlasNetworkServices(self.config)
 
-    def execute_scan(self, work_item):  # type: ignore[no-untyped-def]
+    def execute_scan(self, work_item: ScanWorkItem) -> None:
         target_data = work_item.target_data
         utils.create_scan_dir(target_data["scan_id"])
         # setting this here ensures the finally block won't error if we don't submit data
@@ -163,7 +156,7 @@ class ThreadScan(threading.Thread):
                 target_data["scan_id"], failed=didFail, saveFails=self.config.save_fails
             )
 
-    def run(self):  # type: ignore[no-untyped-def]
+    def run(self) -> None:
         while True:
             with push_scope() as scope:
                 add_breadcrumb(
@@ -171,7 +164,7 @@ class ThreadScan(threading.Thread):
                 )
                 work_item = self.get_work()
 
-                if not work_item:
+                if work_item is None:
                     break
                 scope.set_extra("natlas_scan_id", work_item.target_data["scan_id"])
                 add_breadcrumb(
@@ -193,7 +186,7 @@ class ThreadScan(threading.Thread):
                         f"Failed to process work item: {e}. Sentry event id: {event_id}"
                     )
 
-    def get_work(self):  # type: ignore[no-untyped-def]
+    def get_work(self) -> ScanWorkItem | ManualScanWorkItem | None:
         # If we're in auto mode, the threads handle getting work from the server
         if self.auto:
             target_data = self.netsrv.get_work()
@@ -209,8 +202,6 @@ class ThreadScan(threading.Thread):
                     )
             return ScanWorkItem(target_data)
         # Manual
-        target_data = self.queue.get()
-        if not target_data:
-            return None
-        logger.info(f"Manual Target: {target_data['target']}")
-        return ManualScanWorkItem(self.queue, target_data)
+        manual_target = self.queue.get()
+        logger.info(f"Manual Target: {manual_target['target']}")
+        return ManualScanWorkItem(self.queue, manual_target)
