@@ -12,6 +12,7 @@ from pathlib import Path
 from config import Config
 from natlas import error_reporting, logging, utils
 from natlas.net import NatlasNetworkServices
+from natlas.scan_work import ScanWorkItem
 from natlas.threadscan import ThreadScan
 
 ERR = {"INVALIDTARGET": 1, "SCANTIMEOUT": 2, "DATANOTFOUND": 3, "INVALIDDATA": 4}
@@ -25,7 +26,7 @@ global_logger = logging.get_logger("MainThread")
 netsrv = NatlasNetworkServices(config)
 
 
-def add_targets_to_queue(target, q):  # type: ignore[no-untyped-def]
+def add_targets_to_queue(target: str, q: queue.Queue[ScanWorkItem]) -> None:
     targetNetwork = ipaddress.ip_network(target.strip())
     if targetNetwork.num_addresses == 1:
         target_data = netsrv.get_work(target=str(targetNetwork.network_address))
@@ -41,7 +42,7 @@ def add_targets_to_queue(target, q):  # type: ignore[no-untyped-def]
             q.put(target_data)
 
 
-def main():  # type: ignore[no-untyped-def]
+def main() -> None:
     PARSER_DESC = "Scan hosts and report data to a configured server. The server will reject your findings if they are deemed not in scope."
     PARSER_EPILOG = "Report problems to https://github.com/natlas/natlas"
     parser = argparse.ArgumentParser(
@@ -91,7 +92,7 @@ def main():  # type: ignore[no-untyped-def]
 
     # Initialize SentryIo after basic environment checks complete
     error_reporting.initialize_sentryio(config)
-    q = queue.Queue(maxsize=MAX_QUEUE_SIZE)  # type: ignore[var-annotated]
+    q: queue.Queue[ScanWorkItem] = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
     servicesSha = ""
     SERVICESPATH = utils.get_services_path()

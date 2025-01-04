@@ -3,16 +3,18 @@ import json
 import os
 import random
 import time
-from typing import ClassVar
+from typing import Any, ClassVar, Literal
 
 import requests
+from config import Config
+from requests import Response
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from natlas import logging, utils
 
 
 class NatlasNetworkServices:
-    config = None  # type: ignore[var-annotated]
+    config: Config
     netlogger = logging.get_logger("NetworkServices")
 
     api_endpoints: ClassVar = {
@@ -21,32 +23,32 @@ class NatlasNetworkServices:
         "SUBMIT": "/api/submit",
     }
 
-    def __init__(self, config):  # type: ignore[no-untyped-def]
+    def __init__(self, config: Config) -> None:
         self.config = config
 
         if self.config.ignore_ssl_warn:
             requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-    def make_request(  # type: ignore[no-untyped-def]
+    def make_request(
         self,
-        endpoint,
-        reqType="GET",
-        postData=None,
-        contentType="application/json",
-        statusCode=200,
-    ):
-        headers = {"user-agent": f"natlas-agent/{self.config.NATLAS_VERSION}"}  # type: ignore[union-attr]
-        if self.config.agent_id and self.config.auth_token:  # type: ignore[union-attr]
-            authheader = self.config.agent_id + ":" + self.config.auth_token  # type: ignore[union-attr]
+        endpoint: str,
+        reqType: str = "GET",
+        postData: dict[str, Any] | None = None,
+        contentType: str = "application/json",
+        statusCode: int = 200,
+    ) -> Response | Literal[False]:
+        headers = {"user-agent": f"natlas-agent/{self.config.NATLAS_VERSION}"}
+        if self.config.agent_id and self.config.auth_token:
+            authheader = self.config.agent_id + ":" + self.config.auth_token
             headers["Authorization"] = f"Bearer {authheader}"
         args = {
-            "timeout": self.config.request_timeout,  # type: ignore[union-attr]
+            "timeout": self.config.request_timeout,
             "headers": headers,
-            "verify": not self.config.ignore_ssl_warn,  # type: ignore[union-attr]
+            "verify": not self.config.ignore_ssl_warn,
         }
         try:
             if reqType == "GET":
-                req = requests.get(self.config.server + endpoint, **args)  # type: ignore[union-attr]
+                req = requests.get(self.config.server + endpoint, **args)
                 if req.status_code == 200:
                     if "message" in req.json():
                         self.netlogger.info("[Server] " + req.json()["message"])
@@ -74,7 +76,7 @@ class NatlasNetworkServices:
                     return False
             elif reqType == "POST" and postData:
                 args["json"] = postData
-                req = requests.post(self.config.server + endpoint, **args)  # type: ignore[union-attr]
+                req = requests.post(self.config.server + endpoint, **args)
                 if req.status_code == 200:
                     if "message" in req.json():
                         self.netlogger.info("[Server] " + req.json()["message"])
@@ -97,12 +99,12 @@ class NatlasNetworkServices:
                     return req
         except requests.ConnectionError:
             self.netlogger.warning(
-                f"Connection Error connecting to {self.config.server}"  # type: ignore[union-attr]
+                f"Connection Error connecting to {self.config.server}"
             )
             return False
         except requests.Timeout:
             self.netlogger.warning(
-                f"Request timed out after {self.config.request_timeout} seconds."  # type: ignore[union-attr]
+                f"Request timed out after {self.config.request_timeout} seconds."
             )
             return False
         except ValueError as e:
@@ -111,7 +113,9 @@ class NatlasNetworkServices:
 
         return req  # type: ignore[possibly-undefined]
 
-    def backoff_request(self, giveup=False, *args, **kwargs):  # type: ignore[no-untyped-def]
+    def backoff_request(
+        self, giveup: bool = False, *args: Any, **kwargs: Any
+    ) -> Response | Literal[False]:
         attempt = 0
         result = None
         while not result:
@@ -135,43 +139,43 @@ class NatlasNetworkServices:
 
             if RETRY:
                 attempt += 1
-                if giveup and attempt == self.config.max_retries:  # type: ignore[union-attr]
+                if giveup and attempt == self.config.max_retries:
                     self.netlogger.warning(
-                        f"Request to {self.config.server} failed {self.config.max_retries} times. Giving up"  # type: ignore[union-attr]
+                        f"Request to {self.config.server} failed {self.config.max_retries} times. Giving up"
                     )
                     return False
                 jitter = (
                     random.randint(0, 1000) / 1000
                 )  # jitter to reduce chance of locking
                 current_sleep = (
-                    min(self.config.backoff_max, self.config.backoff_base * 2**attempt)  # type: ignore[union-attr]
+                    min(self.config.backoff_max, self.config.backoff_base * 2**attempt)
                     + jitter
                 )
                 self.netlogger.warning(
-                    f"Request to {self.config.server} failed. Waiting {current_sleep} seconds before retrying."  # type: ignore[union-attr]
+                    f"Request to {self.config.server} failed. Waiting {current_sleep} seconds before retrying."
                 )
                 time.sleep(current_sleep)
         return result  # type: ignore[unreachable]
 
-    def get_services_file(self):  # type: ignore[no-untyped-def]
-        self.netlogger.info(f"Fetching natlas-services file from {self.config.server}")  # type: ignore[union-attr]
+    def get_services_file(self) -> str:
+        self.netlogger.info(f"Fetching natlas-services file from {self.config.server}")
         services_path = utils.get_services_path()
         response = self.backoff_request(endpoint=self.api_endpoints["GETSERVICES"])
-        if response:
+        if response is not False:
             serviceData = response.json()
             if serviceData["id"] == "None":
                 self.netlogger.error(
-                    f"{self.config.server} doesn't have a service file for us"  # type: ignore[union-attr]
+                    f"{self.config.server} doesn't have a service file for us"
                 )
-                return False
+                return ""
             if (
                 hashlib.sha256(serviceData["services"].encode()).hexdigest()
                 != serviceData["sha256"]
             ):
                 self.netlogger.error(
-                    f"hash provided by {self.config.server} doesn't match locally computed hash of services"  # type: ignore[union-attr]
+                    f"hash provided by {self.config.server} doesn't match locally computed hash of services"
                 )
-                return False
+                return ""
             with open(services_path, "w") as f:
                 f.write(serviceData["services"])
             with open(services_path) as f:
@@ -182,21 +186,21 @@ class NatlasNetworkServices:
                     self.netlogger.error(
                         "hash of local file doesn't match hash provided by server"
                     )
-                    return False
+                    return ""
         else:
-            return False  # return false if we were unable to get a response from the server
-        return serviceData[
+            return ""  # return an empty string if we were unable to get a response from the server
+        return serviceData[  # type: ignore[no-any-return]
             "sha256"
-        ]  # return True if we got a response and everything checks out
+        ]  # return the sha256 if we got a response and everything checks out
 
     def get_work(self, target=None):  # type: ignore[no-untyped-def]
         if target:
             self.netlogger.info(
-                f"Getting work config for {target} from {self.config.server}"  # type: ignore[union-attr]
+                f"Getting work config for {target} from {self.config.server}"
             )
             get_work_endpoint = self.api_endpoints["GETWORK"] + "?target=" + target
         else:
-            self.netlogger.info(f"Getting work from {self.config.server}")  # type: ignore[union-attr]
+            self.netlogger.info(f"Getting work from {self.config.server}")
             get_work_endpoint = self.api_endpoints["GETWORK"]
 
         response = self.backoff_request(endpoint=get_work_endpoint)

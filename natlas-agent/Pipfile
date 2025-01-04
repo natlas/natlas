@@ -4,6 +4,7 @@ mypy = "~=1.14"
 [packages]
 natlas-libnmap = "~=0.7"
 pillow = "~=11.0"
+pydantic = "~=2.10"
 pydantic-settings = "~=2.7"
 python-dotenv = "~=1.0.1"
 requests = "~=2.31.0"

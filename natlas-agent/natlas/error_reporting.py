@@ -4,7 +4,7 @@ import sentry_sdk
 from config import Config
 
 
-def initialize_sentryio(config: Config):  # type: ignore[no-untyped-def]
+def initialize_sentryio(config: Config) -> None:
     if config.sentry_dsn:
         url = urlparse(config.sentry_dsn)
         print(
