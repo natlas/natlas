@@ -1,6 +1,7 @@
 import logging
 import time
 from datetime import datetime
+from typing import Any
 
 import elasticsearch
 import semver
@@ -8,8 +9,8 @@ from opentelemetry import trace
 
 
 class ElasticClient:
-    es = None  # type: ignore[var-annotated]
-    lastReconnectAttempt = None  # type: ignore[var-annotated]
+    es: elasticsearch.Elasticsearch | None = None
+    lastReconnectAttempt: datetime | None = None
     status = False
     # Quiets the elasticsearch logger because otherwise connection errors print tracebacks to the WARNING level, even when the exception is handled.
     logger = logging.getLogger("elasticsearch")
@@ -43,14 +44,14 @@ class ElasticClient:
             # Set the lastReconnectAttempt to the timestamp after initialization
             self.lastReconnectAttempt = datetime.utcnow()
 
-    def _ping(self):  # type: ignore[no-untyped-def]
+    def _ping(self) -> bool:
         """
         Returns True if the cluster is up, False otherwise
         """
         with self._new_trace_span(operation="ping"):
             return self.es.ping()  # type: ignore[union-attr]
 
-    def _attempt_reconnect(self):  # type: ignore[no-untyped-def]
+    def _attempt_reconnect(self) -> bool:
         """
         Attempt to reconnect if we haven't tried to reconnect too recently
         """
@@ -62,7 +63,7 @@ class ElasticClient:
 
         return self.status
 
-    def _check_status(self):  # type: ignore[no-untyped-def]
+    def _check_status(self) -> bool:
         """
         If we're in a known bad state, try to reconnect
         """
@@ -70,10 +71,10 @@ class ElasticClient:
             raise elasticsearch.ConnectionError("Could not connect to Elasticsearch")
         return self.status
 
-    def set_auth(self, elasticUser: str, elasticPassword: str):  # type: ignore[no-untyped-def]
+    def set_auth(self, elasticUser: str, elasticPassword: str) -> None:
         self.es.options(basic_auth=(elasticUser, elasticPassword))  # type: ignore[union-attr]
 
-    def initialize_index(self, index: str, mapping: dict):  # type: ignore[no-untyped-def, type-arg]
+    def initialize_index(self, index: str, mapping: dict) -> None:  # type: ignore[type-arg]
         """
         Check each required index and make sure it exists, if it doesn't then create it
         """
@@ -90,20 +91,20 @@ class ElasticClient:
             else:
                 self.es.indices.put_mapping(index=index, body=mapping)  # type: ignore[union-attr]
 
-    def delete_index(self, index: str):  # type: ignore[no-untyped-def]
+    def delete_index(self, index: str) -> None:
         """
         Delete an existing index
         """
         if self.es.indices.exists(index=index):  # type: ignore[union-attr]
             self.es.indices.delete(index=index)  # type: ignore[union-attr]
 
-    def index_exists(self, index: str):  # type: ignore[no-untyped-def]
+    def index_exists(self, index: str) -> bool:
         """
         Check if index exists
         """
         return self.es.indices.exists(index=index)  # type: ignore[union-attr]
 
-    def get_collection(self, **kwargs):  # type: ignore[no-untyped-def]
+    def get_collection(self, **kwargs: Any) -> tuple[int, list[dict[str, Any]]]:
         """
         Execute a search and return a collection of results
         """
@@ -113,7 +114,7 @@ class ElasticClient:
         docsources = self.collate_source(results["hits"]["hits"])
         return results["hits"]["total"], docsources
 
-    def get_single_host(self, **kwargs):  # type: ignore[no-untyped-def]
+    def get_single_host(self, **kwargs: Any) -> tuple[int, dict[str, Any] | None]:
         """
         Execute a search and return a single result
         """
@@ -122,11 +123,11 @@ class ElasticClient:
             return 0, None
         return results["hits"]["total"], results["hits"]["hits"][0]["_source"]
 
-    def collate_source(self, documents):  # type: ignore[no-untyped-def]
+    def collate_source(self, documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
         return [doc["_source"] for doc in documents]
 
     # Mid-level query executor abstraction.
-    def execute_search(self, **kwargs):  # type: ignore[no-untyped-def]
+    def execute_search(self, **kwargs: Any) -> dict[str, Any]:
         """
         Execute an arbitrary search.
         """
@@ -138,9 +139,9 @@ class ElasticClient:
             )
             span.set_attribute("es.hits.total", results["hits"]["total"])
             self._attach_shard_span_attrs(span, results)
-            return results
+            return results  # type: ignore[no-any-return]
 
-    def execute_count(self, **kwargs):  # type: ignore[no-untyped-def]
+    def execute_count(self, **kwargs: Any) -> dict[str, int]:
         """
         Executes an arbitrary count.
         """
@@ -149,8 +150,8 @@ class ElasticClient:
             results = self._execute_raw_query(self.es.count, **kwargs)  # type: ignore[union-attr]
             self._attach_shard_span_attrs(span, results)
         if not results:
-            return 0
-        return results
+            return {"count": 0}
+        return results  # type: ignore[no-any-return]
 
     def execute_delete_by_query(self, **kwargs):  # type: ignore[no-untyped-def]
         """

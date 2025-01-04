@@ -1,6 +1,6 @@
 import elasticsearch
 import sentry_sdk
-from flask import request
+from flask import Response, request
 
 from app import db
 from app.errors import bp
@@ -8,7 +8,7 @@ from app.errors.errors import NatlasSearchError, NatlasServiceError
 from app.errors.responses import get_response, get_supported_formats
 
 
-def build_response(err: NatlasServiceError):  # type: ignore[no-untyped-def]
+def build_response(err: NatlasServiceError) -> Response:
     selected_format = request.accept_mimetypes.best_match(
         get_supported_formats(), default="application/json"
     )

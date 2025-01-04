@@ -1,6 +1,7 @@
 import secrets
 import string
 from datetime import datetime
+from typing import Optional
 
 from app import db
 from app.models.dict_serializable import DictSerializable
@@ -21,27 +22,27 @@ class Agent(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     # optional friendly name for viewing on user page
     friendly_name = db.Column(db.String(128), default="")
 
-    def verify_secret(self, secret):  # type: ignore[no-untyped-def]
+    def verify_secret(self, secret: str) -> bool:
         return secrets.compare_digest(secret, self.token)
 
     @staticmethod
-    def verify_agent(auth_header):  # type: ignore[no-untyped-def]
+    def verify_agent(auth_header: str) -> bool:
         auth_list = auth_header.split()
         if auth_list[0].lower() != "bearer":
             return False
         agent_id, agent_token = auth_list[1].split(":", 1)
         agent = Agent.load_agent(agent_id)
-        return bool(agent and agent.verify_secret(agent_token))
+        return bool(agent is not None and agent.verify_secret(agent_token))
 
     @staticmethod
-    def load_agent(agentid):  # type: ignore[no-untyped-def]
-        return Agent.query.filter_by(agentid=agentid).first()
+    def load_agent(agentid: str) -> Optional["Agent"]:
+        return Agent.query.filter_by(agentid=agentid).first()  # type: ignore[no-any-return]
 
     @staticmethod
-    def generate_token():  # type: ignore[no-untyped-def]
+    def generate_token() -> str:
         tokencharset = string.ascii_uppercase + string.ascii_lowercase + string.digits
         return "".join(secrets.choice(tokencharset) for _ in range(32))
 
     @staticmethod
-    def generate_agentid():  # type: ignore[no-untyped-def]
+    def generate_agentid() -> str:
         return generate_hex_16()

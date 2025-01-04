@@ -5,8 +5,8 @@ from netaddr import IPSet
 class IPScanManager:
     networks = None  # type: ignore[var-annotated]
     total = 0
-    rng = None  # type: ignore[var-annotated]
-    consistent = None  # type: ignore[var-annotated]
+    rng: CyclicPRNG | None = None
+    consistent: bool = False
 
     def __init__(self, whitelist: IPSet, blacklist: IPSet, consistent: bool):
         self.networks = []
@@ -17,7 +17,7 @@ class IPScanManager:
         self.blacklist = blacklist
         self.initialize_manager()
 
-    def log_to_db(self, message: str):  # type: ignore[no-untyped-def]
+    def log_to_db(self, message: str) -> None:
         from app import db
         from app.models import ScopeLog
 
@@ -30,7 +30,7 @@ class IPScanManager:
         db.session.add(db_log)
         db.session.commit()
 
-    def initialize_manager(self):  # type: ignore[no-untyped-def]
+    def initialize_manager(self) -> None:
         self.networks = []
         self.ipset = self.whitelist - self.blacklist
 
@@ -49,10 +49,7 @@ class IPScanManager:
             self.total, consistent=self.consistent, event_handler=self.log_to_db
         )
 
-        def blockcomp(b):  # type: ignore[no-untyped-def]
-            return b["start"]
-
-        self.networks.sort(key=blockcomp)
+        self.networks.sort(key=lambda b: b["start"])
 
         start = 1
         for i in range(0, len(self.networks)):
@@ -61,11 +58,11 @@ class IPScanManager:
 
         self.initialized = True
 
-    def get_total(self):  # type: ignore[no-untyped-def]
+    def get_total(self) -> int:
         return self.total
 
-    def get_ready(self):  # type: ignore[no-untyped-def]
-        return self.rng and self.total > 0 and self.initialized
+    def get_ready(self) -> bool:
+        return bool(self.rng and self.total > 0 and self.initialized)
 
     def get_next_ip(self):  # type: ignore[no-untyped-def]
         if self.rng:
@@ -73,7 +70,7 @@ class IPScanManager:
             return self.get_ip(index)
         return None
 
-    def get_ip(self, index):  # type: ignore[no-untyped-def]
+    def get_ip(self, index: int):  # type: ignore[no-untyped-def]
         def binarysearch(networks, i):  # type: ignore[no-untyped-def]
             middle = int(len(networks) / 2)
             network = networks[middle]

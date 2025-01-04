@@ -5,7 +5,7 @@ from flask import current_app
 from app.models import ScopeItem
 
 
-def get_target_tags(target: str) -> list:  # type: ignore[type-arg]
+def get_target_tags(target: str) -> list[str]:
     overlap = ScopeItem.get_overlapping_ranges(target)
     tags = []
     for scope in overlap:

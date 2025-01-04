@@ -20,34 +20,34 @@ class RescanTask(db.Model, DictSerializable):  # type: ignore[misc, name-defined
     date_completed = db.Column(db.DateTime, index=True)
     scan_id = db.Column(db.String(256), index=True, unique=True)
 
-    def dispatchTask(self):  # type: ignore[no-untyped-def]
+    def dispatchTask(self) -> None:
         self.dispatched = True
         self.date_dispatched = datetime.utcnow()
 
-    def completeTask(self, scan_id):  # type: ignore[no-untyped-def]
+    def completeTask(self, scan_id: str) -> None:
         self.scan_id = scan_id
         self.complete = True
         self.date_completed = datetime.utcnow()
 
     @staticmethod
-    def getPendingTasks():  # type: ignore[no-untyped-def]
+    def getPendingTasks() -> list["RescanTask"]:
         # Tasks that haven't been completed and haven't been dispatched
-        return (
+        return (  # type: ignore[no-any-return]
             RescanTask.query.filter_by(complete=False).filter_by(dispatched=False).all()
         )
 
     @staticmethod
-    def getDispatchedTasks():  # type: ignore[no-untyped-def]
+    def getDispatchedTasks() -> list["RescanTask"]:
         # Tasks that have been dispatched but haven't been completed
-        return (
+        return (  # type: ignore[no-any-return]
             RescanTask.query.filter_by(dispatched=True).filter_by(complete=False).all()
         )
 
     @staticmethod
-    def getIncompleteTasks():  # type: ignore[no-untyped-def]
+    def getIncompleteTasks() -> list["RescanTask"]:
         # All tasks that haven't been marked as complete
-        return RescanTask.query.filter_by(complete=False).all()
+        return RescanTask.query.filter_by(complete=False).all()  # type: ignore[no-any-return]
 
     @staticmethod
-    def getIncompleteTaskForTarget(ip):  # type: ignore[no-untyped-def]
-        return RescanTask.query.filter_by(target=ip).filter_by(complete=False).all()
+    def getIncompleteTaskForTarget(ip: str) -> list["RescanTask"]:
+        return RescanTask.query.filter_by(target=ip).filter_by(complete=False).all()  # type: ignore[no-any-return]

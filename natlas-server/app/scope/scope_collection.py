@@ -10,10 +10,10 @@ class ScopeCollection:
         scope_source: A callable that returns a collection of ScopeItem
         """
         self.scope_source = scope_source
-        self.list = []  # type: ignore[var-annotated]
+        self.list: list[IPNetwork] = []
         self.set = IPSet()
 
-    def update(self):  # type: ignore[no-untyped-def]
+    def update(self) -> None:
         self.list = [IPNetwork(item.target, False) for item in self.scope_source()]  # type: ignore[misc]
         self.set = IPSet(self.list)
         self.size = self.set.size

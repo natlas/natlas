@@ -21,5 +21,5 @@ def get_response(requested_format: str, err: NatlasServiceError) -> Response:
     return supported_formats.get(requested_format)(err)  # type: ignore[misc]
 
 
-def get_supported_formats() -> list:  # type: ignore[type-arg]
+def get_supported_formats() -> list[str]:
     return supported_formats.keys()  # type: ignore[return-value]

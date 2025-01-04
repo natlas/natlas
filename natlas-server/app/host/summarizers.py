@@ -1,7 +1,7 @@
 from flask import abort, current_app
 
 
-def hostinfo(ip):  # type: ignore[no-untyped-def]
+def hostinfo(ip: str):  # type: ignore[no-untyped-def]
     hostinfo = {}
     count, context = current_app.elastic.get_host(ip)  # type: ignore[attr-defined]
     if count == 0:

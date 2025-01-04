@@ -7,13 +7,13 @@ class NatlasServiceError(Exception):
         self.message = message
         self.template = template if template else f"errors/{self.status_code}.html"
 
-    def __str__(self):  # type: ignore[no-untyped-def]
+    def __str__(self) -> str:
         return f"{self.status_code}: {self.message}"
 
-    def get_dict(self):  # type: ignore[no-untyped-def]
+    def get_dict(self) -> dict[str, int | str]:
         return {"status": self.status_code, "message": self.message}
 
-    def get_json(self):  # type: ignore[no-untyped-def]
+    def get_json(self) -> str:
         return json.dumps(self.get_dict(), sort_keys=True, indent=4)
 
 

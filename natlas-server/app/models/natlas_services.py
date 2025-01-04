@@ -1,4 +1,5 @@
 import hashlib
+from typing import Any
 
 from app import db
 
@@ -15,11 +16,11 @@ class NatlasServices(db.Model):  # type: ignore[misc, name-defined]
         self.sha256 = hashlib.sha256(self.services.encode()).hexdigest()
 
     @staticmethod
-    def get_latest_services():  # type: ignore[no-untyped-def]
-        return NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()
+    def get_latest_services() -> dict[str, str]:
+        return NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()  # type: ignore[no-any-return]
 
-    def hash_equals(self, hash):  # type: ignore[no-untyped-def]
-        return self.sha256 == hash
+    def hash_equals(self, hash: str) -> bool:
+        return self.sha256 == hash  # type: ignore[no-any-return]
 
     def services_as_list(self):  # type: ignore[no-untyped-def]
         servlist = []
@@ -36,7 +37,7 @@ class NatlasServices(db.Model):  # type: ignore[misc, name-defined]
             idx += 1
         return servlist
 
-    def as_dict(self):  # type: ignore[no-untyped-def]
+    def as_dict(self) -> dict[str, Any]:
         servdict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         servdict["as_list"] = self.services_as_list()
         return servdict

@@ -19,7 +19,7 @@ json_content = "application/json"
 
 @bp.route("/getwork", methods=["GET"])
 @is_agent_authenticated
-def getwork():  # type: ignore[no-untyped-def]
+def getwork() -> Response:
     manual = request.args.get("target", "")
     if "natlas-agent" in request.headers["user-agent"]:
         verstr = request.headers["user-agent"].split("/")[1]
@@ -89,7 +89,7 @@ def getwork():  # type: ignore[no-untyped-def]
 
 @bp.route("/submit", methods=["POST"])
 @is_agent_authenticated
-def submit():  # type: ignore[no-untyped-def]
+def submit() -> Response:
     status_code = None
     response_body = None
     data = request.get_json()
@@ -215,7 +215,7 @@ def submit():  # type: ignore[no-untyped-def]
 
 @bp.route("/natlas-services", methods=["GET"])
 @is_agent_authenticated
-def natlasServices():  # type: ignore[no-untyped-def]
+def natlasServices() -> Response:
     if current_app.current_services["id"] != "None":  # type: ignore[attr-defined]
         tmpdict = (
             current_app.current_services.copy()  # type: ignore[attr-defined]
@@ -235,7 +235,7 @@ def natlasServices():  # type: ignore[no-untyped-def]
 
 @bp.route("/status", methods=["GET"])
 @is_authenticated
-def status():  # type: ignore[no-untyped-def]
+def status() -> Response:
     last_cycle_start = current_app.ScopeManager.get_last_cycle_start()  # type: ignore[attr-defined]
     completed_cycles = current_app.ScopeManager.get_completed_cycle_count()  # type: ignore[attr-defined]
     avg_cycle_time = None

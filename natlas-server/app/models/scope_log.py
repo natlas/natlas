@@ -10,9 +10,9 @@ class ScopeLog(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     msg = db.Column(db.String(256))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, msg=None):  # type: ignore[no-untyped-def]
+    def __init__(self, msg: str | None = None) -> None:
         self.msg = msg
 
-    def __repr__(self):  # type: ignore[no-untyped-def]
+    def __repr__(self) -> str:
         timerepr = self.created_at.strftime("%Y-%m-%d-%H:%M:%S")
         return f"<Log: {timerepr} - {self.msg[:50]}>"

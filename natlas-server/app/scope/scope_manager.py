@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from flask import current_app
 from netaddr import IPAddress
@@ -6,6 +7,9 @@ from netaddr.core import AddrFormatError
 
 from app.scope.scan_group import ScanGroup
 from app.scope.scan_manager import IPScanManager
+
+if TYPE_CHECKING:
+    from app.models.rescan_task import RescanTask
 
 
 class ScopeManager:
@@ -15,9 +19,9 @@ class ScopeManager:
     effective_size = 0
     default_group = "all"
 
-    def __init__(self):  # type: ignore[no-untyped-def]
-        self.pendingRescans = []
-        self.dispatchedRescans = []
+    def __init__(self) -> None:
+        self.pendingRescans: list[RescanTask] = []
+        self.dispatchedRescans: list[RescanTask] = []
 
     def init_app(self, app):  # type: ignore[no-untyped-def]
         app.ScopeManager = self
@@ -31,7 +35,7 @@ class ScopeManager:
             }
         self.init_time = datetime.utcnow()
 
-    def load_all_groups(self):  # type: ignore[no-untyped-def]
+    def load_all_groups(self) -> None:
         """
         Used at initialization to update all scan groups with their database values
         """
@@ -62,7 +66,7 @@ class ScopeManager:
     def get_completed_cycle_count(self, group: str = default_group) -> int:
         return self.scopes[group].get_completed_cycle_count()  # type: ignore[index, no-any-return]
 
-    def update(self, group: str = default_group):  # type: ignore[no-untyped-def]
+    def update(self, group: str = default_group) -> None:
         self.scopes.get(group).update()  # type: ignore[union-attr]
         current_app.logger.info(f"{datetime.utcnow()!s} - ScopeManager Updated\n")
 
@@ -81,13 +85,13 @@ class ScopeManager:
             and target in self.scopes[group].scope.set  # type: ignore[index]
         )
 
-    def get_pending_rescans(self) -> list:  # type: ignore[type-arg]
+    def get_pending_rescans(self) -> list["RescanTask"]:
         return self.pendingRescans
 
-    def get_dispatched_rescans(self) -> list:  # type: ignore[type-arg]
+    def get_dispatched_rescans(self) -> list["RescanTask"]:
         return self.dispatchedRescans
 
-    def get_incomplete_scans(self) -> list:  # type: ignore[type-arg]
+    def get_incomplete_scans(self) -> list["RescanTask"]:
         if self.pendingRescans == [] or self.dispatchedRescans == []:
             from app.models import RescanTask
 
@@ -95,12 +99,12 @@ class ScopeManager:
             self.dispatchedRescans = RescanTask.getDispatchedTasks()
         return self.pendingRescans + self.dispatchedRescans
 
-    def update_dispatched_rescans(self):  # type: ignore[no-untyped-def]
+    def update_dispatched_rescans(self) -> None:
         from app.models import RescanTask
 
         self.dispatchedRescans = RescanTask.getDispatchedTasks()
 
-    def update_pending_rescans(self):  # type: ignore[no-untyped-def]
+    def update_pending_rescans(self) -> None:
         from app.models import RescanTask
 
         self.pendingRescans = RescanTask.getPendingTasks()

@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from typing import Literal
 
 from netaddr import IPAddress, IPNetwork
 from netaddr.core import AddrFormatError
@@ -30,12 +31,12 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     start_addr = db.Column(db.VARBINARY(16))
     stop_addr = db.Column(db.VARBINARY(16))
 
-    def __init__(self, target: str, blacklist: bool):
+    def __init__(self, target: str, blacklist: bool) -> None:
         self.target = target
         self.blacklist = blacklist
         self.parse_network_range(target)
 
-    def parse_network_range(self, network: str):  # type: ignore[no-untyped-def]
+    def parse_network_range(self, network: str) -> None:
         net = IPNetwork(network)
         self.addr_family = net.version
         size = 4 if net.version == 4 else 16
@@ -43,7 +44,7 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         self.stop_addr = net.last.to_bytes(size, byteorder="big")
 
     @staticmethod
-    def get_overlapping_ranges(addr: str) -> list:  # type: ignore[type-arg]
+    def get_overlapping_ranges(addr: str) -> list["ScopeItem"]:
         addr = IPAddress(addr)
         size = 4 if addr.version == 4 else 16  # type: ignore[attr-defined]
         binval = addr.value.to_bytes(size, byteorder="big")  # type: ignore[attr-defined]
@@ -54,30 +55,30 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
             .all()
         )
 
-    def addTag(self, tag: Tag):  # type: ignore[no-untyped-def]
+    def addTag(self, tag: Tag) -> None:
         if not self.is_tagged(tag):
             self.tags.append(tag)
 
-    def delTag(self, tag: Tag):  # type: ignore[no-untyped-def]
+    def delTag(self, tag: Tag) -> None:
         if self.is_tagged(tag):
             self.tags.remove(tag)
 
-    def is_tagged(self, tag: Tag):  # type: ignore[no-untyped-def]
+    def is_tagged(self, tag: Tag) -> bool:
         return tag in self.tags  # type: ignore[attr-defined]
 
-    def get_tag_names(self):  # type: ignore[no-untyped-def]
+    def get_tag_names(self) -> list[str]:
         return [tag.name for tag in self.tags]  # type: ignore[attr-defined]
 
     @staticmethod
-    def getBlacklist():  # type: ignore[no-untyped-def]
-        return ScopeItem.query.filter_by(blacklist=True).all()
+    def getBlacklist() -> list["ScopeItem"]:
+        return ScopeItem.query.filter_by(blacklist=True).all()  # type: ignore[no-any-return]
 
     @staticmethod
-    def getScope():  # type: ignore[no-untyped-def]
-        return ScopeItem.query.filter_by(blacklist=False).all()
+    def getScope() -> list["ScopeItem"]:
+        return ScopeItem.query.filter_by(blacklist=False).all()  # type: ignore[no-any-return]
 
     @staticmethod
-    def addTags(scopeitem, tags: Iterable):  # type: ignore[no-untyped-def, type-arg]
+    def addTags(scopeitem: "ScopeItem", tags: Iterable[str]) -> None:
         from app.models import Tag
 
         for tag in tags:
@@ -87,7 +88,7 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
             scopeitem.addTag(tag_obj)
 
     @staticmethod
-    def parse_tags(tags: Iterable) -> Iterable:  # type: ignore[type-arg]
+    def parse_tags(tags: Iterable[str]) -> list[str]:
         out = []
         for t in tags:
             if t.strip() == "":
@@ -96,20 +97,20 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         return out
 
     @staticmethod
-    def parse_import_line(line: str):  # type: ignore[no-untyped-def]
+    def parse_import_line(line: str) -> tuple[IPNetwork, list[str]]:
         splitline = line.split(",")
-        tags = []  # type: ignore[var-annotated]
+        tags = []
         if len(splitline) > 1:
             ip = splitline[0]
-            tags = ScopeItem.parse_tags(splitline[1:])  # type: ignore[assignment]
+            tags = ScopeItem.parse_tags(splitline[1:])
         else:
             ip = line
-        ip = ScopeItem.validate_ip(ip)
-        return ip, tags
+        validated_ip = ScopeItem.validate_ip(ip)
+        return validated_ip, tags
 
     @staticmethod
-    def extract_import_tags(import_list: list) -> Iterable[str]:  # type: ignore[type-arg]
-        out = set()  # type: ignore[var-annotated]
+    def extract_import_tags(import_list: list[str]) -> Iterable[str]:
+        out = set()
         for line in import_list:
             split = line.split(",")
             if len(split) > 1:
@@ -118,7 +119,9 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         return out
 
     @staticmethod
-    def create_if_none(ip: str, blacklist: bool, tags=None):  # type: ignore[no-untyped-def]
+    def create_if_none(
+        ip: str, blacklist: bool, tags: list[str] | None = None
+    ) -> tuple[bool, "ScopeItem"]:
         if tags is None:
             tags = []
         new = False
@@ -131,14 +134,14 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         return new, item
 
     @staticmethod
-    def validate_ip(ip: str):  # type: ignore[no-untyped-def]
+    def validate_ip(ip: str) -> IPNetwork | Literal[False]:
         try:
             return IPNetwork(ip)
         except AddrFormatError:
             return False
 
     @staticmethod
-    def import_scope_list(address_list: Iterable, blacklist: bool) -> dict:  # type: ignore[type-arg]
+    def import_scope_list(address_list: Iterable[str], blacklist: bool) -> dict:  # type: ignore[type-arg]
         result = {"fail": [], "success": 0, "exist": 0}
         prefixes = {"sqlite": " OR IGNORE", "mysql": " IGNORE"}
         selected_prefix = prefixes.get(db.engine.dialect.name)

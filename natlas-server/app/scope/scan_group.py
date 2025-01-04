@@ -43,13 +43,13 @@ class ScanGroup:
             return 0
         return self.scan_manager.rng.completed_cycle_count  # type: ignore[unreachable]
 
-    def update(self):  # type: ignore[no-untyped-def]
+    def update(self) -> None:
         self.scope.update()
         self.blacklist.update()
         self.update_scan_manager()
         self.effective_size = (self.scope.set - self.blacklist.set).size
 
-    def update_scan_manager(self):  # type: ignore[no-untyped-def]
+    def update_scan_manager(self) -> None:
         try:
             self.scan_manager = IPScanManager(  # type: ignore[assignment]
                 self.scope.set,

@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 
 from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user
+from werkzeug.wrappers.response import Response
 
 from app import db
 from app.auth import bp
@@ -119,8 +120,11 @@ def reset_password():  # type: ignore[no-untyped-def]
 
 @bp.route("/invite", methods=["GET", "POST"])
 @is_not_authenticated
-def invite_user():  # type: ignore[no-untyped-def]
+def invite_user() -> Response:
     url_token = request.args.get("token", None)
+    if not url_token:
+        flash("No token found")
+        return redirect(url_for("auth.login"))
     invite = UserInvitation.get_invite(url_token)
     if not invite:
         flash("Invite token is invalid or has expired", "danger")
@@ -140,7 +144,7 @@ def invite_user():  # type: ignore[no-untyped-def]
         login_user(new_user)
         flash("Your password has been set.", "success")
         return redirect(url_for("main.browse"))
-    return render_template(
+    return render_template(  # type: ignore[return-value]
         supported_forms[form_type]["template"],  # type: ignore[arg-type]
         title="Accept Invitation",
         form=form,
