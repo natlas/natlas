@@ -76,9 +76,9 @@ def generate_new_token(agent_id):  # type: ignore[no-untyped-def]
 
     if generateTokenForm.validate_on_submit():
         myAgent = Agent.load_agent(agent_id)
-        myAgent.token = Agent.generate_token()
+        myAgent.token = Agent.generate_token()  # type: ignore[union-attr]
         db.session.commit()
-        flash(f"Agent {myAgent.agentid} has a new key of: {myAgent.token}", "success")
+        flash(f"Agent {myAgent.agentid} has a new key of: {myAgent.token}", "success")  # type: ignore[union-attr]
     else:
         flash("Couldn't generate new token", "danger")
     return redirect(url_for("user.profile"))
@@ -91,11 +91,12 @@ def change_agent_name(agent_id):  # type: ignore[no-untyped-def]
 
     if agentNameForm.validate_on_submit():
         myAgent = Agent.load_agent(agent_id)
-        oldname = myAgent.friendly_name
-        myAgent.friendly_name = agentNameForm.agent_name.data
+        oldname = myAgent.friendly_name  # type: ignore[union-attr]
+        myAgent.friendly_name = agentNameForm.agent_name.data  # type: ignore[union-attr]
         db.session.commit()
         flash(
-            f"Agent name changed from {oldname} to {myAgent.friendly_name}", "success"
+            f"Agent name changed from {oldname} to {myAgent.friendly_name}",  # type: ignore[union-attr]
+            "success",
         )
     else:
         flash("Couldn't change agent name", "danger")

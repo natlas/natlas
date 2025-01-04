@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import werkzeug
 from flask import (
     Response,
     abort,
@@ -25,7 +26,7 @@ from app.models import RescanTask
 
 @bp.route("/<ip:ip>")
 @is_authenticated
-def host(ip):  # type: ignore[no-untyped-def]
+def host(ip: str) -> str:
     info, context = hostinfo(ip)
     delForm = DeleteForm()
     delHostForm = DeleteForm()
@@ -46,7 +47,7 @@ def host(ip):  # type: ignore[no-untyped-def]
 
 @bp.route("/<ip:ip>/history")
 @is_authenticated
-def host_history(ip):  # type: ignore[no-untyped-def]
+def host_history(ip: str) -> str:
     info, context = hostinfo(ip)
     page = int(request.args.get("p", 1))
     searchOffset = current_user.results_per_page * (page - 1)
@@ -83,7 +84,7 @@ def host_history(ip):  # type: ignore[no-untyped-def]
 
 @bp.route("/<ip:ip>/<scan_id>")
 @is_authenticated
-def host_historical_result(ip, scan_id):  # type: ignore[no-untyped-def]
+def host_historical_result(ip: str, scan_id: str) -> str:
     delForm = DeleteForm()
     delHostForm = DeleteForm()
     rescanForm = RescanForm()
@@ -105,9 +106,9 @@ def host_historical_result(ip, scan_id):  # type: ignore[no-untyped-def]
 
 @bp.route("/<ip:ip>/<scan_id>.<ext>")
 @is_authenticated
-def export_scan(ip, scan_id, ext):  # type: ignore[no-untyped-def]
+def export_scan(ip: str, scan_id: str, ext: str) -> Response:
     if ext not in ["xml", "nmap", "gnmap", "json"]:
-        return abort(404)
+        abort(404)
 
     export_field = f"{ext}_data"
 
@@ -117,12 +118,14 @@ def export_scan(ip, scan_id, ext):  # type: ignore[no-untyped-def]
         return jsonify(context)
     if count > 0 and export_field in context:
         return Response(context[export_field], mimetype=mime)
-    return abort(404)
+    abort(404)
+    # This return is unreachable but the RET503 linter doesn't understand that abort is a NoReturn apparently?
+    return None  # type: ignore[unreachable]
 
 
 @bp.route("/<ip:ip>/screenshots")
 @is_authenticated
-def host_screenshots(ip):  # type: ignore[no-untyped-def]
+def host_screenshots(ip: str) -> str:
     page = int(request.args.get("p", 1))
     searchOffset = current_user.results_per_page * (page - 1)
 
@@ -156,8 +159,8 @@ def host_screenshots(ip):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/<ip:ip>/rescan", methods=["POST"])
-@login_required
-def rescan_host(ip):  # type: ignore[no-untyped-def]
+@login_required  # type: ignore[misc]
+def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
     rescanForm = RescanForm()
 
     if not (
@@ -200,7 +203,7 @@ def rescan_host(ip):  # type: ignore[no-untyped-def]
 
 @bp.route("/random")
 @is_authenticated
-def random_host():  # type: ignore[no-untyped-def]
+def random_host() -> str:
     random_host = current_app.elastic.random_host()  # type: ignore[attr-defined]
     # This would most likely occur when there are no hosts up in the index, so just throw a 404
     if not random_host:

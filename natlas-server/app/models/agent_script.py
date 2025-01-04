@@ -12,5 +12,5 @@ class AgentScript(db.Model, DictSerializable):  # type: ignore[misc, name-define
     name = db.Column(db.String(128), index=True, unique=True)
 
     @staticmethod
-    def get_scripts_string():  # type: ignore[no-untyped-def]
+    def get_scripts_string() -> str:
         return ",".join(s.name for s in AgentScript.query.all())

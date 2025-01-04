@@ -1,5 +1,6 @@
 import secrets
 from datetime import datetime, timedelta
+from typing import Optional
 
 from app import db
 from app.models import User
@@ -51,25 +52,27 @@ class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-def
         return deliver_auth_link(invite.email, invite.token, "invite")
 
     @staticmethod
-    def get_invite(url_token):  # type: ignore[no-untyped-def]
-        record = UserInvitation.query.filter_by(token=url_token).first()
-        if not record:
-            return False
+    def get_invite(url_token: str) -> Optional["UserInvitation"]:
+        record: UserInvitation | None = UserInvitation.query.filter_by(
+            token=url_token
+        ).first()
+        if record is None:
+            return None
         return validate_token(record, url_token, record.token, record.validate_invite)
 
-    def accept_invite(self):  # type: ignore[no-untyped-def]
+    def accept_invite(self) -> None:
         now = datetime.utcnow()
         self.accepted_date = now
         self.expire_invite(now)
 
     # If a token is expired, mark it as such
-    def expire_invite(self, timestamp):  # type: ignore[no-untyped-def]
+    def expire_invite(self, timestamp: datetime) -> None:
         self.expiration_date = min(timestamp, self.expiration_date)
 
         # Leave original expiration date intact since it's already past
         self.is_expired = True
 
     # verify that the token is not expired
-    def validate_invite(self):  # type: ignore[no-untyped-def]
+    def validate_invite(self) -> bool:
         now = datetime.utcnow()
         return self.expiration_date > now and not self.is_expired

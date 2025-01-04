@@ -19,7 +19,7 @@ from app.main.pagination import build_pagination_urls, results_offset
 
 
 @bp.route("/")
-def index():  # type: ignore[no-untyped-def]
+def index() -> str:
     login_form = None
     reg_form = None
     if current_user.is_anonymous:
@@ -33,7 +33,7 @@ def index():  # type: ignore[no-untyped-def]
 # Serve media files in case the front-end proxy doesn't do it
 @bp.route("/media/<path:filename>")
 @is_authenticated
-def send_media(filename):  # type: ignore[no-untyped-def]
+def send_media(filename: str) -> Response:
     # If you're looking at this function, wondering why your files aren't sending...
     # It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
     return send_from_directory(current_app.config["MEDIA_DIRECTORY"], filename)
@@ -41,7 +41,7 @@ def send_media(filename):  # type: ignore[no-untyped-def]
 
 @bp.route("/browse")
 @is_authenticated
-def browse():  # type: ignore[no-untyped-def]
+def browse() -> str:
     """
     A simple browser that doesn't deal with queries at all
     """
@@ -78,13 +78,13 @@ def browse():  # type: ignore[no-untyped-def]
 
 @bp.route("/search")
 @is_authenticated
-def search():  # type: ignore[no-untyped-def]
+def search() -> Response | str:
     """
     Return search results for a given query
     """
     query = request.args.get("query", "")
     if query == "":
-        return redirect(url_for("main.browse"))
+        return redirect(url_for("main.browse"))  # type: ignore[return-value]
     page = int(request.args.get("page", 1))
     format = request.args.get("format", "")
     scan_ids = request.args.get("includeScanIDs", "")
@@ -137,13 +137,13 @@ def search():  # type: ignore[no-untyped-def]
 
 @bp.route("/searchmodal")
 @is_authenticated
-def search_modal():  # type: ignore[no-untyped-def]
+def search_modal() -> str:
     return render_template("includes/search_modal_content.html")
 
 
 @bp.route("/screenshots")
 @is_authenticated
-def screenshots():  # type: ignore[no-untyped-def]
+def screenshots() -> str:
     page = int(request.args.get("page", 1))
 
     results_per_page, search_offset = results_offset(page)
@@ -166,7 +166,7 @@ def screenshots():  # type: ignore[no-untyped-def]
 
 @bp.route("/status")
 @is_authenticated
-def status():  # type: ignore[no-untyped-def]
+def status() -> str:
     """
     Simple html representation of the status api
     """

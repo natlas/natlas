@@ -8,7 +8,7 @@ class Tag(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     name = db.Column(db.String(128), index=True, unique=True, nullable=False)
 
     @staticmethod
-    def create_if_none(tag):  # type: ignore[no-untyped-def]
+    def create_if_none(tag: str) -> "Tag":
         """If tag exists, return it. If not, create it and return it."""
         tag = tag.strip()
         existingTag = Tag.query.filter_by(name=tag).first()
@@ -16,4 +16,4 @@ class Tag(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
             newTag = Tag(name=tag)
             db.session.add(newTag)
             return newTag
-        return existingTag
+        return existingTag  # type: ignore[no-any-return]

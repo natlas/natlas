@@ -29,7 +29,7 @@ def validate_email(addr):  # type: ignore[no-untyped-def]
     return validemail
 
 
-def build_email_url(token, token_type):  # type: ignore[no-untyped-def]
+def build_email_url(token: str, token_type: str) -> str:
     return url_for(
         token_types[token_type]["route"],
         token=token,

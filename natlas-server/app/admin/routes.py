@@ -28,9 +28,9 @@ from app.models import (
 
 
 @bp.route("/", methods=["GET", "POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def admin():  # type: ignore[no-untyped-def]
+def admin() -> str:
     configForm = forms.ConfigForm()
     configItems = current_app.config
     if configForm.validate_on_submit():
@@ -49,9 +49,9 @@ def admin():  # type: ignore[no-untyped-def]
 
 
 @bp.route("/users", methods=["GET", "POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def users():  # type: ignore[no-untyped-def]
+def users() -> Response | str:
     users = User.query.all()
     inviteForm = forms.InviteUserForm()
     if inviteForm.validate_on_submit():
@@ -59,7 +59,7 @@ def users():  # type: ignore[no-untyped-def]
         msg = UserInvitation.deliver_invite(invitation)
         flash(msg, "success")
         db.session.commit()
-        return redirect(url_for("admin.users"))
+        return redirect(url_for("admin.users"))  # type: ignore[return-value]
     return render_template(
         "admin/users.html",
         users=users,
@@ -70,14 +70,14 @@ def users():  # type: ignore[no-untyped-def]
 
 
 @bp.route("/users/<int:id>/delete", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def delete_user(id):  # type: ignore[no-untyped-def]
+def delete_user(id: int) -> Response:
     delForm = forms.UserDeleteForm()
     if delForm.validate_on_submit():
         if current_user.id == id:
             flash("You can't delete yourself!", "danger")
-            return redirect(url_for("admin.users"))
+            return redirect(url_for("admin.users"))  # type: ignore[return-value]
         user = User.query.filter_by(id=id).first()
         User.query.filter_by(id=id).delete()
         db.session.commit()
@@ -85,32 +85,32 @@ def delete_user(id):  # type: ignore[no-untyped-def]
     else:
         flash("Form couldn't validate!", "danger")
 
-    return redirect(url_for("admin.users"))
+    return redirect(url_for("admin.users"))  # type: ignore[return-value]
 
 
 @bp.route("/users/<int:id>/toggle", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def toggle_user(id):  # type: ignore[no-untyped-def]
+def toggle_user(id: int) -> Response:
     editForm = forms.UserEditForm()
     if editForm.validate_on_submit():
         user = User.query.filter_by(id=id).first()
         if user.id == current_user.id:
             flash("Can't demote yourself!", "danger")
-            return redirect(url_for("admin.users"))
+            return redirect(url_for("admin.users"))  # type: ignore[return-value]
         user.is_admin = not user.is_admin
         db.session.commit()
         flash("User status toggled.", "success")
     else:
         flash("Form couldn't validate!", "danger")
 
-    return redirect(url_for("admin.users"))
+    return redirect(url_for("admin.users"))  # type: ignore[return-value]
 
 
 @bp.route("/scope", methods=["GET", "POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def scope():  # type: ignore[no-untyped-def]
+def scope() -> Response | str:
     render = {
         "scope": ScopeItem.getScope(),
         "scopeSize": current_app.ScopeManager.get_scope_size(),  # type: ignore[attr-defined]
@@ -132,14 +132,14 @@ def scope():  # type: ignore[no-untyped-def]
         db.session.commit()
         current_app.ScopeManager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} added.", "success")
-        return redirect(url_for("admin.scope"))
+        return redirect(url_for("admin.scope"))  # type: ignore[return-value]
     return render_template("admin/scope.html", **render)
 
 
 @bp.route("/blacklist", methods=["GET", "POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def blacklist():  # type: ignore[no-untyped-def]
+def blacklist() -> Response | str:
     render = {
         "scope": ScopeItem.getBlacklist(),
         "blacklistSize": current_app.ScopeManager.get_blacklist_size(),  # type: ignore[attr-defined]
@@ -160,14 +160,14 @@ def blacklist():  # type: ignore[no-untyped-def]
         db.session.commit()
         current_app.ScopeManager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} blacklisted.", "success")
-        return redirect(url_for("admin.blacklist"))
+        return redirect(url_for("admin.blacklist"))  # type: ignore[return-value]
     return render_template("admin/blacklist.html", **render)
 
 
 @bp.route("/import/<string:scopetype>", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def import_scope(scopetype=""):  # type: ignore[no-untyped-def]
+def import_scope(scopetype: str = "") -> Response:
     if scopetype == "blacklist":
         importBlacklist = True
         importForm = forms.ImportBlacklistForm()
@@ -175,7 +175,7 @@ def import_scope(scopetype=""):  # type: ignore[no-untyped-def]
         importBlacklist = False
         importForm = forms.ImportScopeForm()
     else:
-        return abort(404)
+        abort(404)
     if importForm.validate_on_submit():
         newScopeItems = importForm.scope.data.split("\n")
         result = ScopeItem.import_scope_list(newScopeItems, importBlacklist)
@@ -193,7 +193,7 @@ def import_scope(scopetype=""):  # type: ignore[no-untyped-def]
         for _field, errors in importForm.errors.items():
             for error in errors:
                 flash(error, "danger")
-    return redirect(url_for(f"admin.{scopetype}"))
+    return redirect(url_for(f"admin.{scopetype}"))  # type: ignore[return-value]
 
 
 @bp.route("/export/<string:scopetype>", methods=["GET"])
@@ -483,8 +483,8 @@ def tags():  # type: ignore[no-untyped-def]
 
 
 @bp.route("/logs", methods=["GET"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def logs():  # type: ignore[no-untyped-def]
+def logs() -> str:
     scope_logs = ScopeLog.query.order_by(ScopeLog.created_at.desc()).all()
     return render_template("admin/logs.html", scope_logs=scope_logs)

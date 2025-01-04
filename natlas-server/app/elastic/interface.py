@@ -7,8 +7,8 @@ from app.elastic.indices import ElasticIndices
 
 
 class ElasticInterface:
-    client = None  # type: ignore[var-annotated]
-    indices = None  # type: ignore[var-annotated]
+    client: ElasticClient
+    indices: ElasticIndices
 
     def __init__(
         self,
@@ -49,8 +49,8 @@ class ElasticInterface:
         }
         sort = {"ctime": {"order": "desc"}}
 
-        return self.client.get_collection(  # type: ignore[union-attr]
-            index=self.indices.name(searchIndex),  # type: ignore[union-attr]
+        return self.client.get_collection(
+            index=self.indices.name(searchIndex),
             query=query,
             sort=sort,
             from_=offset,
@@ -60,7 +60,7 @@ class ElasticInterface:
         """
         Count the number of documents in nmap and return the count
         """
-        result = self.client.execute_count(index=self.indices.name("latest"))  # type: ignore[union-attr]
+        result = self.client.execute_count(index=self.indices.name("latest"))
         return result["count"]
 
     def new_result(self, host: dict):  # type: ignore[no-untyped-def, type-arg]
@@ -69,9 +69,9 @@ class ElasticInterface:
         """
         ip = str(host["ip"])
 
-        self.client.execute_index(index=self.indices.name("history"), document=host)  # type: ignore[union-attr]
-        self.client.execute_index(  # type: ignore[union-attr]
-            index=self.indices.name("latest"),  # type: ignore[union-attr]
+        self.client.execute_index(index=self.indices.name("history"), document=host)
+        self.client.execute_index(
+            index=self.indices.name("latest"),
             id=ip,
             document=host,
         )
@@ -86,8 +86,8 @@ class ElasticInterface:
         query = {"term": {"ip": ip}}
         sort = {"ctime": {"order": "desc"}}
 
-        return self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("history"),  # type: ignore[union-attr]
+        return self.client.get_single_host(
+            index=self.indices.name("history"),
             size=size,
             query=query,
             sort=sort,
@@ -100,8 +100,8 @@ class ElasticInterface:
         query = {"term": {"ip": ip}}
         sort = {"ctime": {"order": "desc"}}
 
-        return self.client.get_collection(  # type: ignore[union-attr]
-            index=self.indices.name("history"),  # type: ignore[union-attr]
+        return self.client.get_collection(
+            index=self.indices.name("history"),
             size=limit,
             from_=offset,
             query=query,
@@ -133,8 +133,8 @@ class ElasticInterface:
         }
         sort = {"ctime": {"order": "desc"}}
         source_fields = ["screenshots", "ctime", "scan_id"]
-        return self.client.get_collection(  # type: ignore[union-attr]
-            index=self.indices.name("history"),  # type: ignore[union-attr]
+        return self.client.get_collection(
+            index=self.indices.name("history"),
             query=query,
             size=limit,
             from_=offset,
@@ -158,8 +158,8 @@ class ElasticInterface:
         }
         sort = {"ctime": {"order": "desc"}}
 
-        return self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("history"),  # type: ignore[union-attr]
+        return self.client.get_single_host(
+            index=self.indices.name("history"),
             size=size,
             query=query,
             sort=sort,
@@ -173,8 +173,8 @@ class ElasticInterface:
         size = 1
         query = {"query_string": {"query": scan_id, "fields": ["scan_id"]}}
         sort = {"ctime": {"order": "desc"}}
-        count, host = self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("latest"),  # type: ignore[union-attr]
+        count, host = self.client.get_single_host(
+            index=self.indices.name("latest"),
             size=size,
             query=query,
             sort=sort,
@@ -182,13 +182,13 @@ class ElasticInterface:
         if count != 0:
             # we're deleting the most recent scan result and need to pull the next most recent into the nmap index
             # otherwise you won't find the host when doing searches or browsing
-            ipaddr = host["ip"]
+            ipaddr = host["ip"]  # type: ignore[index]
             size = 2
             query = {"query_string": {"query": ipaddr, "fields": ["ip"]}}
             sort = {"ctime": {"order": "desc"}}
 
-            count, twoscans = self.client.get_collection(  # type: ignore[union-attr]
-                index=self.indices.name("history"),  # type: ignore[union-attr]
+            count, twoscans = self.client.get_collection(
+                index=self.indices.name("history"),
                 size=size,
                 query=query,
                 sort=sort,
@@ -206,13 +206,13 @@ class ElasticInterface:
                 }
             }
         }
-        result = self.client.execute_delete_by_query(  # type: ignore[union-attr]
-            index=self.indices.str_indices(),  # type: ignore[union-attr]
+        result = self.client.execute_delete_by_query(
+            index=self.indices.str_indices(),
             body=deleteBody,
         )
         if migrate:
-            self.client.execute_index(  # type: ignore[union-attr]
-                index=self.indices.name("latest"),  # type: ignore[union-attr]
+            self.client.execute_index(
+                index=self.indices.name("latest"),
                 id=ipaddr,  # type: ignore[possibly-undefined]
                 document=twoscans[1],  # type: ignore[possibly-undefined]
             )
@@ -232,8 +232,8 @@ class ElasticInterface:
             }
         }
 
-        deleted = self.client.execute_delete_by_query(  # type: ignore[union-attr]
-            index=self.indices.str_indices(),  # type: ignore[union-attr]
+        deleted = self.client.execute_delete_by_query(
+            index=self.indices.str_indices(),
             body=deleteBody,
         )
         return deleted["deleted"]
@@ -259,8 +259,8 @@ class ElasticInterface:
             }
         }
 
-        count, host = self.client.get_single_host(  # type: ignore[union-attr]
-            index=self.indices.name("latest"),  # type: ignore[union-attr]
+        count, host = self.client.get_single_host(
+            index=self.indices.name("latest"),
             size=size,
             from_=offset,
             query=query,
@@ -276,8 +276,8 @@ class ElasticInterface:
         sort = {"ctime": {"order": "desc"}}
         source_fields = ["screenshots", "ctime", "scan_id", "ip"]
         # We need to execute_search instead of get_collection here because we also need the aggregation information
-        result = self.client.execute_search(  # type: ignore[union-attr]
-            index=self.indices.name("latest"),  # type: ignore[union-attr]
+        result = self.client.execute_search(
+            index=self.indices.name("latest"),
             query=query,
             size=limit,
             from_=offset,
@@ -287,7 +287,7 @@ class ElasticInterface:
             track_scores=False,
         )
         num_screenshots = int(result["aggregations"]["screenshot_count"]["value"])
-        results = self.client.collate_source(result["hits"]["hits"])  # type: ignore[union-attr]
+        results = self.client.collate_source(result["hits"]["hits"])
 
         return result["hits"]["total"], num_screenshots, results
 
@@ -302,8 +302,8 @@ class ElasticInterface:
         """
         Count the number of scans that match an arbitrary search body
         """
-        return self.client.execute_search(  # type: ignore[union-attr]
-            index=self.indices.name(index),  # type: ignore[union-attr]
+        return self.client.execute_search(
+            index=self.indices.name(index),
             size=0,
             track_scores=False,
             **kwargs,

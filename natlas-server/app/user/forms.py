@@ -14,7 +14,7 @@ class ChangePasswordForm(FlaskForm):  # type: ignore[misc]
     )
     changePassword = SubmitField("Change Password")
 
-    def validate_old_password(self, old_password):  # type: ignore[no-untyped-def]
+    def validate_old_password(self, old_password: PasswordField) -> None:
         user = User.query.get(current_user.id)
         if user is None:
             raise ValidationError("You're not logged in!")
@@ -39,6 +39,6 @@ class AgentNameForm(FlaskForm):  # type: ignore[misc]
     agent_name = StringField("New Agent Name", validators=[DataRequired()])
     change_name = SubmitField("Change Name")
 
-    def validate_agent_name(self, agent_name):  # type: ignore[no-untyped-def]
+    def validate_agent_name(self, agent_name: StringField) -> None:
         if len(agent_name.data) > 32:
             raise ValidationError("Name must be less than 32 characters")
