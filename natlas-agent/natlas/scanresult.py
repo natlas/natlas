@@ -58,4 +58,4 @@ class ScanResult:
     def add_screenshot(self, screenshot: AquatoneScreenshot | VNCScreenshot) -> None:
         if "screenshots" not in self.result:
             self.result["screenshots"] = []
-        self.result["screenshots"].append(screenshot)
+        self.result["screenshots"].append(screenshot.model_dump())
