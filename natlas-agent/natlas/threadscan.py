@@ -18,7 +18,9 @@ logger = logging.get_logger("AgentThread")
 conf = Config()
 
 
-def command_builder(scan_id, agentConfig, target):  # type: ignore[no-untyped-def]
+def command_builder(
+    scan_id: str, agentConfig: dict[str, Any], target: str
+) -> list[str]:
     outFiles = os.path.join(utils.get_scan_dir(scan_id), f"nmap.{scan_id}")
     servicepath = utils.get_services_path()
     command = ["nmap", "--privileged", "-oA", outFiles, "--servicedb", servicepath]
@@ -123,7 +125,7 @@ def scan(target_data: dict[str, Any], config: Config) -> ScanResult | Literal[Fa
 class ThreadScan(threading.Thread):
     def __init__(
         self,
-        queue: queue.Queue[ScanWorkItem],
+        queue: queue.Queue[dict[str, Any]],
         config: Config,
         auto: bool = False,
         servicesSha: str = "",
@@ -200,8 +202,6 @@ class ThreadScan(threading.Thread):
                     )
             return ScanWorkItem(target_data)
         # Manual
-        target_data = self.queue.get()
-        if not target_data:
-            return None
-        logger.info(f"Manual Target: {target_data['target']}")
-        return ManualScanWorkItem(self.queue, target_data)
+        manual_target = self.queue.get()
+        logger.info(f"Manual Target: {manual_target['target']}")
+        return ManualScanWorkItem(self.queue, manual_target)

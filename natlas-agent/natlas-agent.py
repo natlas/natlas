@@ -8,11 +8,11 @@ import queue
 import subprocess
 import time
 from pathlib import Path
+from typing import Any
 
 from config import Config
 from natlas import error_reporting, logging, utils
 from natlas.net import NatlasNetworkServices
-from natlas.scan_work import ScanWorkItem
 from natlas.threadscan import ThreadScan
 
 ERR = {"INVALIDTARGET": 1, "SCANTIMEOUT": 2, "DATANOTFOUND": 3, "INVALIDDATA": 4}
@@ -26,7 +26,7 @@ global_logger = logging.get_logger("MainThread")
 netsrv = NatlasNetworkServices(config)
 
 
-def add_targets_to_queue(target: str, q: queue.Queue[ScanWorkItem]) -> None:
+def add_targets_to_queue(target: str, q: queue.Queue[dict[str, Any]]) -> None:
     targetNetwork = ipaddress.ip_network(target.strip())
     if targetNetwork.num_addresses == 1:
         target_data = netsrv.get_work(target=str(targetNetwork.network_address))
@@ -92,7 +92,7 @@ def main() -> None:
 
     # Initialize SentryIo after basic environment checks complete
     error_reporting.initialize_sentryio(config)
-    q: queue.Queue[ScanWorkItem] = queue.Queue(maxsize=MAX_QUEUE_SIZE)
+    q: queue.Queue[dict[str, Any]] = queue.Queue(maxsize=MAX_QUEUE_SIZE)
 
     servicesSha = ""
     SERVICESPATH = utils.get_services_path()

@@ -11,7 +11,9 @@ class ScanWorkItem:
 
 
 class ManualScanWorkItem(ScanWorkItem):
-    def __init__(self, queue: Queue[ScanWorkItem], target_data: dict[str, Any]) -> None:
+    def __init__(
+        self, queue: Queue[dict[str, Any]], target_data: dict[str, Any]
+    ) -> None:
         super().__init__(target_data)
         self.queue = queue
 

@@ -11,6 +11,7 @@ from requests import Response
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from natlas import logging, utils
+from natlas.scanresult import ScanResult
 
 
 class NatlasNetworkServices:
@@ -189,11 +190,9 @@ class NatlasNetworkServices:
                     return ""
         else:
             return ""  # return an empty string if we were unable to get a response from the server
-        return serviceData[  # type: ignore[no-any-return]
-            "sha256"
-        ]  # return the sha256 if we got a response and everything checks out
+        return str(serviceData["sha256"])
 
-    def get_work(self, target=None):  # type: ignore[no-untyped-def]
+    def get_work(self, target: str | None = None) -> dict[str, Any] | None:
         if target:
             self.netlogger.info(
                 f"Getting work config for {target} from {self.config.server}"
@@ -207,11 +206,11 @@ class NatlasNetworkServices:
         if response:
             work = response.json()
         else:
-            return False  # failed to get work from server
-        return work
+            return None
+        return work  # type: ignore[no-any-return]
 
     # Results is a ScanResult object
-    def submit_results(self, results):  # type: ignore[no-untyped-def]
+    def submit_results(self, results: ScanResult) -> Response | Literal[False]:
         if results.result.get("timed_out"):
             self.netlogger.info(
                 f"Submitting scan timeout notice for {results.result['ip']}"

@@ -80,7 +80,9 @@ def parse_aquatone_session(base_dir: str) -> list[AquatoneScreenshot]:
     return output
 
 
-def get_web_screenshots(target: str, scan_id: str, proctimeout: float):  # type: ignore[no-untyped-def]
+def get_web_screenshots(
+    target: str, scan_id: str, proctimeout: float
+) -> list[AquatoneScreenshot]:
     scan_dir = utils.get_scan_dir(scan_id)
     xml_file = os.path.join(scan_dir, f"nmap.{scan_id}.xml")
     output_dir = os.path.join(scan_dir, f"aquatone.{scan_id}")
