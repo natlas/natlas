@@ -18,7 +18,7 @@ class RescanTask(db.Model, DictSerializable):  # type: ignore[misc, name-defined
     date_dispatched = db.Column(db.DateTime, index=True)
     complete = db.Column(db.Boolean, default=False, index=True)
     date_completed = db.Column(db.DateTime, index=True)
-    scan_id = db.Column(db.String(256), index=True, unique=True)
+    scan_id = db.Column(db.String(128), index=True, unique=True)
 
     def dispatchTask(self) -> None:
         self.dispatched = True

@@ -35,7 +35,7 @@ def test_reset_token():  # type: ignore[no-untyped-def]
     assert not user.validate_reset_token()
     assert User.get_reset_token(email)
     assert user.validate_reset_token()
-    assert User.get_user_by_token(user.password_reset_token)
+    assert User.get_user_by_token(user.password_reset_token)  # type: ignore[arg-type]
     user.expire_reset_token()
     assert not user.validate_reset_token()
     assert not User.get_reset_token("notoken@example.com")

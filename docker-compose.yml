@@ -92,7 +92,6 @@ services:
       - OTEL_ENABLE=True
       - OTEL_COLLECTOR=otel:4317
       - DB_AUTO_UPGRADE=True
-      - SQLALCHEMY_DATABASE_URI=postgresql+psycopg://natlas:natlas-dev-password-do-not-use@postgres:5432/natlas
     volumes:
       - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server

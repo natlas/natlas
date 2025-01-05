@@ -4,30 +4,38 @@ from typing import TYPE_CHECKING, Literal, Optional
 
 from email_validator import EmailNotValidError, ValidatedEmail, validate_email
 from flask_login import UserMixin
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import db, login
+from app import NatlasBase, db, login
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 
 if TYPE_CHECKING:
+    from app.models.agent import Agent
+    from app.models.rescan_task import RescanTask
     from app.models.user_invitation import UserInvitation
 
 
-class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-defined]
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(254), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
-    is_admin = db.Column(db.Boolean, default=False)
-    results_per_page = db.Column(db.Integer, default=100)
-    preview_length = db.Column(db.Integer, default=100)
-    result_format = db.Column(db.Integer, default=0)
-    password_reset_token = db.Column(db.String(256), unique=True)
-    password_reset_expiration = db.Column(db.DateTime)
-    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=False)
-    rescans = db.relationship("RescanTask", backref="submitter", lazy="select")
-    agents = db.relationship("Agent", backref="user", lazy=True)
+class User(UserMixin, NatlasBase, DictSerializable):  # type: ignore[misc]
+    __tablename__ = "user"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str | None] = mapped_column(String(254), index=True, unique=True)
+    password_hash: Mapped[str | None] = mapped_column(String(128))
+    is_admin: Mapped[bool | None] = mapped_column(default=False)
+    results_per_page: Mapped[int | None] = mapped_column(default=100)
+    preview_length: Mapped[int | None] = mapped_column(default=100)
+    result_format: Mapped[int | None] = mapped_column(default=0)
+    password_reset_token: Mapped[str | None] = mapped_column(String(256), unique=True)
+    password_reset_expiration: Mapped[datetime | None]
+    creation_date: Mapped[datetime | None] = mapped_column(default=datetime.utcnow)
+    is_active: Mapped[bool | None] = mapped_column(default=False)
+    rescans: Mapped[list["RescanTask"]] = relationship(
+        backref="submitter", lazy="select"
+    )
+    agents: Mapped[list["Agent"]] = relationship(backref="submitter", lazy="select")
 
     # Tokens expire after 48 hours or upon use
     expiration_duration = 60 * 60 * 24 * 2
@@ -53,7 +61,7 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password: str) -> bool:
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password_hash, password)  # type: ignore[arg-type]
 
     @login.user_loader  # type: ignore[misc]
     def load_user(id: int) -> "User":
@@ -72,7 +80,7 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
     def validate_reset_token(self) -> bool:
         if not (self.password_reset_token and self.password_reset_expiration):
             return False
-        return self.password_reset_expiration > datetime.utcnow()  # type: ignore[no-any-return]
+        return self.password_reset_expiration > datetime.utcnow()
 
     @staticmethod
     def get_reset_token(email: str) -> Optional["User"]:
@@ -91,7 +99,10 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
         if not record:
             return None
         return validate_token(
-            record, url_token, record.password_reset_token, record.validate_reset_token
+            record,
+            url_token,
+            record.password_reset_token,
+            record.validate_reset_token,  # type: ignore[arg-type]
         )
 
     @staticmethod

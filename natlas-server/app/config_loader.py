@@ -9,7 +9,7 @@ def load_natlas_config(app, db):  # type: ignore[no-untyped-def]
 
     from app.models import ConfigItem
 
-    for item in ConfigItem.query.all():
+    for item in db.session.execute(db.select(ConfigItem)).scalars().all():
         app.config[item.name] = config.casted_value(item.type, item.value)
 
 

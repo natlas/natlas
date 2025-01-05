@@ -30,8 +30,8 @@ def render_template_start(app: flask.Flask, template, context):  # type: ignore[
 
 
 def initialize_opentelemetry(config: Config, flask_app: flask.Flask) -> None:
-    if config.otel_enable:
-        collector = config.otel_collector
+    if config.OTEL_ENABLE:
+        collector = config.OTEL_COLLECTOR
         print(f"OpenTelemetry enabled and reporting to {collector} using gRPC")
         exporter = OTLPSpanExporter(endpoint=collector, insecure=True)
         provider = TracerProvider(
@@ -47,15 +47,15 @@ def initialize_opentelemetry(config: Config, flask_app: flask.Flask) -> None:
 
 
 def initialize_sentryio(config: Config) -> None:
-    if config.sentry_dsn:
-        url = urlparse(config.sentry_dsn)
+    if config.SENTRY_DSN:
+        url = urlparse(config.SENTRY_DSN)
         print(
             f"Sentry.io enabled and reporting errors to {url.scheme}://{url.hostname}"
         )
         from sentry_sdk.integrations.flask import FlaskIntegration
 
         sentry_sdk.init(
-            dsn=config.sentry_dsn,
+            dsn=config.SENTRY_DSN,
             release=config.NATLAS_VERSION,
             integrations=[FlaskIntegration()],
         )
