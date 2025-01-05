@@ -15,6 +15,8 @@ if TYPE_CHECKING:
 # Each record represents a user-requested rescan of a given target.
 # Tracks when it was dispatched, when it was completed, and the scan id of the complete scan.
 class RescanTask(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+    __tablename__ = "rescan_task"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     date_added: Mapped[datetime] = mapped_column(index=True, default=datetime.utcnow())
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)

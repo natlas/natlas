@@ -10,6 +10,8 @@ from app import db
 # While generally I prefer to use a singular model name, each record here is going to be storing a set of services
 # Each record in this table is a complete nmap-services db
 class NatlasServices(db.Model):  # type: ignore[misc, name-defined]
+    __tablename__ = "natlas_services"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     sha256: Mapped[str | None] = mapped_column(String(64))
     services: Mapped[str | None] = mapped_column(Text)

@@ -15,6 +15,8 @@ from app.util import generate_hex_16
 # Users can have many agents, each agent has an ID and a secret (token)
 # Friendly name is purely for identification of agents in the management page
 class Agent(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+    __tablename__ = "agent"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     agentid: Mapped[str] = mapped_column(String(128), index=True, unique=True)

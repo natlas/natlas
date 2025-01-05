@@ -5,6 +5,8 @@ from app.models.dict_serializable import DictSerializable
 
 
 class AgentConfig(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+    __tablename__ = "agent_config"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     versionDetection: Mapped[bool | None] = mapped_column(
         default=True

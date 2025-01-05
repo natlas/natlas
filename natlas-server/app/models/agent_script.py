@@ -11,6 +11,8 @@ from app.models.dict_serializable import DictSerializable
 # auth, broadcast, default, discovery, dos, exploit, external, fuzzer, intrusive, malware, safe, version, vuln
 # https://nmap.org/book/nse-usage.html#nse-categories
 class AgentScript(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+    __tablename__ = "agent_script"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str | None] = mapped_column(String(128), index=True, unique=True)
 

@@ -20,6 +20,7 @@ scopetags = db.Table(
 
 class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     __tablename__ = "scope_item"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     target: Mapped[str | None] = mapped_column(String(128), index=True, unique=True)
     blacklist: Mapped[bool | None] = mapped_column(index=True)
