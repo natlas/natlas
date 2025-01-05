@@ -8,6 +8,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from migrations.migrator import handle_db_upgrade, migration_needed
+from sqlalchemy.orm import DeclarativeBase
 from webpack_manifest import webpack_manifest
 
 from app.config_loader import load_config_from_db
@@ -22,13 +23,17 @@ class AnonUser(AnonymousUserMixin):  # type: ignore[misc]
     preview_length = 50
 
 
+class NatlasBase(DeclarativeBase):
+    pass
+
+
 login = LoginManager()
 login.login_view = "auth.login"
 login.anonymous_user = AnonUser
 login.login_message_category = "warning"
 login.session_protection = "strong"
 mail = Mail()
-db = SQLAlchemy()
+db = SQLAlchemy(model_class=NatlasBase)
 migrate = Migrate()
 csrf = CSRFProtect()
 ScopeManager = ScopeManager()  # type: ignore[assignment, misc]
@@ -48,9 +53,10 @@ def unauthorized():  # type: ignore[no-untyped-def]
 
 def create_app(config_class=config.Config, migrating=False):  # type: ignore[no-untyped-def]
     app = Flask(__name__)
-    initialize_opentelemetry(config_class, app)
+    config = config_class
 
-    app.config.from_object(config_class)
+    app.config.from_object(config)
+    initialize_opentelemetry(config, app)
     db.init_app(app)
     migrate.init_app(app, db)
 

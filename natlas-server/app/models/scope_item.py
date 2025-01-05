@@ -28,8 +28,8 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         lazy=True,
     )
     addr_family = db.Column(db.Integer)
-    start_addr = db.Column(db.VARBINARY(16))
-    stop_addr = db.Column(db.VARBINARY(16))
+    start_addr = db.Column(db.LargeBinary(16))
+    stop_addr = db.Column(db.LargeBinary(16))
 
     def __init__(self, target: str, blacklist: bool) -> None:
         self.target = target

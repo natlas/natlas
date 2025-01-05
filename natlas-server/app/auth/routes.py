@@ -82,7 +82,7 @@ def reset_password_request():  # type: ignore[no-untyped-def]
             return redirect(url_for("auth.reset_password_request"))
         user = User.get_reset_token(validemail)
         if user:
-            deliver_auth_link(user.email, user.password_reset_token, "reset")
+            deliver_auth_link(user.email, user.password_reset_token, "reset")  # type: ignore[arg-type]
         db.session.commit()
         flash("Check your email for the instructions to reset your password", "info")
         return redirect(url_for("auth.login"))

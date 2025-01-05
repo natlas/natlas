@@ -72,6 +72,6 @@ def reset_password(email):  # type: ignore[no-untyped-def]
     user = User.get_reset_token(email)
     if not user:
         raise click.BadParameter(err_msgs["no_such_user"].format(email))
-    msg = deliver_auth_link(user.email, user.password_reset_token, "reset")
+    msg = deliver_auth_link(user.email, user.password_reset_token, "reset")  # type: ignore[arg-type]
     db.session.commit()
     print(msg)

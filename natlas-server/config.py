@@ -54,10 +54,10 @@ class Config(BaseSettings):
 
     CONSISTENT_SCAN_CYCLE: bool = Field(default=False)
 
-    sentry_dsn: str | None = Field(default=None)
+    SENTRY_DSN: str | None = Field(default=None)
     SENTRY_JS_DSN: str | None = Field(default=None)
-    otel_enable: bool = Field(default=False)
-    otel_collector: str = Field(default="127.0.0.1:4317")
+    OTEL_ENABLE: bool = Field(default=False)
+    OTEL_COLLECTOR: str = Field(default="127.0.0.1:4317")
 
     version_override: str | None = Field(default=None)
     TESTING: bool = Field(default=False)
