@@ -21,6 +21,7 @@ netaddr = "~=0.8.0"
 opentelemetry-exporter-otlp = "~=1.23"
 opentelemetry-instrumentation-flask = "~=0.44b"
 opentelemetry-sdk = "~=1.23"
+psycopg = {extras = ["binary", "pool"], version = "~=3.2"}
 pydantic = "~=2.10"
 pydantic-settings = "~=2.7"
 python-dateutil = "~=2.9"

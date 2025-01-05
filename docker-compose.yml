@@ -34,12 +34,17 @@ services:
       timeout: 10s
       retries: 24
 
-  mysql:
-    image: mysql:8.0.21
-    command: --default-authentication-plugin=mysql_native_password
+  postgres:
+    image: postgres:17.2
+    restart: unless-stopped
+    expose:
+      - 5432
+    volumes:
+      - postgres-data:/var/lib/postgreql/data
     environment:
-      - MYSQL_ROOT_PASSWORD=natlas-dev-password-do-not-use
-      - MYSQL_DATABASE=natlas
+      POSTGRES_USER: "natlas"
+      POSTGRES_PASSWORD: "natlas-dev-password-do-not-use"
+      POSTGRES_DB: "natlas"
     networks:
       - backend
 
@@ -87,12 +92,14 @@ services:
       - OTEL_ENABLE=True
       - OTEL_COLLECTOR=otel:4317
       - DB_AUTO_UPGRADE=True
+      - SQLALCHEMY_DATABASE_URI=postgresql+psycopg://natlas:natlas-dev-password-do-not-use@postgres:5432/natlas
     volumes:
       - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
       - html_assets:/opt/natlas/natlas-server/static/dist
     links:
       - elastic
+      - postgres
     depends_on:
       elastic:
         condition: service_healthy
@@ -122,3 +129,4 @@ volumes:
   elastic:
   node_modules:
   html_assets:
+  postgres-data:
