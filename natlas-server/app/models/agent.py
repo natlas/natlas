@@ -3,6 +3,9 @@ import string
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app import db
 from app.models.dict_serializable import DictSerializable
 from app.util import generate_hex_16
@@ -12,18 +15,15 @@ from app.util import generate_hex_16
 # Users can have many agents, each agent has an ID and a secret (token)
 # Friendly name is purely for identification of agents in the management page
 class Agent(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    # agent identification string for storing in reports
-    agentid = db.Column(db.String(128), index=True, unique=True, nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    # auth token
-    token = db.Column(db.String(128), index=True, unique=True)
-    # optional friendly name for viewing on user page
-    friendly_name = db.Column(db.String(128), default="")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    agentid: Mapped[str] = mapped_column(String(128), index=True, unique=True)
+    date_created: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    token: Mapped[str | None] = mapped_column(String(128), index=True, unique=True)
+    friendly_name: Mapped[str | None] = mapped_column(String(128), default="")
 
     def verify_secret(self, secret: str) -> bool:
-        return secrets.compare_digest(secret, self.token)
+        return secrets.compare_digest(secret, self.token)  # type: ignore[type-var]
 
     @staticmethod
     def verify_agent(auth_header: str) -> bool:
