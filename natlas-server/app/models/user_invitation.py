@@ -2,6 +2,9 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 
+from sqlalchemy import DateTime, String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app import db
 from app.models import User
 from app.models.dict_serializable import DictSerializable
@@ -9,15 +12,18 @@ from app.models.token_validation import validate_token
 
 
 class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(254), unique=True)
-    token = db.Column(db.String(256), unique=True, nullable=False)
-    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
-    expiration_date = db.Column(db.DateTime, nullable=False)
-    accepted_date = db.Column(db.DateTime)
-    is_expired = db.Column(db.Boolean, default=False)
-    # is_admin should really only be used for bootstrapping users with add-user.py
-    is_admin = db.Column(db.Boolean, default=False)
+    __tablename__ = "user_invitation"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str | None] = mapped_column(String(254), unique=True)
+    token: Mapped[str] = mapped_column(String(256), unique=True)
+    creation_date: Mapped[datetime | None] = mapped_column(
+        DateTime, default=datetime.utcnow
+    )
+    expiration_date: Mapped[datetime]
+    accepted_date: Mapped[datetime | None]
+    is_expired: Mapped[bool | None] = mapped_column(default=False)
+    is_admin: Mapped[bool | None] = mapped_column(default=False)
 
     # Tokens expire after 48 hours or upon use
     expiration_duration = 60 * 60 * 24 * 2

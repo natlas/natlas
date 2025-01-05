@@ -19,7 +19,7 @@ def test_add_tags(app):  # type: ignore[no-untyped-def]
     test_scope = ScopeItem(target="127.0.0.1/8", blacklist=False)
     db.session.add(test_scope)
     ScopeItem.addTags(test_scope, tags)
-    for tag in test_scope.tags:  # type: ignore[attr-defined]
+    for tag in test_scope.tags:
         assert test_scope.is_tagged(tag)
 
 
@@ -28,9 +28,9 @@ def test_del_tags(app):  # type: ignore[no-untyped-def]
     test_scope = ScopeItem(target="127.0.0.1/8", blacklist=False)
     db.session.add(test_scope)
     ScopeItem.addTags(test_scope, tags)
-    assert len([t.name for t in test_scope.tags]) == 3  # type: ignore[attr-defined]
-    test_scope.delTag(test_scope.tags[2])  # type: ignore[index]
-    assert len([t.name for t in test_scope.tags]) == 2  # type: ignore[attr-defined]
+    assert len([t.name for t in test_scope.tags]) == 3
+    test_scope.delTag(test_scope.tags[2])
+    assert len([t.name for t in test_scope.tags]) == 2
 
 
 def test_get_scope(app):  # type: ignore[no-untyped-def]

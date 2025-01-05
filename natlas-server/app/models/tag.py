@@ -1,11 +1,14 @@
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app import db
 from app.models.dict_serializable import DictSerializable
 
 
 # Simple tags that can be added to scope items for automatic tagging
 class Tag(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), index=True, unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(128), index=True, unique=True)
 
     @staticmethod
     def create_if_none(tag: str) -> "Tag":

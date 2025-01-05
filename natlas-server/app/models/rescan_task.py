@@ -1,24 +1,29 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db
 from app.models.dict_serializable import DictSerializable
+
+if TYPE_CHECKING:
+    pass
 
 
 # Rescan Queue
 # Each record represents a user-requested rescan of a given target.
 # Tracks when it was dispatched, when it was completed, and the scan id of the complete scan.
 class RescanTask(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
-    id = db.Column(db.Integer, primary_key=True)
-    date_added = db.Column(
-        db.DateTime, index=True, default=datetime.utcnow, nullable=False
-    )
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    target = db.Column(db.String(128), index=True, nullable=False)
-    dispatched = db.Column(db.Boolean, default=False, index=True)
-    date_dispatched = db.Column(db.DateTime, index=True)
-    complete = db.Column(db.Boolean, default=False, index=True)
-    date_completed = db.Column(db.DateTime, index=True)
-    scan_id = db.Column(db.String(128), index=True, unique=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    date_added: Mapped[datetime] = mapped_column(index=True, default=datetime.utcnow())
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    target: Mapped[str] = mapped_column(String(128), index=True)
+    dispatched: Mapped[bool | None] = mapped_column(default=False, index=True)
+    date_dispatched: Mapped[datetime | None] = mapped_column(index=True)
+    complete: Mapped[bool | None] = mapped_column(default=False, index=True)
+    date_completed: Mapped[datetime | None] = mapped_column(index=True)
+    scan_id: Mapped[str | None] = mapped_column(String(128), index=True, unique=True)
 
     def dispatchTask(self) -> None:
         self.dispatched = True

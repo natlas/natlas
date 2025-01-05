@@ -1,35 +1,42 @@
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app import db
 from app.models.dict_serializable import DictSerializable
 
 
 class AgentConfig(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
-    id = db.Column(db.Integer, primary_key=True)
-    versionDetection = db.Column(
-        db.Boolean, default=True
+    id: Mapped[int] = mapped_column(primary_key=True)
+    versionDetection: Mapped[bool | None] = mapped_column(
+        default=True
     )  # Enable Version Detection (-sV)
-    osDetection = db.Column(db.Boolean, default=True)  # Enable OS Detection (-O)
-    enableScripts = db.Column(
-        db.Boolean, default=True
+    osDetection: Mapped[bool | None] = mapped_column(
+        default=True
+    )  # Enable OS Detection (-O)
+    enableScripts: Mapped[bool | None] = mapped_column(
+        default=True
     )  # Enable Nmap Scripting Engine (loads all AgentScripts)
-    onlyOpens = db.Column(db.Boolean, default=True)  # Only report open ports (--open)
-    scanTimeout = db.Column(
-        db.Integer, default=660
+    onlyOpens: Mapped[bool | None] = mapped_column(
+        default=True
+    )  # Only report open ports (--open)
+    scanTimeout: Mapped[int | None] = mapped_column(
+        default=60
     )  # SIGKILL nmap if it's running longer than this
-    webScreenshots = db.Column(
-        db.Boolean, default=True
+    webScreenshots: Mapped[bool | None] = mapped_column(
+        default=True
     )  # Attempt to take web screenshots (aquatone)
-    vncScreenshots = db.Column(
-        db.Boolean, default=True
+    vncScreenshots: Mapped[bool | None] = mapped_column(
+        default=True
     )  # Attempt to take VNC screenshots (xvfb+vncsnapshot)
-    webScreenshotTimeout = db.Column(
-        db.Integer, default=60
+    webScreenshotTimeout: Mapped[int | None] = mapped_column(
+        default=60
     )  # aquatone process timeout in seconds
-    vncScreenshotTimeout = db.Column(
-        db.Integer, default=60
+    vncScreenshotTimeout: Mapped[int | None] = mapped_column(
+        default=60
     )  # vnc process timeout in seconds
-
-    scriptTimeout = db.Column(db.Integer, default=60)  # --script-timeout (s)
-    hostTimeout = db.Column(db.Integer, default=600)  # --host-timeout (s)
-    osScanLimit = db.Column(db.Boolean, default=True)  # --osscan-limit
-    noPing = db.Column(db.Boolean, default=False)  # -Pn
-    udpScan = db.Column(db.Boolean, default=False)  # -sSU
+    scriptTimeout: Mapped[int | None] = mapped_column(
+        default=60
+    )  # --script-timeout (s)
+    hostTimeout: Mapped[int | None] = mapped_column(default=600)  # --host-timeout (s)
+    osScanLimit: Mapped[bool | None] = mapped_column(default=True)  # --osscan-limit
+    noPing: Mapped[bool | None] = mapped_column(default=False)  # -Pn
+    udpScan: Mapped[bool | None] = mapped_column(default=False)  # -sSU

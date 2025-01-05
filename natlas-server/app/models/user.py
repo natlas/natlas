@@ -101,8 +101,8 @@ class User(UserMixin, NatlasBase, DictSerializable):  # type: ignore[misc]
         return validate_token(
             record,
             url_token,
-            record.password_reset_token,
-            record.validate_reset_token,  # type: ignore[arg-type]
+            record.password_reset_token,  # type: ignore[arg-type]
+            record.validate_reset_token,
         )
 
     @staticmethod

@@ -3,6 +3,8 @@ from typing import Literal
 
 from netaddr import IPAddress, IPNetwork
 from netaddr.core import AddrFormatError
+from sqlalchemy import LargeBinary, String
+from sqlalchemy.orm import Mapped, backref, mapped_column, relationship
 
 from app import db
 from app.models.dict_serializable import DictSerializable
@@ -17,19 +19,19 @@ scopetags = db.Table(
 
 
 class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
-    id = db.Column(db.Integer, primary_key=True)
-    target = db.Column(db.String(128), index=True, unique=True)
-    blacklist = db.Column(db.Boolean, index=True)
-    tags = db.relationship(
-        "Tag",
+    __tablename__ = "scope_item"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    target: Mapped[str | None] = mapped_column(String(128), index=True, unique=True)
+    blacklist: Mapped[bool | None] = mapped_column(index=True)
+    tags: Mapped[list[Tag]] = relationship(
         secondary=scopetags,
         primaryjoin=(scopetags.c.scope_id == id),
-        backref=db.backref("scope", lazy=True),
-        lazy=True,
+        backref=backref("scope", lazy="select"),
+        lazy="select",
     )
-    addr_family = db.Column(db.Integer)
-    start_addr = db.Column(db.LargeBinary(16))
-    stop_addr = db.Column(db.LargeBinary(16))
+    addr_family: Mapped[int | None]
+    start_addr: Mapped[bytes | None] = mapped_column(LargeBinary(16))
+    stop_addr: Mapped[bytes | None] = mapped_column(LargeBinary(16))
 
     def __init__(self, target: str, blacklist: bool) -> None:
         self.target = target
@@ -64,10 +66,10 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
             self.tags.remove(tag)
 
     def is_tagged(self, tag: Tag) -> bool:
-        return tag in self.tags  # type: ignore[attr-defined]
+        return tag in self.tags
 
     def get_tag_names(self) -> list[str]:
-        return [tag.name for tag in self.tags]  # type: ignore[attr-defined]
+        return [tag.name for tag in self.tags]
 
     @staticmethod
     def getBlacklist() -> list["ScopeItem"]:
