@@ -8,7 +8,7 @@ RUN yarn --no-progress --frozen-lockfile --non-interactive
 COPY . /app
 RUN yarn run webpack --mode production
 
-FROM python:3.12 AS build
+FROM python:3.13 AS build
 
 COPY Pipfile .
 COPY Pipfile.lock .
@@ -26,7 +26,7 @@ COPY --from=webpack /app/app/static/dist app/static/dist
 RUN python3 -m compileall .
 
 # Build final image
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libmariadb3 \
