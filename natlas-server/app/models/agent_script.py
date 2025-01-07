@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db
@@ -18,4 +18,4 @@ class AgentScript(db.Model, DictSerializable):  # type: ignore[misc, name-define
 
     @staticmethod
     def get_scripts_string() -> str:
-        return ",".join(s.name for s in AgentScript.query.all())
+        return ",".join(s.name for s in db.session.scalars(select(AgentScript)).all())  # type: ignore[misc]

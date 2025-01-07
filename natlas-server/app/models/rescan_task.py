@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db
@@ -39,22 +39,40 @@ class RescanTask(db.Model, DictSerializable):  # type: ignore[misc, name-defined
     @staticmethod
     def getPendingTasks() -> list["RescanTask"]:
         # Tasks that haven't been completed and haven't been dispatched
-        return (  # type: ignore[no-any-return]
-            RescanTask.query.filter_by(complete=False).filter_by(dispatched=False).all()
+        return list(
+            db.session.scalars(
+                select(RescanTask).where(
+                    RescanTask.complete == False, RescanTask.dispatched == False
+                )
+            ).all()
         )
 
     @staticmethod
     def getDispatchedTasks() -> list["RescanTask"]:
         # Tasks that have been dispatched but haven't been completed
-        return (  # type: ignore[no-any-return]
-            RescanTask.query.filter_by(dispatched=True).filter_by(complete=False).all()
+        return list(
+            db.session.scalars(
+                select(RescanTask).where(
+                    RescanTask.dispatched == True, RescanTask.complete == False
+                )
+            ).all()
         )
 
     @staticmethod
     def getIncompleteTasks() -> list["RescanTask"]:
         # All tasks that haven't been marked as complete
-        return RescanTask.query.filter_by(complete=False).all()  # type: ignore[no-any-return]
+        return list(
+            db.session.scalars(
+                select(RescanTask).where(RescanTask.complete == False)
+            ).all()
+        )
 
     @staticmethod
     def getIncompleteTaskForTarget(ip: str) -> list["RescanTask"]:
-        return RescanTask.query.filter_by(target=ip).filter_by(complete=False).all()  # type: ignore[no-any-return]
+        return list(
+            db.session.scalars(
+                select(RescanTask).where(
+                    RescanTask.target == ip, RescanTask.complete == False
+                )
+            ).all()
+        )

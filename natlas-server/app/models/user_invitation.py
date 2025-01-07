@@ -2,7 +2,7 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db
@@ -32,12 +32,17 @@ class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-def
     # Build a new invitation
     @staticmethod
     def new_invite(email=None, is_admin=False):  # type: ignore[no-untyped-def]
-        if email and User.query.filter_by(email=email).first():
+        if (
+            email
+            and db.session.scalars(select(User).where(User.email == email)).first()
+        ):
             return False
         now = datetime.utcnow()
         expiration_date = now + timedelta(seconds=UserInvitation.expiration_duration)
         new_token = secrets.token_urlsafe(UserInvitation.token_length)
-        invite = UserInvitation.query.filter_by(email=email).first()
+        invite = db.session.scalars(
+            select(UserInvitation).where(UserInvitation.email == email)
+        ).first()
         if invite and not invite.accepted_date:
             invite.token = new_token
             invite.expiration_date = expiration_date
@@ -52,15 +57,15 @@ class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-def
         return invite
 
     @staticmethod
-    def deliver_invite(invite):  # type: ignore[no-untyped-def]
+    def deliver_invite(invite: "UserInvitation") -> str:
         from app.auth.email import deliver_auth_link
 
-        return deliver_auth_link(invite.email, invite.token, "invite")
+        return deliver_auth_link(invite.email, invite.token, "invite")  # type: ignore[arg-type, no-any-return]
 
     @staticmethod
     def get_invite(url_token: str) -> Optional["UserInvitation"]:
-        record: UserInvitation | None = UserInvitation.query.filter_by(
-            token=url_token
+        record = db.session.scalars(
+            select(UserInvitation).where(UserInvitation.token == url_token)
         ).first()
         if record is None:
             return None

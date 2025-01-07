@@ -20,6 +20,9 @@ class ScopeManager:
     default_group = "all"
 
     def __init__(self) -> None:
+        # TODO: This is currently broken, its storing references to models that are bound in other sessions
+        # I think it was designed to avoid having to constantly the database when handing out work
+        # This won't work with multi-node deployments anyways so this needs to be revisited. But it's borked.
         self.pendingRescans: list[RescanTask] = []
         self.dispatchedRescans: list[RescanTask] = []
 

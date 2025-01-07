@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 
+from app import db
 from app.models import User
 
 
@@ -15,7 +16,7 @@ class ChangePasswordForm(FlaskForm):  # type: ignore[misc]
     changePassword = SubmitField("Change Password")
 
     def validate_old_password(self, old_password: PasswordField) -> None:
-        user = User.query.get(current_user.id)
+        user = db.session.get(User, current_user.id)
         if user is None:
             raise ValidationError("You're not logged in!")
         if not user.check_password(old_password.data):

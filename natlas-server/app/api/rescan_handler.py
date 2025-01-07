@@ -7,6 +7,11 @@ from app import db
 if TYPE_CHECKING:
     from app.models.rescan_task import RescanTask
 
+"""
+TODO: Yeah this whole thing is probably broken. I'm amazed it ever worked.
+I think previously it would automatically rebind objects to the current session.
+"""
+
 
 def mark_scan_dispatched(rescan: "RescanTask") -> None:
     rescan.dispatchTask()

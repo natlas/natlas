@@ -3,7 +3,7 @@ from typing import Literal
 
 from netaddr import IPAddress, IPNetwork
 from netaddr.core import AddrFormatError
-from sqlalchemy import LargeBinary, String
+from sqlalchemy import LargeBinary, String, select
 from sqlalchemy.orm import Mapped, backref, mapped_column, relationship
 
 from app import db
@@ -48,14 +48,17 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
 
     @staticmethod
     def get_overlapping_ranges(addr: str) -> list["ScopeItem"]:
-        addr = IPAddress(addr)
-        size = 4 if addr.version == 4 else 16  # type: ignore[attr-defined]
-        binval = addr.value.to_bytes(size, byteorder="big")  # type: ignore[attr-defined]
-        return (  # type: ignore[no-any-return]
-            ScopeItem.query.filter(ScopeItem.addr_family == addr.version)  # type: ignore[attr-defined]
-            .filter(ScopeItem.start_addr <= binval)
-            .filter(ScopeItem.stop_addr >= binval)
-            .all()
+        ipaddr = IPAddress(addr)
+        size = 4 if ipaddr.version == 4 else 16
+        binval = ipaddr.value.to_bytes(size, byteorder="big")
+        return list(
+            db.session.scalars(
+                select(ScopeItem).where(
+                    ScopeItem.addr_family == ipaddr.version,
+                    ScopeItem.start_addr <= binval,
+                    ScopeItem.stop_addr >= binval,
+                )
+            ).all()
         )
 
     def addTag(self, tag: Tag) -> None:
@@ -74,11 +77,19 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
 
     @staticmethod
     def getBlacklist() -> list["ScopeItem"]:
-        return ScopeItem.query.filter_by(blacklist=True).all()  # type: ignore[no-any-return]
+        return list(
+            db.session.scalars(
+                select(ScopeItem).where(ScopeItem.blacklist == True)
+            ).all()
+        )
 
     @staticmethod
     def getScope() -> list["ScopeItem"]:
-        return ScopeItem.query.filter_by(blacklist=False).all()  # type: ignore[no-any-return]
+        return list(
+            db.session.scalars(
+                select(ScopeItem).where(ScopeItem.blacklist == False)
+            ).all()
+        )
 
     @staticmethod
     def addTags(scopeitem: "ScopeItem", tags: Iterable[str]) -> None:
@@ -120,21 +131,6 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
                 tags = ScopeItem.parse_tags(split[1:])
                 out.update(tags)
         return out
-
-    @staticmethod
-    def create_if_none(
-        ip: str, blacklist: bool, tags: list[str] | None = None
-    ) -> tuple[bool, "ScopeItem"]:
-        if tags is None:
-            tags = []
-        new = False
-        item = ScopeItem.query.filter_by(target=ip).first()
-        if not item:
-            item = ScopeItem(target=ip, blacklist=blacklist)
-            new = True
-        for tag in tags:
-            item.addTag(tag)
-        return new, item
 
     @staticmethod
     def validate_ip(ip: str) -> IPNetwork | Literal[False]:
@@ -180,7 +176,9 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
             ins_result = db.session.execute(ins_stmt)
             result["success"] += ins_result.rowcount
         result["exist"] = len(address_list) - len(result["fail"]) - result["success"]  # type: ignore[arg-type, operator]
-        all_scope = {item.target: item.id for item in ScopeItem.query.all()}
+        all_scope = {
+            item.target: item.id for item in db.session.scalars(select(ScopeItem)).all()
+        }
         tags_to_import = []
         for k, v in scope_tag_import.items():
             for tag in v:

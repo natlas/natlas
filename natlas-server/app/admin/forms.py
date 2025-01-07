@@ -3,6 +3,7 @@ import ipaddress
 from flask import flash
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
+from sqlalchemy import select
 from wtforms import (
     BooleanField,
     IntegerField,
@@ -13,6 +14,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Email, ValidationError
 
+from app import db
 from app.models import AgentScript, ScopeItem, User
 
 
@@ -35,7 +37,7 @@ class InviteUserForm(FlaskForm):  # type: ignore[misc]
                 "danger",
             )
             raise ValidationError
-        user = User.query.filter_by(email=email.data).first()
+        user = db.session.scalars(select(User).where(User.email == email.data)).first()
         if user is not None:
             flash(f"Email {user.email} already exists!", "danger")
             raise ValidationError
@@ -57,7 +59,9 @@ class NewScopeForm(FlaskForm):  # type: ignore[misc]
     def validate_target(self, target):  # type: ignore[no-untyped-def]
         try:
             isValid = ipaddress.ip_network(target.data, False)
-            item = ScopeItem.query.filter_by(target=isValid.with_prefixlen).first()
+            item = db.session.scalars(
+                select(ScopeItem).where(ScopeItem.target == isValid.with_prefixlen)
+            ).first()
             if item is not None:
                 raise ValidationError(f"Target {item.target} already exists!")
         except ipaddress.AddressValueError as e:
@@ -125,8 +129,10 @@ class AddScriptForm(FlaskForm):  # type: ignore[misc]
     scriptName = StringField("Script Name", validators=[DataRequired()])
     addScript = SubmitField("Add Script")
 
-    def validate_scriptname(self, scriptName):  # type: ignore[no-untyped-def]
-        script = AgentScript.query.filter_by(name=scriptName).first()
+    def validate_scriptName(self, scriptName: str) -> None:
+        script = db.session.scalars(
+            select(AgentScript).where(AgentScript.name == str(scriptName))
+        ).first()
         if script is not None:
             raise ValidationError(f"{script.name} already exists!")
 
