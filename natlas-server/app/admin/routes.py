@@ -10,6 +10,8 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import select
+from werkzeug.wrappers.response import Response as wzResponse
 
 from app import db
 from app.admin import bp, forms, redirects
@@ -72,12 +74,12 @@ def users() -> Response | str:
 @bp.route("/users/<int:id>/delete", methods=["POST"])
 @login_required  # type: ignore[misc]
 @is_admin
-def delete_user(id: int) -> Response:
+def delete_user(id: int) -> wzResponse:
     delForm = forms.UserDeleteForm()
     if delForm.validate_on_submit():
         if current_user.id == id:
             flash("You can't delete yourself!", "danger")
-            return redirect(url_for("admin.users"))  # type: ignore[return-value]
+            return redirect(url_for("admin.users"))
         user = User.query.filter_by(id=id).first()
         User.query.filter_by(id=id).delete()
         db.session.commit()
@@ -85,32 +87,32 @@ def delete_user(id: int) -> Response:
     else:
         flash("Form couldn't validate!", "danger")
 
-    return redirect(url_for("admin.users"))  # type: ignore[return-value]
+    return redirect(url_for("admin.users"))
 
 
 @bp.route("/users/<int:id>/toggle", methods=["POST"])
 @login_required  # type: ignore[misc]
 @is_admin
-def toggle_user(id: int) -> Response:
+def toggle_user(id: int) -> wzResponse:
     editForm = forms.UserEditForm()
     if editForm.validate_on_submit():
         user = User.query.filter_by(id=id).first()
         if user.id == current_user.id:
             flash("Can't demote yourself!", "danger")
-            return redirect(url_for("admin.users"))  # type: ignore[return-value]
+            return redirect(url_for("admin.users"))
         user.is_admin = not user.is_admin
         db.session.commit()
         flash("User status toggled.", "success")
     else:
         flash("Form couldn't validate!", "danger")
 
-    return redirect(url_for("admin.users"))  # type: ignore[return-value]
+    return redirect(url_for("admin.users"))
 
 
 @bp.route("/scope", methods=["GET", "POST"])
 @login_required  # type: ignore[misc]
 @is_admin
-def scope() -> Response | str:
+def scope() -> wzResponse | str:
     render = {
         "scope": ScopeItem.getScope(),
         "scopeSize": current_app.scope_manager.get_scope_size(),  # type: ignore[attr-defined]
@@ -123,7 +125,7 @@ def scope() -> Response | str:
     }
 
     render["addTagForm"].tagname.choices = [
-        (row.name, row.name) for row in Tag.query.all()
+        (row.name, row.name) for row in db.session.scalars(select(Tag)).all()
     ]
     if render["newForm"].validate_on_submit():
         target = ipaddress.ip_network(render["newForm"].target.data, False)
@@ -132,14 +134,14 @@ def scope() -> Response | str:
         db.session.commit()
         current_app.scope_manager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} added.", "success")
-        return redirect(url_for("admin.scope"))  # type: ignore[return-value]
+        return redirect(url_for("admin.scope"))
     return render_template("admin/scope.html", **render)
 
 
 @bp.route("/blacklist", methods=["GET", "POST"])
 @login_required  # type: ignore[misc]
 @is_admin
-def blacklist() -> Response | str:
+def blacklist() -> wzResponse | str:
     render = {
         "scope": ScopeItem.getBlacklist(),
         "blacklistSize": current_app.scope_manager.get_blacklist_size(),  # type: ignore[attr-defined]
@@ -151,7 +153,7 @@ def blacklist() -> Response | str:
         "addTagForm": forms.TagScopeForm(),
     }
     render["addTagForm"].tagname.choices = [
-        (row.name, row.name) for row in Tag.query.all()
+        (row.name, row.name) for row in db.session.scalars(select(Tag)).all()
     ]
     if render["newForm"].validate_on_submit():
         target = ipaddress.ip_network(render["newForm"].target.data, False)
@@ -160,14 +162,14 @@ def blacklist() -> Response | str:
         db.session.commit()
         current_app.scope_manager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} blacklisted.", "success")
-        return redirect(url_for("admin.blacklist"))  # type: ignore[return-value]
+        return redirect(url_for("admin.blacklist"))
     return render_template("admin/blacklist.html", **render)
 
 
 @bp.route("/import/<string:scopetype>", methods=["POST"])
 @login_required  # type: ignore[misc]
 @is_admin
-def import_scope(scopetype: str = "") -> Response:
+def import_scope(scopetype: str = "") -> wzResponse:
     if scopetype == "blacklist":
         importBlacklist = True
         importForm = forms.ImportBlacklistForm()
@@ -193,13 +195,13 @@ def import_scope(scopetype: str = "") -> Response:
         for _field, errors in importForm.errors.items():
             for error in errors:
                 flash(error, "danger")
-    return redirect(url_for(f"admin.{scopetype}"))  # type: ignore[return-value]
+    return redirect(url_for(f"admin.{scopetype}"))
 
 
 @bp.route("/export/<string:scopetype>", methods=["GET"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def export_scope(scopetype=""):  # type: ignore[no-untyped-def]
+def export_scope(scopetype: str = "") -> Response:
     if scopetype == "blacklist":
         exportBlacklist = True
     elif scopetype == "scope":
@@ -213,11 +215,11 @@ def export_scope(scopetype=""):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/<string:scopetype>/<int:id>/delete", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def delete_scope(scopetype, id):  # type: ignore[no-untyped-def]
+def delete_scope(scopetype: str, id: int) -> wzResponse:
     if scopetype not in ["scope", "blacklist"]:
-        return abort(404)
+        abort(404)
     delForm = forms.ScopeDeleteForm()
     if delForm.validate_on_submit():
         item = ScopeItem.query.filter_by(id=id).first()
@@ -233,11 +235,11 @@ def delete_scope(scopetype, id):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/<string:scopetype>/<int:id>/toggle", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def toggle_scope(scopetype, id):  # type: ignore[no-untyped-def]
+def toggle_scope(scopetype: str, id: int) -> wzResponse:
     if scopetype not in ["scope", "blacklist"]:
-        return abort(404)
+        abort(404)
     toggleForm = forms.ScopeToggleForm()
     if toggleForm.validate_on_submit():
         item = ScopeItem.query.filter_by(id=id).first()
@@ -251,47 +253,53 @@ def toggle_scope(scopetype, id):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/<string:scopetype>/<int:id>/tag", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def tag_scope(scopetype, id):  # type: ignore[no-untyped-def]
+def tag_scope(scopetype: str, id: int) -> wzResponse:
     if scopetype not in ["scope", "blacklist"]:
-        return abort(404)
+        abort(404)
     addTagForm = forms.TagScopeForm()
-    addTagForm.tagname.choices = [(row.name, row.name) for row in Tag.query.all()]
+    addTagForm.tagname.choices = [
+        (row.name, row.name) for row in db.session.scalars(select(Tag)).all()
+    ]
     if addTagForm.validate_on_submit():
-        scope = ScopeItem.query.get(id)
-        mytag = Tag.query.filter_by(name=addTagForm.tagname.data).first()
-        scope.addTag(mytag)
+        scope = db.session.scalar(select(ScopeItem).where(ScopeItem.id == id))
+        mytag = db.session.scalars(
+            select(Tag).filter_by(name=addTagForm.tagname.data)
+        ).first()
+        scope.addTag(mytag)  # type: ignore[union-attr, arg-type]
         db.session.commit()
-        flash(f'Tag "{mytag.name}" added to {scope.target}.', "success")
+        flash(f'Tag "{mytag.name}" added to {scope.target}.', "success")  # type: ignore[union-attr]
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
 
 
 @bp.route("/<string:scopetype>/<int:id>/untag", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def untag_scope(scopetype, id):  # type: ignore[no-untyped-def]
+def untag_scope(scopetype: str, id: int) -> wzResponse:
     if scopetype not in ["scope", "blacklist"]:
-        return abort(404)
+        abort(404)
     delTagForm = forms.TagScopeForm()
     scope = ScopeItem.query.get(id)
     delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags]
     if delTagForm.validate_on_submit():
-        mytag = Tag.query.filter_by(name=delTagForm.tagname.data).first()
+        mytag = db.session.scalars(
+            select(Tag).filter_by(name=delTagForm.tagname.data)
+        ).first()
         scope.delTag(mytag)
         db.session.commit()
-        flash(f'Tag "{mytag.name}" removed from {scope.target}.', "success")
+        flash(f'Tag "{mytag.name}" removed from {scope.target}.', "success")  # type: ignore[union-attr]
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
 
 
 @bp.route("/services", methods=["GET", "POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def services():  # type: ignore[no-untyped-def]
+def services() -> wzResponse | str:
     uploadForm = forms.ServicesUploadForm(prefix="upload-services")
     addServiceForm = forms.AddServiceForm(prefix="add-service")
     addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp", "UDP")]
@@ -352,17 +360,17 @@ def services():  # type: ignore[no-untyped-def]
 
 
 @bp.route("/services/export", methods=["GET"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def export_services():  # type: ignore[no-untyped-def]
+def export_services() -> Response:
     current_services = NatlasServices.get_latest_services()
     return Response(str(current_services["services"]), mimetype="text/plain")
 
 
 @bp.route("/agents", methods=["GET", "POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def agent_config():  # type: ignore[no-untyped-def]
+def agent_config() -> str:
     agentConfig = AgentConfig.query.get(1)
     agent_scripts = AgentScript.query.all()
     # pass the model to the form to populate
@@ -387,9 +395,9 @@ def agent_config():  # type: ignore[no-untyped-def]
 
 
 @bp.route("/agents/script/add", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def add_script():  # type: ignore[no-untyped-def]
+def add_script() -> wzResponse:
     addScriptForm = forms.AddScriptForm(prefix="add-script")
 
     if addScriptForm.validate_on_submit():
@@ -407,9 +415,9 @@ def add_script():  # type: ignore[no-untyped-def]
 
 
 @bp.route("/agents/script/<string:name>/delete", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def delete_script(name):  # type: ignore[no-untyped-def]
+def delete_script(name: str) -> wzResponse | None:
     deleteForm = forms.DeleteForm()
 
     if deleteForm.validate_on_submit():
@@ -426,9 +434,9 @@ def delete_script(name):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/scans/delete/<scan_id>", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def delete_scan(scan_id):  # type: ignore[no-untyped-def]
+def delete_scan(scan_id: str) -> wzResponse:
     delForm = forms.DeleteForm()
     redirectLoc = url_for("main.browse")
 
@@ -445,9 +453,9 @@ def delete_scan(scan_id):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/hosts/delete/<ip>", methods=["POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def delete_host(ip):  # type: ignore[no-untyped-def]
+def delete_host(ip: str) -> wzResponse | None:
     delForm = forms.DeleteForm()
     redirectLoc = url_for("main.browse")
 
@@ -466,9 +474,9 @@ def delete_host(ip):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/tags", methods=["GET", "POST"])
-@login_required
+@login_required  # type: ignore[misc]
 @is_admin
-def tags():  # type: ignore[no-untyped-def]
+def tags() -> str | wzResponse:
     tags = Tag.query.all()
 
     addForm = forms.AddTagForm()
@@ -486,5 +494,7 @@ def tags():  # type: ignore[no-untyped-def]
 @login_required  # type: ignore[misc]
 @is_admin
 def logs() -> str:
-    scope_logs = ScopeLog.query.order_by(ScopeLog.created_at.desc()).all()
+    scope_logs = db.session.scalars(
+        select(ScopeLog).order_by(ScopeLog.created_at.desc())
+    ).all()
     return render_template("admin/logs.html", scope_logs=scope_logs)
