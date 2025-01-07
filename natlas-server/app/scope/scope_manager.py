@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from flask import current_app
+from flask import Flask, current_app
 from netaddr import IPAddress
 from netaddr.core import AddrFormatError
 
@@ -23,8 +23,8 @@ class ScopeManager:
         self.pendingRescans: list[RescanTask] = []
         self.dispatchedRescans: list[RescanTask] = []
 
-    def init_app(self, app):  # type: ignore[no-untyped-def]
-        app.ScopeManager = self
+    def init_app(self, app: Flask) -> None:
+        app.scope_manager = self  # type: ignore[attr-defined]
 
         with app.app_context():
             self.scopes = {

@@ -36,7 +36,7 @@ mail = Mail()
 db = SQLAlchemy(model_class=NatlasBase)
 migrate = Migrate()
 csrf = CSRFProtect()
-ScopeManager = ScopeManager()  # type: ignore[assignment, misc]
+scope_manager = ScopeManager()
 
 
 @login.unauthorized_handler
@@ -83,7 +83,7 @@ def create_app(config_class=config.Config, migrating=False):  # type: ignore[no-
     login.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
-    ScopeManager.init_app(app)  # type: ignore[arg-type, call-arg]
+    scope_manager.init_app(app)
     app.config["webpack"] = webpack_manifest.load(
         # An absolute path to a manifest file
         path=os.path.join(
@@ -95,7 +95,7 @@ def create_app(config_class=config.Config, migrating=False):  # type: ignore[no-
 
     with app.app_context():
         load_config_from_db(app, db)
-        ScopeManager.load_all_groups()  # type: ignore[call-arg]
+        scope_manager.load_all_groups()
 
     register_converters(app)
 
