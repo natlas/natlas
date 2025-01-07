@@ -3,12 +3,12 @@ from datetime import datetime
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase
 from app.models.dict_serializable import DictSerializable
 
 
 # Basic Logging for Scope related events
-class ScopeLog(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class ScopeLog(NatlasBase, DictSerializable):
     __tablename__ = "scope_log"
 
     id: Mapped[int] = mapped_column(primary_key=True)

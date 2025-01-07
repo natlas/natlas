@@ -1,12 +1,12 @@
 from collections.abc import Iterable
-from typing import Literal
+from typing import Literal, TypedDict
 
 from netaddr import IPAddress, IPNetwork
 from netaddr.core import AddrFormatError
-from sqlalchemy import LargeBinary, String, select
+from sqlalchemy import LargeBinary, String, insert, select
 from sqlalchemy.orm import Mapped, backref, mapped_column, relationship
 
-from app import db
+from app import NatlasBase, db
 from app.models.dict_serializable import DictSerializable
 from app.models.tag import Tag
 
@@ -18,7 +18,13 @@ scopetags = db.Table(
 )
 
 
-class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class ScopeImportResults(TypedDict):
+    fail: list[str]
+    success: int
+    exist: int
+
+
+class ScopeItem(NatlasBase, DictSerializable):
     __tablename__ = "scope_item"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -140,8 +146,10 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
             return False
 
     @staticmethod
-    def import_scope_list(address_list: Iterable[str], blacklist: bool) -> dict:  # type: ignore[type-arg]
-        result = {"fail": [], "success": 0, "exist": 0}
+    def import_scope_list(
+        address_list: Iterable[str], blacklist: bool
+    ) -> ScopeImportResults:
+        result: ScopeImportResults = {"fail": [], "success": 0, "exist": 0}
         prefixes = {"sqlite": " OR IGNORE", "mysql": " IGNORE"}
         selected_prefix = prefixes.get(db.engine.dialect.name)
         scope_import = {}
@@ -157,9 +165,9 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         for line in address_list:
             ip, tags = ScopeItem.parse_import_line(line)
             if not ip:
-                result["fail"].append(line)  # type: ignore[attr-defined]
+                result["fail"].append(line)
                 continue
-            tags = [tag_dict[tag] for tag in tags]
+            tags = [tag_dict[tag] for tag in tags]  # type: ignore[misc]
             item = ScopeItem(target=str(ip), blacklist=blacklist).as_dict()
             scope_tag_import[item["target"]] = tags
             scope_import[item["target"]] = item
@@ -171,11 +179,13 @@ class ScopeItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
         ]
         for chunk in import_chunks:
             ins_stmt = (
-                ScopeItem.__table__.insert().prefix_with(selected_prefix).values(chunk)
+                insert(ScopeItem)
+                .prefix_with(selected_prefix)  # type: ignore[arg-type]
+                .values(chunk)
             )
             ins_result = db.session.execute(ins_stmt)
-            result["success"] += ins_result.rowcount
-        result["exist"] = len(address_list) - len(result["fail"]) - result["success"]  # type: ignore[arg-type, operator]
+            result["success"] = int(result["success"]) + ins_result.rowcount
+        result["exist"] = len(address_list) - len(result["fail"]) - result["success"]
         all_scope = {
             item.target: item.id for item in db.session.scalars(select(ScopeItem)).all()
         }

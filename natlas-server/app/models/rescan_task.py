@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase, db
 from app.models.dict_serializable import DictSerializable
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 # Rescan Queue
 # Each record represents a user-requested rescan of a given target.
 # Tracks when it was dispatched, when it was completed, and the scan id of the complete scan.
-class RescanTask(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class RescanTask(NatlasBase, DictSerializable):
     __tablename__ = "rescan_task"
 
     id: Mapped[int] = mapped_column(primary_key=True)

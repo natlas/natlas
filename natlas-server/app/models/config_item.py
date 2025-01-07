@@ -1,14 +1,14 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase
 from app.models.dict_serializable import DictSerializable
 
 
 # Server configuration options
 # This uses a generic key,value style schema so that we can avoid changing the model for every new feature
 # Default config options are defined in natlas-server/config.py
-class ConfigItem(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class ConfigItem(NatlasBase, DictSerializable):
     __tablename__ = "config_item"
 
     id: Mapped[int] = mapped_column(primary_key=True)

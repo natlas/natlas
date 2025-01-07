@@ -8,7 +8,7 @@ from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import db, login
+from app import NatlasBase, db, login
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from app.models.user_invitation import UserInvitation
 
 
-class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class User(UserMixin, NatlasBase, DictSerializable):  # type: ignore[misc]
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)

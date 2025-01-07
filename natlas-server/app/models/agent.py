@@ -6,7 +6,7 @@ from typing import Optional
 from sqlalchemy import ForeignKey, String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase, db
 from app.models.dict_serializable import DictSerializable
 from app.util import generate_hex_16
 
@@ -14,7 +14,7 @@ from app.util import generate_hex_16
 # Agent registration
 # Users can have many agents, each agent has an ID and a secret (token)
 # Friendly name is purely for identification of agents in the management page
-class Agent(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class Agent(NatlasBase, DictSerializable):
     __tablename__ = "agent"
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -4,12 +4,12 @@ from typing import Any
 from sqlalchemy import String, Text, select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase, db
 
 
 # While generally I prefer to use a singular model name, each record here is going to be storing a set of services
 # Each record in this table is a complete nmap-services db
-class NatlasServices(db.Model):  # type: ignore[misc, name-defined]
+class NatlasServices(NatlasBase):
     __tablename__ = "natlas_services"
 
     id: Mapped[int] = mapped_column(primary_key=True)
