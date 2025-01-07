@@ -5,13 +5,13 @@ from typing import Optional
 from sqlalchemy import DateTime, String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase, db
 from app.models import User
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 
 
-class UserInvitation(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class UserInvitation(NatlasBase, DictSerializable):
     __tablename__ = "user_invitation"
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -1,12 +1,14 @@
 from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase, db
 from app.models.dict_serializable import DictSerializable
 
 
 # Simple tags that can be added to scope items for automatic tagging
-class Tag(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class Tag(NatlasBase, DictSerializable):
+    __tablename__ = "tag"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(128), index=True, unique=True)
 

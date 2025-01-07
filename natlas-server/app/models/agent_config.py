@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import db
+from app import NatlasBase
 from app.models.dict_serializable import DictSerializable
 
 
-class AgentConfig(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
+class AgentConfig(NatlasBase, DictSerializable):
     __tablename__ = "agent_config"
 
     id: Mapped[int] = mapped_column(primary_key=True)
