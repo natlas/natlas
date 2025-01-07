@@ -113,8 +113,8 @@ def toggle_user(id: int) -> Response:
 def scope() -> Response | str:
     render = {
         "scope": ScopeItem.getScope(),
-        "scopeSize": current_app.ScopeManager.get_scope_size(),  # type: ignore[attr-defined]
-        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),  # type: ignore[attr-defined]
+        "scopeSize": current_app.scope_manager.get_scope_size(),  # type: ignore[attr-defined]
+        "effectiveScopeSize": current_app.scope_manager.get_effective_scope_size(),  # type: ignore[attr-defined]
         "newForm": forms.NewScopeForm(),
         "delForm": forms.ScopeDeleteForm(),
         "editForm": forms.ScopeToggleForm(),
@@ -130,7 +130,7 @@ def scope() -> Response | str:
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=False)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.ScopeManager.update()  # type: ignore[attr-defined]
+        current_app.scope_manager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} added.", "success")
         return redirect(url_for("admin.scope"))  # type: ignore[return-value]
     return render_template("admin/scope.html", **render)
@@ -142,8 +142,8 @@ def scope() -> Response | str:
 def blacklist() -> Response | str:
     render = {
         "scope": ScopeItem.getBlacklist(),
-        "blacklistSize": current_app.ScopeManager.get_blacklist_size(),  # type: ignore[attr-defined]
-        "effectiveScopeSize": current_app.ScopeManager.get_effective_scope_size(),  # type: ignore[attr-defined]
+        "blacklistSize": current_app.scope_manager.get_blacklist_size(),  # type: ignore[attr-defined]
+        "effectiveScopeSize": current_app.scope_manager.get_effective_scope_size(),  # type: ignore[attr-defined]
         "newForm": forms.NewScopeForm(),
         "delForm": forms.ScopeDeleteForm(),
         "editForm": forms.ScopeToggleForm(),
@@ -158,7 +158,7 @@ def blacklist() -> Response | str:
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=True)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.ScopeManager.update()  # type: ignore[attr-defined]
+        current_app.scope_manager.update()  # type: ignore[attr-defined]
         flash(f"{newTarget.target} blacklisted.", "success")
         return redirect(url_for("admin.blacklist"))  # type: ignore[return-value]
     return render_template("admin/blacklist.html", **render)
@@ -180,7 +180,7 @@ def import_scope(scopetype: str = "") -> Response:
         newScopeItems = importForm.scope.data.split("\n")
         result = ScopeItem.import_scope_list(newScopeItems, importBlacklist)
         db.session.commit()
-        current_app.ScopeManager.update()  # type: ignore[attr-defined]
+        current_app.scope_manager.update()  # type: ignore[attr-defined]
         if result["success"]:
             flash(f"{result['success']} targets added to {scopetype}.", "success")
         if result["exist"]:
@@ -225,7 +225,7 @@ def delete_scope(scopetype, id):  # type: ignore[no-untyped-def]
             item.tags.remove(tag)
         ScopeItem.query.filter_by(id=id).delete()
         db.session.commit()
-        current_app.ScopeManager.update()  # type: ignore[attr-defined]
+        current_app.scope_manager.update()  # type: ignore[attr-defined]
         flash(f"{item.target} deleted.", "success")
     else:
         flash("Form couldn't validate!", "danger")
@@ -244,7 +244,7 @@ def toggle_scope(scopetype, id):  # type: ignore[no-untyped-def]
         item.blacklist = not item.blacklist
         flash(f"Toggled scope status for {item.target}.", "success")
         db.session.commit()
-        current_app.ScopeManager.update()  # type: ignore[attr-defined]
+        current_app.scope_manager.update()  # type: ignore[attr-defined]
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)

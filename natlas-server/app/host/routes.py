@@ -165,12 +165,12 @@ def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
 
     if not (
         rescanForm.validate_on_submit()
-        or current_app.ScopeManager.is_acceptable_target(ip)  # type: ignore[attr-defined]
+        or current_app.scope_manager.is_acceptable_target(ip)  # type: ignore[attr-defined]
     ):
         flash(f"Could not handle rescan request for {ip}", "danger")
         return redirect(url_for("host.host", ip=ip))
 
-    incompleteScans = current_app.ScopeManager.get_incomplete_scans()  # type: ignore[attr-defined]
+    incompleteScans = current_app.scope_manager.get_incomplete_scans()  # type: ignore[attr-defined]
     scan_dispatched = {}
     for scan in incompleteScans:
         scan_dispatched[scan.target] = scan
@@ -185,8 +185,8 @@ def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
             # It should never take this long so mark it as not dispatched
             scan.dispatched = False
             db.session.commit()
-            current_app.ScopeManager.update_pending_rescans()  # type: ignore[attr-defined]
-            current_app.ScopeManager.update_dispatched_rescans()  # type: ignore[attr-defined]
+            current_app.scope_manager.update_pending_rescans()  # type: ignore[attr-defined]
+            current_app.scope_manager.update_dispatched_rescans()  # type: ignore[attr-defined]
             flash(f"Refreshed stale rescan request for {ip}", "success")
             return redirect(url_for("host.host", ip=ip))
         flash(f"There's an outstanding rescan request for {ip}", "warning")
@@ -195,8 +195,8 @@ def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
     rescan = RescanTask(user_id=current_user.id, target=ip)
     db.session.add(rescan)
     db.session.commit()
-    current_app.ScopeManager.update_pending_rescans()  # type: ignore[attr-defined]
-    current_app.ScopeManager.update_dispatched_rescans()  # type: ignore[attr-defined]
+    current_app.scope_manager.update_pending_rescans()  # type: ignore[attr-defined]
+    current_app.scope_manager.update_dispatched_rescans()  # type: ignore[attr-defined]
     flash(f"Requested rescan of {ip}", "success")
     return redirect(url_for("host.host", ip=ip))
 
