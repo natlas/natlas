@@ -6,7 +6,7 @@ import click
 from flask.cli import AppGroup
 
 from app import db
-from app.models import ScopeItem
+from app.models.scope_item import ScopeImportResults, ScopeItem
 
 cli_group = AppGroup("scope")
 
@@ -14,9 +14,9 @@ import_helptext = "Import scope/blacklist from a file containing line-separated 
 Optionally, each line can contain a comma separated list of tags to apply to that target. e.g. 127.0.0.1,local,private,test"
 
 
-def import_scope(scope_file: typing.TextIO, blacklist: bool):  # type: ignore[no-untyped-def]
+def import_scope(scope_file: typing.TextIO, blacklist: bool) -> ScopeImportResults:
     if not scope_file:  # type: ignore[truthy-bool]
-        return {"failed": 0, "existed": 0, "successful": 0}
+        return {"fail": [], "exist": 0, "success": 0}
     addresses = scope_file.readlines()
     result = ScopeItem.import_scope_list(addresses, blacklist)
     db.session.commit()
@@ -32,17 +32,17 @@ def import_scope(scope_file: typing.TextIO, blacklist: bool):  # type: ignore[no
     default=False,
     help="Should this file be considered in scope or blacklisted?",
 )
-def import_items(file: str, import_as_blacklist: bool):  # type: ignore[no-untyped-def]
+def import_items(file: typing.TextIO, import_as_blacklist: bool) -> None:
     import_name = "blacklist" if import_as_blacklist else "scope"
     results = {
         "timestamp": datetime.utcnow().isoformat(),
-        import_name: import_scope(file, import_as_blacklist),  # type: ignore[arg-type]
+        import_name: import_scope(file, import_as_blacklist),
     }
     print(json.dumps(results, indent=2))
 
 
 @cli_group.command("export")
-def export_items():  # type: ignore[no-untyped-def]
+def export_items() -> None:
     result = {
         "timestamp": datetime.utcnow().isoformat(),
         "scope": [

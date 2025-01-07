@@ -15,7 +15,7 @@ def get_target_tags(target: str) -> list[str]:
     )  # make it a set for only uniques, then make it a list to serialize to JSON
 
 
-def get_unique_scan_id():  # type: ignore[no-untyped-def]
+def get_unique_scan_id() -> str:
     scan_id = ""
     while scan_id == "":
         rand = secrets.token_hex(16)

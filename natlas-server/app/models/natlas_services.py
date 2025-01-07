@@ -16,9 +16,9 @@ class NatlasServices(NatlasBase):
     sha256: Mapped[str | None] = mapped_column(String(64))
     services: Mapped[str | None] = mapped_column(Text)
 
-    def __init__(self, services):  # type: ignore[no-untyped-def]
+    def __init__(self, services: str) -> None:
         self.services = services
-        self.sha256 = hashlib.sha256(self.services.encode()).hexdigest()  # type: ignore[union-attr]
+        self.sha256 = hashlib.sha256(self.services.encode()).hexdigest()
 
     @staticmethod
     def get_latest_services() -> dict[str, str]:
@@ -33,7 +33,7 @@ class NatlasServices(NatlasBase):
     def hash_equals(self, hash: str) -> bool:
         return self.sha256 == hash
 
-    def services_as_list(self):  # type: ignore[no-untyped-def]
+    def services_as_list(self) -> list[tuple[int, str | Any, str | Any, str | Any]]:
         servlist = []
         idx = 1
         for line in self.services.splitlines():  # type: ignore[union-attr]

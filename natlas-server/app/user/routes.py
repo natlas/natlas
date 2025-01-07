@@ -1,5 +1,6 @@
 from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
+from werkzeug.wrappers.response import Response as wzResponse
 
 from app import db
 from app.models import Agent, User
@@ -13,8 +14,8 @@ from app.user.forms import (
 
 
 @bp.route("/", methods=["GET", "POST"])
-@login_required
-def profile():  # type: ignore[no-untyped-def]
+@login_required  # type: ignore[misc]
+def profile() -> str:
     myagents = current_user.agents
     changePasswordForm = ChangePasswordForm(prefix="change-password")
     displaySettingsForm = DisplaySettingsForm(
@@ -70,8 +71,8 @@ def profile():  # type: ignore[no-untyped-def]
 
 
 @bp.route("/agent/<string:agent_id>/newToken", methods=["POST"])
-@login_required
-def generate_new_token(agent_id):  # type: ignore[no-untyped-def]
+@login_required  # type: ignore[misc]
+def generate_new_token(agent_id: str) -> wzResponse:
     generateTokenForm = GenerateTokenForm()
 
     if generateTokenForm.validate_on_submit():
@@ -85,8 +86,8 @@ def generate_new_token(agent_id):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/agent/<string:agent_id>/newName", methods=["POST"])
-@login_required
-def change_agent_name(agent_id):  # type: ignore[no-untyped-def]
+@login_required  # type: ignore[misc]
+def change_agent_name(agent_id: str) -> wzResponse:
     agentNameForm = AgentNameForm()
 
     if agentNameForm.validate_on_submit():
@@ -104,8 +105,8 @@ def change_agent_name(agent_id):  # type: ignore[no-untyped-def]
 
 
 @bp.route("/agent/newAgent", methods=["POST"])
-@login_required
-def new_agent():  # type: ignore[no-untyped-def]
+@login_required  # type: ignore[misc]
+def new_agent() -> wzResponse:
     newAgentForm = AgentNameForm()
 
     if newAgentForm.validate_on_submit():

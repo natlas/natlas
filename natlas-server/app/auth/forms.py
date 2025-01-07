@@ -22,7 +22,7 @@ class RegistrationForm(FlaskForm):  # type: ignore[misc]
     )
     submit = SubmitField("Register")
 
-    def validate_email(self, email):  # type: ignore[no-untyped-def]
+    def validate_email(self, email: StringField) -> None:
         user = db.session.scalars(
             select(User).where(User.email == email.data.lower())
         ).first()

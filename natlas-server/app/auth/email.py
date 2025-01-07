@@ -1,3 +1,4 @@
+from email_validator import ValidatedEmail
 from flask import current_app, flash, render_template, url_for
 
 from app.email import send_email
@@ -16,7 +17,7 @@ token_types = {
 }
 
 
-def validate_email(addr):  # type: ignore[no-untyped-def]
+def validate_email(addr: str) -> ValidatedEmail | None:
     from app.models import User
 
     validemail = User.validate_email(addr)
@@ -39,10 +40,12 @@ def build_email_url(token: str, token_type: str) -> str:
 
 
 def email_configured() -> bool:
-    return current_app.config["MAIL_FROM"] and current_app.config["MAIL_SERVER"]  # type: ignore[no-any-return]
+    return bool(
+        current_app.config.get("MAIL_FROM") and current_app.config.get("MAIL_SERVER")
+    )
 
 
-def send_auth_email(email, token, token_type):  # type: ignore[no-untyped-def]
+def send_auth_email(email: str, token: str, token_type: str) -> None:
     send_email(
         token_types[token_type]["subject"],
         sender=current_app.config["MAIL_FROM"],
@@ -53,7 +56,7 @@ def send_auth_email(email, token, token_type):  # type: ignore[no-untyped-def]
     )
 
 
-def deliver_auth_link(email: str, token: str, token_type: str):  # type: ignore[no-untyped-def]
+def deliver_auth_link(email: str, token: str, token_type: str) -> str:
     if email_configured() and email:
         send_auth_email(email, token, token_type)
         msg = f"Email sent to {email} via {current_app.config['MAIL_SERVER']}!"
