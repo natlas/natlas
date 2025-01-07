@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 
 from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user
+from sqlalchemy import select
 from werkzeug.wrappers.response import Response
 
 from app import db
@@ -23,7 +24,9 @@ from app.models import User, UserInvitation
 def login():  # type: ignore[no-untyped-def]
     form = LoginForm(prefix="login")
     if form.validate_on_submit():
-        user = User.query.filter_by(email=User.validate_email(form.email.data)).first()
+        user = db.session.scalars(
+            select(User).where(User.email == User.validate_email(form.email.data))
+        ).first()
         if user is None or not user.check_password(form.password.data):
             flash("Invalid email or password", "danger")
             return redirect(url_for("auth.login"))

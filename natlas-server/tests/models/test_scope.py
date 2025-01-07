@@ -1,5 +1,6 @@
 from app import db
 from app.models import ScopeItem
+from sqlalchemy import select
 
 
 def test_new_scope(app):  # type: ignore[no-untyped-def]
@@ -58,10 +59,14 @@ def test_import_scope(app):  # type: ignore[no-untyped-def]
     assert len(result["fail"]) == 1
     assert result["exist"] == 1
     assert result["success"] == 5
-    item = ScopeItem.query.filter_by(target="127.0.0.1/32").first()
-    tags = [t.name for t in item.tags]
+    item = db.session.scalars(
+        select(ScopeItem).where(ScopeItem.target == "127.0.0.1/32")
+    ).first()
+    tags = [t.name for t in item.tags]  # type: ignore[union-attr]
     assert len(tags) == 3
     assert "one" in tags
     assert "four" not in tags
-    item = ScopeItem.query.filter_by(target="10.12.13.14/32").first()
-    assert len(item.tags) == 0
+    item = db.session.scalars(
+        select(ScopeItem).where(ScopeItem.target == "10.12.13.14/32")
+    ).first()
+    assert len(item.tags) == 0  # type: ignore[union-attr]

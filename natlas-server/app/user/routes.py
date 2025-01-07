@@ -44,18 +44,18 @@ def profile():  # type: ignore[no-untyped-def]
         changePasswordForm.changePassword.data
         and changePasswordForm.validate_on_submit()
     ):
-        user = User.query.get(current_user.id)
-        user.set_password(changePasswordForm.password.data)
+        user = db.session.get(User, current_user.id)
+        user.set_password(changePasswordForm.password.data)  # type: ignore[union-attr]
         db.session.commit()
         flash("Your password has been changed.", "success")
     elif (
         displaySettingsForm.updateDisplaySettings.data
         and displaySettingsForm.validate_on_submit()
     ):
-        user = User.query.get(current_user.id)
-        user.results_per_page = displaySettingsForm.results_per_page.data
-        user.preview_length = displaySettingsForm.preview_length.data
-        user.result_format = displaySettingsForm.result_format.data
+        user = db.session.get(User, current_user.id)
+        user.results_per_page = displaySettingsForm.results_per_page.data  # type: ignore[union-attr]
+        user.preview_length = displaySettingsForm.preview_length.data  # type: ignore[union-attr]
+        user.result_format = displaySettingsForm.result_format.data  # type: ignore[union-attr]
         db.session.commit()
         flash("Display settings updated.", "success")
 

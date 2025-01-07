@@ -1,7 +1,7 @@
 import hashlib
 from typing import Any
 
-from sqlalchemy import String, Text
+from sqlalchemy import String, Text, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db
@@ -22,7 +22,13 @@ class NatlasServices(db.Model):  # type: ignore[misc, name-defined]
 
     @staticmethod
     def get_latest_services() -> dict[str, str]:
-        return NatlasServices.query.order_by(NatlasServices.id.desc()).first().as_dict()  # type: ignore[no-any-return]
+        return (
+            db.session.scalars(  # type: ignore[union-attr]
+                select(NatlasServices).order_by(NatlasServices.id.desc())
+            )
+            .first()
+            .as_dict()
+        )
 
     def hash_equals(self, hash: str) -> bool:
         return self.sha256 == hash

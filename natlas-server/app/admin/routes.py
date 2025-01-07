@@ -40,8 +40,10 @@ def admin() -> str:
             if fieldname.upper() in ["SUBMIT", "CSRF_TOKEN"]:
                 continue
             current_app.config[fieldname.upper()] = fieldvalue
-            confitem = ConfigItem.query.filter_by(name=fieldname.upper()).first()
-            confitem.value = str(fieldvalue)
+            confitem = db.session.scalars(
+                select(ConfigItem).where(ConfigItem.name == fieldname.upper())
+            ).first()
+            confitem.value = str(fieldvalue)  # type: ignore[union-attr]
             db.session.add(confitem)
         db.session.commit()
         flash("Successfully updated Natlas configuration.", "success")
@@ -54,7 +56,7 @@ def admin() -> str:
 @login_required  # type: ignore[misc]
 @is_admin
 def users() -> Response | str:
-    users = User.query.all()
+    users = db.session.scalars(select(User)).all()
     inviteForm = forms.InviteUserForm()
     if inviteForm.validate_on_submit():
         invitation = UserInvitation.new_invite(inviteForm.email.data)
@@ -77,13 +79,13 @@ def users() -> Response | str:
 def delete_user(id: int) -> wzResponse:
     delForm = forms.UserDeleteForm()
     if delForm.validate_on_submit():
+        user = db.session.scalars(select(User).where(User.id == id)).first()
         if current_user.id == id:
             flash("You can't delete yourself!", "danger")
             return redirect(url_for("admin.users"))
-        user = User.query.filter_by(id=id).first()
-        User.query.filter_by(id=id).delete()
+        db.session.delete(db.session.get(User, id))
         db.session.commit()
-        flash(f"{user.email} deleted.", "success")
+        flash(f"{user.email} deleted.", "success")  # type: ignore[union-attr]
     else:
         flash("Form couldn't validate!", "danger")
 
@@ -96,11 +98,11 @@ def delete_user(id: int) -> wzResponse:
 def toggle_user(id: int) -> wzResponse:
     editForm = forms.UserEditForm()
     if editForm.validate_on_submit():
-        user = User.query.filter_by(id=id).first()
-        if user.id == current_user.id:
+        user = db.session.scalars(select(User).where(User.id == id)).first()
+        if user.id == current_user.id:  # type: ignore[union-attr]
             flash("Can't demote yourself!", "danger")
             return redirect(url_for("admin.users"))
-        user.is_admin = not user.is_admin
+        user.is_admin = not user.is_admin  # type: ignore[union-attr]
         db.session.commit()
         flash("User status toggled.", "success")
     else:
@@ -208,7 +210,9 @@ def export_scope(scopetype: str = "") -> Response:
         exportBlacklist = False
     else:
         return abort(404)
-    items = ScopeItem.query.filter_by(blacklist=exportBlacklist).all()
+    items = db.session.scalars(
+        select(ScopeItem).where(ScopeItem.blacklist == exportBlacklist)
+    ).all()
     return Response(
         "\n".join(str(item.target) for item in items), mimetype="text/plain"
     )
@@ -222,13 +226,13 @@ def delete_scope(scopetype: str, id: int) -> wzResponse:
         abort(404)
     delForm = forms.ScopeDeleteForm()
     if delForm.validate_on_submit():
-        item = ScopeItem.query.filter_by(id=id).first()
-        for tag in item.tags:
-            item.tags.remove(tag)
-        ScopeItem.query.filter_by(id=id).delete()
+        item = db.session.scalars(select(ScopeItem).where(ScopeItem.id == id)).first()
+        for tag in item.tags:  # type: ignore[union-attr]
+            item.tags.remove(tag)  # type: ignore[union-attr]
+        db.session.delete(db.session.get(ScopeItem, id))
         db.session.commit()
         current_app.scope_manager.update()  # type: ignore[attr-defined]
-        flash(f"{item.target} deleted.", "success")
+        flash(f"{item.target} deleted.", "success")  # type: ignore[union-attr]
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
@@ -242,9 +246,9 @@ def toggle_scope(scopetype: str, id: int) -> wzResponse:
         abort(404)
     toggleForm = forms.ScopeToggleForm()
     if toggleForm.validate_on_submit():
-        item = ScopeItem.query.filter_by(id=id).first()
-        item.blacklist = not item.blacklist
-        flash(f"Toggled scope status for {item.target}.", "success")
+        item = db.session.scalars(select(ScopeItem).where(ScopeItem.id == id)).first()
+        item.blacklist = not item.blacklist  # type: ignore[union-attr]
+        flash(f"Toggled scope status for {item.target}.", "success")  # type: ignore[union-attr]
         db.session.commit()
         current_app.scope_manager.update()  # type: ignore[attr-defined]
     else:
@@ -265,7 +269,7 @@ def tag_scope(scopetype: str, id: int) -> wzResponse:
     if addTagForm.validate_on_submit():
         scope = db.session.scalar(select(ScopeItem).where(ScopeItem.id == id))
         mytag = db.session.scalars(
-            select(Tag).filter_by(name=addTagForm.tagname.data)
+            select(Tag).where(Tag.name == addTagForm.tagname.data)
         ).first()
         scope.addTag(mytag)  # type: ignore[union-attr, arg-type]
         db.session.commit()
@@ -282,13 +286,13 @@ def untag_scope(scopetype: str, id: int) -> wzResponse:
     if scopetype not in ["scope", "blacklist"]:
         abort(404)
     delTagForm = forms.TagScopeForm()
-    scope = ScopeItem.query.get(id)
-    delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags]
+    scope = db.session.get(ScopeItem, id)
+    delTagForm.tagname.choices = [(row.name, row.name) for row in scope.tags]  # type: ignore[union-attr]
     if delTagForm.validate_on_submit():
         mytag = db.session.scalars(
-            select(Tag).filter_by(name=delTagForm.tagname.data)
+            select(Tag).where(Tag.name == delTagForm.tagname.data)
         ).first()
-        scope.delTag(mytag)
+        scope.delTag(mytag)  # type: ignore[union-attr, arg-type]
         db.session.commit()
         flash(f'Tag "{mytag.name}" removed from {scope.target}.', "success")  # type: ignore[union-attr]
     else:
@@ -371,8 +375,8 @@ def export_services() -> Response:
 @login_required  # type: ignore[misc]
 @is_admin
 def agent_config() -> str:
-    agentConfig = AgentConfig.query.get(1)
-    agent_scripts = AgentScript.query.all()
+    agentConfig = db.session.scalar(select(AgentConfig).where(AgentConfig.id == 1))
+    agent_scripts = db.session.scalars(select(AgentScript)).all()
     # pass the model to the form to populate
     agentForm = forms.AgentConfigForm(obj=agentConfig)
     addScriptForm = forms.AddScriptForm(prefix="add-script")
@@ -382,7 +386,7 @@ def agent_config() -> str:
         # populate the object from the form data
         agentForm.populate_obj(agentConfig)
         db.session.commit()
-        current_app.agentConfig = agentConfig.as_dict()  # type: ignore[attr-defined]
+        current_app.agentConfig = agentConfig.as_dict()  # type: ignore[attr-defined, union-attr]
         flash("Successfully updated agent configuration.", "success")
 
     return render_template(
@@ -421,7 +425,9 @@ def delete_script(name: str) -> wzResponse | None:
     deleteForm = forms.DeleteForm()
 
     if deleteForm.validate_on_submit():
-        delScript = AgentScript.query.filter_by(name=name).first()
+        delScript = db.session.scalars(
+            select(AgentScript).where(AgentScript.name == name)
+        ).first()
         if delScript:
             db.session.delete(delScript)
             db.session.commit()
@@ -477,7 +483,7 @@ def delete_host(ip: str) -> wzResponse | None:
 @login_required  # type: ignore[misc]
 @is_admin
 def tags() -> str | wzResponse:
-    tags = Tag.query.all()
+    tags = db.session.scalars(select(Tag)).all()
 
     addForm = forms.AddTagForm()
     if addForm.validate_on_submit():

@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
+from sqlalchemy import select
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
+from app import db
 from app.models import User
 
 
@@ -21,7 +23,9 @@ class RegistrationForm(FlaskForm):  # type: ignore[misc]
     submit = SubmitField("Register")
 
     def validate_email(self, email):  # type: ignore[no-untyped-def]
-        user = User.query.filter_by(email=email.data.lower()).first()
+        user = db.session.scalars(
+            select(User).where(User.email == email.data.lower())
+        ).first()
         if user is not None:
             raise ValidationError("Email already exists!")
 

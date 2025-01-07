@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Literal, Optional
 
 from email_validator import EmailNotValidError, ValidatedEmail, validate_email
 from flask_login import UserMixin
-from sqlalchemy import String
+from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -46,7 +46,10 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
 
     @staticmethod
     def exists(email: str) -> bool:
-        return User.query.filter_by(email=email).first() is not None
+        return (
+            db.session.scalars(select(User).where(User.email == email)).first()
+            is not None
+        )
 
     # https://github.com/JoshData/python-email-validator
     @staticmethod
@@ -65,7 +68,7 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
 
     @login.user_loader  # type: ignore[misc]
     def load_user(id: int) -> "User":
-        return User.query.get(id)  # type: ignore[no-any-return]
+        return db.session.get(User, id)  # type: ignore[return-value]
 
     def new_reset_token(self) -> None:
         self.password_reset_token = secrets.token_urlsafe(User.token_length)
@@ -84,17 +87,17 @@ class User(UserMixin, db.Model, DictSerializable):  # type: ignore[misc, name-de
 
     @staticmethod
     def get_reset_token(email: str) -> Optional["User"]:
-        user = User.query.filter_by(email=email).first()
+        user = db.session.scalars(select(User).where(User.email == email)).first()
         if not user:
             return None
         if not user.validate_reset_token():
             user.new_reset_token()
-        return user  # type: ignore[no-any-return]
+        return user
 
     @staticmethod
     def get_user_by_token(url_token: str) -> Optional["User"]:
-        record: User | None = User.query.filter_by(
-            password_reset_token=url_token
+        record = db.session.scalars(
+            select(User).where(User.password_reset_token == url_token)
         ).first()
         if not record:
             return None

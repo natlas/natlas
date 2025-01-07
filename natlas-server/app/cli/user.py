@@ -1,6 +1,7 @@
 import click
 from flask import current_app
 from flask.cli import AppGroup
+from sqlalchemy import select
 
 from app import db
 from app.auth.email import deliver_auth_link
@@ -17,7 +18,7 @@ err_msgs = {
 
 
 def get_user(email):  # type: ignore[no-untyped-def]
-    user = User.query.filter_by(email=email).first()
+    user = db.session.scalars(select(User).where(User.email == email)).first()
     if not user:
         raise click.BadParameter(err_msgs["no_such_user"].format(email))
     return user

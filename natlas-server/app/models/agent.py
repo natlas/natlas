@@ -3,7 +3,7 @@ import string
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db
@@ -38,7 +38,7 @@ class Agent(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
 
     @staticmethod
     def load_agent(agentid: str) -> Optional["Agent"]:
-        return Agent.query.filter_by(agentid=agentid).first()  # type: ignore[no-any-return]
+        return db.session.scalars(select(Agent).where(Agent.agentid == agentid)).first()
 
     @staticmethod
     def generate_token() -> str:
