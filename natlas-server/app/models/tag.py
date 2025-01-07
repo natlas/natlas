@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import db
@@ -14,9 +14,9 @@ class Tag(db.Model, DictSerializable):  # type: ignore[misc, name-defined]
     def create_if_none(tag: str) -> "Tag":
         """If tag exists, return it. If not, create it and return it."""
         tag = tag.strip()
-        existingTag = Tag.query.filter_by(name=tag).first()
+        existingTag = db.session.scalars(select(Tag).filter_by(name=tag)).first()
         if not existingTag:
             newTag = Tag(name=tag)
             db.session.add(newTag)
             return newTag
-        return existingTag  # type: ignore[no-any-return]
+        return existingTag
