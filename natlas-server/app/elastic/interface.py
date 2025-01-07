@@ -56,14 +56,14 @@ class ElasticInterface:
             from_=offset,
         )
 
-    def total_hosts(self):  # type: ignore[no-untyped-def]
+    def total_hosts(self) -> int:
         """
         Count the number of documents in nmap and return the count
         """
         result = self.client.execute_count(index=self.indices.name("latest"))
         return result["count"]
 
-    def new_result(self, host: dict):  # type: ignore[no-untyped-def, type-arg]
+    def new_result(self, host: dict) -> bool:  # type: ignore[type-arg]
         """
         Create new elastic documents in both indices for a new scan result
         """
@@ -108,7 +108,7 @@ class ElasticInterface:
             sort=sort,
         )
 
-    def count_host_screenshots(self, ip: str):  # type: ignore[no-untyped-def]
+    def count_host_screenshots(self, ip: str) -> int:
         """
         Search history for an ip address and returns the number of historical screenshots
         """

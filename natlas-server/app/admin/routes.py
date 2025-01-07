@@ -1,4 +1,5 @@
 import ipaddress
+from typing import cast
 
 from flask import (
     Response,
@@ -59,7 +60,10 @@ def users() -> Response | str:
     users = db.session.scalars(select(User)).all()
     inviteForm = forms.InviteUserForm()
     if inviteForm.validate_on_submit():
-        invitation = UserInvitation.new_invite(inviteForm.email.data)
+        emailaddr = cast(
+            str, inviteForm.email.data
+        )  # inviteForm requires this field and requires it to be a valid email
+        invitation = UserInvitation.new_invite(emailaddr)
         msg = UserInvitation.deliver_invite(invitation)
         flash(msg, "success")
         db.session.commit()

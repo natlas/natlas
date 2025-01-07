@@ -21,7 +21,7 @@ def mark_scan_dispatched(rescan: "RescanTask") -> None:
     current_app.scope_manager.update_dispatched_rescans()  # type: ignore[attr-defined]
 
 
-def mark_scan_completed(ip, scan_id) -> bool:  # type: ignore[no-untyped-def]
+def mark_scan_completed(ip: str, scan_id: str) -> bool:
     dispatched = current_app.scope_manager.get_dispatched_rescans()  # type: ignore[attr-defined]
     for scan in dispatched:
         if scan.target == ip:

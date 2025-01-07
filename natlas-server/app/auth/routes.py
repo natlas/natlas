@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user
 from sqlalchemy import select
-from werkzeug.wrappers.response import Response
+from werkzeug.wrappers.response import Response as wzResponse
 
 from app import db
 from app.auth import bp
@@ -21,7 +21,7 @@ from app.models import User, UserInvitation
 
 @bp.route("/login", methods=["GET", "POST"])
 @is_not_authenticated
-def login():  # type: ignore[no-untyped-def]
+def login() -> wzResponse | str:
     form = LoginForm(prefix="login")
     if form.validate_on_submit():
         user = db.session.scalars(
@@ -40,14 +40,14 @@ def login():  # type: ignore[no-untyped-def]
 
 @bp.route("/logout")
 @is_authenticated
-def logout():  # type: ignore[no-untyped-def]
+def logout() -> wzResponse:
     logout_user()
     return redirect(url_for("auth.login"))
 
 
 @bp.route("/register", methods=["GET", "POST"])
 @is_not_authenticated
-def register():  # type: ignore[no-untyped-def]
+def register() -> wzResponse | str:
     if not current_app.config["REGISTER_ALLOWED"]:
         flash(
             "Sorry, we're not currently accepting new users. If you feel you've received this message in error, please contact an administrator.",
@@ -71,7 +71,7 @@ def register():  # type: ignore[no-untyped-def]
 
 @bp.route("/reset_password_request", methods=["GET", "POST"])
 @is_not_authenticated
-def reset_password_request():  # type: ignore[no-untyped-def]
+def reset_password_request() -> wzResponse | str:
     if not email_configured():
         flash(
             "Sorry, self-service password resets are not currently available. Please contact an administrator for assistance.",
@@ -99,7 +99,7 @@ def reset_password_request():  # type: ignore[no-untyped-def]
 
 @bp.route("/reset_password", methods=["GET", "POST"])
 @is_not_authenticated
-def reset_password():  # type: ignore[no-untyped-def]
+def reset_password() -> wzResponse | str:
     url_token = request.args.get("token", None)
     if not url_token:
         flash("No reset token found")
@@ -123,7 +123,7 @@ def reset_password():  # type: ignore[no-untyped-def]
 
 @bp.route("/invite", methods=["GET", "POST"])
 @is_not_authenticated
-def invite_user() -> Response:
+def invite_user() -> wzResponse | str:
     url_token = request.args.get("token", None)
     if not url_token:
         flash("No token found")
@@ -147,7 +147,7 @@ def invite_user() -> Response:
         login_user(new_user)
         flash("Your password has been set.", "success")
         return redirect(url_for("main.browse"))
-    return render_template(  # type: ignore[return-value]
+    return render_template(
         supported_forms[form_type]["template"],  # type: ignore[arg-type]
         title="Accept Invitation",
         form=form,

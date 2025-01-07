@@ -32,7 +32,7 @@ def get_file_path(img_hash: str, subdir: str, ext: str) -> str:
     return os.path.join(hash_dir, img_hash + ext)
 
 
-def create_thumbnail(fname, file_ext):  # type: ignore[no-untyped-def]
+def create_thumbnail(fname: str, file_ext: str) -> str:
     thumb_size = (255, 160)
     thumb = Image.open(fname)
     thumb.thumbnail(thumb_size)
