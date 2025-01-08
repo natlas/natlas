@@ -6,6 +6,7 @@ import dateutil.parser
 from flask import Response, current_app, jsonify, request
 from libnmap.parser import NmapParser, NmapParserException
 
+from app import scope_manager
 from app.api import bp
 from app.api.prepare_work import prepare_work
 from app.api.processing.screenshot import process_screenshots
@@ -34,7 +35,7 @@ def getwork() -> Response:
     work = {}
 
     if manual:
-        canTarget = current_app.scope_manager.is_acceptable_target(manual)  # type: ignore[attr-defined]
+        canTarget = scope_manager.is_acceptable_target(manual)
         if canTarget:
             work["scan_reason"] = "manual"
             work["target"] = manual
@@ -52,15 +53,15 @@ def getwork() -> Response:
             )
         return response
 
-    rescans = current_app.scope_manager.get_pending_rescans()  # type: ignore[attr-defined]
+    rescans = scope_manager.get_pending_rescans()
     if (
         len(rescans) == 0
     ):  # If there aren't any rescans, update the Rescan Queue and get it again, because of lazy loading
-        current_app.scope_manager.update_pending_rescans()  # type: ignore[attr-defined]
-        rescans = current_app.scope_manager.get_pending_rescans()  # type: ignore[attr-defined]
+        scope_manager.update_pending_rescans()
+        rescans = scope_manager.get_pending_rescans()
 
     if len(rescans) == 0:  # if we don't have rescans, use the ScanManager
-        scanmanager = current_app.scope_manager.get_scan_manager()  # type: ignore[attr-defined]
+        scanmanager = scope_manager.get_scan_manager()
 
         if not scanmanager:
             response_body = json.dumps(
@@ -113,9 +114,7 @@ def submit() -> Response:
             )
 
         # If it's not an acceptable target, tell the agent it's out of scope
-        elif len(
-            nmap.hosts
-        ) == 1 and not current_app.scope_manager.is_acceptable_target(  # type: ignore[attr-defined]
+        elif len(nmap.hosts) == 1 and not scope_manager.is_acceptable_target(
             nmap.hosts[0].address
         ):
             status_code = 400
@@ -238,24 +237,22 @@ def natlasServices() -> Response:
 @bp.route("/status", methods=["GET"])
 @is_authenticated
 def status() -> Response:
-    last_cycle_start = current_app.scope_manager.get_last_cycle_start()  # type: ignore[attr-defined]
-    completed_cycles = current_app.scope_manager.get_completed_cycle_count()  # type: ignore[attr-defined]
+    last_cycle_start = scope_manager.get_last_cycle_start()
+    completed_cycles = scope_manager.get_completed_cycle_count()
     avg_cycle_time = None
     if last_cycle_start:
         scans_this_cycle = current_app.elastic.count_scans_since(last_cycle_start)  # type: ignore[attr-defined]
-        if completed_cycles > 0:
-            delta = (
-                last_cycle_start - current_app.scope_manager.init_time  # type: ignore[attr-defined]
-            ) / completed_cycles
+        if completed_cycles > 0 and scope_manager.init_time is not None:
+            delta = (last_cycle_start - scope_manager.init_time) / completed_cycles
             avg_cycle_time = pretty_time_delta(delta)
     else:
         scans_this_cycle = 0
     payload = {
-        "natlas_start_time": current_app.scope_manager.init_time,  # type: ignore[attr-defined]
+        "natlas_start_time": scope_manager.init_time,
         "cycle_start_time": last_cycle_start,
         "completed_cycles": completed_cycles,
         "scans_this_cycle": scans_this_cycle,
-        "effective_scope_size": current_app.scope_manager.get_effective_scope_size(),  # type: ignore[attr-defined]
+        "effective_scope_size": scope_manager.get_effective_scope_size(),
         "avg_cycle_duration": avg_cycle_time,
     }
     return jsonify(payload)

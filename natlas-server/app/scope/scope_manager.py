@@ -60,10 +60,10 @@ class ScopeManager:
     def get_blacklist(self, group: str = default_group) -> list:  # type: ignore[type-arg]
         return self.scopes[group].blacklist.list  # type: ignore[index, no-any-return]
 
-    def get_scan_manager(self, group: str = default_group) -> IPScanManager:
+    def get_scan_manager(self, group: str = default_group) -> IPScanManager | None:
         return self.scopes.get(group).get_scan_manager()  # type: ignore[no-any-return, union-attr]
 
-    def get_last_cycle_start(self, group: str = default_group) -> datetime:
+    def get_last_cycle_start(self, group: str = default_group) -> datetime | None:
         return self.scopes[group].get_last_cycle_start()  # type: ignore[index, no-any-return]
 
     def get_completed_cycle_count(self, group: str = default_group) -> int:

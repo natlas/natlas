@@ -14,7 +14,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 
-from app import db
+from app import db, scope_manager
 from app.admin.forms import DeleteForm
 from app.auth.wrappers import is_authenticated
 from app.host import bp
@@ -163,14 +163,11 @@ def host_screenshots(ip: str) -> str:
 def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
     rescanForm = RescanForm()
 
-    if not (
-        rescanForm.validate_on_submit()
-        or current_app.scope_manager.is_acceptable_target(ip)  # type: ignore[attr-defined]
-    ):
+    if not (rescanForm.validate_on_submit() or scope_manager.is_acceptable_target(ip)):
         flash(f"Could not handle rescan request for {ip}", "danger")
         return redirect(url_for("host.host", ip=ip))
 
-    incompleteScans = current_app.scope_manager.get_incomplete_scans()  # type: ignore[attr-defined]
+    incompleteScans = scope_manager.get_incomplete_scans()
     scan_dispatched = {}
     for scan in incompleteScans:
         scan_dispatched[scan.target] = scan
@@ -180,13 +177,13 @@ def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
         scan_window = current_app.agentConfig["scanTimeout"] * 2  # type: ignore[attr-defined]
         if (
             scan.dispatched
-            and (datetime.utcnow() - scan.date_dispatched).seconds > scan_window
+            and (datetime.utcnow() - scan.date_dispatched).seconds > scan_window  # type: ignore[operator]
         ):
             # It should never take this long so mark it as not dispatched
             scan.dispatched = False
             db.session.commit()
-            current_app.scope_manager.update_pending_rescans()  # type: ignore[attr-defined]
-            current_app.scope_manager.update_dispatched_rescans()  # type: ignore[attr-defined]
+            scope_manager.update_pending_rescans()
+            scope_manager.update_dispatched_rescans()
             flash(f"Refreshed stale rescan request for {ip}", "success")
             return redirect(url_for("host.host", ip=ip))
         flash(f"There's an outstanding rescan request for {ip}", "warning")
@@ -195,8 +192,8 @@ def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
     rescan = RescanTask(user_id=current_user.id, target=ip)
     db.session.add(rescan)
     db.session.commit()
-    current_app.scope_manager.update_pending_rescans()  # type: ignore[attr-defined]
-    current_app.scope_manager.update_dispatched_rescans()  # type: ignore[attr-defined]
+    scope_manager.update_pending_rescans()
+    scope_manager.update_dispatched_rescans()
     flash(f"Requested rescan of {ip}", "success")
     return redirect(url_for("host.host", ip=ip))
 
