@@ -19,7 +19,7 @@ It is best practice to take a backup of your database before you upgrade or down
 """
 
 
-def main():  # type: ignore[no-untyped-def]
+def main() -> None:
     parser = argparse.ArgumentParser(description=parser_desc)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(

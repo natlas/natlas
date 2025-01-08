@@ -1,4 +1,5 @@
 import click
+from email_validator import ValidatedEmail
 from flask import current_app
 from flask.cli import AppGroup
 from sqlalchemy import select
@@ -17,14 +18,18 @@ err_msgs = {
 }
 
 
-def get_user(email):  # type: ignore[no-untyped-def]
+def get_user(email: str) -> User:
     user = db.session.scalars(select(User).where(User.email == email)).first()
     if not user:
         raise click.BadParameter(err_msgs["no_such_user"].format(email))
     return user
 
 
-def validate_email(ctx, param, value):  # type: ignore[no-untyped-def]
+def validate_email(_ctx: object, _param: object, value: str) -> ValidatedEmail | None:
+    """
+    I have no idea what the ctx, param, and value types are. I'm sure click documents it somewhere but idk.
+    I'm just marking them as object because we don't use them anyways.
+    """
     if not value:
         return None
     valid_email = User.validate_email(value)
@@ -33,15 +38,15 @@ def validate_email(ctx, param, value):  # type: ignore[no-untyped-def]
     return valid_email
 
 
-def ensure_server_name():  # type: ignore[no-untyped-def]
+def ensure_server_name() -> None:
     if not current_app.config["SERVER_NAME"]:
         raise click.UsageError(err_msgs["server_name"])
 
 
 @cli_group.command("new")
-@click.option("--email", callback=validate_email, default=None)
+@click.option("--email", callback=validate_email)
 @click.option("--admin", is_flag=True, default=False)
-def new_user(email, admin):  # type: ignore[no-untyped-def]
+def new_user(email: str, admin: bool) -> None:
     ensure_server_name()
 
     if email and User.exists(email):
@@ -56,7 +61,7 @@ def new_user(email, admin):  # type: ignore[no-untyped-def]
 @cli_group.command("role")
 @click.argument("email", callback=validate_email)
 @click.option("--promote/--demote", default=False)
-def promote_user(email, promote):  # type: ignore[no-untyped-def]
+def promote_user(email: str, promote: bool) -> None:
     user = get_user(email)
     if user.is_admin == promote:
         print(f"{email} is already{' not ' if not promote else ' '}an admin")
@@ -68,7 +73,7 @@ def promote_user(email, promote):  # type: ignore[no-untyped-def]
 
 @cli_group.command("reset-password")
 @click.argument("email", callback=validate_email)
-def reset_password(email):  # type: ignore[no-untyped-def]
+def reset_password(email: str) -> None:
     ensure_server_name()
     user = User.get_reset_token(email)
     if not user:

@@ -16,28 +16,28 @@ def build_response(err: NatlasServiceError) -> Response:
 
 
 @bp.app_errorhandler(400)
-def bad_request(e):  # type: ignore[no-untyped-def]
+def bad_request(e: object) -> Response:
     errmsg = "The server was unable to process your request"
     err = NatlasServiceError(400, errmsg)
     return build_response(err)
 
 
 @bp.app_errorhandler(404)
-def page_not_found(e):  # type: ignore[no-untyped-def]
+def page_not_found(e: object) -> Response:
     errmsg = f"{request.path} Not found"
     err = NatlasServiceError(404, errmsg)
     return build_response(err)
 
 
 @bp.app_errorhandler(405)
-def method_not_allowed(e):  # type: ignore[no-untyped-def]
+def method_not_allowed(e: object) -> Response:
     errmsg = f"Method {request.method} Not Allowed on {request.path}"
     err = NatlasServiceError(405, errmsg)
     return build_response(err)
 
 
 @bp.app_errorhandler(500)
-def internal_server_error(e):  # type: ignore[no-untyped-def]
+def internal_server_error(e: object) -> Response:
     errmsg = "Internal Server Error"
     err = NatlasServiceError(500, errmsg)
     db.session.rollback()
@@ -45,7 +45,7 @@ def internal_server_error(e):  # type: ignore[no-untyped-def]
 
 
 @bp.app_errorhandler(elasticsearch.ConnectionError)
-def elastic_unavailable(e):  # type: ignore[no-untyped-def]
+def elastic_unavailable(e: elasticsearch.ConnectionError) -> Response:
     """
     This capture_exception happens here but not in others because
     the others use Flask's exception handling already. Since we are handling
@@ -58,6 +58,6 @@ def elastic_unavailable(e):  # type: ignore[no-untyped-def]
 
 
 @bp.app_errorhandler(NatlasSearchError)
-def invalid_elastic_query(e):  # type: ignore[no-untyped-def]
+def invalid_elastic_query(e: NatlasSearchError) -> Response:
     sentry_sdk.capture_exception(e)
     return build_response(e)

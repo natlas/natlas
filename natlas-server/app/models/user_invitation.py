@@ -6,7 +6,6 @@ from sqlalchemy import DateTime, String, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import NatlasBase, db
-from app.models import User
 from app.models.dict_serializable import DictSerializable
 from app.models.token_validation import validate_token
 
@@ -31,19 +30,14 @@ class UserInvitation(NatlasBase, DictSerializable):
 
     # Build a new invitation
     @staticmethod
-    def new_invite(email=None, is_admin=False):  # type: ignore[no-untyped-def]
-        if (
-            email
-            and db.session.scalars(select(User).where(User.email == email)).first()
-        ):
-            return False
+    def new_invite(email: str | None, is_admin: bool = False) -> "UserInvitation":
         now = datetime.utcnow()
         expiration_date = now + timedelta(seconds=UserInvitation.expiration_duration)
         new_token = secrets.token_urlsafe(UserInvitation.token_length)
         invite = db.session.scalars(
             select(UserInvitation).where(UserInvitation.email == email)
         ).first()
-        if invite and not invite.accepted_date:
+        if email is not None and invite and not invite.accepted_date:
             invite.token = new_token
             invite.expiration_date = expiration_date
         else:
@@ -60,7 +54,7 @@ class UserInvitation(NatlasBase, DictSerializable):
     def deliver_invite(invite: "UserInvitation") -> str:
         from app.auth.email import deliver_auth_link
 
-        return deliver_auth_link(invite.email, invite.token, "invite")  # type: ignore[arg-type, no-any-return]
+        return deliver_auth_link(invite.email, invite.token, "invite")  # type: ignore[arg-type]
 
     @staticmethod
     def get_invite(url_token: str) -> Optional["UserInvitation"]:

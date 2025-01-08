@@ -10,6 +10,7 @@ from flask_wtf.csrf import CSRFProtect
 from migrations.migrator import handle_db_upgrade, migration_needed
 from sqlalchemy.orm import DeclarativeBase
 from webpack_manifest import webpack_manifest
+from werkzeug.wrappers.response import Response as wzResponse
 
 from app.config_loader import load_config_from_db
 from app.elastic import ElasticInterface
@@ -39,8 +40,8 @@ csrf = CSRFProtect()
 scope_manager = ScopeManager()
 
 
-@login.unauthorized_handler
-def unauthorized():  # type: ignore[no-untyped-def]
+@login.unauthorized_handler  # type: ignore[misc]
+def unauthorized() -> wzResponse:
     if current_user.is_anonymous:
         flash("You must login to continue.", "warning")
         return redirect(url_for("auth.login"))

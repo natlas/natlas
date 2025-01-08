@@ -30,7 +30,7 @@ class InviteUserForm(FlaskForm):  # type: ignore[misc]
     email = StringField("Email", validators=[DataRequired(), Email()])
     submit = SubmitField("Invite User")
 
-    def validate_email(self, email):  # type: ignore[no-untyped-def]
+    def validate_email(self, email: StringField) -> None:
         if not User.validate_email(email.data):
             flash(
                 f"{email.data} does not appear to be a valid, deliverable email address.",
@@ -56,7 +56,7 @@ class NewScopeForm(FlaskForm):  # type: ignore[misc]
     blacklist = BooleanField("Blacklist")
     submit = SubmitField("Add Target")
 
-    def validate_target(self, target):  # type: ignore[no-untyped-def]
+    def validate_target(self, target: StringField) -> None:
         try:
             isValid = ipaddress.ip_network(target.data, False)
             item = db.session.scalars(
@@ -97,11 +97,11 @@ class AddServiceForm(FlaskForm):  # type: ignore[misc]
     serviceProtocol = SelectField("Protocol", validators=[DataRequired()])
     addService = SubmitField("Add Service")
 
-    def validate_serviceName(self, serviceName):  # type: ignore[no-untyped-def]
+    def validate_serviceName(self, serviceName: StringField) -> None:
         if " " in serviceName.data:
             raise ValidationError("Service names cannot contain spaces! Use - instead.")
 
-    def validate_servicePort(self, servicePort):  # type: ignore[no-untyped-def]
+    def validate_servicePort(self, servicePort: IntegerField) -> None:
         if servicePort.data > 65535 or servicePort.data < 0:
             raise ValidationError("Port has to be withing range of 0-65535")
 
