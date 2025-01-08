@@ -1,8 +1,6 @@
 from typing import TYPE_CHECKING
 
-from flask import current_app
-
-from app import db
+from app import db, scope_manager
 
 if TYPE_CHECKING:
     from app.models.rescan_task import RescanTask
@@ -17,17 +15,17 @@ def mark_scan_dispatched(rescan: "RescanTask") -> None:
     rescan.dispatchTask()
     db.session.add(rescan)
     db.session.commit()
-    current_app.scope_manager.update_pending_rescans()  # type: ignore[attr-defined]
-    current_app.scope_manager.update_dispatched_rescans()  # type: ignore[attr-defined]
+    scope_manager.update_pending_rescans()
+    scope_manager.update_dispatched_rescans()
 
 
 def mark_scan_completed(ip, scan_id) -> bool:  # type: ignore[no-untyped-def]
-    dispatched = current_app.scope_manager.get_dispatched_rescans()  # type: ignore[attr-defined]
+    dispatched = scope_manager.get_dispatched_rescans()
     for scan in dispatched:
         if scan.target == ip:
             scan.completeTask(scan_id)
             db.session.add(scan)
             db.session.commit()
-            current_app.scope_manager.update_dispatched_rescans()  # type: ignore[attr-defined]
+            scope_manager.update_dispatched_rescans()
             return True
     return False

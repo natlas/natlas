@@ -13,7 +13,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import select
 from werkzeug.wrappers.response import Response as wzResponse
 
-from app import db
+from app import db, scope_manager
 from app.admin import bp, forms, redirects
 from app.auth.wrappers import is_admin
 from app.models import (
@@ -117,8 +117,8 @@ def toggle_user(id: int) -> wzResponse:
 def scope() -> wzResponse | str:
     render = {
         "scope": ScopeItem.getScope(),
-        "scopeSize": current_app.scope_manager.get_scope_size(),  # type: ignore[attr-defined]
-        "effectiveScopeSize": current_app.scope_manager.get_effective_scope_size(),  # type: ignore[attr-defined]
+        "scopeSize": scope_manager.get_scope_size(),
+        "effectiveScopeSize": scope_manager.get_effective_scope_size(),
         "newForm": forms.NewScopeForm(),
         "delForm": forms.ScopeDeleteForm(),
         "editForm": forms.ScopeToggleForm(),
@@ -126,15 +126,15 @@ def scope() -> wzResponse | str:
         "addTagForm": forms.TagScopeForm(),
     }
 
-    render["addTagForm"].tagname.choices = [
+    render["addTagForm"].tagname.choices = [  # type: ignore[attr-defined]
         (row.name, row.name) for row in db.session.scalars(select(Tag)).all()
     ]
-    if render["newForm"].validate_on_submit():
-        target = ipaddress.ip_network(render["newForm"].target.data, False)
+    if render["newForm"].validate_on_submit():  # type: ignore[attr-defined]
+        target = ipaddress.ip_network(render["newForm"].target.data, False)  # type: ignore[attr-defined]
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=False)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.scope_manager.update()  # type: ignore[attr-defined]
+        scope_manager.update()
         flash(f"{newTarget.target} added.", "success")
         return redirect(url_for("admin.scope"))
     return render_template("admin/scope.html", **render)
@@ -146,23 +146,23 @@ def scope() -> wzResponse | str:
 def blacklist() -> wzResponse | str:
     render = {
         "scope": ScopeItem.getBlacklist(),
-        "blacklistSize": current_app.scope_manager.get_blacklist_size(),  # type: ignore[attr-defined]
-        "effectiveScopeSize": current_app.scope_manager.get_effective_scope_size(),  # type: ignore[attr-defined]
+        "blacklistSize": scope_manager.get_blacklist_size(),
+        "effectiveScopeSize": scope_manager.get_effective_scope_size(),
         "newForm": forms.NewScopeForm(),
         "delForm": forms.ScopeDeleteForm(),
         "editForm": forms.ScopeToggleForm(),
         "importForm": forms.ImportScopeForm(),
         "addTagForm": forms.TagScopeForm(),
     }
-    render["addTagForm"].tagname.choices = [
+    render["addTagForm"].tagname.choices = [  # type: ignore[attr-defined]
         (row.name, row.name) for row in db.session.scalars(select(Tag)).all()
     ]
-    if render["newForm"].validate_on_submit():
-        target = ipaddress.ip_network(render["newForm"].target.data, False)
+    if render["newForm"].validate_on_submit():  # type: ignore[attr-defined]
+        target = ipaddress.ip_network(render["newForm"].target.data, False)  # type: ignore[attr-defined]
         newTarget = ScopeItem(target=target.with_prefixlen, blacklist=True)
         db.session.add(newTarget)
         db.session.commit()
-        current_app.scope_manager.update()  # type: ignore[attr-defined]
+        scope_manager.update()
         flash(f"{newTarget.target} blacklisted.", "success")
         return redirect(url_for("admin.blacklist"))
     return render_template("admin/blacklist.html", **render)
@@ -184,7 +184,7 @@ def import_scope(scopetype: str = "") -> wzResponse:
         newScopeItems = importForm.scope.data.split("\n")
         result = ScopeItem.import_scope_list(newScopeItems, importBlacklist)
         db.session.commit()
-        current_app.scope_manager.update()  # type: ignore[attr-defined]
+        scope_manager.update()
         if result["success"]:
             flash(f"{result['success']} targets added to {scopetype}.", "success")
         if result["exist"]:
@@ -231,7 +231,7 @@ def delete_scope(scopetype: str, id: int) -> wzResponse:
             item.tags.remove(tag)  # type: ignore[union-attr]
         db.session.delete(db.session.get(ScopeItem, id))
         db.session.commit()
-        current_app.scope_manager.update()  # type: ignore[attr-defined]
+        scope_manager.update()
         flash(f"{item.target} deleted.", "success")  # type: ignore[union-attr]
     else:
         flash("Form couldn't validate!", "danger")
@@ -250,7 +250,7 @@ def toggle_scope(scopetype: str, id: int) -> wzResponse:
         item.blacklist = not item.blacklist  # type: ignore[union-attr]
         flash(f"Toggled scope status for {item.target}.", "success")  # type: ignore[union-attr]
         db.session.commit()
-        current_app.scope_manager.update()  # type: ignore[attr-defined]
+        scope_manager.update()
     else:
         flash("Form couldn't validate!", "danger")
     return redirects.get_scope_redirect(scopetype)
