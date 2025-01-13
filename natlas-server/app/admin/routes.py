@@ -321,7 +321,7 @@ def services() -> wzResponse | str:
             db.session.commit()
             current_app.current_services = new_services.as_dict()  # type: ignore[attr-defined]
             flash(
-                f'New services file with hash {current_app.current_services["sha256"]} has been uploaded.',  # type: ignore[attr-defined]
+                f"New services file with hash {current_app.current_services['sha256']} has been uploaded.",  # type: ignore[attr-defined]
                 "success",
             )
         else:
