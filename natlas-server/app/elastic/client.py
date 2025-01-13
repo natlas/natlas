@@ -187,9 +187,9 @@ class ElasticClient:
             span_name += "." + operation
         span = tracer.start_span(name=span_name)
         if "index" in kwargs:
-            span.set_attribute("es.index", f'{kwargs["index"]}')
+            span.set_attribute("es.index", f"{kwargs['index']}")
         if "body" in kwargs:
-            span.set_attribute("es.query", f'{kwargs["body"]}')
+            span.set_attribute("es.query", f"{kwargs['body']}")
         return span
 
     def _attach_shard_span_attrs(self, span, results: dict):  # type: ignore[no-untyped-def, type-arg]
