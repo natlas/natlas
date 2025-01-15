@@ -27,7 +27,7 @@ pydantic = "~=2.10"
 pydantic-settings = "~=2.7"
 python-dateutil = "~=2.9"
 semver = "~=2.13.0"
-sentry-sdk = "~=1.14.0"
+sentry-sdk = "~=2.8.0"
 sympy = "~=1.8"
 webpack-manifest = "~=2.1.1"
 
