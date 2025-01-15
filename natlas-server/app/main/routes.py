@@ -1,4 +1,5 @@
 import elasticsearch
+from config import S3Settings
 from flask import (
     Response,
     current_app,
@@ -6,10 +7,10 @@ from flask import (
     redirect,
     render_template,
     request,
-    send_from_directory,
     url_for,
 )
 from flask_login import current_user
+from minio import Minio
 
 from app.auth.forms import LoginForm, RegistrationForm
 from app.auth.wrappers import is_authenticated
@@ -30,13 +31,26 @@ def index() -> str:
     return render_template("main/index.html", login_form=login_form, reg_form=reg_form)
 
 
-# Serve media files in case the front-end proxy doesn't do it
 @bp.route("/media/<path:filename>")
 @is_authenticated
 def send_media(filename: str) -> Response:
-    # If you're looking at this function, wondering why your files aren't sending...
-    # It's probably because current_app.config['MEDIA_DIRECTORY'] isn't pointing to an absolute file path
-    return send_from_directory(current_app.config["MEDIA_DIRECTORY"], filename)
+    s3_config: S3Settings = current_app.config["S3"]
+    storage = Minio(
+        endpoint=s3_config.endpoint,
+        access_key=s3_config.access_key.get_secret_value(),
+        secret_key=s3_config.secret_key.get_secret_value(),
+        secure=s3_config.use_tls,
+    )
+    file_ext = filename.rsplit(".", 1)[1]
+    mime = "image/jpeg" if file_ext == "jpg" else "image/png"
+    try:
+        response = storage.get_object(
+            bucket_name=s3_config.bucket, object_name=filename
+        )
+        return Response(response.read(), status=200, mimetype=mime, content_type=mime)
+    finally:
+        response.close()
+        response.release_conn()
 
 
 @bp.route("/browse")
