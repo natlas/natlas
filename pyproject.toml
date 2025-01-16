@@ -24,12 +24,17 @@ exclude = [
 files = "."
 local_partial_types = true
 mypy_path = "mypy_stubs"
-no_implicit_reexport = false
+no_implicit_reexport = true
+plugins = ["pydantic.mypy"]
 pretty = false
 strict = true
 strict_optional = true
 warn_unreachable = true
-warn_unused_configs = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
 
 [tool.ruff]
 

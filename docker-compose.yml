@@ -67,6 +67,11 @@ services:
       POSTGRES_DB: "natlas"
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   zipkin:
     image: openzipkin/zipkin-slim:3.1.0
@@ -118,7 +123,6 @@ services:
       - DB_AUTO_UPGRADE=True
     env_file: .env
     volumes:
-      - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
       - html_assets:/opt/natlas/natlas-server/static/dist
     links:
@@ -131,7 +135,7 @@ services:
       elastic:
         condition: service_healthy
       postgres:
-        condition: service_started
+        condition: service_healthy
 
 
   agent:
@@ -154,7 +158,6 @@ networks:
   backend:
 
 volumes:
-  ns-data:
   elastic:
   node_modules:
   html_assets:
