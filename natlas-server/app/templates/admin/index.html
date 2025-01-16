@@ -3,9 +3,13 @@
 {% set active_page = "config" %}
 {% block content %}
   {% include 'admin/_header.html' %}
+  <div class="alert alert-info" role="alert">
+    These values are readonly and declared in the server configuration. To change a value, adjust the server configuration and restart the server.
+  </div>
    <div class="row">
     <div class="col">
-    <form class="form config-form" action="{{url_for('admin.admin')}}" method="post">
+    <form class="form config-form" action="#" method="post">
+        <fieldset disabled="disabled">
         <h3>General Settings</h3>
         {{ configForm.hidden_tag() }}
         <div class="form-check">
@@ -25,6 +29,7 @@
             {{ configForm.custom_brand(value=configItems["CUSTOM_BRAND"], class="form-control", placeholder="Natlas Internal") }}
         </div>
         {{ configForm.submit(class="btn btn-primary") }}
+    </fieldset>
     </form>
     </div>
     <div class="col">

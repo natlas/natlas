@@ -1,29 +1,9 @@
-import json
 import os
 import secrets
 from typing import Self
 
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings
-
-with open("defaults/db_configs.json") as f:
-    defaultConfig = json.load(f)
-
-
-def get_defaults():  # type: ignore[no-untyped-def]
-    return defaultConfig.items()
-
-
-# This mechanism for casting a bool is needed because bool("False") == True
-def casted_bool(value):  # type: ignore[no-untyped-def]
-    if isinstance(value, bool):
-        return value
-    return value.lower() == "true"
-
-
-def casted_value(expected_type, value):  # type: ignore[no-untyped-def]
-    cast_map = {"bool": casted_bool, "string": str, "int": int}
-    return cast_map[expected_type](value)  # type: ignore[operator]
 
 
 class BaseConfig:
@@ -79,6 +59,10 @@ class Config(BaseSettings):
 
     version_override: str | None = Field(default=None)
     TESTING: bool = Field(default=False)
+    LOGIN_REQUIRED: bool = Field(default=True)
+    REGISTER_ALLOWED: bool = Field(default=False)
+    AGENT_AUTHENTICATION: bool = Field(default=True)
+    CUSTOM_BRAND: str = Field(default="")
 
     # By capitalizing this, we can technically access this object from flask's app.config
     # I'm not certain I want to keep using flask's app.config or just move to using this config directly
