@@ -1,8 +1,11 @@
 import secrets
 
 from flask import current_app
+from pydantic import BaseModel
 
-from app.models import ScopeItem
+from app import db
+from app.models import AgentConfig, NatlasServices, ScopeItem
+from app.models.agent_script import AgentScript
 
 
 def get_target_tags(target: str) -> list[str]:
@@ -25,13 +28,55 @@ def get_unique_scan_id() -> str:
     return scan_id
 
 
-def prepare_work(work):  # type: ignore[no-untyped-def]
-    work["tags"] = get_target_tags(work["target"])
-    work["type"] = "nmap"
-    work["agent_config"] = current_app.agentConfig  # type: ignore[attr-defined]
-    work["agent_config"]["scripts"] = current_app.agent_scripts  # type: ignore[attr-defined]
-    work["services_hash"] = current_app.current_services["sha256"]  # type: ignore[attr-defined]
-    work["scan_id"] = get_unique_scan_id()
-    work["status"] = 200
-    work["message"] = "Target: " + str(work["target"])
-    return work
+class AgentConfigSerializer(BaseModel):
+    id: int
+    versionDetection: bool
+    osDetection: bool
+    enableScripts: bool
+    onlyOpens: bool
+    scanTimeout: int
+    webScreenshots: bool
+    vncScreenshots: bool
+    webScreenshotTimeout: int
+    vncScreenshotTimeout: int
+    scriptTimeout: int
+    hostTimeout: int
+    osScanLimit: bool
+    noPing: bool
+    udpScan: bool | None
+    scripts: str
+
+
+class AgentWork(BaseModel):
+    reason: str
+    target: str
+    tags: list[str]
+    type: str = "nmap"
+    agent_config: AgentConfigSerializer
+    services_hash: str
+    scan_id: str
+    status: int = 200
+    message: str
+
+
+def prepare_work(reason: str, target: str) -> AgentWork:
+    services = db.session.get(NatlasServices, 1)
+    if not services:
+        raise RuntimeError("We have no services configured! What happened?!")
+    config = db.session.get(AgentConfig, 1)
+    if not config:
+        raise RuntimeError("We have no agent config! What happened?!")
+
+    return AgentWork(
+        reason=reason,
+        target=target,
+        tags=get_target_tags(target),
+        type="nmap",
+        agent_config=AgentConfigSerializer(
+            **config.as_dict(), scripts=AgentScript.get_scripts_string()
+        ),
+        services_hash=services.sha256,  # type: ignore[arg-type]
+        scan_id=get_unique_scan_id(),
+        status=200,
+        message=f"Target: {target}",
+    )
