@@ -108,11 +108,12 @@ services:
       - ELASTIC_AUTH_ENABLE=True
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=natlas-dev-password-do-not-use
+      - SQLALCHEMY_DATABASE_URI=postgresql+psycopg://natlas:natlas-dev-password-do-not-use@postgres/natlas
       - S3_ENDPOINT=minio:9000
       - S3_USE_TLS=0
       - S3_BUCKET=natlas-screenshots
       - FLASK_ENV=development
-      - OTEL_ENABLE=True
+      - OTEL_ENABLE=False
       - OTEL_COLLECTOR=otel:4317
       - DB_AUTO_UPGRADE=True
     env_file: .env
@@ -129,6 +130,8 @@ services:
         condition: service_healthy
       elastic:
         condition: service_healthy
+      postgres:
+        condition: service_started
 
 
   agent:

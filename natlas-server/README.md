@@ -110,8 +110,7 @@ Environment configs are loaded from the environment or a `.env` file and require
 | Variable | Default | Explanation |
 |---|---|---|
 | `SECRET_KEY` | Randomly generated | Used for CSRF tokens and sessions. You should generate a unique value for this in `.env`, otherwise sessions will be invalidated whenever the app restarts. |
-| `DATA_DIR` | `/data` | Path to store any data that should be persisted. Sqlite database, any log files, and media files all go in subdirectories of this directory. |
-| `SQLALCHEMY_DATABASE_URI` | `sqlite:///$DATA_DIR/db/metadata.db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the database to store natlas metadata in. Supported types by natlas-server are: `sqlite:`, `mysql:` |
+| `SQLALCHEMY_DATABASE_URI` | `postgres+psycopg://user:pass@host/db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the Postgres database to store natlas metadata in. Supported types by natlas-server are: `postgres+psycopg://` |
 | `DB_AUTO_UPGRADE` | `False` | Automatically perform necessary data migrations when upgrading to a new version of natlas. Not recommended for multi-node deployments. |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
 | `ELASTIC_AUTH_ENABLE` | `False` | Whether authentication is enabled on the elasticsearch cluster |
