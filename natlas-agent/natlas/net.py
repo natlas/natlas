@@ -72,7 +72,7 @@ class NatlasNetworkServices:
                     return req
                 if req.headers["content-type"] != contentType:
                     self.netlogger.warning(
-                        f'Expected {contentType}, received {req.headers["content-type"]}'
+                        f"Expected {contentType}, received {req.headers['content-type']}"
                     )
                     return False
             elif reqType == "POST" and postData:
