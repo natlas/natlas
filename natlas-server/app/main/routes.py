@@ -47,7 +47,12 @@ def send_media(filename: str) -> Response:
         response = storage.get_object(
             bucket_name=s3_config.bucket, object_name=filename
         )
-        return Response(response.read(), status=200, mimetype=mime, content_type=mime)
+        flask_response = Response(
+            response.read(), status=200, mimetype=mime, content_type=mime
+        )
+        # 86400 == 1 day. This should balance reducing server load and overloading the browser cache with images
+        flask_response.headers["Cache-Control"] = "public, max-age=86400, immutable"
+        return flask_response
     finally:
         response.close()
         response.release_conn()
