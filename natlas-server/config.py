@@ -47,13 +47,14 @@ class S3Settings(BaseSettings):
 class Config(BaseSettings):
     NATLAS_VERSION: str = "0.6.12"
     BASEDIR: str = os.path.abspath(os.path.dirname(__file__))
-    DATA_DIR: str = "/data"
     SERVER_NAME: str = Field(default="localhost:5000")
     SECRET_KEY: str = Field(default=secrets.token_urlsafe(64))
     PREFERRED_URL_SCHEME: str = Field(default="https")
-    SQLALCHEMY_DATABASE_URI: str = Field(
-        default=f"sqlite:///{os.path.join(DATA_DIR, 'db', 'metadata.db')}"
-    )
+
+    # We should replace SQLALCHEMY_DATABASE_URI with specific params for the database configuration
+    # The URI is kinda clunky and requires exposing the password in the same variable as the host and database name
+    # Flask-SQLAlchemy also doesn't understand the PostgresDsn type from Pydantic.
+    SQLALCHEMY_DATABASE_URI: str = Field()
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     DB_AUTO_UPGRADE: bool = Field(default=False)
     ELASTICSEARCH_URL: str = Field(default="http://localhost:9200")

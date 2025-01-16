@@ -23,7 +23,7 @@ class User(UserMixin, NatlasBase, DictSerializable):  # type: ignore[misc]
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str | None] = mapped_column(String(254), index=True, unique=True)
-    password_hash: Mapped[str | None] = mapped_column(String(128))
+    password_hash: Mapped[str | None] = mapped_column(String(256))
     is_admin: Mapped[bool | None] = mapped_column(default=False)
     results_per_page: Mapped[int | None] = mapped_column(default=100)
     preview_length: Mapped[int | None] = mapped_column(default=100)
