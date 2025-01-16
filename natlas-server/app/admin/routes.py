@@ -20,7 +20,6 @@ from app.auth.wrappers import is_admin
 from app.models import (
     AgentConfig,
     AgentScript,
-    ConfigItem,
     NatlasServices,
     ScopeItem,
     ScopeLog,
@@ -30,24 +29,12 @@ from app.models import (
 )
 
 
-@bp.route("/", methods=["GET", "POST"])
+@bp.route("/", methods=["GET"])
 @login_required  # type: ignore[misc]
 @is_admin
 def admin() -> str:
     configForm = forms.ConfigForm()
     configItems = current_app.config
-    if configForm.validate_on_submit():
-        for fieldname, fieldvalue in configForm.data.items():
-            if fieldname.upper() in ["SUBMIT", "CSRF_TOKEN"]:
-                continue
-            current_app.config[fieldname.upper()] = fieldvalue
-            confitem = db.session.scalars(
-                select(ConfigItem).where(ConfigItem.name == fieldname.upper())
-            ).first()
-            confitem.value = str(fieldvalue)  # type: ignore[union-attr]
-            db.session.add(confitem)
-        db.session.commit()
-        flash("Successfully updated Natlas configuration.", "success")
     return render_template(
         "admin/index.html", configForm=configForm, configItems=configItems
     )
