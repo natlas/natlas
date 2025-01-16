@@ -83,8 +83,7 @@ class Config(BaseSettings):
     # By capitalizing this, we can technically access this object from flask's app.config
     # I'm not certain I want to keep using flask's app.config or just move to using this config directly
     # But for now I'll maintain the pattern. `app.config['s3']` yields an S3Settings object.
-    # Additionally, the settings load from environment, but mypy doesn't understand that.
-    S3: S3Settings = S3Settings()  # type: ignore[call-arg]
+    S3: S3Settings = S3Settings()
 
     @model_validator(mode="after")
     def override_version(self) -> Self:
