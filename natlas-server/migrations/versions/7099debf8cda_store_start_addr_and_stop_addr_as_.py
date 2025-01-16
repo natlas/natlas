@@ -26,8 +26,8 @@ class ScopeItem(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     target = sa.Column(sa.String(length=128))
     addr_family = sa.Column(sa.Integer)
-    start_addr = sa.Column(sa.VARBINARY(length=16))
-    stop_addr = sa.Column(sa.VARBINARY(length=16))
+    start_addr = sa.Column(sa.LargeBinary(length=16))
+    stop_addr = sa.Column(sa.LargeBinary(length=16))
 
     def parse_network_range(self, network: str):
         net = IPNetwork(network)
@@ -42,10 +42,10 @@ def upgrade():
     with op.batch_alter_table("scope_item", schema=None) as batch_op:
         batch_op.add_column(sa.Column("addr_family", sa.Integer(), nullable=True))
         batch_op.add_column(
-            sa.Column("start_addr", sa.VARBINARY(length=16), nullable=True)
+            sa.Column("start_addr", sa.LargeBinary(length=16), nullable=True)
         )
         batch_op.add_column(
-            sa.Column("stop_addr", sa.VARBINARY(length=16), nullable=True)
+            sa.Column("stop_addr", sa.LargeBinary(length=16), nullable=True)
         )
 
     bind = op.get_bind()

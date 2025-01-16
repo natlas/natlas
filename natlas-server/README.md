@@ -110,8 +110,7 @@ Environment configs are loaded from the environment or a `.env` file and require
 | Variable | Default | Explanation |
 |---|---|---|
 | `SECRET_KEY` | Randomly generated | Used for CSRF tokens and sessions. You should generate a unique value for this in `.env`, otherwise sessions will be invalidated whenever the app restarts. |
-| `DATA_DIR` | `/data` | Path to store any data that should be persisted. Sqlite database, any log files, and media files all go in subdirectories of this directory. |
-| `SQLALCHEMY_DATABASE_URI` | `sqlite:///$DATA_DIR/db/metadata.db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the database to store natlas metadata in. Supported types by natlas-server are: `sqlite:`, `mysql:` |
+| `SQLALCHEMY_DATABASE_URI` | `postgres+psycopg://user:pass@host/db` | A [SQLALCHEMY URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/) that points to the Postgres database to store natlas metadata in. Supported types by natlas-server are: `postgres+psycopg://` |
 | `DB_AUTO_UPGRADE` | `False` | Automatically perform necessary data migrations when upgrading to a new version of natlas. Not recommended for multi-node deployments. |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` | A URL that points to the elasticsearch cluster to store natlas scan data in |
 | `ELASTIC_AUTH_ENABLE` | `False` | Whether authentication is enabled on the elasticsearch cluster |
@@ -119,7 +118,6 @@ Environment configs are loaded from the environment or a `.env` file and require
 | `ELASTIC_PASSWORD` | `""` | elasticsearch user password for authentication |
 | `FLASK_ENV` | `production` | Used to tell flask which environment to run. Only change this if you are debugging or developing, and never leave your server running in anything but `production`.  |
 | `FLASK_APP` | `natlas-server.py` | The file name that launches the flask application. This should not be changed as it allows commands like `flask run`, `flask db upgrade`, and `flask shell` to run.|
-| `MEDIA_DIRECTORY` | `$DATA_DIR/media/` | If you want to store media (screenshots) in a larger mounted storage volume, set this value to an absolute path. If you change this value, be sure to copy the contents of the previous media directory to the new location, otherwise old media will not render.|
 | `NATLAS_VERSION_OVERRIDE` | `None` | **Danger**: This can be optionally set for development purposes to override the version string that natlas thinks it's running. Doing this can have adverse affects and should only be done with caution. The only reason to really do this is if you're developing changes to the way host data is stored and presented. |
 | `SENTRY_DSN` | `""` | Enables automatic reporting of all Flask exceptions to a [Sentry.io instance](https://sentry.io/). Example: `http://mytoken@mysentry.example.com/1` |
 | `SENTRY_ENVIRONMENT` | `None` | Specifies the value to provided for the `environment` tag in Sentry. Use it to differentiate between different stages or stacks. e.g. `Beta` or `Prod` |

@@ -34,6 +34,26 @@ services:
       timeout: 10s
       retries: 24
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"         # S3 API
+      - "9001:9001"         # MinIO Console
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: natlas-dev-password-do-not-use
+    volumes:
+      - minio_data:/data
+    networks:
+      - backend
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   postgres:
     image: postgres:17.2
     restart: unless-stopped
@@ -47,6 +67,11 @@ services:
       POSTGRES_DB: "natlas"
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   zipkin:
     image: openzipkin/zipkin-slim:3.1.0
@@ -88,19 +113,28 @@ services:
       - ELASTIC_AUTH_ENABLE=True
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=natlas-dev-password-do-not-use
+      - SQLALCHEMY_DATABASE_URI=postgresql+psycopg://natlas:natlas-dev-password-do-not-use@postgres/natlas
+      - S3_ENDPOINT=minio:9000
+      - S3_USE_TLS=0
+      - S3_BUCKET=natlas-screenshots
       - FLASK_ENV=development
-      - OTEL_ENABLE=True
+      - OTEL_ENABLE=False
       - OTEL_COLLECTOR=otel:4317
       - DB_AUTO_UPGRADE=True
+    env_file: .env
     volumes:
-      - ns-data:/data
       - ./natlas-server:/opt/natlas/natlas-server
       - html_assets:/opt/natlas/natlas-server/static/dist
     links:
       - elastic
       - postgres
+      - minio
     depends_on:
+      minio:
+        condition: service_healthy
       elastic:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
 
@@ -124,8 +158,8 @@ networks:
   backend:
 
 volumes:
-  ns-data:
   elastic:
   node_modules:
   html_assets:
   postgres-data:
+  minio_data:
