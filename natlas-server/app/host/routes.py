@@ -14,7 +14,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 
-from app import db, scope_manager
+from app import db, elastic, scope_manager
 from app.admin.forms import DeleteForm
 from app.auth.wrappers import is_authenticated
 from app.host import bp
@@ -55,7 +55,7 @@ def host_history(ip: str) -> str:
     delHostForm = DeleteForm()
     rescanForm = RescanForm()
 
-    count, context = current_app.elastic.get_host_history(  # type: ignore[attr-defined]
+    count, context = elastic.get_host_history(
         ip, current_user.results_per_page, searchOffset
     )
     if count == 0:
@@ -89,7 +89,7 @@ def host_historical_result(ip: str, scan_id: str) -> str:
     delHostForm = DeleteForm()
     rescanForm = RescanForm()
     info, context = hostinfo(ip)
-    count, context = current_app.elastic.get_host_by_scan_id(scan_id)  # type: ignore[attr-defined]
+    count, context = elastic.get_host_by_scan_id(scan_id)
 
     version = determine_data_version(context)
     template_str = f"host/versions/{version}/summary.html"
@@ -113,7 +113,7 @@ def export_scan(ip: str, scan_id: str, ext: str) -> Response:
     export_field = f"{ext}_data"
 
     mime = "application/json" if ext == "json" else "text/plain"
-    count, context = current_app.elastic.get_host_by_scan_id(scan_id)  # type: ignore[attr-defined]
+    count, context = elastic.get_host_by_scan_id(scan_id)
     if ext == "json" and count > 0:
         return jsonify(context)
     if count > 0 and export_field in context:
@@ -132,7 +132,7 @@ def host_screenshots(ip: str) -> str:
     delHostForm = DeleteForm()
     rescanForm = RescanForm()
     info, context = hostinfo(ip)
-    total_entries, screenshots = current_app.elastic.get_host_screenshots(  # type: ignore[attr-defined]
+    total_entries, screenshots = elastic.get_host_screenshots(
         ip, current_user.results_per_page, searchOffset
     )
 
@@ -201,7 +201,7 @@ def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
 @bp.route("/random")
 @is_authenticated
 def random_host() -> str:
-    random_host = current_app.elastic.random_host()  # type: ignore[attr-defined]
+    random_host = elastic.random_host()
     # This would most likely occur when there are no hosts up in the index, so just throw a 404
     if not random_host:
         return abort(404)

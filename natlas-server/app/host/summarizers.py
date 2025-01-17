@@ -1,13 +1,15 @@
-from flask import abort, current_app
+from flask import abort
+
+from app import elastic
 
 
 def hostinfo(ip: str):  # type: ignore[no-untyped-def]
     hostinfo = {}
-    count, context = current_app.elastic.get_host(ip)  # type: ignore[attr-defined]
+    count, context = elastic.get_host(ip)  # type: ignore[attr-defined]
     if count == 0:
         return abort(404)
     hostinfo["history"] = count
-    screenshot_count = current_app.elastic.count_host_screenshots(ip)  # type: ignore[attr-defined]
+    screenshot_count = elastic.count_host_screenshots(ip)  # type: ignore[attr-defined]
     hostinfo["screenshot_count"] = screenshot_count
     screenshots = 0
     screenshotTypes = [

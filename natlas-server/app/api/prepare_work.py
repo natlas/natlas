@@ -1,9 +1,8 @@
 import secrets
 
-from flask import current_app
 from pydantic import BaseModel
 
-from app import db
+from app import db, elastic
 from app.models import AgentConfig, NatlasServices, ScopeItem
 from app.models.agent_script import AgentScript
 
@@ -22,7 +21,7 @@ def get_unique_scan_id() -> str:
     scan_id = ""
     while scan_id == "":
         rand = secrets.token_hex(16)
-        count, context = current_app.elastic.get_host_by_scan_id(rand)  # type: ignore[attr-defined]
+        count, context = elastic.get_host_by_scan_id(rand)
         if count == 0:
             scan_id = rand
     return scan_id
@@ -48,7 +47,7 @@ class AgentConfigSerializer(BaseModel):
 
 
 class AgentWork(BaseModel):
-    reason: str
+    scan_reason: str
     target: str
     tags: list[str]
     type: str = "nmap"
@@ -68,7 +67,7 @@ def prepare_work(reason: str, target: str) -> AgentWork:
         raise RuntimeError("We have no agent config! What happened?!")
 
     return AgentWork(
-        reason=reason,
+        scan_reason=reason,
         target=target,
         tags=get_target_tags(target),
         type="nmap",

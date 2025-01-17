@@ -14,7 +14,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import select
 from werkzeug.wrappers.response import Response as wzResponse
 
-from app import db, scope_manager
+from app import db, elastic, scope_manager
 from app.admin import bp, forms, redirects
 from app.auth.wrappers import is_admin
 from app.models import (
@@ -438,7 +438,7 @@ def delete_scan(scan_id: str) -> wzResponse:
     redirectLoc = url_for("main.browse")
 
     if delForm.validate_on_submit():
-        deleted = current_app.elastic.delete_scan(scan_id)  # type: ignore[attr-defined]
+        deleted = elastic.delete_scan(scan_id)
         if deleted not in [1, 2]:
             flash(f"Couldn't delete scan {scan_id}!", "danger")
         else:
@@ -457,7 +457,7 @@ def delete_host(ip: str) -> wzResponse | None:
     redirectLoc = url_for("main.browse")
 
     if delForm.validate_on_submit():
-        deleted = current_app.elastic.delete_host(ip)  # type: ignore[attr-defined]
+        deleted = elastic.delete_host(ip)
         if deleted > 0:
             flash(
                 f"Successfully deleted {deleted - 1 if deleted > 1 else deleted} scans for {ip}.",

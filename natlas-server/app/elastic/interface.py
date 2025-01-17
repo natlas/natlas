@@ -2,6 +2,8 @@ import random
 import sys
 from datetime import datetime
 
+from flask import Flask
+
 from app.elastic.client import ElasticClient
 from app.elastic.indices import ElasticIndices
 
@@ -10,21 +12,14 @@ class ElasticInterface:
     client: ElasticClient
     indices: ElasticIndices
 
-    def __init__(
-        self,
-        elasticUrl: str,
-        authEnabled: bool,
-        elasticUser: str,
-        elasticPassword: str,
-        basename: str = "nmap",
-    ):
+    def init_app(self, app: Flask) -> None:
         self.client = ElasticClient(
-            elasticUrl,
-            authEnabled=authEnabled,
-            elasticUser=elasticUser,
-            elasticPassword=elasticPassword,
+            elasticURL=app.config["ELASTICSEARCH_URL"],
+            authEnabled=app.config["ELASTIC_AUTH_ENABLE"],
+            elasticUser=app.config["ELASTIC_USER"],
+            elasticPassword=app.config["ELASTIC_PASSWORD"],
         )
-        self.indices = ElasticIndices(self.client, basename)
+        self.indices = ElasticIndices(self.client, "nmap")
 
     def search(  # type: ignore[no-untyped-def]
         self, limit: int, offset: int, query: str = "nmap", searchIndex: str = "latest"

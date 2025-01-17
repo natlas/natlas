@@ -38,6 +38,7 @@ db = SQLAlchemy(model_class=NatlasBase)
 migrate = Migrate()
 csrf = CSRFProtect()
 scope_manager = ScopeManager()
+elastic = ElasticInterface()
 
 
 @login.unauthorized_handler  # type: ignore[misc]
@@ -74,13 +75,7 @@ def create_app(config_class=config.Config, migrating=False):  # type: ignore[no-
         )
 
     app.jinja_env.add_extension("jinja2.ext.do")
-    app.elastic = ElasticInterface(  # type: ignore[attr-defined]
-        app.config["ELASTICSEARCH_URL"],
-        app.config["ELASTIC_AUTH_ENABLE"],
-        app.config["ELASTIC_USER"],
-        app.config["ELASTIC_PASSWORD"],
-    )
-
+    elastic.init_app(app)
     login.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
