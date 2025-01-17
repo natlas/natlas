@@ -47,7 +47,7 @@ class AgentConfigSerializer(BaseModel):
 
 
 class AgentWork(BaseModel):
-    reason: str
+    scan_reason: str
     target: str
     tags: list[str]
     type: str = "nmap"
@@ -67,7 +67,7 @@ def prepare_work(reason: str, target: str) -> AgentWork:
         raise RuntimeError("We have no agent config! What happened?!")
 
     return AgentWork(
-        reason=reason,
+        scan_reason=reason,
         target=target,
         tags=get_target_tags(target),
         type="nmap",
