@@ -6,7 +6,7 @@ import dateutil.parser
 from flask import Response, current_app, jsonify, request
 from libnmap.parser import NmapParser, NmapParserException
 
-from app import scope_manager
+from app import elastic, scope_manager
 from app.api import bp
 from app.api.prepare_work import prepare_work
 from app.api.processing.screenshot import process_screenshots
@@ -120,7 +120,7 @@ def submit() -> Response:
 
         # If there's no further processing to do, store the host and prepare the response
         elif not newhost["is_up"] or (newhost["is_up"] and newhost["port_count"] == 0):
-            current_app.elastic.new_result(newhost)  # type: ignore[attr-defined]
+            elastic.new_result(newhost)
             status_code = 200
             response_body = json.dumps(
                 {"status": status_code, "message": "Received: " + newhost["ip"]}
@@ -193,7 +193,7 @@ def submit() -> Response:
         )
     else:
         status_code = 200
-        current_app.elastic.new_result(newhost)  # type: ignore[attr-defined]
+        elastic.new_result(newhost)
         response_body = json.dumps(
             {
                 "status": status_code,
@@ -233,7 +233,7 @@ def status() -> Response:
     completed_cycles = scope_manager.get_completed_cycle_count()
     avg_cycle_time = None
     if last_cycle_start:
-        scans_this_cycle = current_app.elastic.count_scans_since(last_cycle_start)  # type: ignore[attr-defined]
+        scans_this_cycle = elastic.count_scans_since(last_cycle_start)
         if completed_cycles > 0 and scope_manager.init_time is not None:
             delta = (last_cycle_start - scope_manager.init_time) / completed_cycles
             avg_cycle_time = pretty_time_delta(delta)

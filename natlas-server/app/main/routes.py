@@ -12,6 +12,7 @@ from flask import (
 from flask_login import current_user
 from minio import Minio
 
+from app import elastic
 from app.auth.forms import LoginForm, RegistrationForm
 from app.auth.wrappers import is_authenticated
 from app.errors import NatlasSearchError
@@ -71,10 +72,10 @@ def browse() -> str:
 
     searchIndex = "history" if includeHistory else "latest"
 
-    count, hostdata = current_app.elastic.search(  # type: ignore[attr-defined]
+    count, hostdata = elastic.search(
         results_per_page, search_offset, searchIndex=searchIndex
     )
-    totalHosts = current_app.elastic.total_hosts()  # type: ignore[attr-defined]
+    totalHosts = elastic.total_hosts()
 
     if includeHistory:
         next_url, prev_url = build_pagination_urls(
@@ -114,13 +115,13 @@ def search() -> Response | str:
     searchIndex = "history" if includeHistory else "latest"
 
     try:
-        count, context = current_app.elastic.search(  # type: ignore[attr-defined]
+        count, context = elastic.search(
             results_per_page, search_offset, query=query, searchIndex=searchIndex
         )
     except elasticsearch.RequestError as e:
         raise NatlasSearchError(e) from e
 
-    totalHosts = current_app.elastic.total_hosts()  # type: ignore[attr-defined]
+    totalHosts = elastic.total_hosts()
 
     if includeHistory:
         next_url, prev_url = build_pagination_urls(
@@ -167,7 +168,7 @@ def screenshots() -> str:
 
     results_per_page, search_offset = results_offset(page)
 
-    total_hosts, total_screenshots, hosts = current_app.elastic.get_current_screenshots(  # type: ignore[attr-defined]
+    total_hosts, total_screenshots, hosts = elastic.get_current_screenshots(
         results_per_page, search_offset
     )
 

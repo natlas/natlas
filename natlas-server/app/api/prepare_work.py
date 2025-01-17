@@ -1,9 +1,8 @@
 import secrets
 
-from flask import current_app
 from pydantic import BaseModel
 
-from app import db
+from app import db, elastic
 from app.models import AgentConfig, NatlasServices, ScopeItem
 from app.models.agent_script import AgentScript
 
@@ -22,7 +21,7 @@ def get_unique_scan_id() -> str:
     scan_id = ""
     while scan_id == "":
         rand = secrets.token_hex(16)
-        count, context = current_app.elastic.get_host_by_scan_id(rand)  # type: ignore[attr-defined]
+        count, context = elastic.get_host_by_scan_id(rand)
         if count == 0:
             scan_id = rand
     return scan_id
