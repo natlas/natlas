@@ -74,7 +74,7 @@ def prepare_work(reason: str, target: str) -> AgentWork:
         agent_config=AgentConfigSerializer(
             **config.as_dict(), scripts=AgentScript.get_scripts_string()
         ),
-        services_hash=services.sha256,  # type: ignore[arg-type]
+        services_hash=services.sha256,
         scan_id=get_unique_scan_id(),
         status=200,
         message=f"Target: {target}",
