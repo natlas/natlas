@@ -298,23 +298,20 @@ def services() -> wzResponse | str:
     uploadForm = forms.ServicesUploadForm(prefix="upload-services")
     addServiceForm = forms.AddServiceForm(prefix="add-service")
     addServiceForm.serviceProtocol.choices = [("tcp", "TCP"), ("udp", "UDP")]
+    services = db.session.get(NatlasServices, 1)
+
     if uploadForm.uploadFile.data and uploadForm.validate_on_submit():
         newServicesContent = (
             uploadForm.serviceFile.data.read().decode("utf-8").rstrip("\r\n")
         )
-        new_services = NatlasServices(services=newServicesContent)
-        if not new_services.hash_equals(current_app.current_services["sha256"]):  # type: ignore[attr-defined]
-            db.session.add(new_services)
+        if not services:
+            services = NatlasServices(services=newServicesContent)
+            db.session.add(services)
             db.session.commit()
-            current_app.current_services = new_services.as_dict()  # type: ignore[attr-defined]
-            flash(
-                f"New services file with hash {current_app.current_services['sha256']} has been uploaded.",  # type: ignore[attr-defined]
-                "success",
-            )
         else:
-            flash(
-                "That file is an exact match for our current services file!", "warning"
-            )
+            services.update_services(newServicesContent)
+            db.session.commit()
+        flash("Natlas Services Updated", "success")
         return redirect(url_for("admin.services"))
 
     if addServiceForm.serviceName.data and addServiceForm.validate_on_submit():
@@ -324,33 +321,29 @@ def services() -> wzResponse | str:
             + "/"
             + addServiceForm.serviceProtocol.data
         )
-        if "\t" + newServicePort in str(current_app.current_services["services"]):  # type: ignore[attr-defined]
+        newServiceLine = f"{newServiceName}\t{newServicePort}"
+        if not services:
+            services = NatlasServices(services=newServiceLine)
+            db.session.add(services)
+            db.session.commit()
+        elif "\t" + newServicePort in services.services:
             flash(f"A service with port {newServicePort} already exists!", "danger")
         else:
-            newServices = (
-                current_app.current_services["services"]  # type: ignore[attr-defined]
-                + "\n"
-                + newServiceName
-                + "\t"
-                + newServicePort
-            )
-            ns = NatlasServices(services=newServices)
-            db.session.add(ns)
+            newServices = f"{services.services}\n{newServiceLine}"
+            services.update_services(newServices)
             db.session.commit()
-            current_app.current_services = NatlasServices.get_latest_services()  # type: ignore[attr-defined]
             flash(
                 f"New service {newServiceName} on port {newServicePort} has been added.",
                 "success",
             )
         return redirect(url_for("admin.services"))
 
-    current_services = NatlasServices.get_latest_services()
     return render_template(
         "admin/services.html",
         uploadForm=uploadForm,
         addServiceForm=addServiceForm,
-        current_services=current_services,
-        servlist=current_services["as_list"],
+        current_services=services,
+        servlist=services.services_as_list(),
     )
 
 
@@ -358,15 +351,17 @@ def services() -> wzResponse | str:
 @login_required  # type: ignore[misc]
 @is_admin
 def export_services() -> Response:
-    current_services = NatlasServices.get_latest_services()
-    return Response(str(current_services["services"]), mimetype="text/plain")
+    services = db.session.get(NatlasServices, 1)
+    if not services:
+        return Response("No services found", status=400)
+    return Response(str(services.services), mimetype="text/plain")
 
 
 @bp.route("/agents", methods=["GET", "POST"])
 @login_required  # type: ignore[misc]
 @is_admin
 def agent_config() -> str:
-    agentConfig = db.session.scalar(select(AgentConfig).where(AgentConfig.id == 1))
+    agentConfig = db.session.get(AgentConfig, 1)
     agent_scripts = db.session.scalars(select(AgentScript)).all()
     # pass the model to the form to populate
     agentForm = forms.AgentConfigForm(obj=agentConfig)
@@ -377,7 +372,6 @@ def agent_config() -> str:
         # populate the object from the form data
         agentForm.populate_obj(agentConfig)
         db.session.commit()
-        current_app.agentConfig = agentConfig.as_dict()  # type: ignore[attr-defined, union-attr]
         flash("Successfully updated agent configuration.", "success")
 
     return render_template(

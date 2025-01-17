@@ -6,13 +6,14 @@ import dateutil.parser
 from flask import Response, current_app, jsonify, request
 from libnmap.parser import NmapParser, NmapParserException
 
-from app import elastic, scope_manager
+from app import db, elastic, scope_manager
 from app.api import bp
 from app.api.prepare_work import prepare_work
 from app.api.processing.screenshot import process_screenshots
 from app.api.processing.ssl import parse_ssl_data
 from app.api.rescan_handler import mark_scan_completed, mark_scan_dispatched
 from app.auth.wrappers import is_agent_authenticated, is_authenticated
+from app.models.natlas_services import NatlasServices
 from app.util import pretty_time_delta
 
 json_content = "application/json"
@@ -209,20 +210,11 @@ def submit() -> Response:
 @bp.route("/natlas-services", methods=["GET"])
 @is_agent_authenticated
 def natlasServices() -> Response:
-    if current_app.current_services["id"] != "None":  # type: ignore[attr-defined]
-        tmpdict = (
-            current_app.current_services.copy()  # type: ignore[attr-defined]
-        )  # make an actual copy of the dict so that we can remove the list
-        del tmpdict[
-            "as_list"
-        ]  # don't return the "as_list" version of the services, which is only used for making a pretty table.
-        response_body = json.dumps(tmpdict)
-        status_code = 200
-    else:
-        response_body = json.dumps(current_app.current_services)  # type: ignore[attr-defined]
-        status_code = 404
+    services = db.session.get(NatlasServices, 1)
+    if services is None:
+        return Response(response="{}", status=404, content_type=json_content)
     return Response(
-        response=response_body, status=status_code, content_type=json_content
+        response=json.dumps(services.as_dict()), status=200, content_type=json_content
     )
 
 

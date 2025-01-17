@@ -4,7 +4,6 @@ import werkzeug
 from flask import (
     Response,
     abort,
-    current_app,
     flash,
     jsonify,
     redirect,
@@ -22,6 +21,7 @@ from app.host.forms import RescanForm
 from app.host.migrators import determine_data_version
 from app.host.summarizers import hostinfo
 from app.models import RescanTask
+from app.models.agent_config import AgentConfig
 
 
 @bp.route("/<ip:ip>")
@@ -174,7 +174,10 @@ def rescan_host(ip: str) -> werkzeug.wrappers.response.Response:
 
     if ip in scan_dispatched:
         scan = scan_dispatched[ip]
-        scan_window = current_app.agentConfig["scanTimeout"] * 2  # type: ignore[attr-defined]
+        agent_config = db.session.get(AgentConfig, 1)
+        if not agent_config:
+            raise RuntimeError("AgentConfig table is empty somehow")
+        scan_window = agent_config.scanTimeout * 2
         if (
             scan.dispatched
             and (datetime.utcnow() - scan.date_dispatched).seconds > scan_window  # type: ignore[operator]
