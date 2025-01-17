@@ -32,16 +32,12 @@ def getwork() -> Response:
             return Response(
                 response=response_body, status=400, content_type=json_content
             )
-    work = {}
-
     if manual:
         canTarget = scope_manager.is_acceptable_target(manual)
         if canTarget:
-            work["scan_reason"] = "manual"
-            work["target"] = manual
-            work = prepare_work(work)
+            work = prepare_work(reason="manual", target=manual)
             response = Response(
-                response=json.dumps(work), status=200, content_type=json_content
+                response=work.model_dump_json(), status=200, content_type=json_content
             )
         else:
             errmsg = f"{manual} is not a valid target for this server."
@@ -74,17 +70,13 @@ def getwork() -> Response:
             return Response(
                 response=response_body, status=404, content_type=json_content
             )
-
-        work["target"] = str(scanmanager.get_next_ip())
-        work["scan_reason"] = "auto"
+        work = prepare_work(reason="auto", target=str(scanmanager.get_next_ip()))
 
     else:  # Get the ip from the rescan queue, mark the job as dispatched, update the PendingRescans for other requests
-        work["target"] = rescans[0].target
-        work["scan_reason"] = "requested"
+        work = prepare_work(reason="requested", target=rescans[0].target)
         mark_scan_dispatched(rescans[0])
 
-    work = prepare_work(work)
-    response_body = json.dumps(work)
+    response_body = work.model_dump_json()
     return Response(response=response_body, status=200, content_type=json_content)
 
 
