@@ -1,4 +1,7 @@
 FROM python:3.12-bookworm AS base
+COPY --from=ghcr.io/astral-sh/uv:0.5.21 /uv /uvx /bin/
+
+WORKDIR /agent
 
 FROM base AS build
 
@@ -14,18 +17,15 @@ RUN export AQUATONEURL='https://github.com/michenriksen/aquatone/releases/downlo
 	&& wget -O /tmp/dumb-init $DUMBINITURL \
 	&& chmod +x /tmp/dumb-init
 
-COPY Pipfile .
-COPY Pipfile.lock .
+FROM base AS python_build
+RUN \
+	--mount=type=bind,source=pyproject.toml,target=/agent/pyproject.toml \
+	--mount=type=bind,source=uv.lock,target=/agent/uv.lock \
+	--mount=type=cache,target=/root/.cache \
+	uv sync --frozen
 
-RUN pip install pipenv
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy \
-	&& rm -rf Pipfile Pipfile.lock deployment
 
-COPY . /opt/natlas/natlas-agent
-
-WORKDIR /opt/natlas/natlas-agent
-
-RUN python3 -m compileall .
+COPY . /agent/
 
 # Build final image
 FROM base
@@ -34,20 +34,17 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install --no-install-recommends -qy chromium nmap xvfb vncsnapshot libcap2-bin \
 	&& setcap cap_net_raw,cap_net_admin,cap_net_bind_service+eip /usr/bin/nmap \
-	&& rm -rf /var/cache/* /root /var/lib/apt/info/* /var/lib/apt/lists/* /var/lib/ghc /var/lib/dpkg /var/lib/log/*
+	&& adduser --disabled-password --gecos "" --disabled-login docker \
+	&& rm -rf /var/cache/* /root /var/lib/apt/info/* /var/lib/apt/lists/* /var/lib/ghc /var/lib/dpkg /var/lib/log/* \
+	&& bash -c 'mkdir -p /data/{scans,conf,logs}' \
+	&& chown -R docker:docker /data
 
 COPY --from=build /tmp/dumb-init /usr/bin/dumb-init
 COPY --from=build /tmp/aquatone/aquatone /usr/bin/aquatone
-COPY --from=build /opt/natlas /opt/natlas
+COPY --from=python_build /agent/ /agent/
 
-RUN bash -c 'mkdir -p /data/{scans,conf,logs} \
-	&& chown -R www-data:www-data /data'
-
-COPY --from=build /.venv /.venv/
-WORKDIR /opt/natlas/natlas-agent
-USER www-data
-ENV LC_ALL='C.UTF-8' \
-    PATH="/.venv/bin:$PATH"
+USER docker
+ENV LC_ALL='C.UTF-8'
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-CMD ["python3", "/opt/natlas/natlas-agent/natlas-agent.py"]
+CMD ["uv", "run", "/agent/natlas-agent.py"]
