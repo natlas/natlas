@@ -3,11 +3,9 @@ FROM python:3.12-bookworm AS base
 FROM base AS build
 
 RUN export DEBIAN_FRONTEND=noninteractive \
-    export BUILD_PKGS="unzip" \
     && apt-get update \
-    && apt-get install --no-install-recommends -qy $BUILD_PKGS
-
-RUN export AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.7.0/aquatone_linux_amd64_1.7.0.zip' \
+    && apt-get install --no-install-recommends -qy unzip \
+    && export AQUATONEURL='https://github.com/michenriksen/aquatone/releases/download/v1.7.0/aquatone_linux_amd64_1.7.0.zip' \
     && wget $AQUATONEURL -O /tmp/aquatone.zip -q \
     && unzip /tmp/aquatone.zip -d /tmp/aquatone \
     && export DUMBINITURL='https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64' \
@@ -37,8 +35,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && bash -c 'mkdir -p /data/{scans,conf,logs}' \
     && chown -R docker:docker /data
 
-COPY --from=build /tmp/dumb-init /usr/bin/dumb-init
-COPY --from=build /tmp/aquatone/aquatone /usr/bin/aquatone
+COPY --from=build /tmp/dumb-init /tmp/aquatone/aquatone /usr/bin/
 COPY --from=python_build /.venv/ /.venv/
 COPY --from=python_build /agent/ /agent/
 
