@@ -1,7 +1,4 @@
 FROM python:3.12-bookworm AS base
-COPY --from=ghcr.io/astral-sh/uv:0.5.21 /uv /uvx /bin/
-
-WORKDIR /agent
 
 FROM base AS build
 
@@ -18,9 +15,10 @@ RUN export AQUATONEURL='https://github.com/michenriksen/aquatone/releases/downlo
 	&& chmod +x /tmp/dumb-init
 
 FROM base AS python_build
+COPY --from=ghcr.io/astral-sh/uv:0.5.21 /uv /uvx /bin/
 RUN \
-	--mount=type=bind,source=pyproject.toml,target=/agent/pyproject.toml \
-	--mount=type=bind,source=uv.lock,target=/agent/uv.lock \
+	--mount=type=bind,source=pyproject.toml,target=/pyproject.toml \
+	--mount=type=bind,source=uv.lock,target=/uv.lock \
 	--mount=type=cache,target=/root/.cache \
 	uv sync --frozen
 
@@ -29,7 +27,7 @@ COPY . /agent/
 
 # Build final image
 FROM base
-
+WORKDIR /agent
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install --no-install-recommends -qy chromium nmap xvfb vncsnapshot libcap2-bin \
@@ -41,10 +39,13 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 COPY --from=build /tmp/dumb-init /usr/bin/dumb-init
 COPY --from=build /tmp/aquatone/aquatone /usr/bin/aquatone
+COPY --from=python_build /.venv/ /.venv/
 COPY --from=python_build /agent/ /agent/
 
+
 USER docker
-ENV LC_ALL='C.UTF-8'
+ENV LC_ALL='C.UTF-8' \
+	PATH="/.venv/bin:$PATH"
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-CMD ["uv", "run", "/agent/natlas-agent.py"]
+CMD ["/agent/natlas-agent.py"]

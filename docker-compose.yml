@@ -103,7 +103,7 @@ services:
 
   server:
     build: natlas-server
-    command: uv run flask run --host 0.0.0.0
+    command: flask run --host 0.0.0.0
     ports:
       - 5000:5000
     networks:
