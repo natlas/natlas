@@ -123,8 +123,8 @@ services:
       - DB_AUTO_UPGRADE=True
     env_file: .env
     volumes:
-      - ./natlas-server:/opt/natlas/natlas-server
-      - html_assets:/opt/natlas/natlas-server/static/dist
+      - ./natlas-server:/server
+      - html_assets:/server/static/dist
     links:
       - elastic
       - postgres
@@ -150,7 +150,7 @@ services:
     security_opt:
       - seccomp=./natlas-agent/chrome.json
     volumes:
-      - ./natlas-agent:/opt/natlas/natlas-agent
+      - ./natlas-agent:/agent
     links:
       - server
 
