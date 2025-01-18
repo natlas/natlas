@@ -1,6 +1,6 @@
 [project]
 name = "natlas"
-requires-python = "==3.11"
+requires-python = ">=3.12"
 
 [tool.mypy]
 disable_error_code = [
@@ -73,3 +73,10 @@ select = [
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
+
+# UV does not manage this pyproject
+# This pyproject does not have dependencies
+# It's just used for pre-commit linting and mypy
+# So that all code is standardized.
+[tool.uv]
+managed = false

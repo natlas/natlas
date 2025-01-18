@@ -14,6 +14,10 @@ tests/
 # Dev Environment
 .env
 venv/
+.venv/
+.mypy_cache/
+__pycache__/
+.vscode/
 tmp/
 logs/
 data/
