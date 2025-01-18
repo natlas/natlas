@@ -1,67 +1,76 @@
-<nav class="navbar navbar-dark bg-dark fixed-top navbar-expand-md">
-    <div class="container">
-        <a class="navbar-brand natlas-brand" href="{{ url_for('main.index') }}" title="Natlas Home">
-            <img src="/static/img/natlas-logo.png" class="img-fluid natlas-logo" alt="Natlas Globe"/>
+<nav class="bg-gray-900 fixed top-0 left-0 right-0 z-50">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Brand -->
+        <a class="flex items-center text-white natlas-brand" href="{{ url_for('main.index') }}" title="Natlas Home">
+            <img src="/static/img/natlas-logo.png" class="h-8 w-auto" alt="Natlas Globe"/>
             <span class="sr-only">Natlas</span>
-            {% if config.CUSTOM_BRAND %}<span class="ml-1">{{ config.CUSTOM_BRAND }}</span>{%endif%}
+            {% if config.CUSTOM_BRAND %}
+              <span class="ml-1">{{ config.CUSTOM_BRAND }}</span>
+            {% endif %}
         </a>
-            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+
+        <!-- Mobile Menu Button -->
+        <button type="button" class="text-white md:hidden focus:outline-none" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <!-- Navbar Links & Extras -->
+        <div id="navbar" class="hidden md:flex md:items-center md:space-x-4 w-full md:w-auto">
+          <!-- Navigation Links -->
+          <ul class="flex flex-col md:flex-row md:space-x-4 mt-4 md:mt-0 flex-grow">
+            <li>
+                <a class="block text-white hover:text-gray-300 py-2" href="{{ url_for('main.browse') }}">Browse</a>
+            </li>
+            <li>
+                <a class="block text-white hover:text-gray-300 py-2" href="{{ url_for('main.screenshots') }}">Screenshots</a>
+            </li>
+            <li>
+                <a class="block text-white hover:text-gray-300 py-2" href="{{ url_for('main.status') }}">Status</a>
+            </li>
+            <li>
+                <a class="block text-white hover:text-gray-300 py-2" href="{{ url_for('host.random_host') }}">Random</a>
+            </li>
+          </ul>
+
+          <!-- User Dropdown -->
+          <div class="relative ml-4">
+            <button class="flex items-center bg-gray-700 text-white px-3 py-2 rounded hover:bg-gray-600 focus:outline-none" type="button" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-user"></i>
             </button>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.browse') }}">Browse</a>
-                </li>
-                <li>
-                    <a class="nav-link" href="{{ url_for('main.screenshots') }}">Screenshots</a>
-                </li>
-                <li>
-                    <a class="nav-link" href="{{ url_for('main.status') }}">Status</a>
-                </li>
-                <li>
-                    <a class="nav-link" href="{{ url_for('host.random_host') }}">Random</a>
-                </li>
-            </ul>
-            <div class="dropdown mr-2">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-user"></i>
-                </button>
-                <div class="dropdown-menu" aria-labelledby="userDropdown">
-                    {% if current_user.is_admin %}
-                    <a class="dropdown-item" href="{{ url_for('admin.admin') }}">Admin</a>
-                    {% endif %}
-                    {% if current_user.is_anonymous %}
-                    <a class="dropdown-item" href="{{ url_for('auth.login') }}">Login</a>
-                    {% else %}
-                    <a class="dropdown-item" href="{{ url_for('user.profile') }}">Profile</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
-                    {% endif %}
-                </div>
+            <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                {% if current_user.is_admin %}
+                  <a class="block px-4 py-2 text-gray-700 hover:bg-gray-100" href="{{ url_for('admin.admin') }}">Admin</a>
+                {% endif %}
+                {% if current_user.is_anonymous %}
+                  <a class="block px-4 py-2 text-gray-700 hover:bg-gray-100" href="{{ url_for('auth.login') }}">Login</a>
+                {% else %}
+                  <a class="block px-4 py-2 text-gray-700 hover:bg-gray-100" href="{{ url_for('user.profile') }}">Profile</a>
+                  <div class="border-t border-gray-200"></div>
+                  <a class="block px-4 py-2 text-gray-700 hover:bg-gray-100" href="{{ url_for('auth.logout') }}">Logout</a>
+                {% endif %}
             </div>
-            <form class="form-inline" action="{{ url_for('main.search') }}" name="search">
-                <div class="input-group">
-                    <input type="text" class="form-control" aria-label="Search" value="{{query}}" required name="query" placeholder="Search..." aria-describedby="search-addon"/>
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="submit" id="search-addon"><i class="fas fa-search"></i></button>
-                    </div>
-                </div>
+          </div>
 
-                <a href="#" class="ml-1" data-toggle="modal" data-target="#searchHelp" onclick="loadModalContent()"><i class="fas fa-question-circle natlas-pink"></i></a>
-            </form>
-            <!--http://tholman.com/github-corners/ -->
-            <span class="d-none d-md-block">
-                <a target="_blank" rel="noopener noreferrer" href="https://github.com/natlas/natlas" class="github-corner" aria-label="View source on GitHub">
-                    <svg width="50" height="50" viewBox="0 0 250 250" style="fill:#fff; color:#222; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
-                        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-                        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
-                        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
-                    </svg>
-                </a>
-            </span>
+          <!-- Search Form -->
+          <form class="flex items-center ml-4" action="{{ url_for('main.search') }}" name="search">
+            <div class="flex">
+              <input type="text" class="block w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring focus:border-blue-300"
+                     aria-label="Search" value="{{query}}" required name="query" placeholder="Search..." aria-describedby="search-addon"/>
+              <button class="px-4 py-2 border border-gray-300 bg-gray-100 text-gray-700 rounded-r-md hover:bg-gray-200 focus:outline-none" type="submit" id="search-addon">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+            <a href="#" class="ml-1 text-gray-400 hover:text-gray-200" data-toggle="modal" data-target="#searchHelp" onclick="loadModalContent()">
+              <i class="fas fa-question-circle natlas-pink"></i>
+            </a>
+          </form>
         </div>
+      </div>
     </div>
-</nav>
+  </nav>
 
-{% include 'includes/search_modal.html' %}
+  {% include 'includes/search_modal.html' %}

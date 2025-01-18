@@ -27,6 +27,17 @@ const config = (env, argv) => {
                     use: [
                         MiniCssExtractPlugin.loader,
                         'css-loader',
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                postcssOptions: {
+                                    plugins: [
+                                        'tailwindcss',
+                                        'autoprefixer'
+                                    ]
+                                }
+                            }
+                        },
                         'sass-loader'
                     ]
                 },

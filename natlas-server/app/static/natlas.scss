@@ -14,6 +14,9 @@
 @import 'css/components/screenshots';
 @import 'css/pages/status';
 @import 'css/pages/landing';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /*
  * Global add-ons
