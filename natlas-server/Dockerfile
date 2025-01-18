@@ -14,10 +14,10 @@ FROM base AS build
 COPY --from=ghcr.io/astral-sh/uv:0.5.21 /uv /uvx /bin/
 
 RUN \
-	--mount=type=bind,source=pyproject.toml,target=/pyproject.toml \
-	--mount=type=bind,source=uv.lock,target=/uv.lock \
-	--mount=type=cache,target=/root/.cache \
-	uv sync --frozen
+    --mount=type=bind,source=pyproject.toml,target=/pyproject.toml \
+    --mount=type=bind,source=uv.lock,target=/uv.lock \
+    --mount=type=cache,target=/root/.cache \
+    uv sync --frozen
 
 COPY . /server/
 
