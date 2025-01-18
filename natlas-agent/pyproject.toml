@@ -6,7 +6,7 @@ dependencies = [
   "pydantic~=2.10",
   "python-dotenv~=1.0",
   "requests~=2.31",
-  "sentry-sdk~=1.40"
+  "sentry-sdk~=2.20"
 ]
 name = "natlas-agent"
 readme = "README.md"
