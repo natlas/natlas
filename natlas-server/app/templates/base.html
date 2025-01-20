@@ -1,14 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-white">
   {% include 'includes/head.html' %}
-  <body>
-    {% include 'includes/nav.html' %}
-    <div class="container max-w-6xl mx-auto px-4 py-8 main-content">
-        {% include 'includes/messages.html' %}
-      {% block content %}
-      {% endblock %}
-      {% include 'includes/backtotop.html' %}
-    </div> <!-- /container -->
-    {% include 'includes/footer.html' %}
+  <body class="h-full" x-data="{ mobileSidebar: false, userMenu: false }">
+    <div>
+
+      {% include 'includes/mobile-sidebar.html' %}
+      {% include 'includes/desktop-sidebar.html' %}
+
+
+
+      <!-- Main Content Wrapper -->
+      <div class="lg:pl-72">
+        {% include 'includes/header.html' %}
+
+        <!-- Main Content Area -->
+        <main class="py-10">
+          <div class="px-4 sm:px-6 lg:px-8">
+            {% include 'includes/messages.html' %}
+            {% block content %}
+            {% endblock %}
+            {% include 'includes/backtotop.html' %}
+          </div>
+        </main>
+      </div>
+    </div>
+    {% include 'includes/search_modal.html' %}
+    <!-- AlpineJS is assumed to be loaded already (e.g., via CDN in head) -->
   </body>
 </html>

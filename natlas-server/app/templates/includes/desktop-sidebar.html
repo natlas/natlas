@@ -1,0 +1,107 @@
+<!-- Static Sidebar for Desktop -->
+<div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <div class="flex flex-col h-full overflow-y-auto bg-gray-900 px-6 pb-4">
+      <!-- Top Branding and Navigation -->
+      <div>
+        <!-- Branding -->
+        <div class="flex h-16 shrink-0 items-center">
+          <a href="{{ url_for('main.index') }}" title="Natlas Home">
+            <img class="h-8 w-auto" src="/static/img/natlas-logo.png" alt="Natlas Globe">
+          </a>
+          {% if config.CUSTOM_BRAND %}
+            <span class="ml-1 text-white">{{ config.CUSTOM_BRAND }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Navigation -->
+        <nav class="mt-6">
+          <ul role="list" class="flex flex-col gap-y-7">
+            <li>
+              <ul role="list" class="-mx-2 space-y-1">
+                <!-- Browse -->
+                <li>
+                  <a href="{{ url_for('main.browse') }}" class="group flex gap-x-3 rounded-md bg-gray-800 p-2 text-sm font-semibold text-white">
+                    <!-- House Icon (Heroicons Solid) -->
+                    <svg class="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5a1 1 0 001-1v-4h2v4a1 1 0 001 1h5a1 1 0 001-1V8.586l-7.293-7.293z" />
+                    </svg>
+                    <span>Browse</span>
+                  </a>
+                </li>
+                <!-- Screenshots -->
+                <li>
+                  <a href="{{ url_for('main.screenshots') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <!-- Photo Icon (Heroicons Outline) -->
+                    <svg class="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h18M3 19h18M5 5v14M19 5v14M9 9a3 3 0 016 0 3 3 0 01-6 0z" />
+                    </svg>
+                    <span>Screenshots</span>
+                  </a>
+                </li>
+                <!-- Status -->
+                <li>
+                  <a href="{{ url_for('main.status') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <!-- Chart Icon (Heroicons Outline) -->
+                    <svg class="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V3h2v8h-2zm-4 4v-6h2v6H7zm8 0v-4h2v4h-2z" />
+                    </svg>
+                    <span>Status</span>
+                  </a>
+                </li>
+                <!-- Random -->
+                <li>
+                  <a href="{{ url_for('host.random_host') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" aria-hidden="true" viewBox="0 0 640 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8L173.1 413.7c28.1 28.1 73.7 28.1 101.8 0L413.7 274.9c28.1-28.1 28.1-73.7 0-101.8L274.9 34.3zM200 224a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM96 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 376a24 24 0 1 1 0-48 24 24 0 1 1 0 48zM352 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 120a24 24 0 1 1 0-48 24 24 0 1 1 0 48zm96 328c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-192c0-35.3-28.7-64-64-64l-114.3 0c11.6 36 3.1 77-25.4 105.5L320 413.8l0 34.2zM480 328a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
+                    <span>Random</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Pinned Bottom Section -->
+      <div class="mt-auto space-y-2">
+        <!-- External Links as Text Links -->
+        <div class="text-xs">
+          <ul class="flex flex-wrap gap-x-2">
+            <li>
+              <a href="https://github.com/natlas/natlas" title="Check out Natlas on Github" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white">
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/natlas/natlas/issues" title="Checkout the issues" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white">
+                Issues
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/natlas/natlas/wiki" title="Visit the wiki" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white">
+                Wiki
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/natlas/natlas/blob/main/LICENSE" title="View our license" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white">
+                License
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- Logout Button -->
+        {% if not current_user.is_anonymous %}
+        <div>
+          <a href="{{ url_for('auth.logout') }}" class="block text-sm text-red-600 font-semibold hover:text-red-700">
+            Logout
+          </a>
+        </div>
+        {% endif %}
+        <!-- Version Link -->
+        <div class="text-xs text-gray-400">
+          <a id="natlasVersion" href="https://github.com/natlas/natlas/releases/tag/v{{ config.NATLAS_VERSION }}" target="_blank" class="hover:text-white">
+            v{{ config.NATLAS_VERSION }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>

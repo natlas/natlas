@@ -9,6 +9,7 @@
         "@fortawesome/fontawesome-free": "^5.15.3",
         "@sentry/browser": "^6.2.5",
         "@tsparticles/engine": "^3.3.0",
+        "alpinejs": "^3.14.8",
         "bootstrap": "^4.6.0",
         "datatables.net-bs4": "^1.10.24",
         "jquery": "^3.6.0",

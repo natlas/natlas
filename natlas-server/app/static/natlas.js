@@ -9,6 +9,11 @@ import { getReducedMotion } from './util/media-queries';
 import 'natlas.scss';
 import 'bootstrap';
 import 'datatables.net-bs4';
+import Alpine from 'alpinejs'
+
+window.Alpine = Alpine
+
+Alpine.start()
 
 $(function() {
     $('.expand-img').on('click', function() {
@@ -74,27 +79,6 @@ $(document).ready(function() {
         ]
     });
     $('[data-toggle="popover"]').popover();
-});
-
-$(document).ready(function() {
-    var btn = $('#backtotop');
-    btn.tooltip();
-    $(window).scroll(function() {
-        if ($(window).scrollTop() > 300) {
-            btn.addClass('show');
-        } else {
-            btn.removeClass('show');
-        }
-    });
-
-    btn.on('click', function(e) {
-        e.preventDefault();
-        if (getReducedMotion().matches) {
-            window.scroll(0, 0);
-        } else {
-            $('html, body').animate({scrollTop:0}, '300');
-        }
-    });
 });
 
 $(document).ready(function() {

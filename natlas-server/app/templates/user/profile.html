@@ -2,117 +2,148 @@
 {% set title = current_user.email ~ " | Profile" %}
 {% set active_page = "profile" %}
 {% block content %}
-        {% include 'user/_header.html' %}
-        <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-4">
-                <h3>Change Password</h3>
-                <form class="form-horizontal pwchange-form" action="{{url_for('user.profile')}}" method="post">
-                    {{ changePasswordForm.hidden_tag() }}
-                    <div class="form-group">
-                        {{ changePasswordForm.old_password.label(class="control-label") }}
-                        {{ changePasswordForm.old_password(class="form-control") }}
-                        {% for error in changePasswordForm.old_password.errors %}
-                        <span style="color: red;">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    <div class="form-group">
-                        {{ changePasswordForm.password.label(class="control-label") }}
-                        {{ changePasswordForm.password(class="form-control") }}
-                        {% for error in changePasswordForm.password.errors %}
-                        <span style="color: red;">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    <div class="form-group">
-                        {{ changePasswordForm.password2.label(class="control-label") }}
-                        {{ changePasswordForm.password2(class="form-control") }}
-                        {% for error in changePasswordForm.password2.errors %}
-                        <span style="color: red;">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    <div>{{ changePasswordForm.changePassword(class="btn btn-primary") }}</div>
-                </form>
-            </div>
-            <div class="col-xs-12 col-sm-5 col-sm-offset-1 col-md-3 col-md-offset-1">
-                <h3>Display Settings</h3>
-                <form class="form-horizontal display-form" action="{{url_for('user.profile')}}" method="post">
-                    {{ displaySettingsForm.hidden_tag() }}
-                    <div class="form-group">
-                        {{ displaySettingsForm.results_per_page.label(class="control-label") }}
-                        {{ displaySettingsForm.results_per_page(class="form-control", selected=current_user.results_per_page) }}
-                    </div>
-                    <div class="form-group">
-                        {{ displaySettingsForm.preview_length.label(class="control-label") }}
-                        {{ displaySettingsForm.preview_length(class="form-control", selected=current_user.preview_length) }}
-                    </div>
-                    <div class="form-group">
-                        {{ displaySettingsForm.result_format.label(class="control-label") }}
-                        {{ displaySettingsForm.result_format(class="form-control", selected=current_user.result_format) }}
-                    </div>
-                    <div>{{ displaySettingsForm.updateDisplaySettings(class="btn btn-primary") }}</div>
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 my-3 border-bottom d-flex justify-content-between">
-                <h2 class="d-inline-block">My Agents</h2>
-                <div class="d-inline-block mb-2" style="font-size:2rem;">
-                    <button class="btn btn-success" id="newAgent" name="newagent" title="Create New Agent" data-toggle="modal" data-target="#agentmodal" data-agentid="None" data-agentname="None" data-action="newagent" type="button"><i class="fas fa-plus-circle text-white mr-1"></i>New Agent</button>
-                </div>
-            </div>
-            {% if agents %}
-            <div class="col-12">
-                <table class="table table-striped dataTable">
-                    <thead>
-                      <tr>
-                        <th scope="col">Date Created</th>
-                        <th scope="col">Agent ID</th>
-                        <th scope="col">Friendly Name</th>
-                        <th scope="col">API Key</th>
-                        <th class="table-controls" scope="col"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for agent in agents %}
-                      <tr id="agentrow-{{loop.index}}">
-                        <td><time datetime="{{ agent.date_created.strftime('%Y-%m-%d %H:%M') }}" title="{{ agent.date_created.strftime('%Y-%m-%d %H:%M %Z') }}">{{ agent.date_created.strftime('%Y-%m-%d %H:%M') }}</time></td>
-                        <td class="text-monospace">{{ agent.agentid }}</td>
-                        <td>{{ agent.friendly_name }}</td>
-                        <td id="agenttoken-{{loop.index}}" class="text-monospace">
-                            <div id="showtokenwrapper-{{loop.index}}"><a id="showtoken-{{loop.index}}" class="showtoken" style="cursor:pointer;">Show API Key</a></div>
-                            <div class="tokenval" id="tokenval-{{loop.index}}" style="display:none;">{{ agent.token }}</div>
-                        </td>
-                        <td style="text-align:center;">
-                          {% include 'user/_agent_menu.html' %}
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-            </div>
-            {% endif %}
-        </div>
+  {# Optional header include #}
+  {% include 'user/_header.html' %}
 
-<div class="modal fade" tabindex="-1" role="dialog" id="agentmodal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Change Agent Name</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form method="POST" action="{{url_for('user.new_agent')}}" id="agentNameForm">
-      <div class="modal-body">
-          {{ agentNameForm.hidden_tag() }}
-          {{ agentNameForm.agent_name(size=32, class="form-control", placeholder="Agent 1") }}
+  <!-- Forms Section -->
+  <div class="flex flex-wrap -mx-2">
+    <!-- Change Password Column -->
+    <div class="w-full sm:w-1/2 md:w-1/3 px-2 mb-4">
+      <h3 class="text-lg font-semibold mb-3">Change Password</h3>
+      <form class="space-y-4 pwchange-form" action="{{ url_for('user.profile') }}" method="post">
+        {{ changePasswordForm.hidden_tag() }}
+        <div class="mb-4">
+          {{ changePasswordForm.old_password.label(class="block text-sm font-medium text-gray-700") }}
+          {{ changePasswordForm.old_password(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
+          {% for error in changePasswordForm.old_password.errors %}
+            <span class="text-red-600 text-sm">{{ error }}</span>
+          {% endfor %}
+        </div>
+        <div class="mb-4">
+          {{ changePasswordForm.password.label(class="block text-sm font-medium text-gray-700") }}
+          {{ changePasswordForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
+          {% for error in changePasswordForm.password.errors %}
+            <span class="text-red-600 text-sm">{{ error }}</span>
+          {% endfor %}
+        </div>
+        <div class="mb-4">
+          {{ changePasswordForm.password2.label(class="block text-sm font-medium text-gray-700") }}
+          {{ changePasswordForm.password2(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
+          {% for error in changePasswordForm.password2.errors %}
+            <span class="text-red-600 text-sm">{{ error }}</span>
+          {% endfor %}
+        </div>
+        <div>
+          {{ changePasswordForm.changePassword(class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded") }}
+        </div>
+      </form>
+    </div>
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="submit" id="change_name" class="btn btn-primary">Change Name</button>
-      </div>
+    <!-- Display Settings Column -->
+    <div class="w-full sm:w-1/2 md:w-1/3 px-2 mb-4">
+      <h3 class="text-lg font-semibold mb-3">Display Settings</h3>
+      <form class="space-y-4 display-form" action="{{ url_for('user.profile') }}" method="post">
+        {{ displaySettingsForm.hidden_tag() }}
+        <div class="mb-4">
+          {{ displaySettingsForm.results_per_page.label(class="block text-sm font-medium text-gray-700") }}
+          {{ displaySettingsForm.results_per_page(class="mt-1 block w-full p-2 border border-gray-300 rounded", selected=current_user.results_per_page) }}
+        </div>
+        <div class="mb-4">
+          {{ displaySettingsForm.preview_length.label(class="block text-sm font-medium text-gray-700") }}
+          {{ displaySettingsForm.preview_length(class="mt-1 block w-full p-2 border border-gray-300 rounded", selected=current_user.preview_length) }}
+        </div>
+        <div class="mb-4">
+          {{ displaySettingsForm.result_format.label(class="block text-sm font-medium text-gray-700") }}
+          {{ displaySettingsForm.result_format(class="mt-1 block w-full p-2 border border-gray-300 rounded", selected=current_user.result_format) }}
+        </div>
+        <div>
+          {{ displaySettingsForm.updateDisplaySettings(class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded") }}
+        </div>
       </form>
     </div>
   </div>
-</div>
+
+  <!-- My Agents Header & New Agent Button -->
+  <div class="flex items-center justify-between w-full my-3 border-b pb-2">
+    <h2 class="text-2xl font-bold">My Agents</h2>
+    <div class="text-2xl">
+      <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded inline-flex items-center"
+              id="newAgent"
+              name="newagent"
+              title="Create New Agent"
+              data-toggle="modal"
+              data-target="#agentmodal"
+              data-agentid="None"
+              data-agentname="None"
+              data-action="newagent"
+              type="button">
+        <i class="fas fa-plus-circle mr-1"></i> New Agent
+      </button>
+    </div>
+  </div>
+
+  {% if agents %}
+    <!-- Agents Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+          <tr>
+            <th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase">Date Created</th>
+            <th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase">Agent ID</th>
+            <th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase">Friendly Name</th>
+            <th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase">API Key</th>
+            <th scope="col" class="px-4 py-2 text-center text-xs font-semibold text-gray-700 uppercase"></th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for agent in agents %}
+            <tr id="agentrow-{{ loop.index }}">
+              <td class="px-4 py-2">
+                <time datetime="{{ agent.date_created.strftime('%Y-%m-%d %H:%M') }}"
+                      title="{{ agent.date_created.strftime('%Y-%m-%d %H:%M %Z') }}">
+                  {{ agent.date_created.strftime('%Y-%m-%d %H:%M') }}
+                </time>
+              </td>
+              <td class="px-4 py-2 font-mono">{{ agent.agentid }}</td>
+              <td class="px-4 py-2">{{ agent.friendly_name }}</td>
+              <td class="px-4 py-2 font-mono">
+                <div id="showtokenwrapper-{{ loop.index }}">
+                  <a id="showtoken-{{ loop.index }}" class="showtoken cursor-pointer text-blue-600 hover:underline">Show API Key</a>
+                </div>
+                <div class="tokenval hidden" id="tokenval-{{ loop.index }}">
+                  {{ agent.token }}
+                </div>
+              </td>
+              <td class="px-4 py-2 text-center">
+                {% include 'user/_agent_menu.html' %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <!-- Tailwind Modal for Agent Name Change -->
+  <div id="agentmodal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md">
+      <div class="flex justify-between items-center border-b px-4 py-2">
+        <h5 class="text-lg font-medium">Change Agent Name</h5>
+        <button type="button" class="text-gray-600 hover:text-gray-800" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{{ url_for('user.new_agent') }}" id="agentNameForm">
+        <div class="p-4">
+          {{ agentNameForm.hidden_tag() }}
+          {{ agentNameForm.agent_name(size=32, class="mt-1 block w-full p-2 border border-gray-300 rounded", placeholder="Agent 1") }}
+        </div>
+        <div class="flex justify-end border-t px-4 py-2 space-x-2">
+          <button type="button" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded" data-dismiss="modal">Cancel</button>
+          <button type="submit" id="change_name" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Change Name</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 {% endblock %}

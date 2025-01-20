@@ -7,34 +7,49 @@
 {% endif %}
 
 {% block content %}
-  <div class="row search-header mb-3">
-    <div class="col">
-    {% if query != '' %}
-      <h2 class="sub-header">{{numresults}} search results for '{{query}}'{%if request.args.get('includeHistory')%} <small>(including history)</small>{% endif %}</h2>
-      {% if numresults > 0 %}
-        {% include 'includes/hostlist_button.html' %}
-      {% endif %}
-    {% else %}
-      {% if request.args.get('includeHistory') %}
-      <h2 class="sub-header">{{ numresults }} results across {{ totalHosts }} hosts <small>(including history)</small></h2>
+  <!-- Header Section -->
+  <div class="flex flex-wrap items-center justify-between mb-3">
+    <div class="flex-grow">
+      {% if query != '' %}
+        <h2 class="text-xl font-semibold">
+          {{ numresults }} search results for '{{ query }}'
+          {% if request.args.get('includeHistory') %}
+            <small class="text-sm font-normal text-gray-500">(including history)</small>
+          {% endif %}
+        </h2>
+        {% if numresults > 0 %}
+          {% include 'includes/hostlist_button.html' %}
+        {% endif %}
       {% else %}
-      <h2 class="sub-header">{{ numresults }} results across {{ totalHosts }} hosts</h2>
+        {% if request.args.get('includeHistory') %}
+          <h2 class="text-xl font-semibold">
+            {{ numresults }} results across {{ totalHosts }} hosts
+            <small class="text-sm font-normal text-gray-500">(including history)</small>
+          </h2>
+        {% else %}
+          <h2 class="text-xl font-semibold">
+            {{ numresults }} results across {{ totalHosts }} hosts
+          </h2>
+        {% endif %}
       {% endif %}
-    {% endif %}
     </div>
     {% if numresults > current_user.results_per_page %}
-      <div class="col-xs-12 col-sm-1">
+      <div class="w-full sm:w-auto mt-2 sm:mt-0">
         {% include 'includes/pagination.html' %}
       </div>
     {% endif %}
   </div>
+
+  <!-- Host Collection -->
   <div class="host-rows">
     {% include 'main/_host_collection.html' %}
   </div>
+
   {% include 'host/_imagemodal.html' %}
+
   {% if numresults > current_user.results_per_page %}
-    <div class="row">
-      <div class="col text-center my-2">
+    <div class="mt-4">
+      <div class="text-center my-2">
         {% include 'includes/pagination.html' %}
       </div>
     </div>
