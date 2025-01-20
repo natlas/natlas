@@ -1,11 +1,14 @@
-<div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-body">
-          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <h3 class="imagetitle">Placeholder Title</h3>
-        <img src="/static/img/placeholder.png" alt="Placeholder Alt" class="imagepreview" style="width: 100%;" >
-      </div>
+<div id="imagemodal" tabindex="-1" role="dialog" aria-hidden="true" class="fixed inset-0 z-50 hidden overflow-y-auto">
+  <!-- Overlay with background -->
+  <div class="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
+    <!-- Modal Content Container -->
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-4xl relative p-4">
+      <button type="button" data-dismiss="modal" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
+        <span aria-hidden="true">&times;</span>
+        <span class="sr-only">Close</span>
+      </button>
+      <h3 class="text-2xl font-bold mb-4 imagetitle">Placeholder Title</h3>
+      <img src="/static/img/placeholder.png" alt="Placeholder Alt" class="w-full imagepreview">
     </div>
   </div>
 </div>

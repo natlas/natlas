@@ -51,18 +51,7 @@
     <!-- Screenshots -->
     {% for screenshot in host.screenshots %}
       {% if screenshot.hash %}
-      <div class="relative mt-2">
-        <div class="absolute inset-0 flex flex-col justify-between bg-black bg-opacity-50 text-white p-2 opacity-0 hover:opacity-100 transition duration-300">
-          <div class="text-sm">{{ screenshot.service }}</div>
-          <div class="text-sm">{{ screenshot.host }}:{{ screenshot.port }}</div>
-        </div>
-        <img class="w-full h-auto rounded border"
-             data-path="/media/original/{{ screenshot.hash|get_screenshot_path(screenshot.service) }}"
-             data-ip="{{ host.ip }}"
-             data-scan_id="{{ host.scan_id }}"
-             src="/media/thumbs/{{ screenshot.thumb_hash|get_screenshot_path(screenshot.service) }}"
-             alt="{{ screenshot.host }} - {{ screenshot.port }}{% if screenshot.host != host.ip %} ({{ host.ip }}){% endif %}">
-      </div>
+        {% include 'includes/_screenshot.html' %}
       {% endif %}
     {% endfor %}
   </div>

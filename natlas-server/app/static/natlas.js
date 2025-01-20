@@ -13,19 +13,36 @@ import Alpine from 'alpinejs'
 
 window.Alpine = Alpine
 
+
 Alpine.start()
 
 $(function() {
     $('.expand-img').on('click', function() {
         var selectAttr = 'src';
-        if ($(this).find('img')[0].hasAttribute('data-path')) {
+        var $img = $(this).find('img');
+        if ($img.length && $img[0].hasAttribute('data-path')) {
             selectAttr = 'data-path';
         }
-        $('.imagetitle').text($(this).find('img').attr('alt'));
-        $('.imagepreview').attr('src', $(this).find('img').attr(selectAttr));
-        $('#imagemodal').modal('show');
+        $('.imagetitle').text($img.attr('alt'));
+        $('.imagepreview').attr('src', $img.attr(selectAttr));
+        $('#imagemodal').removeClass('hidden');
+    });
+
+    // Close modal when clicking the close button
+    $('#imagemodal button[data-dismiss="modal"]').on('click', function(e) {
+        e.preventDefault();
+        $('#imagemodal').addClass('hidden');
+    });
+
+    // Close modal when clicking outside the modal content
+    $('#imagemodal').on('click', function(e) {
+        // If the click target is not within the modal content, close the modal.
+        if ($(e.target).closest('.modal-content').length === 0) {
+            $('#imagemodal').addClass('hidden');
+        }
     });
 });
+
 
 $(function() {
     $('.image-browser').on('click', function() {
