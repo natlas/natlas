@@ -1,31 +1,30 @@
 {% extends "base.html" %}
 {% set title = "Screenshot Browser" %}
+{% set MainNav = "screenshots" %}
 {% block content %}
-    <div class="row search-header">
-        <div class="col">
-            <h2 class="sub-header">{{total_screenshots}} screenshots across {{total_hosts}} hosts</h2>
+    <div class="flex flex-col sm:flex-row items-center justify-between mb-6">
+        <div>
+            <h2 class="text-xl font-semibold">{{ total_screenshots }} screenshots across {{ total_hosts }} hosts</h2>
         </div>
         {% if total_hosts > current_user.results_per_page %}
-        <div class="col-xs-12 col-sm-1 text-center">
-        {% include 'includes/pagination.html' %}
+        <div class="mt-4 sm:mt-0">
+            {% include 'includes/pagination.html' %}
         </div>
-      {% endif %}
+        {% endif %}
     </div>
     {% include 'host/_imagemodal.html' %}
-        <div class="row image-row">
-            {% for host in hosts %}
-                {% for screenshot in host.screenshots %}
-                    {% if screenshot.hash %}
-                        {% include 'includes/_screenshot.html' %}
-                    {% endif %}
-                {% endfor %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for host in hosts %}
+            {% for screenshot in host.screenshots %}
+                {% if screenshot.hash %}
+                    {% include 'includes/_screenshot.html' %}
+                {% endif %}
             {% endfor %}
-        </div>
-    {% if total_hosts > current_user.results_per_page %}
-    <div class="row">
-      <div class="col text-center my-2">
-      {% include 'includes/pagination.html' %}
-      </div>
+        {% endfor %}
     </div>
-  {% endif %}
+    {% if total_hosts > current_user.results_per_page %}
+    <div class="flex justify-center mt-6">
+        {% include 'includes/pagination.html' %}
+    </div>
+    {% endif %}
 {% endblock %}

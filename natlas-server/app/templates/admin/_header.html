@@ -1,36 +1,59 @@
-<div class="row page-header">
-    <div class="col-xs-12 col-sm-10">
-      <h1>Admin Panel</h1>
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row items-center justify-between mb-6 page-header">
+            <div class="w-full sm:w-10/12">
+                <h1 class="text-3xl font-bold">Admin Panel</h1>
+            </div>
+            <div class="w-full sm:w-2/12 text-right mt-4 sm:mt-0">
+                <button type="button" id="checkForUpdate" data-placement="bottom" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded check-update">
+                    Check For Updates
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-6">
+            <ul class="flex border-b host-nav" role="tablist">
+                <li class="mr-1" role="presentation">
+                    <a id="nav-summary" href="{{ url_for('admin.admin') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'config' else 'border-transparent' }}">
+                        Config
+                    </a>
+                </li>
+                <li class="mr-1" role="presentation">
+                    <a id="nav-users" href="{{ url_for('admin.users') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'users' else 'border-transparent' }}">
+                        Users
+                    </a>
+                </li>
+                <li class="mr-1" role="presentation">
+                    <a id="nav-scope" href="{{ url_for('admin.scope') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'scope' else 'border-transparent' }}">
+                        Scope
+                    </a>
+                </li>
+                <li class="mr-1" role="presentation">
+                    <a id="nav-blacklist" href="{{ url_for('admin.blacklist') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'blacklist' else 'border-transparent' }}">
+                        Blacklist
+                    </a>
+                </li>
+                <li class="mr-1" role="presentation">
+                    <a id="nav-tags" href="{{ url_for('admin.tags') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'tags' else 'border-transparent' }}">
+                        Tags
+                    </a>
+                </li>
+                <li class="mr-1" role="presentation">
+                    <a id="nav-services" href="{{ url_for('admin.services') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'services' else 'border-transparent' }}">
+                        Services
+                    </a>
+                </li>
+                <li class="mr-1" role="presentation">
+                    <a id="nav-agents" href="{{ url_for('admin.agent_config') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'agents' else 'border-transparent' }}">
+                        Agents
+                    </a>
+                </li>
+                <li class="mr-1" role="presentation">
+                    <a id="nav-logs" href="{{ url_for('admin.logs') }}" class="inline-block py-2 px-4 text-gray-500 border-b-2 font-medium hover:text-blue-600 hover:border-blue-300 {{ 'text-blue-600 border-blue-500' if active_page == 'logs' else 'border-transparent' }}">
+                        Logs
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div class="col-xs-12 col-sm-2" style="text-align:right;">
-      <button type="button" id="checkForUpdate" data-placement="bottom" class="btn btn-primary check-update">Check For Updates</button>
-    </div>
-</div>
-<div class="row">
-<ul class="nav nav-tabs host-nav" role="tablist">
-  <li class="nav-item" role="presentation">
-    <a id="nav-summary" class="nav-link{{ ' active' if active_page == 'config' }}" href="{{ url_for('admin.admin') }}">Config</a>
-  </li>
-  <li class="nav-item" role="presentation">
-      <a class="nav-link{{ ' active' if active_page == 'users' }}" id="nav-users" href="{{ url_for('admin.users') }}">Users</a>
-  </li>
-  <li class="nav-item" role="presentation">
-      <a class="nav-link{{ ' active' if active_page == 'scope' }}" id="nav-scope" href="{{ url_for('admin.scope') }}">Scope</a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link{{ ' active' if active_page == 'blacklist' }}" id="nav-blacklist" href="{{ url_for('admin.blacklist') }}">Blacklist</a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link{{ ' active' if active_page == 'tags' }}" id="nav-tags" href="{{ url_for('admin.tags') }}">Tags</a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link{{ ' active' if active_page == 'services' }}" id="nav-services" href="{{ url_for('admin.services') }}">Services</a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link{{ ' active' if active_page == 'agents' }}" id="nav-agents" href="{{ url_for('admin.agent_config') }}">Agents</a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link{{ ' active' if active_page == 'logs' }}" id="nav-agents" href="{{ url_for('admin.logs') }}">Logs</a>
-  </li>
-</ul>
-</div>

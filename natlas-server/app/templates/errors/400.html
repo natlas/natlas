@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% set title = "400 - Bad Request" %}
 {% block content %}
-  <div class="row">
-      <h2 class="sub-header">{{ err }}</h2>
-    <p><a href="{{ url_for('main.index') }}">Return to Natlas</a></p>
+  <div class="container mx-auto px-4 py-8">
+      <h2 class="text-xl font-semibold text-red-600 mb-4">{{ err }}</h2>
+      <p><a href="{{ url_for('main.index') }}" class="text-blue-500 hover:underline">Return to Natlas</a></p>
   </div>
 {% endblock %}

@@ -5,57 +5,34 @@
     {% include 'host/versions/0.6.12/_header.html' %}
     {% include 'host/_imagemodal.html' %}
     {% if numresults > current_user.results_per_page %}
-        <div class="row">
-          <div class="col text-center my-2">
-          {% include 'includes/pagination.html' %}
-          </div>
+        <div class="flex flex-wrap">
+            <div class="w-full text-center my-2">
+                {% include 'includes/pagination.html' %}
+            </div>
         </div>
-      {% endif %}
+    {% endif %}
     {% for entry in historical_screenshots %}
-        <div class="row screenshot-header-row mt-2">
-            <h5 class="border-bottom">
-                <a href="{{url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id)}}"><time datetime={{ entry.ctime }} title="{{ entry.ctime|ctime(human=True) }}">{{ entry.ctime | ctime }}</time></a>
+        <div class="flex flex-wrap screenshot-header-row mt-2">
+            <h5 class="border-b border-gray-200">
+                <a href="{{ url_for('host.host_historical_result', ip=ip, scan_id=entry.scan_id) }}">
+                    <time datetime="{{ entry.ctime }}" title="{{ entry.ctime|ctime(human=True) }}">
+                        {{ entry.ctime | ctime }}
+                    </time>
+                </a>
             </h5>
         </div>
-        <div class="row image-row">
+        <div class="flex flex-wrap image-row">
             {% for screenshot in entry.screenshots %}
-            {% if screenshot.hash %}
-            <div class="w-full sm:w-1/4 p-2">
-              <div class="image-browser">
-                <div class="thumbnail-hover flex flex-col justify-between">
-                  <div class="image-browser-service p-2">{{ screenshot.service }}</div>
-                  <div class="image-browser-port p-2">{{ screenshot.host }}:{{ screenshot.port }}</div>
-                </div>
-                <img class="w-full rounded border"
-                     data-path="/media/original/{{ screenshot.hash|get_screenshot_path(screenshot.service) }}"
-                     data-ip="{{ ip }}"
-                     data-scan_id="{{ entry.scan_id }}"
-                     src="/media/thumbs/{{ screenshot.thumb_hash|get_screenshot_path(screenshot.service) }}"
-                     alt="{{ screenshot.host }} - {{ screenshot.port }}{% if screenshot.host != ip %} ({{ ip }}){% endif %}">
-              </div>
-            </div>
-            {% endif %}
-
-            {% if screenshot.path %}
-            <div class="w-full sm:w-1/4 p-2">
-              <strong class="block mt-2">{{ screenshot.service }}</strong>
-              <div class="expand-img">
-                <img class="w-full rounded border"
-                     data-path="/media/{{ screenshot.path }}"
-                     src="/media/{{ screenshot.thumb }}"
-                     alt="{{ entry.ctime|ctime }} - {{ screenshot.service }}">
-              </div>
-            </div>
-            {% endif %}
-
+                {% set host = {'ip': ip, 'scan_id': entry.scan_id} %}
+                {% include 'includes/_screenshot.html' %}
             {% endfor %}
         </div>
     {% endfor %}
     {% if numresults > current_user.results_per_page %}
-    <div class="row">
-      <div class="col text-center my-2">
-      {% include 'includes/pagination.html' %}
-      </div>
-    </div>
-  {% endif %}
+        <div class="flex flex-wrap">
+            <div class="w-full text-center my-2">
+                {% include 'includes/pagination.html' %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

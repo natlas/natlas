@@ -1,11 +1,53 @@
-<div class="btn-group host-export" role="group">
-  <button id="exportGroup-{{host.scan_id}}" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="fas fa-file-export mr-1"></i>Export
+<div class="relative host-export" x-data="{ open: false }" @click.away="open = false">
+  <!-- Dropdown Toggle Button -->
+  <button
+    id="exportGroup-{{ host.scan_id }}"
+    type="button"
+    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    @click="open = !open"
+    aria-haspopup="true"
+    :aria-expanded="open"
+  >
+    <i class="fas fa-file-export mr-2"></i>Export
+    <!-- Dropdown Arrow Icon -->
+    <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
   </button>
-  <div class="dropdown-menu" aria-labelledby="exportGroup-{{host.scan_id}}">
-    {% if host.xml_data %}<a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='xml') }}">.xml</a>{% endif %}
-    {% if host.nmap_data %}<a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='nmap') }}">.nmap</a>{% endif %}
-    {% if host.gnmap_data %}<a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='gnmap') }}">.gnmap</a>{% endif %}
-    <a class="dropdown-item" href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='json') }}">.json</a>
+
+  <!-- Dropdown Menu -->
+  <div
+    class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+    x-show="open"
+    x-cloak
+    x-transition:enter="transition ease-out duration-100"
+    x-transition:enter-start="transform opacity-0 scale-95"
+    x-transition:enter-end="transform opacity-100 scale-100"
+    x-transition:leave="transition ease-in duration-75"
+    x-transition:leave-start="transform opacity-100 scale-100"
+    x-transition:leave-end="transform opacity-0 scale-95"
+    role="menu"
+    aria-labelledby="exportGroup-{{ host.scan_id }}"
+  >
+    <div class="py-1" role="none">
+      {% if host.xml_data %}
+        <a href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='xml') }}"
+           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+           role="menuitem">.xml</a>
+      {% endif %}
+      {% if host.nmap_data %}
+        <a href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='nmap') }}"
+           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+           role="menuitem">.nmap</a>
+      {% endif %}
+      {% if host.gnmap_data %}
+        <a href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='gnmap') }}"
+           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+           role="menuitem">.gnmap</a>
+      {% endif %}
+      <a href="{{ url_for('host.export_scan', ip=host.ip, scan_id=host.scan_id, ext='json') }}"
+         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+         role="menuitem">.json</a>
+    </div>
   </div>
 </div>

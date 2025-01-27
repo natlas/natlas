@@ -12,21 +12,21 @@
       <h3 class="text-lg font-semibold mb-3">Change Password</h3>
       <form class="space-y-4 pwchange-form" action="{{ url_for('user.profile') }}" method="post">
         {{ changePasswordForm.hidden_tag() }}
-        <div class="mb-4">
+        <div>
           {{ changePasswordForm.old_password.label(class="block text-sm font-medium text-gray-700") }}
           {{ changePasswordForm.old_password(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
           {% for error in changePasswordForm.old_password.errors %}
             <span class="text-red-600 text-sm">{{ error }}</span>
           {% endfor %}
         </div>
-        <div class="mb-4">
+        <div>
           {{ changePasswordForm.password.label(class="block text-sm font-medium text-gray-700") }}
           {{ changePasswordForm.password(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
           {% for error in changePasswordForm.password.errors %}
             <span class="text-red-600 text-sm">{{ error }}</span>
           {% endfor %}
         </div>
-        <div class="mb-4">
+        <div>
           {{ changePasswordForm.password2.label(class="block text-sm font-medium text-gray-700") }}
           {{ changePasswordForm.password2(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
           {% for error in changePasswordForm.password2.errors %}
@@ -44,17 +44,17 @@
       <h3 class="text-lg font-semibold mb-3">Display Settings</h3>
       <form class="space-y-4 display-form" action="{{ url_for('user.profile') }}" method="post">
         {{ displaySettingsForm.hidden_tag() }}
-        <div class="mb-4">
+        <div>
           {{ displaySettingsForm.results_per_page.label(class="block text-sm font-medium text-gray-700") }}
-          {{ displaySettingsForm.results_per_page(class="mt-1 block w-full p-2 border border-gray-300 rounded", selected=current_user.results_per_page) }}
+          {{ displaySettingsForm.results_per_page(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
         </div>
-        <div class="mb-4">
+        <div>
           {{ displaySettingsForm.preview_length.label(class="block text-sm font-medium text-gray-700") }}
-          {{ displaySettingsForm.preview_length(class="mt-1 block w-full p-2 border border-gray-300 rounded", selected=current_user.preview_length) }}
+          {{ displaySettingsForm.preview_length(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
         </div>
-        <div class="mb-4">
+        <div>
           {{ displaySettingsForm.result_format.label(class="block text-sm font-medium text-gray-700") }}
-          {{ displaySettingsForm.result_format(class="mt-1 block w-full p-2 border border-gray-300 rounded", selected=current_user.result_format) }}
+          {{ displaySettingsForm.result_format(class="mt-1 block w-full p-2 border border-gray-300 rounded") }}
         </div>
         <div>
           {{ displaySettingsForm.updateDisplaySettings(class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded") }}
@@ -125,21 +125,21 @@
   {% endif %}
 
   <!-- Tailwind Modal for Agent Name Change -->
-  <div id="agentmodal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+  <div id="agentmodal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50" x-data="{ open: false }" x-show="open" @click.away="open = false">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md">
       <div class="flex justify-between items-center border-b px-4 py-2">
         <h5 class="text-lg font-medium">Change Agent Name</h5>
-        <button type="button" class="text-gray-600 hover:text-gray-800" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="text-gray-600 hover:text-gray-800" @click="open = false" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form method="POST" action="{{ url_for('user.new_agent') }}" id="agentNameForm">
+      <form method="POST" action="{{ url_for('user.new_agent') }}" id="agentNameForm" class="flex flex-col">
         <div class="p-4">
           {{ agentNameForm.hidden_tag() }}
-          {{ agentNameForm.agent_name(size=32, class="mt-1 block w-full p-2 border border-gray-300 rounded", placeholder="Agent 1") }}
+          {{ agentNameForm.agent_name(class="mt-1 block w-full p-2 border border-gray-300 rounded", placeholder="Agent 1") }}
         </div>
         <div class="flex justify-end border-t px-4 py-2 space-x-2">
-          <button type="button" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded" data-dismiss="modal">Cancel</button>
+          <button type="button" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded" @click="open = false">Cancel</button>
           <button type="submit" id="change_name" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Change Name</button>
         </div>
       </form>

@@ -2,33 +2,35 @@
 {% set title = "Register" %}
 
 {% block content %}
-    <h2>Register</h2>
-    <div class="row">
-        <div class="col-xs-12 col-sm-6">
-            <form method="post">
+    <div class="flex justify-center">
+        <div class="w-full sm:w-1/2 px-4">
+            <h2 class="text-2xl font-semibold mb-6">Register</h2>
+            <form method="post" class="space-y-6">
                 {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ form.email.label(class="control-label") }}
-                    {{ form.email(class="form-control") }}
+                <div>
+                    {{ form.email.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.email(class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500") }}
                     {% for error in form.email.errors %}
-                    <span style="color: red;">{{ error }}</span>
+                        <span class="text-red-600 text-sm">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <div class="form-group">
-                    {{ form.password.label(class="control-label") }}
-                    {{ form.password(class="form-control") }}
+                <div>
+                    {{ form.password.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.password(class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500") }}
                     {% for error in form.password.errors %}
-                    <span style="color: red;">{{ error }}</span>
+                        <span class="text-red-600 text-sm">{{ error }}</span>
                     {% endfor %}
                 </div>
-                <div class="form-group">
-                    {{ form.password2.label(class="control-label") }}
-                    {{ form.password2(class="form-control") }}
+                <div>
+                    {{ form.password2.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.password2(class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500") }}
                     {% for error in form.password2.errors %}
-                    <span style="color: red;">{{ error }}</span>
+                        <span class="text-red-600 text-sm">{{ error }}</span>
                     {% endfor %}
                 </div>
-                {{ form.submit(class="btn btn-primary") }}
+                <div>
+                    {{ form.submit(class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                </div>
             </form>
         </div>
     </div>

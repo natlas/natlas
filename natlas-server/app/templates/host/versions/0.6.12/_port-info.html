@@ -1,48 +1,60 @@
-<div class="row py-3{% if not portloop.last %} port-row{% endif %}">
-    <div class="col-xs-6 col-sm-2 port-summary">
-        <div class="port-num-proto d-block">
+<div class="flex flex-col sm:flex-row py-3{% if not portloop.last %} port-row{% endif %}">
+    <!-- Meta Column -->
+    <div class="w-full sm:w-1/6 port-summary p-2">
+        <div class="port-num-proto block">
             <div class="port-number">
                 {{ port.port }}
             </div>
             <div class="port-protocol">
                 {{ port.protocol }}
             </div>
-            <div class="clearfix"></div>
+            <!-- Removed 'clearfix' as Tailwind handles layout with flexbox -->
         </div>
         <div class="port-service">
             {{ port.service.name }}
         </div>
         {% if 'http' in port.service.name %}
         <div class="port-link">
-            <a class="d-block" target="_blank" rel="noopener noreferrer" href="{% if port.service.tunnel == 'ssl' %}https://{% else %}http://{% endif %}{{ host.ip }}{% if port.port not in [80,443] %}:{{ port.port }}{% endif %}"><i class="fas fa-external-link-alt"></i></a>
+            <a class="block" target="_blank" rel="noopener noreferrer" href="{% if port.service.tunnel == 'ssl' %}https://{% else %}http://{% endif %}{{ host.ip }}{% if port.port not in [80,443] %}:{{ port.port }}{% endif %}">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
         </div>
         {% endif %}
     </div><!--end port-summary-->
 
-    <div class="col-xs-12 col-sm-10 port-details">
+    <!-- Data Column -->
+    <div class="w-full sm:w-5/6 port-details p-2">
         {% if port.service.product or port.service.version or port.service.extrainfo %}
-        <h5 class="service-header">{{ port.service.product }}{% if port.service.version %}<small class="text-muted service-version pl-2">{{ port.service.version }}</small>{% endif %}{% if port.service.extrainfo %}<small class="text-muted service-extrainfo pl-2">{{ port.service.extrainfo }}</small>{% endif %}</h5>
+        <h5 class="service-header">
+            {{ port.service.product }}
+            {% if port.service.version %}
+                <small class="text-gray-500 service-version pl-2">{{ port.service.version }}</small>
+            {% endif %}
+            {% if port.service.extrainfo %}
+                <small class="text-gray-500 service-extrainfo pl-2">{{ port.service.extrainfo }}</small>
+            {% endif %}
+        </h5>
         {% endif %}
         {% if port.banner %}
-            <div class="row port-banner">
-                <div class="col">
-                    <p><small class="text-muted">{{ port.banner }}</small></p>
+            <div class="flex flex-wrap port-banner p-2">
+                <div class="w-full">
+                    <p><small class="text-gray-500">{{ port.banner }}</small></p>
                 </div>
             </div>
         {% endif %}
         {% if port.scripts %}
             {% for script in port.scripts %}
                 {% if script.output.rstrip() != "" %}
-                <div class="row script-header">
-                    <div class="col">
+                <div class="flex flex-wrap script-header p-2">
+                    <div class="w-full">
                         <div class="script-container" id="{{ port.protocol }}-{{ port.port }}-{{ script.id }}-{{ host.scan_id }}">
-                            <h5 class="text-muted script-id">{{ script.id }}</h5>
+                            <h5 class="text-gray-500 script-id">{{ script.id }}</h5>
                         </div>
                     </div>
                 </div>
-                <div class="row script-data">
-                    <div class="col">
-                        <pre class="script-output pl-2 pt-2">{{ script.output }}</pre>
+                <div class="flex flex-wrap script-data p-2">
+                    <div class="w-full">
+                        <pre class="text-xs pl-2 pt-2 whitespace-pre-wrap">{{ script.output }}</pre>
                     </div>
                 </div>
                 {% endif %}

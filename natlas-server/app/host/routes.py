@@ -69,7 +69,7 @@ def host_history(ip: str) -> str:
 
     # TODO Hardcoding the version here is bad. Revisit this.
     return render_template(
-        "host/versions/0.6.5/history.html",
+        "host/versions/0.6.12/history.html",
         ip=ip,
         info=info,
         page=page,

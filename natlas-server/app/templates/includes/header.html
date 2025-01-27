@@ -40,7 +40,7 @@
               </svg>
             </span>
           </button>
-          <div id="user-menu" x-show="userMenu" x-transition class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+          <div id="user-menu" x-show="userMenu" x-cloak x-transition class="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
             <a href="{{ url_for('user.profile') }}" class="block px-3 py-1 text-sm text-gray-900" role="menuitem">Your profile</a>
             {% if current_user.is_admin %}<a href="{{ url_for('admin.admin') }}" class="block px-3 py-1 text-sm text-gray-900" role="menuitem">Admin</a>{% endif %}
             <a href="{{ url_for('auth.logout') }}" class="block px-3 py-1 text-sm text-gray-900" role="menuitem">Sign out</a>

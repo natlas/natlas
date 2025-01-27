@@ -1,8 +1,14 @@
 {% extends "base.html" %}
 {% set title = "405 - Method Not Allowed" %}
 {% block content %}
-  <div class="row">
-      <h2 class="sub-header">{{ err }}</h2>
-    <p><a href="{{ url_for('main.index') }}">Return to Natlas</a></p>
+  <div class="container mx-auto px-4 py-8">
+      <div class="mb-6">
+          <h2 class="text-2xl font-semibold text-red-600">{{ err }}</h2>
+      </div>
+      <div>
+          <p class="text-gray-700">
+              <a href="{{ url_for('main.index') }}" class="text-blue-500 hover:underline">Return to Natlas</a>
+          </p>
+      </div>
   </div>
 {% endblock %}

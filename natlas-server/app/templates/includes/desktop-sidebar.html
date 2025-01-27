@@ -20,7 +20,7 @@
               <ul role="list" class="-mx-2 space-y-1">
                 <!-- Browse -->
                 <li>
-                  <a href="{{ url_for('main.browse') }}" class="group flex gap-x-3 rounded-md bg-gray-800 p-2 text-sm font-semibold text-white">
+                  <a href="{{ url_for('main.browse') }}" class="group flex gap-x-3 rounded-md text-sm font-semibold p-2 {{ 'bg-gray-800 text-white' if MainNav == 'browse' else 'text-gray-400 hover:bg-gray-800 hover:text-white'}}">
                     <!-- House Icon (Heroicons Solid) -->
                     <svg class="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                       <path d="M10.707 1.293a1 1 0 00-1.414 0L2 8.586V17a1 1 0 001 1h5a1 1 0 001-1v-4h2v4a1 1 0 001 1h5a1 1 0 001-1V8.586l-7.293-7.293z" />
@@ -30,7 +30,7 @@
                 </li>
                 <!-- Screenshots -->
                 <li>
-                  <a href="{{ url_for('main.screenshots') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                  <a href="{{ url_for('main.screenshots') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold {{ 'bg-gray-800 text-white' if MainNav == 'screenshots' else 'text-gray-400 hover:bg-gray-800 hover:text-white'}}">
                     <!-- Photo Icon (Heroicons Outline) -->
                     <svg class="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h18M3 19h18M5 5v14M19 5v14M9 9a3 3 0 016 0 3 3 0 01-6 0z" />
@@ -40,7 +40,7 @@
                 </li>
                 <!-- Status -->
                 <li>
-                  <a href="{{ url_for('main.status') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                  <a href="{{ url_for('main.status') }}" class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold {{ 'bg-gray-800 text-white' if MainNav == 'status' else 'text-gray-400 hover:bg-gray-800 hover:text-white'}}">
                     <!-- Chart Icon (Heroicons Outline) -->
                     <svg class="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V3h2v8h-2zm-4 4v-6h2v6H7zm8 0v-4h2v4h-2z" />
