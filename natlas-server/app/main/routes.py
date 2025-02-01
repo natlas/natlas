@@ -13,7 +13,6 @@ from flask_login import current_user
 from minio import Minio
 
 from app import elastic
-from app.auth.forms import LoginForm, RegistrationForm
 from app.auth.wrappers import is_authenticated
 from app.errors import NatlasSearchError
 from app.main import bp
@@ -22,14 +21,9 @@ from app.main.pagination import build_pagination_urls, results_offset
 
 @bp.route("/")
 def index() -> str:
-    login_form = None
-    reg_form = None
-    if current_user.is_anonymous:
-        if current_app.config["LOGIN_REQUIRED"]:
-            login_form = LoginForm(prefix="login")
-        if current_app.config["REGISTER_ALLOWED"]:
-            reg_form = RegistrationForm(prefix="register")
-    return render_template("main/index.html", login_form=login_form, reg_form=reg_form)
+    if current_user.is_anonymous and current_app.config["LOGIN_REQUIRED"]:
+        return redirect(url_for("auth.login"))
+    return redirect(url_for("main.browse"))
 
 
 @bp.route("/media/<path:filename>")

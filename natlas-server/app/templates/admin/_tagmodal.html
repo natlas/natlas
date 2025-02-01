@@ -1,22 +1,53 @@
-<div class="modal fade" tabindex="-1" role="dialog" id="tagmodal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add Tag</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+<div id="tagmodal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+     x-data="{
+       open: false,
+       scopeid: null,
+       scopetarget: '',
+       action: '',
+       submitTagForm() {
+         // Use $el.querySelector() as a fallback in case the x-ref isn't set yet
+         const form = this.$refs.tagForm || this.$el.querySelector('#tagScopeForm');
+         if (form) {
+           form.submit();
+         } else {
+           console.error('Tag form not found');
+         }
+       }
+     }"
+     x-on:open-tag-modal.window="
+       open = true;
+       scopeid = $event.detail.scopeid;
+       scopetarget = $event.detail.scopetarget;
+       action = $event.detail.action;
+     "
+     x-cloak
+     x-show="open"
+     @click.away="open = false">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md">
+    <div class="flex justify-between items-center border-b px-4 py-2">
+      <h5 class="text-lg font-medium" x-text="action === 'add' ? 'Add Tag' : 'Remove Tag'"></h5>
+      <button type="button" class="text-gray-600 hover:text-gray-800" @click="open = false" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- Use x-ref instead of ref -->
+    <form x-ref="tagForm" method="POST" action="{{ url_for('admin.scope') }}" id="tagScopeForm" class="flex flex-col" novalidate>
+      <div class="p-4">
+        {{ addTagForm.hidden_tag() }}
+        {{ addTagForm.tagname(class="mt-1 block w-full p-2 border border-gray-300 rounded", placeholder="Enter tag") }}
+        <input type="hidden" name="scopeid" :value="scopeid">
+        <input type="hidden" name="action" :value="action">
+      </div>
+      <div class="flex justify-end border-t px-4 py-2 space-x-2">
+        <button type="button" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded" @click="open = false">
+          Cancel
+        </button>
+        <!-- Changed type to "button" and added @click to trigger our custom submit -->
+        <button type="button" id="tagScopeSubmit" @click="submitTagForm"
+                class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+          <span x-text="action === 'add' ? 'Add Tag' : 'Remove Tag'"></span>
         </button>
       </div>
-      <form method="POST" action="{{url_for('admin.scope')}}" id="tagScopeForm">
-        <div class="modal-body">
-            {{ addTagForm.hidden_tag() }}
-            {{ addTagForm.tagname(class="custom-select") }}
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" id="tagScopeSubmit" class="btn btn-primary">Add Tag</button>
-        </div>
-      </form>
-    </div>
+    </form>
   </div>
 </div>

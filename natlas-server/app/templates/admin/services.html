@@ -3,65 +3,98 @@
 {% set active_page = "services" %}
 {% block content %}
   {% include 'admin/_header.html' %}
-  <div class="row">
-    <div class="col-xs-12 col-sm-6 col-md-4">
-      <h3>Upload Services File</h3>
-      <form class="form-inline" action="{{url_for('admin.services')}}" name="uploadForm" method="post" enctype="multipart/form-data">
-      {{ uploadForm.hidden_tag() }}
-      <div class="input-group">
-          {{ uploadForm.serviceFile(class="btn btn-default")}}
-          {{ uploadForm.uploadFile(class="btn btn-primary", style="margin-top:1em;", onclick="return confirm('Are you sure you upload a whole new services file? This will change all the services you're scanning for.')") }}
-        </div>
-        </form>
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-8">
-        <h3>Current Service Information</h3>
-        <h5>Version:
-          <small>{{ current_services.id }}</small>
-        </h5>
 
-        <h5>SHA256:
+  <!-- Top Section: Upload & Current Service Information -->
+  <div class="flex flex-wrap -mx-2">
+    <!-- Upload Services File -->
+    <div class="w-full sm:w-1/2 md:w-1/3 px-2 mb-6">
+      <h3 class="text-xl font-bold mb-4">Upload Services File</h3>
+      <form class="flex flex-col items-start" action="{{ url_for('admin.services') }}" name="uploadForm" method="post" enctype="multipart/form-data">
+        {{ uploadForm.hidden_tag() }}
+        <div class="flex flex-col space-y-2">
+          {{ uploadForm.serviceFile(class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded") }}
+          {{ uploadForm.uploadFile(
+              class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded",
+              style="margin-top:1em;",
+              onclick="return confirm('Are you sure you upload a whole new services file? This will change all the services you\'re scanning for.')"
+          ) }}
+        </div>
+      </form>
+    </div>
+
+    <!-- Current Service Information -->
+    <div class="w-full sm:w-1/2 md:w-2/3 px-2 mb-6">
+      <h3 class="text-xl font-bold mb-4">Current Service Information</h3>
+      <div class="mb-4">
+        <h5 class="text-lg font-semibold">
+          Version: <small class="font-normal">{{ current_services.id }}</small>
+        </h5>
+      </div>
+      <div class="mb-4">
+        <h5 class="text-lg font-semibold">
+          SHA256:
           <small>
-            <abbr style="cursor:default;" title="{{ current_services.sha256 }}" id="sha256">{{ current_services.sha256|truncate(32) }}</abbr>
+            <abbr title="{{ current_services.sha256 }}" id="sha256" class="cursor-default" data-tooltip>
+              {{ current_services.sha256|truncate(32) }}
+            </abbr>
           </small>
         </h5>
-        <form class="form-inline" action="{{url_for('admin.services')}}" name="addServiceForm" method="post">
-          {{ addServiceForm.hidden_tag() }}
-            {{ addServiceForm.serviceName(size=12, class="form-control mx-1 my-1", placeholder="service-name")}}
-            {{ addServiceForm.servicePort(size=5, class="form-control mx-1 my-1", placeholder="22")}}
-            {{ addServiceForm.serviceProtocol(class="custom-select mx-1 my-1")}}
-          <button id="addService" name="addService" title="Add Service" aria-hidden="true" type="submit" class="inline-submit btn-trash text-success ml-2"><i class="fas fa-plus-circle"></i></button>
-        </form>
-          <a href="{{ url_for('admin.export_services') }}" class="btn btn-primary export-btn my-3" role="button">Export Services</a>
       </div>
-  </div>
-  <div class="row my-2">
-    <div class="col">
-      <h3>Current Services</h3>
+      <form class="flex flex-wrap items-center" action="{{ url_for('admin.services') }}" name="addServiceForm" method="post">
+        {{ addServiceForm.hidden_tag() }}
+        {{ addServiceForm.serviceName(
+            size=12,
+            class="border border-gray-300 rounded-md px-3 py-2 mx-1 my-1",
+            placeholder="service-name"
+        ) }}
+        {{ addServiceForm.servicePort(
+            size=5,
+            class="border border-gray-300 rounded-md px-3 py-2 mx-1 my-1",
+            placeholder="22"
+        ) }}
+        {{ addServiceForm.serviceProtocol(
+            class="border border-gray-300 rounded-md px-3 py-2 mx-1 my-1"
+        ) }}
+        <button id="addService" name="addService" title="Add Service" aria-hidden="true" type="submit" class="ml-2 text-green-500 hover:text-green-600 focus:outline-none">
+          <i class="fas fa-plus-circle"></i>
+        </button>
+      </form>
+      <a href="{{ url_for('admin.export_services') }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded my-3" role="button">
+        Export Services
+      </a>
     </div>
   </div>
-  <div class="row">
-    <div class="col">
-<table class="table table-striped dataTable" id="servicesTable">
-        <thead>
-          <tr>
-            <th scope="col">Line Number</th>
-            <th scope="col">Port</th>
-            <th scope="col">Protocol</th>
-            <th scope="col">Service-name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in servlist %}
-          <tr>
-            <th scope="row">{{ item[0] }}</th>
-            <td>{{ item[1] }}</td>
-            <td>{{ item[2] }}</td>
-            <td>{{ item[3] }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+  <!-- Section Header for Current Services -->
+  <div class="flex flex-wrap -mx-2 my-2">
+    <div class="w-full px-2">
+      <h3 class="text-xl font-bold mb-4">Current Services</h3>
+    </div>
+  </div>
+
+  <!-- Current Services Table -->
+  <div class="flex flex-wrap -mx-2">
+    <div class="w-full px-2">
+      <div>
+        <table class="w-full divide-y divide-gray-200 dataTable" id="servicesTable">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Port</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Protocol</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service-name</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for item in servlist %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">{{ item[1] }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ item[2] }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ item[3] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 {% endblock %}

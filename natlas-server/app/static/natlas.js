@@ -3,12 +3,9 @@ import $ from 'jquery';
 import { isNewerVersionAvailable } from './util/version-check';
 import { initializeStatusUpdates } from './util/system-status';
 import { registerTagModalEvents } from './controls/natlas-tagging';
-import { registerAgentEvents } from './controls/user-profile';
-import { registerParticleEvents, authFormSwitcher } from './pages/login';
-import { getReducedMotion } from './util/media-queries';
 import 'natlas.scss';
-import 'bootstrap';
-import 'datatables.net-bs4';
+import './dataTables.js';
+import './dataTables.tailwindcss.js';
 import Alpine from 'alpinejs'
 
 window.Alpine = Alpine
@@ -52,20 +49,6 @@ $(function() {
     });
 });
 
-var modalContentLoaded = false;
-window.loadModalContent = function() {
-    if (modalContentLoaded) {
-        return;
-    }
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/searchmodal');
-    xhr.send();
-    xhr.onload = function() {
-        $('#searchHelpContent').html(xhr.response);
-        modalContentLoaded = true;
-    };
-};
-
 $(document).ready(function() {
     $('#checkForUpdate').click(function() {
         var btn = $(this);
@@ -95,7 +78,6 @@ $(document).ready(function() {
             { 'orderable': false, 'targets': 'table-controls' }
         ]
     });
-    $('[data-toggle="popover"]').popover();
 });
 
 $(document).ready(function() {
@@ -113,8 +95,4 @@ $(document).ready(function() {
     }
 });
 
-registerTagModalEvents();
-registerAgentEvents();
 initializeStatusUpdates();
-registerParticleEvents();
-authFormSwitcher();
