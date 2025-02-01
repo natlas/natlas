@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Literal, Optional
@@ -43,6 +44,16 @@ class User(UserMixin, NatlasBase, DictSerializable):  # type: ignore[misc]
 
     def __repr__(self) -> str:
         return f"<User {self.email}>"
+
+    @property
+    def gravatar_url(self) -> str:
+        # Clean up the email address.
+        size = 256
+        default = "identicon"
+        email = self.email.strip().lower().encode("utf-8")
+        email_hash = hashlib.md5(email).hexdigest()
+        # Construct the Gravatar URL.
+        return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d={default}"
 
     @staticmethod
     def exists(email: str) -> bool:

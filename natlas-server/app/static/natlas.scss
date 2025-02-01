@@ -7,17 +7,22 @@
 @import '~@fortawesome/fontawesome-free/css/fontawesome.css';
 @import '~@fortawesome/fontawesome-free/css/solid.css';
 @import '~bootstrap/dist/css/bootstrap.css';
-@import '~datatables.net-bs4/css/dataTables.bootstrap4.css';
 @import 'css/colors';
 @import 'css/globals';
 @import 'css/components/host-row';
 @import 'css/components/screenshots';
 @import 'css/pages/status';
 @import 'css/pages/landing';
+@import 'css/vendor/dataTables.tailwindcss.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /*
  * Global add-ons
  */
+
+[x-cloak] { display: none; }
 
 .pagenav {
     display: inline-block;

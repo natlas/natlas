@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% set title = "500 - Internal Server Error" %}
 {% block content %}
-  <div class="row">
-      <div class="col">
-          <h2 class="sub-header">{{ err }}</h2>
+  <div class="container mx-auto px-4 py-8">
+      <div class="mb-6">
+          <h2 class="text-2xl font-semibold text-red-600">{{ err }}</h2>
+      </div>
+      <div>
+          <p class="text-gray-700">
+              You can try to return to <a href="{{ url_for('main.browse') }}" class="text-blue-500 hover:underline">browse</a>.
+          </p>
+          <p class="text-gray-700">
+              If you continue to see this message, please contact the administrator.
+          </p>
       </div>
   </div>
-  <div class="row">
-      <div class="col">
-        <p>You can try to return to <a href="{{ url_for('main.browse') }}">browse</a></p>
-        <p>If you continue to see this message, please contact the administrator.</p>
-    </div>
-   </div>
 {% endblock %}

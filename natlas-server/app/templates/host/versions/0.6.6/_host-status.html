@@ -1,9 +1,0 @@
-{% if host.is_up and host.port_count == 0 %}
-<i class="fas fa-circle text-warning" title="No ports open"></i>
-{% elif not host.is_up and host.timed_out %}
-<i class="fas fa-circle text-warning" title="Scan timed out"></i>
-{% elif not host.is_up %}
-<i class="fas fa-circle text-danger" title="Host down"></i>
-{% elif host.is_up and host.port_count > 0 %}
-<i class="fas fa-circle text-success" title="{{ host.port_count }} ports open"></i>
-{% endif %}

@@ -136,6 +136,8 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+      webpack:
+        condition: service_started
 
 
   agent:

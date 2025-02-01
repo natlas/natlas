@@ -1,36 +1,89 @@
-<div class="row page-header">
-    <div class="col-xs-12 col-sm">
-        <h1>{% if host %}{% include 'host/versions/0.6.12/_host-status.html' %}{% endif %}{{ ip }}{% if host %}<small class="text-muted host-header-date"> - <time datetime="{{host.ctime}}">{{ host.ctime | ctime }}</time></small>{% endif %}</h1>
+<div class="flex flex-wrap page-header">
+    <div class="w-full sm:flex-1">
+        <h1>
+            {% if host %}
+                {% include 'host/versions/0.6.12/_host-status.html' %}
+            {% endif %}
+            {{ ip }}
+            {% if host %}
+                <span class="text-gray-500"> - <time datetime="{{host.ctime}}">{{ host.ctime | ctime }}</time></span>
+            {% endif %}
+        </h1>
     </div>
     {% if current_user.is_authenticated %}
-    <div class="col-xs-12 col-sm-2" style="text-align:right;">
-        <div class="btn-group host-history-export" role="group">
-            <form method="POST" action="{{ url_for('host.rescan_host', ip=ip) }}">{{ rescanForm.hidden_tag() }}<button id="requestRescan" class="btn btn-primary" title="Request Rescan" name="requestRescan" type="submit" onclick="return confirm('Request rescan of {{ ip }}?')"><i class="fas fa-redo-alt"></i></button></form>
-            {% if current_user.is_admin %}
-                <button id="deleteGroup" type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                 <i class="fas fa-trash-alt text-white"></i>
+    <div class="w-full sm:w-2/12 text-right">
+        <div class="flex space-x-2 host-history-export" role="group">
+            <form method="POST" action="{{ url_for('host.rescan_host', ip=ip) }}">
+                {{ rescanForm.hidden_tag() }}
+                <button id="requestRescan"
+                        class="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title="Request Rescan"
+                        name="requestRescan"
+                        type="submit"
+                        onclick="return confirm('Request rescan of {{ ip }}?')">
+                    <i class="fas fa-redo-alt mr-1"></i>
                 </button>
-                <div class="dropdown-menu" aria-labelledby="deleteGroup">
-                {% if host %}
-                    <form method="POST" class="dropdown-item" action="{{ url_for('admin.delete_scan', scan_id=host.scan_id) }}">{{ delForm.hidden_tag() }} <button class="dropdown-item" id="deleteScan" name="deleteScan" title="Delete Scan" aria-hidden="true" onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')" type="submit" ><i class="fas fa-trash-alt text-danger"></i> Delete Scan</button></form>
-                {% endif %}
-                  <form method="POST" class="dropdown-item" action="{{ url_for('admin.delete_host', ip=ip) }}">{{ delHostForm.hidden_tag() }} <button class="dropdown-item" id="deleteHost" name="deleteHost" title="Delete Host" aria-hidden="true" onclick="return confirm('Are you sure you want to delete host: {{ ip }}')" type="submit" ><i class="fas fa-dumpster-fire text-danger"></i> Delete Host</button></form>
-                </div> <!-- End delete dropdown-->
+            </form>
+            {% if current_user.is_admin %}
+                <div class="relative">
+                    <button id="deleteGroup"
+                            type="button"
+                            class="inline-flex items-center px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                        <i class="fas fa-trash-alt text-white"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden">
+                        {% if host %}
+                            <form method="POST" class="block" action="{{ url_for('admin.delete_scan', scan_id=host.scan_id) }}">
+                                {{ delForm.hidden_tag() }}
+                                <button class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                        id="deleteScan"
+                                        name="deleteScan"
+                                        title="Delete Scan"
+                                        aria-hidden="true"
+                                        onclick="return confirm('Are you sure you want to delete scan: {{ host.scan_id }}')"
+                                        type="submit">
+                                    <i class="fas fa-trash-alt text-red-600 mr-2"></i> Delete Scan
+                                </button>
+                            </form>
+                        {% endif %}
+                        <form method="POST" class="block" action="{{ url_for('admin.delete_host', ip=ip) }}">
+                            {{ delHostForm.hidden_tag() }}
+                            <button class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                    id="deleteHost"
+                                    name="deleteHost"
+                                    title="Delete Host"
+                                    aria-hidden="true"
+                                    onclick="return confirm('Are you sure you want to delete host: {{ ip }}')"
+                                    type="submit">
+                                <i class="fas fa-dumpster-fire text-red-600 mr-2"></i> Delete Host
+                            </button>
+                        </form>
+                    </div> <!-- End delete dropdown-->
+                </div>
             {% endif %}
         </div>
     </div>
     {% endif %}
 </div>
-<div class="row">
-  <ul class="nav nav-tabs host-nav">
-    <li role="presentation" class="nav-item">
-        <a id="summary" class="nav-link{{ ' active' if active_page == 'summary' }}" href="{{ url_for('host.host', ip=ip) }}">Summary</a>
+<div class="flex flex-wrap">
+  <ul class="flex border-b host-nav">
+    <li role="presentation" class="mr-2">
+        <a id="summary"
+           class="inline-block py-2 px-4 text-blue-600 border-b-2 font-semibold{{ ' border-blue-500' if active_page == 'summary' else '' }}"
+           href="{{ url_for('host.host', ip=ip) }}">Summary</a>
     </li>
-    <li role="presentation" class="nav-item">
-        <a id="history" class="nav-link{{ ' active' if active_page == 'history' }}" href="{{ url_for('host.host_history', ip=ip) }}">History <span class="badge badge-dark">{{ info.history }}</span></a>
+    <li role="presentation" class="mr-2">
+        <a id="history"
+           class="inline-block py-2 px-4 text-blue-600 border-b-2 font-semibold{{ ' border-blue-500' if active_page == 'history' else '' }}"
+           href="{{ url_for('host.host_history', ip=ip) }}">History <span class="bg-gray-800 text-white text-xs font-semibold rounded-full px-2 py-1">{{ info.history }}</span></a>
     </li>
-    <li role="presentation" class="nav-item">
-        <a id="headshots" class="nav-link{{ ' active' if active_page == 'screenshots' }}" href="{{ url_for('host.host_screenshots', ip=ip) }}">Screenshots {% if info.screenshot_count > 0%}<span class="badge badge-dark">{{ info.screenshot_count }}</span>{% endif %}</a>
+    <li role="presentation" class="mr-2">
+        <a id="headshots"
+           class="inline-block py-2 px-4 text-blue-600 border-b-2 font-semibold{{ ' border-blue-500' if active_page == 'screenshots' else '' }}"
+           href="{{ url_for('host.host_screenshots', ip=ip) }}">Screenshots {% if info.screenshot_count > 0 %}<span class="bg-gray-800 text-white text-xs font-semibold rounded-full px-2 py-1">{{ info.screenshot_count }}</span>{% endif %}</a>
     </li>
   </ul>
 </div>

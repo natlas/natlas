@@ -3,36 +3,37 @@
 {% set active_page = "config" %}
 {% block content %}
   {% include 'admin/_header.html' %}
-  <div class="alert alert-info" role="alert">
-    These values are readonly and declared in the server configuration. To change a value, adjust the server configuration and restart the server.
+
+  <!-- Informational Alert -->
+  <div class="bg-blue-100 border border-blue-500 text-blue-700 px-4 py-3 rounded mb-6" role="alert">
+    <p class="text-sm">
+      These values are read‑only and declared in the server configuration.
+      To change a value, adjust the server configuration and restart the server.
+    </p>
   </div>
-   <div class="row">
-    <div class="col">
-    <form class="form config-form" action="#" method="post">
-        <fieldset disabled="disabled">
-        <h3>General Settings</h3>
-        {{ configForm.hidden_tag() }}
-        <div class="form-check">
-            {{ configForm.login_required(checked=configItems["LOGIN_REQUIRED"], class="form-check-input", id="loginRequired") }}
-            {{ configForm.login_required.label(class="form-check-label", for="loginRequired") }}
+
+  <!-- Configuration Card -->
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow rounded-lg p-6">
+      <h3 class="text-2xl font-bold mb-6">General Settings</h3>
+      <div class="space-y-4">
+        <div class="flex items-center">
+          <div class="w-48 font-medium text-gray-700">Login Required:</div>
+          <div class="text-gray-900">{{ configItems["LOGIN_REQUIRED"] }}</div>
         </div>
-        <div class="form-check">
-            {{ configForm.register_allowed(checked=configItems["REGISTER_ALLOWED"], class="form-check-input", id="registerAllowed") }}
-            {{ configForm.register_allowed.label(class="form-check-label", for="registerAllowed") }}
+        <div class="flex items-center">
+          <div class="w-48 font-medium text-gray-700">Register Allowed:</div>
+          <div class="text-gray-900">{{ configItems["REGISTER_ALLOWED"] }}</div>
         </div>
-        <div class="form-check">
-            {{ configForm.agent_authentication(checked=configItems["AGENT_AUTHENTICATION"], class="form-check-input", id="agentAuthentication") }}
-            {{ configForm.agent_authentication.label(class="form-check-label", for="agentAuthentication") }}
+        <div class="flex items-center">
+          <div class="w-48 font-medium text-gray-700">Agent Authentication:</div>
+          <div class="text-gray-900">{{ configItems["AGENT_AUTHENTICATION"] }}</div>
         </div>
-        <div class="form-group">
-            {{ configForm.custom_brand.label(class="control-label") }}
-            {{ configForm.custom_brand(value=configItems["CUSTOM_BRAND"], class="form-control", placeholder=configItems["CUSTOM_BRAND"]) }}
+        <div class="flex items-center">
+          <div class="w-48 font-medium text-gray-700">Custom Brand:</div>
+          <div class="text-gray-900">{{ configItems["CUSTOM_BRAND"] }}</div>
         </div>
-        {{ configForm.submit(class="btn btn-primary") }}
-    </fieldset>
-    </form>
+      </div>
     </div>
-    <div class="col">
-    </div>
-</div>
+  </div>
 {% endblock %}
