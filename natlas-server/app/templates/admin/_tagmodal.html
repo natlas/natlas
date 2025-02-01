@@ -5,12 +5,9 @@
        scopetarget: '',
        action: '',
        submitTagForm() {
-         // Use $el.querySelector() as a fallback in case the x-ref isn't set yet
-         const form = this.$refs.tagForm || this.$el.querySelector('#tagScopeForm');
+         const form = this.$refs.tagForm;
          if (form) {
            form.submit();
-         } else {
-           console.error('Tag form not found');
          }
        }
      }"
@@ -30,19 +27,21 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <!-- Use x-ref instead of ref -->
-    <form x-ref="tagForm" method="POST" action="{{ url_for('admin.scope') }}" id="tagScopeForm" class="flex flex-col" novalidate>
+    <!-- Bind the form's action based on the current mode -->
+    <form x-ref="tagForm" method="POST"
+          x-bind:action="action === 'add' ? `/admin/scope/${scopeid}/tag` : `/admin/scope/${scopeid}/untag`"
+          id="tagScopeForm" class="flex flex-col" novalidate>
       <div class="p-4">
         {{ addTagForm.hidden_tag() }}
         {{ addTagForm.tagname(class="mt-1 block w-full p-2 border border-gray-300 rounded", placeholder="Enter tag") }}
         <input type="hidden" name="scopeid" :value="scopeid">
+        <!-- You can also include a hidden field for action if your endpoint needs it -->
         <input type="hidden" name="action" :value="action">
       </div>
       <div class="flex justify-end border-t px-4 py-2 space-x-2">
         <button type="button" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded" @click="open = false">
           Cancel
         </button>
-        <!-- Changed type to "button" and added @click to trigger our custom submit -->
         <button type="button" id="tagScopeSubmit" @click="submitTagForm"
                 class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
           <span x-text="action === 'add' ? 'Add Tag' : 'Remove Tag'"></span>
