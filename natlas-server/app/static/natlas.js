@@ -2,10 +2,9 @@ import './util/error-tracking';
 import $ from 'jquery';
 import { isNewerVersionAvailable } from './util/version-check';
 import { initializeStatusUpdates } from './util/system-status';
-import { registerTagModalEvents } from './controls/natlas-tagging';
 import 'natlas.scss';
-import './dataTables.js';
-import './dataTables.tailwindcss.js';
+import './vendor/dataTables.js';
+import './vendor/dataTables.tailwindcss.js';
 import Alpine from 'alpinejs'
 
 window.Alpine = Alpine
