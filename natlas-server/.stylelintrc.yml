@@ -1,10 +1,35 @@
 extends: stylelint-config-standard-scss
 plugins:
-    - stylelint-scss
+  - stylelint-scss
 syntax: scss
+
+ignoreFiles:
+  - "**/vendor/*.css"
+  - "**/vendor/*.js"
+
 rules:
   color-no-invalid-hex: true
-  at-rule-no-unknown: null
-  scss/at-rule-no-unknown: true
+  at-rule-no-unknown: [true,
+    {
+      ignoreAtRules: [
+        "tailwind",
+        "apply",
+        "variants",
+        "responsive",
+        "screen"
+      ]
+    }
+  ]
+  scss/at-rule-no-unknown: [true,
+    {
+      ignoreAtRules: [
+        "tailwind",
+        "apply",
+        "variants",
+        "responsive",
+        "screen"
+      ]
+    }
+  ]
   selector-class-pattern: null
   selector-id-pattern: null

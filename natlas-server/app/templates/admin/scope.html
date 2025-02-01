@@ -3,63 +3,100 @@
 {% set active_page = "scope" %}
 {% block content %}
   {% include 'admin/_header.html' %}
-   <div class="row">
-    <div class="col">
-      <h3>Add Scope</h3>
-      <form class="form-inline" action="{{url_for('admin.scope')}}" method="post">
+
+  <!-- Add Scope Form -->
+  <div class="flex flex-wrap -mx-2">
+    <div class="w-full px-2">
+      <h3 class="text-xl font-bold mb-4">Add Scope</h3>
+      <form class="flex items-center" action="{{ url_for('admin.scope') }}" method="post">
         {{ newForm.hidden_tag() }}
-        <div class="input-group">
-          {{ newForm.target(size=32, class="form-control", placeholder="E.g. 10.0.0.0/8") }}
+        <div class="flex-grow">
+          {{ newForm.target(
+            size=32,
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-300",
+            placeholder="E.g. 10.0.0.0/8"
+          ) }}
           {% for error in newForm.target.errors %}
-          <span style="color: red;">{{ error }}</span>
+            <span class="text-red-500 text-sm">{{ error }}</span>
           {% endfor %}
         </div>
-        {{ newForm.submit(class="btn btn-primary ml-3") }}
-      </form>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <h3 class="mt-3 mb-0">Manage Scope ({{ scopeSize }} hosts)</h3>
-      {%if scopeSize != effectiveScopeSize %}
-      <div class="mb-4"><small>Some addresses in scope are included in blacklisted ranges. The effective scope size is <strong>{{ effectiveScopeSize }} hosts</strong>.</small></div>
-      {% endif %}
-      <table class="table table-striped dataTable mt-4">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Target</th>
-            <th scope="col">Tags</th>
-            <th class="table-controls" scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in scope %}
-          <tr>
-            <th scope="row">{{ item.id }}</th>
-            <td>{{ item.target }}</td>
-            <td id="scopeTags-{{item.id}}">{% for tag in item.tags %}{{ tag.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
-            <td style="text-align:center;">
-              {% include 'admin/_scope_menu.html' %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <h3>Import Scope</h3>
-      <form method="POST" action="{{ url_for('admin.import_scope', scopetype='scope') }}">
-        {{ importForm.hidden_tag() }}
-        {{ importForm.scope(rows='10', cols='30') }}
-        <br />
-        {{ importForm.submit(class="btn btn-primary", id="submit-import") }}
-        <a href="{{ url_for('admin.export_scope', scopetype='scope') }}" class="btn btn-primary export-btn inline-submit ml-3" role="button">Export Scope</a>
+        <div class="ml-3">
+          {{ newForm.submit(
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring"
+          ) }}
+        </div>
       </form>
     </div>
   </div>
 
-{% include 'admin/_tagmodal.html' %}
+  <!-- Manage Scope Table -->
+  <div class="flex flex-wrap -mx-2 mt-8">
+    <div class="w-full px-2">
+      <h3 class="text-xl font-bold mb-0">Manage Scope ({{ scopeSize }} hosts)</h3>
+      {% if scopeSize != effectiveScopeSize %}
+        <div class="mb-4">
+          <small>
+            Some addresses in scope are included in blacklisted ranges. The effective scope size is
+            <strong>{{ effectiveScopeSize }} hosts</strong>.
+          </small>
+        </div>
+      {% endif %}
+      <div class="mt-4">
+        <table class="w-full divide-y divide-gray-200 dataTable">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for item in scope %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">{{ item.target }}</td>
+                <td class="px-6 py-4 whitespace-nowrap" id="scopeTags-{{ item.id }}">
+                  {% for tag in item.tags %}
+                    {{ tag.name }}{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  {% include 'admin/_scope_menu.html' %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Scope Form -->
+  <div class="flex flex-wrap -mx-2 mt-8">
+    <div class="w-full px-2">
+      <h3 class="text-xl font-bold mb-4">Import Scope</h3>
+      <form method="POST" action="{{ url_for('admin.import_scope', scopetype='scope') }}" class="space-y-4">
+        {{ importForm.hidden_tag() }}
+        <div>
+          {{ importForm.scope(
+            rows='10',
+            cols='30',
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-300"
+          ) }}
+        </div>
+        <div class="flex items-center space-x-4">
+          {{ importForm.submit(
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring",
+            id="submit-import"
+          ) }}
+          <a href="{{ url_for('admin.export_scope', scopetype='scope') }}"
+             class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded inline-block focus:outline-none focus:ring"
+             role="button">
+            Export Scope
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% include 'admin/_tagmodal.html' %}
 {% endblock %}

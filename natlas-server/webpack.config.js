@@ -10,6 +10,10 @@ const config = (env, argv) => {
     return {
         devtool: isDev ? 'eval-source-map' : 'source-map',
         entry: path.resolve(assetRootPath, 'natlas.js'),
+        watchOptions: {
+            // Ignore node_modules and output folder
+            ignored: /node_modules|static\/dist/,
+        },
         module: {
             rules: [
                 {
@@ -27,6 +31,17 @@ const config = (env, argv) => {
                     use: [
                         MiniCssExtractPlugin.loader,
                         'css-loader',
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                postcssOptions: {
+                                    plugins: [
+                                        'tailwindcss',
+                                        'autoprefixer'
+                                    ]
+                                }
+                            }
+                        },
                         'sass-loader'
                     ]
                 },

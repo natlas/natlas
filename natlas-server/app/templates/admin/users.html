@@ -3,53 +3,102 @@
 {% set active_page = "users" %}
 {% block content %}
   {% include 'admin/_header.html' %}
-  <div class="row">
-    <div class="col">
-      <h3>Invite Users</h3>
-      <form class="form-inline" action="{{url_for('admin.users')}}" method="post">
+
+  <!-- Invite Users Form -->
+  <div class="flex flex-wrap -mx-2">
+    <div class="w-full px-2">
+      <h3 class="text-xl font-bold mb-4">Invite Users</h3>
+      <form class="flex items-center" action="{{ url_for('admin.users') }}" method="post">
         {{ inviteForm.hidden_tag() }}
-        {{ inviteForm.email.label(class="sr-only", for="email")}}
-        {{ inviteForm.email(size=32, class="form-control", placeholder="user@example.com") }}
+        {{ inviteForm.email.label(class="sr-only", for="email") }}
+        {{ inviteForm.email(
+            size=32,
+            class="border border-gray-300 rounded-md px-3 py-2 w-full max-w-md",
+            placeholder="user@example.com"
+          ) }}
         {% for error in inviteForm.email.errors %}
-        <span style="color: red;">{{ error }}</span>
+          <span class="text-red-500 text-sm ml-2">{{ error }}</span>
         {% endfor %}
-        {{ inviteForm.submit(class="btn btn-primary ml-3") }}
+        <div class="ml-3">
+          {{ inviteForm.submit(
+              class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+          ) }}
+        </div>
       </form>
     </div>
   </div>
+
   {% if users %}
-  <div class="row">
-    <div class="col">
-      <h3 class="mt-3">Manage Users</h3>
-      <table class="table table-striped dataTable" id="userTable">
-        <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Email</th>
-            <th scope="col">Admin</th>
-            <th scope="col" class="table-controls"></th>
-            <th scope="col" class="table-controls"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %}
-          <tr>
-            <th scope="row">{{ user.id }}</th>
-            <td>{{ user.email }}</td>
-            <td>{{ user.is_admin }}</td>
-            <td><form method="POST" action="{{ url_for('admin.delete_user', id=user.id) }}">{{ delForm.hidden_tag() }} <button class="btn btn-danger" id="deleteUser-{{user.id}}" name="deleteUser" title="Delete User" onclick="return confirm('Are you sure you want to delete {{ user.email }}?')" type="submit"><i class="fas fa-user-slash mr-2"></i>Delete</button></form></td>
-            <td><form method="POST" action="{{ url_for('admin.toggle_user', id=user.id) }}">{{ editForm.hidden_tag() }}
-              {% if user.is_admin %}
-              <button class="btn btn-warning" id="editUser-{{user.id}}" name="editUser" title="Demote User" onclick="return confirm('Are you sure you want to demote {{ user.email }}?')" type="submit"><i class="fas fa-arrow-circle-down mr-2"></i>Demote</button>
-              {% else %}
-              <button class="btn btn-info" id="editUser-{{user.id}}" name="editUser" title="Promote User" onclick="return confirm('Are you sure you want to promote {{ user.email }}?')" type="submit" ><i class="fas fa-arrow-circle-up mr-2"></i>Promote</button>
-              {% endif %}
-            </form></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Manage Users Table -->
+    <div class="flex flex-wrap -mx-2 mt-8">
+      <div class="w-full px-2">
+        <h3 class="text-xl font-bold mb-4">Manage Users</h3>
+        <div>
+          <table class="w-full divide-y divide-gray-200 dataTable" id="userTable">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
+                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for user in users %}
+                <tr>
+                  <th scope="row" class="px-6 py-4 whitespace-nowrap">{{ user.id }}</th>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ user.email }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">{{ user.is_admin }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <form method="POST" action="{{ url_for('admin.delete_user', id=user.id) }}">
+                      {{ delForm.hidden_tag() }}
+                      <button
+                        id="deleteUser-{{ user.id }}"
+                        name="deleteUser"
+                        title="Delete User"
+                        onclick="return confirm('Are you sure you want to delete {{ user.email }}?')"
+                        type="submit"
+                        class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded inline-flex items-center"
+                      >
+                        <i class="fas fa-user-slash mr-2"></i>Delete
+                      </button>
+                    </form>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <form method="POST" action="{{ url_for('admin.toggle_user', id=user.id) }}">
+                      {{ editForm.hidden_tag() }}
+                      {% if user.is_admin %}
+                        <button
+                          id="editUser-{{ user.id }}"
+                          name="editUser"
+                          title="Demote User"
+                          onclick="return confirm('Are you sure you want to demote {{ user.email }}?')"
+                          type="submit"
+                          class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-1 px-3 rounded inline-flex items-center"
+                        >
+                          <i class="fas fa-arrow-circle-down mr-2"></i>Demote
+                        </button>
+                      {% else %}
+                        <button
+                          id="editUser-{{ user.id }}"
+                          name="editUser"
+                          title="Promote User"
+                          onclick="return confirm('Are you sure you want to promote {{ user.email }}?')"
+                          type="submit"
+                          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded inline-flex items-center"
+                        >
+                          <i class="fas fa-arrow-circle-up mr-2"></i>Promote
+                        </button>
+                      {% endif %}
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
   {% endif %}
 {% endblock %}

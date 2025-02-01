@@ -1,1 +1,24 @@
-<a id="backtotop" data-toggle="tooltip" dir="rtl" data-placement="left" title="Back To Top"><i class="fas fa-flip-horizontal fa-level-up-alt"></i><span class="sr-only">Back to top</span></a>
+<!-- Back-to-Top Button with Alpine.js -->
+<div x-data="{
+    showButton: false,
+    scrollToTop() {
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.scroll(0,0);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }"
+  x-init="window.addEventListener('scroll', () => { showButton = window.pageYOffset > 300; })"
+  x-show="showButton"
+  x-transition.opacity.duration.300ms
+  x-cloak
+  class="fixed bottom-8 right-8 z-50">
+<a href="#"
+   title="Back To Top"
+   @click.prevent="scrollToTop()"
+   class="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg">
+  <i class="fas fa-flip-horizontal fa-level-up-alt"></i>
+  <span class="sr-only">Back to top</span>
+</a>
+</div>

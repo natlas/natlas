@@ -2,25 +2,43 @@ import './util/error-tracking';
 import $ from 'jquery';
 import { isNewerVersionAvailable } from './util/version-check';
 import { initializeStatusUpdates } from './util/system-status';
-import { registerTagModalEvents } from './controls/natlas-tagging';
-import { registerAgentEvents } from './controls/user-profile';
-import { registerParticleEvents, authFormSwitcher } from './pages/login';
-import { getReducedMotion } from './util/media-queries';
 import 'natlas.scss';
-import 'bootstrap';
-import 'datatables.net-bs4';
+import './vendor/dataTables.js';
+import './vendor/dataTables.tailwindcss.js';
+import Alpine from 'alpinejs'
+
+window.Alpine = Alpine
+
+
+Alpine.start()
 
 $(function() {
     $('.expand-img').on('click', function() {
         var selectAttr = 'src';
-        if ($(this).find('img')[0].hasAttribute('data-path')) {
+        var $img = $(this).find('img');
+        if ($img.length && $img[0].hasAttribute('data-path')) {
             selectAttr = 'data-path';
         }
-        $('.imagetitle').text($(this).find('img').attr('alt'));
-        $('.imagepreview').attr('src', $(this).find('img').attr(selectAttr));
-        $('#imagemodal').modal('show');
+        $('.imagetitle').text($img.attr('alt'));
+        $('.imagepreview').attr('src', $img.attr(selectAttr));
+        $('#imagemodal').removeClass('hidden');
+    });
+
+    // Close modal when clicking the close button
+    $('#imagemodal button[data-dismiss="modal"]').on('click', function(e) {
+        e.preventDefault();
+        $('#imagemodal').addClass('hidden');
+    });
+
+    // Close modal when clicking outside the modal content
+    $('#imagemodal').on('click', function(e) {
+        // If the click target is not within the modal content, close the modal.
+        if ($(e.target).closest('.modal-content').length === 0) {
+            $('#imagemodal').addClass('hidden');
+        }
     });
 });
+
 
 $(function() {
     $('.image-browser').on('click', function() {
@@ -29,20 +47,6 @@ $(function() {
         $('#imagemodal').modal('show');
     });
 });
-
-var modalContentLoaded = false;
-window.loadModalContent = function() {
-    if (modalContentLoaded) {
-        return;
-    }
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/searchmodal');
-    xhr.send();
-    xhr.onload = function() {
-        $('#searchHelpContent').html(xhr.response);
-        modalContentLoaded = true;
-    };
-};
 
 $(document).ready(function() {
     $('#checkForUpdate').click(function() {
@@ -73,28 +77,6 @@ $(document).ready(function() {
             { 'orderable': false, 'targets': 'table-controls' }
         ]
     });
-    $('[data-toggle="popover"]').popover();
-});
-
-$(document).ready(function() {
-    var btn = $('#backtotop');
-    btn.tooltip();
-    $(window).scroll(function() {
-        if ($(window).scrollTop() > 300) {
-            btn.addClass('show');
-        } else {
-            btn.removeClass('show');
-        }
-    });
-
-    btn.on('click', function(e) {
-        e.preventDefault();
-        if (getReducedMotion().matches) {
-            window.scroll(0, 0);
-        } else {
-            $('html, body').animate({scrollTop:0}, '300');
-        }
-    });
 });
 
 $(document).ready(function() {
@@ -112,8 +94,4 @@ $(document).ready(function() {
     }
 });
 
-registerTagModalEvents();
-registerAgentEvents();
 initializeStatusUpdates();
-registerParticleEvents();
-authFormSwitcher();

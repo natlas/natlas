@@ -1,36 +1,59 @@
-{% extends "base.html" %}
+{% extends "full.html" %}
 {% set title = "Login" %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-xs-12 col-sm-6">
-            <h2>Sign In</h2>
-            <form action="{{url_for('auth.login')}}" method="post">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ form.email.label(class="control-label") }}
-                    {{ form.email(size=32, placeholder="user@example.com", class="form-control") }}
-                    {% for error in form.email.errors %}
-                    <span style="color: red;">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-group">
-                    {{ form.password.label(class="control-label") }}
-                    {{ form.password(size=32, class="form-control") }}
-                    {% for error in form.password.errors %}
-                    <span style="color: red;">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-group form-check">
-                    {{ form.remember_me(class="form-check-input") }}
-                    {{ form.remember_me.label(class="form-check-label") }}
-                </div>
-                {{ form.submit(class="btn btn-primary") }}
-            </form>
-            {% if config["REGISTER_ALLOWED"] %}
-            <p class="register-link"><a href="{{ url_for('auth.register') }}">New User?</a></p>
-            {% endif %}
-            <p><a href="{{ url_for('auth.reset_password_request') }}">Forgot Your Password?</a></p>
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <img class="mx-auto h-40 w-auto" src="/static/img/natlas-logo.png" alt="Natlas">
+    {% include 'includes/messages.html' %}
+  </div>
+
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <form class="space-y-6" action="{{ url_for('auth.login') }}" method="POST">
+      {{ form.hidden_tag() }}
+      <div>
+        {{ form.email.label(class="block text-sm/6 font-medium text-gray-900") }}
+        <div class="mt-2">
+          {{ form.email(class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6") }}
         </div>
-    </div>
+        {% for error in form.email.errors %}
+          <span class="text-red-600 text-sm">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between">
+          {{ form.password.label(class="block text-sm/6 font-medium text-gray-900") }}
+          <div class="text-sm">
+            <a href="{{ url_for('auth.reset_password_request') }}" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+          </div>
+        </div>
+        <div class="mt-2">
+          {{ form.password(class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6") }}
+        </div>
+        {% for error in form.password.errors %}
+          <span class="text-red-600 text-sm">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          {{ form.remember_me(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
+          {{ form.remember_me.label(class="ml-2 block text-sm text-gray-900") }}
+        </div>
+      </div>
+
+      <div>
+        {{ form.submit(class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600") }}
+      </div>
+    </form>
+
+    {% if config["REGISTER_ALLOWED"] %}
+    <p class="mt-10 text-center text-sm/6 text-gray-500">
+      Not a member?
+      <a href="{{ url_for('auth.register') }}" class="font-semibold text-indigo-600 hover:text-indigo-500">Create an account</a>
+    </p>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
