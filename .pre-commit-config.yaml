@@ -19,7 +19,7 @@ repos:
     -   id: debug-statements
     -   id: mixed-line-ending
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v16.13.2
+    rev: v16.14.1
     hooks:
     -   id: stylelint
         additional_dependencies:
@@ -33,7 +33,7 @@ repos:
         args: [--all, --in-place]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.9.3
+    rev: v0.9.4
     hooks:
       # Run the linter.
       - id: ruff
