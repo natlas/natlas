@@ -1,3 +1,5 @@
+from sqlalchemy import ARRAY, String
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app import NatlasBase
@@ -14,7 +16,7 @@ class AgentConfig(NatlasBase, DictSerializable):
     osDetection: Mapped[bool] = mapped_column(default=True)  # Enable OS Detection (-O)
     enableScripts: Mapped[bool] = mapped_column(
         default=True
-    )  # Enable Nmap Scripting Engine (loads all AgentScripts)
+    )  # Enable Nmap Scripting Engine
     onlyOpens: Mapped[bool] = mapped_column(
         default=True
     )  # Only report open ports (--open)
@@ -38,3 +40,6 @@ class AgentConfig(NatlasBase, DictSerializable):
     osScanLimit: Mapped[bool] = mapped_column(default=True)  # --osscan-limit
     noPing: Mapped[bool] = mapped_column(default=False)  # -Pn
     udpScan: Mapped[bool] = mapped_column(default=False)  # -sSU
+    scripts: Mapped[list[str]] = mapped_column(
+        MutableList.as_mutable(ARRAY(String())), default=list
+    )

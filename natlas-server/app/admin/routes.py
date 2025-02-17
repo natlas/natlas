@@ -19,7 +19,6 @@ from app.admin import bp, forms, redirects
 from app.auth.wrappers import is_admin
 from app.models import (
     AgentConfig,
-    AgentScript,
     NatlasServices,
     ScopeItem,
     ScopeLog,
@@ -362,7 +361,6 @@ def export_services() -> Response:
 @is_admin
 def agent_config() -> str:
     agentConfig = db.session.get(AgentConfig, 1)
-    agent_scripts = db.session.scalars(select(AgentScript)).all()
     # pass the model to the form to populate
     agentForm = forms.AgentConfigForm(obj=agentConfig)
     addScriptForm = forms.AddScriptForm(prefix="add-script")
@@ -377,7 +375,7 @@ def agent_config() -> str:
     return render_template(
         "admin/agents.html",
         agentForm=agentForm,
-        scripts=agent_scripts,
+        scripts=agentConfig.scripts,
         addScriptForm=addScriptForm,
         delScriptForm=delScriptForm,
     )
@@ -390,11 +388,12 @@ def add_script() -> wzResponse:
     addScriptForm = forms.AddScriptForm(prefix="add-script")
 
     if addScriptForm.validate_on_submit():
-        newscript = AgentScript(name=addScriptForm.scriptName.data)
-        db.session.add(newscript)
+        script_name = addScriptForm.scriptName.data
+        config = db.session.get(AgentConfig, 1)
+        config.scripts.append(script_name)
+        db.session.add(config)
         db.session.commit()
-        current_app.agent_scripts = AgentScript.get_scripts_string()  # type: ignore[attr-defined]
-        flash(f"{newscript.name} successfully added to scripts.", "success")
+        flash(f"{script_name} successfully added to scripts.", "success")
     else:
         flash(
             f"{addScriptForm.scriptName.data} couldn't be added to scripts!", "danger"
@@ -410,13 +409,12 @@ def delete_script(name: str) -> wzResponse | None:
     deleteForm = forms.DeleteForm()
 
     if deleteForm.validate_on_submit():
-        delScript = db.session.scalars(
-            select(AgentScript).where(AgentScript.name == name)
-        ).first()
-        if delScript:
-            db.session.delete(delScript)
+        config = db.session.get(AgentConfig, 1)
+
+        if name in config.scripts:
+            config.scripts.remove(name)
+            db.session.add(config)
             db.session.commit()
-            current_app.agent_scripts = AgentScript.get_scripts_string()  # type: ignore[attr-defined]
             flash(f"{name} successfully deleted.", "success")
         else:
             flash(f"{name} doesn't exist!", "danger")

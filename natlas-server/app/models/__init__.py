@@ -1,6 +1,5 @@
 from app.models.agent import Agent
 from app.models.agent_config import AgentConfig
-from app.models.agent_script import AgentScript
 from app.models.natlas_services import NatlasServices
 from app.models.rescan_task import RescanTask
 from app.models.scope_item import ScopeItem
@@ -12,7 +11,6 @@ from app.models.user_invitation import UserInvitation
 __all__ = [
     "Agent",
     "AgentConfig",
-    "AgentScript",
     "NatlasServices",
     "RescanTask",
     "ScopeItem",

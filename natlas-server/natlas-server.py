@@ -3,7 +3,6 @@ from app.instrumentation import initialize_sentryio
 from app.models import (
     Agent,
     AgentConfig,
-    AgentScript,
     NatlasServices,
     RescanTask,
     ScopeItem,
@@ -35,7 +34,6 @@ def make_shell_context():  # type: ignore[no-untyped-def]
         "RescanTask": RescanTask,
         "Tag": Tag,
         "Agent": Agent,
-        "AgentScript": AgentScript,
         "UserInvitation": UserInvitation,
         "ScopeLog": ScopeLog,
     }
