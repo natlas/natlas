@@ -220,6 +220,20 @@ wheels = [
 ]
 
 [[package]]
+name = "elasticsearch-dsl"
+version = "7.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "elasticsearch" },
+    { name = "python-dateutil" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0c/7d/dcd5493c707db180c5fc71f0d69b34b590418ee4fd1b06284df552926609/elasticsearch-dsl-7.4.1.tar.gz", hash = "sha256:07ee9c87dc28cc3cae2daa19401e1e18a172174ad9e5ca67938f752e3902a1d5", size = 56722 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7a/35/5be0558cb93b69d8da5235d0f9448b8fdaccb988b60c8e18f332632d3d9b/elasticsearch_dsl-7.4.1-py2.py3-none-any.whl", hash = "sha256:97f79239a252be7c4cce554c29e64695d7ef6a4828372316a5e5ff815e7a7498", size = 64110 },
+]
+
+[[package]]
 name = "email-validator"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
@@ -577,6 +591,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "cyclicprng" },
     { name = "elasticsearch" },
+    { name = "elasticsearch-dsl" },
     { name = "email-validator" },
     { name = "flask-login" },
     { name = "flask-mail" },
@@ -613,6 +628,7 @@ dev = [
 requires-dist = [
     { name = "cyclicprng", specifier = "~=0.2" },
     { name = "elasticsearch", specifier = "~=7.17" },
+    { name = "elasticsearch-dsl", specifier = ">=7.4.1" },
     { name = "email-validator", specifier = "~=1.1" },
     { name = "flask-login", specifier = "~=0.6" },
     { name = "flask-mail", specifier = "~=0.10" },

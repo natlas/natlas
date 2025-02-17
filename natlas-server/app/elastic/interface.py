@@ -2,13 +2,32 @@ import random
 import sys
 from datetime import datetime
 
+from elasticsearch_dsl import connections
 from flask import Flask
 
 from app.elastic.client import ElasticClient
+from app.elastic.host import Host, HostHistory
 from app.elastic.indices import ElasticIndices
 
 
 class ElasticInterface:
+    app: Flask
+
+    def init_app(self, app: Flask) -> None:
+        self.app = app
+        elasticAuth = (
+            (app.config["ELASTIC_USER"], app.config["ELASTIC_PASSWORD"])
+            if app.config["ELASTIC_AUTH_ENABLE"]
+            else None
+        )
+        connections.create_connection(
+            hosts=[app.config["ELASTICSEARCH_URL"]], basic_auth=elasticAuth
+        )
+        Host.init()
+        HostHistory.init()
+
+
+class ElasticInterfaceOld:
     client: ElasticClient
     indices: ElasticIndices
 

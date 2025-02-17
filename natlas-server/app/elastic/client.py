@@ -71,9 +71,6 @@ class ElasticClient:
             raise elasticsearch.ConnectionError("Could not connect to Elasticsearch")
         return self.status
 
-    def set_auth(self, elasticUser: str, elasticPassword: str) -> None:
-        self.es.options(basic_auth=(elasticUser, elasticPassword))  # type: ignore[union-attr]
-
     def initialize_index(self, index: str, mapping: dict) -> None:  # type: ignore[type-arg]
         """
         Check each required index and make sure it exists, if it doesn't then create it

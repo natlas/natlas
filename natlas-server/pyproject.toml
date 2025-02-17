@@ -8,6 +8,7 @@ dev = [
 [project]
 dependencies = [
   "cyclicprng~=0.2",
+  "elasticsearch-dsl>=7.4.1",
   "elasticsearch~=7.17",
   "email-validator~=1.1",
   "flask-login~=0.6",
