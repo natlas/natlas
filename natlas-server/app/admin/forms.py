@@ -15,7 +15,8 @@ from wtforms import (
 from wtforms.validators import DataRequired, Email, ValidationError
 
 from app import db
-from app.models import AgentScript, ScopeItem, User
+from app.models import ScopeItem, User
+from app.models.agent_config import AgentConfig
 
 
 class ConfigForm(FlaskForm):  # type: ignore[misc]
@@ -130,11 +131,9 @@ class AddScriptForm(FlaskForm):  # type: ignore[misc]
     addScript = SubmitField("Add Script")
 
     def validate_scriptName(self, scriptName: str) -> None:
-        script = db.session.scalars(
-            select(AgentScript).where(AgentScript.name == str(scriptName))
-        ).first()
-        if script is not None:
-            raise ValidationError(f"{script.name} already exists!")
+        config = db.session.get(AgentConfig, 1)
+        if scriptName in config.scripts:
+            raise ValidationError(f"{scriptName} already exists!")
 
 
 class DeleteForm(FlaskForm):  # type: ignore[misc]

@@ -147,11 +147,11 @@
         <ul class="list-disc pl-5 mb-4">
           {% for script in scripts %}
             <li class="mb-2 flex items-center justify-between">
-              <span>{{ script.name }}</span>
-              <form method="POST" action="{{ url_for('admin.delete_script', name=script.name) }}" class="inline-block">
+              <span>{{ script }}</span>
+              <form method="POST" action="{{ url_for('admin.delete_script', name=script) }}" class="inline-block">
                 {{ delScriptForm.hidden_tag() }}
-                <button id="deleteScript-{{ loop.index }}" name="deleteScript" title='Delete Script "{{ script.name }}"'
-                  onclick="return confirm('Are you sure you want to stop running {{ script.name }}?')"
+                <button id="deleteScript-{{ loop.index }}" name="deleteScript" title='Delete Script "{{ script }}"'
+                  onclick="return confirm('Are you sure you want to stop running {{ script }}?')"
                   type="submit"
                   class="text-red-500 hover:text-red-600 inline-flex items-center"
                 >
