@@ -12,7 +12,6 @@ from sqlalchemy.orm import DeclarativeBase
 from webpack_manifest import webpack_manifest
 from werkzeug.wrappers.response import Response as wzResponse
 
-from app.config_loader import load_config_from_db
 from app.elastic import ElasticInterface
 from app.instrumentation import initialize_opentelemetry
 from app.scope import ScopeManager
@@ -90,7 +89,6 @@ def create_app(config_class=config.Config, migrating=False):  # type: ignore[no-
     )
 
     with app.app_context():
-        load_config_from_db(app, db)
         scope_manager.load_all_groups()
 
     register_converters(app)

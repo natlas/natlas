@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 from app import db, elastic
 from app.models import AgentConfig, NatlasServices, ScopeItem
-from app.models.agent_script import AgentScript
 
 
 def get_target_tags(target: str) -> list[str]:
@@ -65,15 +64,14 @@ def prepare_work(reason: str, target: str) -> AgentWork:
     config = db.session.get(AgentConfig, 1)
     if not config:
         raise RuntimeError("We have no agent config! What happened?!")
-
+    config_dict = config.as_dict()
+    config_dict.update(scripts=",".join(config.scripts))
     return AgentWork(
         scan_reason=reason,
         target=target,
         tags=get_target_tags(target),
         type="nmap",
-        agent_config=AgentConfigSerializer(
-            **config.as_dict(), scripts=AgentScript.get_scripts_string()
-        ),
+        agent_config=AgentConfigSerializer.model_validate(config_dict),
         services_hash=services.sha256,
         scan_id=get_unique_scan_id(),
         status=200,
