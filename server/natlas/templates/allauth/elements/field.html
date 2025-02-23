@@ -1,0 +1,36 @@
+{% load allauth %}
+{{ attrs.errors }}
+
+<div class="mb-4">
+    {% if attrs.type == "textarea" %}
+        <label for="{{ attrs.id }}" class="block text-sm font-medium text-gray-700">
+            {% slot label %}{% endslot %}
+        </label>
+        <textarea
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            {% if attrs.required %}required{% endif %}
+            {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+            {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+            {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+            {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}>
+            {% slot value %}{% endslot %}
+        </textarea>
+
+    {% else %}
+        <label for="{{ attrs.id }}" class="block text-sm font-medium text-gray-700">
+            {% slot label %}{% endslot %}
+        </label>
+        <input
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            {% if attrs.required %}required{% endif %}
+            {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+            {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+            {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+            {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
+            type="{{ attrs.type }}">
+    {% endif %}
+
+    {% if attrs.errors %}
+        <p class="mt-2 text-sm text-red-600">{{ attrs.errors }}</p>
+    {% endif %}
+</div>

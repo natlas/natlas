@@ -73,6 +73,14 @@ services:
       timeout: 5s
       retries: 5
 
+  maildev:
+    image: maildev/maildev:latest
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:1080:1080
+    networks:
+      - backend
+
   zipkin:
     image: openzipkin/zipkin-slim:3.1.0
     ports:
@@ -102,10 +110,12 @@ services:
     working_dir: /app
 
   server:
-    build: natlas-server
-    command: flask run --host 0.0.0.0
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    command: python3 manage.py runserver 0.0.0.0:8000
     ports:
-      - 5000:5000
+      - 127.0.0.1:8000:8000
     networks:
       - backend
     environment:
@@ -123,7 +133,7 @@ services:
       - DB_AUTO_UPGRADE=True
     env_file: .env
     volumes:
-      - ./natlas-server:/server
+      - ./server:/server
       - html_assets:/server/static/dist
     links:
       - elastic
@@ -137,6 +147,8 @@ services:
       postgres:
         condition: service_healthy
       webpack:
+        condition: service_started
+      maildev:
         condition: service_started
 
 

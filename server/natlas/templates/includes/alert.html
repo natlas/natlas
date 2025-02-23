@@ -1,0 +1,6 @@
+<div x-data="{ show: true }" x-show="show" x-transition class="flex items-center justify-between p-4 mb-4 text-sm rounded-lg {{ alert_class }}" role="alert">
+    <span>{{ message }}</span>
+    <button type="button" class="ml-3 text-xl leading-none" @click="show = false" aria-label="Close">
+        &times;
+    </button>
+</div>

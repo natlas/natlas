@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block body %}
+  <body class="h-full">
+        <main class="py-10">
+          <div class="px-4 sm:px-6 lg:px-8">
+            {% include 'includes/messages.html' %}
+            {% block content %}
+            {% endblock %}
+          </div>
+        </main>
+  </body>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "account/base_manage.html" %}
+{% load allauth i18n widget_tweaks %}
+
+{% block head_title %}{% trans "Sign Out" %}{% endblock head_title %}
+
+{% block content %}
+<div class="flex items-center justify-center px-6 py-12 sm:px-6 lg:px-8">
+  <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+
+    <!-- Logout Heading -->
+    <h1 class="text-2xl font-bold text-gray-900 text-center">{% trans "Sign Out" %}</h1>
+
+    <!-- Logout Confirmation -->
+    <p class="mt-4 text-center text-gray-600">
+        {% trans "Are you sure you want to sign out?" %}
+    </p>
+
+    <!-- Logout Form -->
+    {% url 'account_logout' as action_url %}
+    {% element form method="post" action=action_url no_visible_fields=True class="mt-6" %}
+        {% slot body %}
+            {% csrf_token %}
+            {{ redirect_field }}
+        {% endslot %}
+
+        {% slot actions %}
+            <button type="submit" class="w-full rounded-md bg-red-600 px-3 py-1.5 text-white font-semibold hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 sm:text-sm">
+                {% trans "Sign Out" %}
+            </button>
+        {% endslot %}
+    {% endelement %}
+  </div>
+</div>
+{% endblock content %}

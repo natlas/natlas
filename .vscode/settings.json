@@ -1,7 +1,7 @@
 {
     "editor.insertSpaces": true,
     "files.exclude": {
-        "natlas-agent/": true,
-        "natlas-server/": true
+        "agent/": true,
+        "server/": true
     }
 }

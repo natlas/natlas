@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block body %}
+  <body class="h-full" x-data="{ mobileSidebar: false, userMenu: false }">
+    <div>
+
+      {% include 'includes/mobile-sidebar.html' %}
+      {% include 'includes/desktop-sidebar.html' %}
+
+      <div class="lg:pl-72">
+        {% include 'includes/header.html' %}
+
+        <main class="py-10">
+          <div class="px-4 sm:px-6 lg:px-8">
+            {% include 'includes/messages.html' %}
+            {% block content %}
+            {% endblock %}
+          </div>
+        </main>
+      </div>
+    </div>
+    {% include 'includes/backtotop.html' %}
+  </body>
+{% endblock %}

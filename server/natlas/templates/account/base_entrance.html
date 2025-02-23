@@ -1,0 +1,20 @@
+{% extends 'unauthenticated.html' %}
+{% load allauth account widget_tweaks i18n static %}
+{% block content %}
+<div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+
+  <!-- Logo -->
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <img class="mx-auto h-24 w-auto" src="{% static 'img/natlas-logo.png' %}" alt="Your Company">
+    <h2 class="mt-6 text-center text-2xl font-bold text-gray-900">{% trans "Sign In" %}</h2>
+  </div>
+
+  <!-- Login Form Container -->
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+        {% block unauthenticated_content %}
+        {% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}

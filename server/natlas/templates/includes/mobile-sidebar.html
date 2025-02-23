@@ -1,0 +1,104 @@
+{% load static %}
+<!-- Mobile Off-canvas Sidebar (shown on small screens) -->
+<div x-show="mobileSidebar" class="relative z-50 lg:hidden" role="dialog" aria-modal="true">
+    <!-- Off-canvas backdrop -->
+    <div class="fixed inset-0 bg-gray-900/80" aria-hidden="true" x-show="mobileSidebar" x-transition.opacity></div>
+    <div class="fixed inset-0 flex">
+        <!-- Off-canvas menu container with slide-in transition -->
+        <div class="relative mr-16 flex w-full max-w-xs flex-1"
+             x-show="mobileSidebar"
+             x-transition:enter="transition ease-in-out duration-300 transform"
+             x-transition:enter-start="-translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in-out duration-300 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="-translate-x-full">
+            <!-- Close button -->
+            <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
+                <button type="button" class="-m-2.5 p-2.5" @click="mobileSidebar = false">
+                    <span class="sr-only">Close sidebar</span>
+                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Sidebar content -->
+            <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
+                <div class="flex h-16 shrink-0 items-center">
+                    <a href="#" title="Natlas Home">
+                        <img class="h-8 w-auto" src="{% static 'img/natlas-logo.png' %}" alt="Natlas Globe">
+                    </a>
+                    {% if NATLAS.BRAND %}
+                        <span class="ml-1 text-white">{{ NATLAS.BRAND }}</span>
+                    {% endif %}
+                </div>
+                <nav class="flex flex-1 flex-col">
+                    <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                        <li>
+                            <ul role="list" class="-mx-2 space-y-1">
+                                <li>
+                                    <a href="#"
+                                       class="group flex gap-x-3 rounded-md bg-gray-800 p-2 text-sm font-semibold text-white">
+                                        Browse
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                       class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                        Screenshots
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                       class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                        Status
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                       class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                        Random
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <div class="text-xs font-semibold text-gray-400">Account</div>
+                            <ul role="list" class="-mx-2 mt-2 space-y-1">
+                                {% if not user.is_authenticated %}
+                                    <li>
+                                        <a href="#"
+                                           class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                            Login
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    {% if user.is_admin %}
+                                        <li>
+                                            <a href="#"
+                                               class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                                Admin
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <a href="#"
+                                           class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                            Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#"
+                                           class="group flex gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white">
+                                            Logout
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
