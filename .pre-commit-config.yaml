@@ -6,7 +6,7 @@ default_stages:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
     -   id: check-yaml
     -   id: end-of-file-fixer
@@ -19,7 +19,7 @@ repos:
     -   id: debug-statements
     -   id: mixed-line-ending
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v16.14.1
+    rev: v17.4.0
     hooks:
     -   id: stylelint
         additional_dependencies:
@@ -27,13 +27,13 @@ repos:
             - 'stylelint-config-standard-scss'
             - 'stylelint-scss'
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2
+    rev: v0.24.3
     hooks:
       - id: toml-sort
         args: [--all, --in-place]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.9.9
+    rev: v0.15.4
     hooks:
       # Run the linter.
       - id: ruff
