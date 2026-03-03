@@ -12,9 +12,9 @@
     <form class="space-y-6" action="{{ url_for('auth.login') }}" method="POST">
       {{ form.hidden_tag() }}
       <div>
-        {{ form.email.label(class="block text-sm/6 font-medium text-gray-900") }}
+       {{ form.email.label(class="block text-sm/6 font-medium text-gray-900") }}
         <div class="mt-2">
-          {{ form.email(class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6") }}
+          {{ form.email(class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-offset-1 border-solid border-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6") }}
         </div>
         {% for error in form.email.errors %}
           <span class="text-red-600 text-sm">{{ error }}</span>
@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="mt-2">
-          {{ form.password(class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6") }}
+          {{ form.password(class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-offset-1 border-solid border-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6") }}
         </div>
         {% for error in form.password.errors %}
           <span class="text-red-600 text-sm">{{ error }}</span>

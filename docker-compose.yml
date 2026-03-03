@@ -120,6 +120,7 @@ services:
       - FLASK_ENV=development
       - SECRET_KEY=im-a-really-long-secret-please-dont-share-me
       - SERVER_NAME=localhost:5001
+      - TEMPLATES_AUTO_RELOAD=True
       - ELASTICSEARCH_URL=http://elastic:9200
       - ELASTIC_AUTH_ENABLE=True
       - ELASTIC_USER=elastic

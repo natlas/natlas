@@ -30,6 +30,8 @@ class Config(BaseSettings):
     SERVER_NAME: str = Field(default="localhost:5000")
     SECRET_KEY: str = Field(default=secrets.token_urlsafe(64))
     PREFERRED_URL_SCHEME: str = Field(default="https")
+    FLASK_ENV: str = Field(default="production")
+    TEMPLATES_AUTO_RELOAD: bool = Field(default=False)
 
     # We should replace SQLALCHEMY_DATABASE_URI with specific params for the database configuration
     # The URI is kinda clunky and requires exposing the password in the same variable as the host and database name
