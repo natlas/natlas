@@ -25,11 +25,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -u elastic:natlas-dev-password-do-not-use -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'"
-        ]
+      test: [ "CMD-SHELL", "curl -u elastic:natlas-dev-password-do-not-use -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'" ]
       interval: 5s
       timeout: 10s
       retries: 24
@@ -38,8 +34,8 @@ services:
     image: minio/minio:latest
     container_name: minio
     ports:
-      - "9000:9000"         # S3 API
-      - "9001:9001"         # MinIO Console
+      - "9000:9000" # S3 API
+      - "9001:9001" # MinIO Console
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: natlas-dev-password-do-not-use
@@ -49,7 +45,7 @@ services:
       - backend
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -68,10 +64,21 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  maildev:
+    image: maildev/maildev:latest
+    ports:
+      - "1080:1080" # Web UI
+      - "1025:1025" # SMTP
+    environment:
+      - MAILDEV_INCOMING_USER=natlas
+      - MAILDEV_INCOMING_PASS=natlas-dev-password-do-not-use
+    networks:
+      - backend
 
   zipkin:
     image: openzipkin/zipkin-slim:3.1.0
@@ -103,12 +110,16 @@ services:
 
   server:
     build: natlas-server
-    command: flask run --host 0.0.0.0
+    command: flask run --host 0.0.0.0 --port 5001
     ports:
-      - 5000:5000
+      - 5001:5001 # MacOS > Monterey binds AirPlayReceiver to 5000
     networks:
       - backend
     environment:
+      # REMINDER: THIS IS DEVELOPMENT ONLY! YOU WILL GET PWNED IF YOU USE THIS CONFIG IN PRODUCTION.
+      - FLASK_ENV=development
+      - SECRET_KEY=im-a-really-long-secret-please-dont-share-me
+      - SERVER_NAME=localhost:5001
       - ELASTICSEARCH_URL=http://elastic:9200
       - ELASTIC_AUTH_ENABLE=True
       - ELASTIC_USER=elastic
@@ -117,11 +128,17 @@ services:
       - S3_ENDPOINT=minio:9000
       - S3_USE_TLS=0
       - S3_BUCKET=natlas-screenshots
-      - FLASK_ENV=development
+      - S3_ACCESS_KEY=minio # doesn't matter, minio doesn't care about FOSS anymore and needs to be replaced
+      - S3_SECRET_KEY=natlas-dev-password-do-not-use # doesn't matter, minio doesn't care about FOSS anymore and needs to be replaced
       - OTEL_ENABLE=False
       - OTEL_COLLECTOR=otel:4317
       - DB_AUTO_UPGRADE=True
-    env_file: .env
+      - MAIL_SERVER=maildev
+      - MAIL_PORT=1025
+      - MAIL_USE_TLS=False
+      - MAIL_USERNAME=natlas
+      - MAIL_PASSWORD=natlas-dev-password-do-not-use
+      - MAIL_FROM=noreply@natlas.test
     volumes:
       - ./natlas-server:/server
       - html_assets:/server/static/dist
@@ -138,19 +155,20 @@ services:
         condition: service_healthy
       webpack:
         condition: service_started
-
+      maildev:
+        condition: service_healthy
 
   agent:
     build: natlas-agent
     networks:
       - backend
     environment:
-      - NATLAS_SERVER_ADDRESS=http://server:5000
+      - NATLAS_SERVER_ADDRESS=http://server:5001
       - NATLAS_SCAN_LOCAL=true
     cap_add:
       - NET_ADMIN
-    security_opt:
-      - seccomp=./natlas-agent/chrome.json
+    # security_opt:
+    #   - seccomp=./natlas-agent/chrome.json
     volumes:
       - ./natlas-agent:/agent
     links:
@@ -158,6 +176,7 @@ services:
 
 networks:
   backend:
+
 
 volumes:
   elastic:

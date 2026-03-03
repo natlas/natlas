@@ -102,6 +102,11 @@
             "args": null
         },
         {
+            "name": "close_range",
+            "action": "SCMP_ACT_ALLOW",
+            "args": null
+        },
+        {
             "name": "connect",
             "action": "SCMP_ACT_ALLOW",
             "args": null
@@ -833,6 +838,11 @@
         },
         {
             "name": "openat",
+            "action": "SCMP_ACT_ALLOW",
+            "args": null
+        },
+        {
+            "name": "openat2",
             "action": "SCMP_ACT_ALLOW",
             "args": null
         },

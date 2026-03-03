@@ -7,6 +7,7 @@ Create Date: 2025-01-17 08:24:56.988416
 """
 
 import sqlalchemy as sa
+from sqlalchemy.sql import table, column
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -46,6 +47,7 @@ def upgrade():
         batch_op.alter_column("hostTimeout", existing_type=sa.INTEGER(), nullable=False)
         batch_op.alter_column("osScanLimit", existing_type=sa.BOOLEAN(), nullable=False)
         batch_op.alter_column("noPing", existing_type=sa.BOOLEAN(), nullable=False)
+        batch_op.execute("UPDATE agent_config SET \"udpScan\" = false WHERE \"udpScan\" IS NULL")
         batch_op.alter_column("udpScan", existing_type=sa.BOOLEAN(), nullable=False)
 
     with op.batch_alter_table("natlas_services", schema=None) as batch_op:
