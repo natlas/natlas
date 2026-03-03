@@ -46,13 +46,13 @@ $muted: #6c757d;
     }
 }
 
-@media (prefers-color-scheme: light) {
-    @include light-mode;
-}
+// @media (prefers-color-scheme: light) {
+//     @include light-mode;
+// }
 
-@media (prefers-color-scheme: dark) {
-    @include dark-mode;
-}
+// @media (prefers-color-scheme: dark) {
+//     @include dark-mode;
+// }
 
 .natlas-pink {
     color: $natlas-pink;
