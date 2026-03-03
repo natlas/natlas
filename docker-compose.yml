@@ -166,6 +166,7 @@ services:
     environment:
       - NATLAS_SERVER_ADDRESS=http://server:5001
       - NATLAS_SCAN_LOCAL=true
+    env_file: natlas-agent/.env
     cap_add:
       - NET_ADMIN
     # security_opt:
