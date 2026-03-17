@@ -38,7 +38,7 @@ def command_builder(
     }
 
     for k, _v in agentConfig.items():
-        if agentConfig[k] and k in commandDict:
+        if _v and k in commandDict:
             command.append(commandDict[k].format(**agentConfig))
     if ipaddress.ip_network(target).version == 6:
         command.append("-6")
